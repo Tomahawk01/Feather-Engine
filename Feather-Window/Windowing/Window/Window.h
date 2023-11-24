@@ -38,7 +38,6 @@ namespace Feather {
 		std::string m_Title;
 		int m_Width, m_Height, m_XPos, m_YPos;
 		Uint32 m_WindowFlags;
-
 	private:
 		void CreateNewWindow(Uint32 flags);
 	};

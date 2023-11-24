@@ -16,7 +16,8 @@ project "Feather-Editor"
         "%{wks.location}/Feather-Window",
         "%{wks.location}/vendor/SDL/include",
         "%{wks.location}/vendor/Glad/src/include",
-        "%{wks.location}/vendor/SOIL/include"
+        "%{wks.location}/vendor/SOIL/include",
+        "%{wks.location}/vendor/glm"
     }
 
     libdirs
