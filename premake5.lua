@@ -21,6 +21,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "vendor/Glad/Build-Glad.lua"
+    include "vendor/SOIL/Build-SOIL.lua"
 group ""
 
 include "Feather-Editor/Build-Editor.lua"

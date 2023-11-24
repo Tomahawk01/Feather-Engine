@@ -15,7 +15,8 @@ project "Feather-Editor"
         "%{wks.location}/Feather-Utilities",
         "%{wks.location}/Feather-Window",
         "%{wks.location}/vendor/SDL/include",
-        "%{wks.location}/vendor/Glad/src/include"
+        "%{wks.location}/vendor/Glad/src/include",
+        "%{wks.location}/vendor/SOIL/include"
     }
 
     libdirs
@@ -28,6 +29,7 @@ project "Feather-Editor"
         "Feather-Utilities",
         "Feather-Window",
         "Glad",
+        "SOIL",
         "SDL2.lib",
         "opengl32.lib"
     }

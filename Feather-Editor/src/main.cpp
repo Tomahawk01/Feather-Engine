@@ -3,8 +3,52 @@
 #include <Windowing/Window/Window.h>
 #include <SDL.h>
 #include <glad/glad.h>
+#include <SOIL/SOIL.h>
 
 #include <iostream>
+
+bool LoadTexture(const std::string& filepath, int& width, int& height, bool blended)
+{
+	int channels = 0;
+	unsigned char* image = SOIL_load_image(filepath.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
+
+	if (!image)
+	{
+		std::cout << "Failed to load image '" << filepath << "' - " << SOIL_last_result();
+		return false;
+	}
+
+	GLint format = GL_RGBA;
+	switch (channels)
+	{
+	case 3:
+		format = GL_RGB;
+		break;
+	case 4:
+		format = GL_RGBA;
+		break;
+	}
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	if (!blended)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
+
+	SOIL_free_image_data(image);
+
+	return true;
+}
 
 int main()
 {
@@ -74,11 +118,31 @@ int main()
 	}
 
 	// TODO: temporary
+	// Load Texture
+	GLuint texID;
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	int width{ 0 }, height{ 0 };
+	if (!LoadTexture("assets/textures/Gem.png", width, height, false))
+	{
+		std::cout << "Failed to load the texture!\n";
+		return -1;
+	}
+
+	//float vertices[] = {
+	//	-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,	// 0	last 2 is texture uvs
+	//	 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,	// 1
+	//	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,	// 2
+	//	-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,	// 3
+	//};
+
+	// Flipped tex coords
 	float vertices[] = {
-		-0.5f,  0.5f, 0.0f,	// 0
-		 0.5f,  0.5f, 0.0f,	// 1
-		 0.5f, -0.5f, 0.0f,	// 2
-		-0.5f, -0.5f, 0.0f,	// 3
+		-0.5f,  0.5f, 0.0f, 0.0f, 0.0f,	// 0	last 2 is texture uvs
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f,	// 1
+		 0.5f, -0.5f, 0.0f, 1.0f, 1.0f,	// 2
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f,	// 3
 	};
 
 	GLuint indices[] = {	// 2	1
@@ -90,9 +154,12 @@ int main()
 	const char* vertexSource =
 		"#version 450 core\n"
 		"layout (location = 0) in vec3 in_Position;\n"
+		"layout (location = 1) in vec2 in_TexCoords;\n"
+		"out vec2 FragUVs;\n"
 		"void main()\n"
 		"{\n"
 		"	gl_Position = vec4(in_Position, 1.0);\n"
+		"	FragUVs = in_TexCoords;\n"
 		"}";
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -113,10 +180,13 @@ int main()
 	// Create FRAGMENT Shader
 	const char* fragmentSource =
 		"#version 450 core\n"
-		"layout (location = 0) out vec4 out_Color;\n"
+		"in vec2 FragUVs;\n"
+		"out vec4 out_Color;\n"
+		"uniform sampler2D u_Texture;\n"
 		"void main()\n"
 		"{\n"
-		"	out_Color = vec4(0.2, 0.2, 0.8, 1.0);\n"
+		//"	out_Color = vec4(0.2, 0.2, 0.8, 1.0);\n"
+		"	out_Color = texture(u_Texture, FragUVs);\n"
 		"}";
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -173,8 +243,11 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(sizeof(float) * 3));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 	
@@ -209,6 +282,9 @@ int main()
 
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texID);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
