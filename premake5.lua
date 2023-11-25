@@ -24,7 +24,5 @@ group "Dependencies"
     include "vendor/SOIL/Build-SOIL.lua"
 group ""
 
+include "Feather-Core/Build-Core.lua"
 include "Feather-Editor/Build-Editor.lua"
-include "Feather-Utilities/Build-Utilities.lua"
-include "Feather-Window/Build-Window.lua"
-include "Feather-Renderer/Build-Renderer.lua"

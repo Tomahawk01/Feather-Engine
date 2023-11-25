@@ -1,4 +1,4 @@
-project "Feather-Utilities"
+project "Feather-Core"
     kind "StaticLib"
     language "C++"
     cppdialect "C++20"
@@ -10,9 +10,18 @@ project "Feather-Utilities"
         "**.cpp"
     }
 
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS"
+    }
+
     includedirs
     {
-        "%{wks.location}/vendor/SDL/include"
+        "src",
+        "%{wks.location}/vendor/Glad/src/include",
+        "%{wks.location}/vendor/SOIL/include",
+        "%{wks.location}/vendor/SDL/include",
+        "%{wks.location}/vendor/glm"
     }
 
     libdirs
@@ -22,6 +31,8 @@ project "Feather-Utilities"
 
     links
     {
+        "Glad",
+        "SOIL",
         "SDL2.lib"
     }
 

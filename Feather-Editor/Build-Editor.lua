@@ -12,9 +12,7 @@ project "Feather-Editor"
 
     includedirs
     {
-        "%{wks.location}/Feather-Utilities",
-        "%{wks.location}/Feather-Window",
-        "%{wks.location}/Feather-Renderer",
+        "%{wks.location}/Feather-Core/src",
         "%{wks.location}/vendor/SDL/include",
         "%{wks.location}/vendor/Glad/src/include",
         "%{wks.location}/vendor/SOIL/include",
@@ -28,9 +26,7 @@ project "Feather-Editor"
 
     links
     {
-        "Feather-Utilities",
-        "Feather-Window",
-        "Feather-Renderer",
+        "Feather-Core",
         "Glad",
         "SOIL",
         "SDL2.lib",
