@@ -1,6 +1,6 @@
 #include "ShaderLoader.h"
+#include "Logger/Logger.h"
 
-#include <iostream>
 #include <fstream>
 
 namespace Feather {
@@ -27,7 +27,7 @@ namespace Feather {
         
         if (!LinkShaders(program, vertex, fragment))
         {
-            std::cout << "Failed to link shaders!\n";
+            F_ERROR("Failed to link shaders!");
             return 0;
         }
 
@@ -42,7 +42,7 @@ namespace Feather {
 
         if (ifs.fail())
         {
-            std::cout << "Shader '" << filepath << "' failed to open\n";
+            F_ERROR("Shader '{0}' failed to open", filepath);
             return 0;
         }
 
@@ -61,7 +61,7 @@ namespace Feather {
 
         if (!CompileSuccess(shaderID))
         {
-            std::cout << "Failed to compile shader '" << filepath << "'\n";
+            F_ERROR("Failed to compile shader '{0}'", filepath);
             return 0;
         }
 
@@ -82,7 +82,7 @@ namespace Feather {
 
             glGetShaderInfoLog(shader, maxLength, &maxLength, errorLog.data());
 
-            std::cout << "Shader compilation failed: " << std::string{ errorLog } << "\n";
+            F_ERROR("Shader compilation failed: {0}", std::string{ errorLog });
 
             glDeleteShader(shader);
             return false;
@@ -105,7 +105,7 @@ namespace Feather {
 
             glGetProgramInfoLog(program, maxLength, &maxLength, errorLog.data());
 
-            std::cout << "Shader program failed to link: " << std::string{ errorLog } << "\n";
+            F_ERROR("Shader program failed to link: {0}", std::string{ errorLog });
             return false;
         }
 

@@ -1,11 +1,10 @@
 #include "SDL_Wrappers.h"
-
-#include <iostream>
+#include "Logger/Logger.h"
 
 void Feather::SDL_Destroyer::operator()(SDL_Window* window) const
 {
 	SDL_DestroyWindow(window);
-	std::cout << "SDL Window Destroyed!\n";
+	F_INFO("SDL Window Destroyed!");
 }
 
 void Feather::SDL_Destroyer::operator()(SDL_GameController* controller) const

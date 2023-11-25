@@ -1,6 +1,5 @@
 #include "Window.h"
-
-#include <iostream>
+#include "Logger/Logger.h"
 
 namespace Feather {
 
@@ -13,9 +12,9 @@ namespace Feather {
 		if (v_sync)
 		{
 			if (!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1"))
-				std::cout << "Failed to enable V-Sync!\n";
+				F_ERROR("Failed to enable V-Sync!");
 		}
-		std::cout << "Window Created Successfully\n";
+		F_INFO("Window created successfully!");
 	}
 
 	Window::~Window()
@@ -35,7 +34,7 @@ namespace Feather {
 		if (!m_pWindow)
 		{
 			std::string error = SDL_GetError();
-			std::cout << "Failed to create the Window: " << error << "\n";
+			F_FATAL("Failed to create the Window: {0}", error);
 		}
 	}
 

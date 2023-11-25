@@ -2,15 +2,13 @@
 
 #include <Windowing/Window/Window.h>
 #include <Renderer/Essentials/ShaderLoader.h>
+#include <Renderer/Essentials/TextureLoader.h>
 #include <Logger/Logger.h>
 
 #include <SDL.h>
 #include <glad/glad.h>
-#include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include <iostream>
 
 class Camera2D
 {
@@ -63,49 +61,6 @@ struct UVs
 	{}
 };
 
-bool LoadTexture(const std::string& filepath, int& width, int& height, bool blended)
-{
-	int channels = 0;
-	stbi_uc* image = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
-
-	if (!image)
-	{
-		std::cout << "Failed to load image '" << filepath << "'\n";
-		return false;
-	}
-
-	GLint format = GL_RGBA;
-	switch (channels)
-	{
-	case 3:
-		format = GL_RGB;
-		break;
-	case 4:
-		format = GL_RGBA;
-		break;
-	}
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	if (!blended)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	}
-	else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	}
-
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
-
-	stbi_image_free(image);
-
-	return true;
-}
-
 int main()
 {
 	Feather::Log::Init();
@@ -116,7 +71,7 @@ int main()
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		std::string error = SDL_GetError();
-		std::cout << "Failed to initialize SDL: " << error << "\n";
+		F_ERROR("Failed to initialize SDL! {0}", error);
 		running = false;
 		return -1;
 	}
@@ -125,7 +80,7 @@ int main()
 	if (SDL_GL_LoadLibrary(NULL) != 0)
 	{
 		std::string error = SDL_GetError();
-		std::cout << "Failed to load OpenGL library: " << error << "\n";
+		F_ERROR("Failed to load OpenGL library! {0}", error);
 		running = false;
 		return -1;
 	}
@@ -149,7 +104,7 @@ int main()
 
 	if (!window.GetWindow())
 	{
-		std::cout << "Failed to create the window!" << "\n";
+		F_ERROR("Failed to create the window!");
 		running = false;
 		return -1;
 	}
@@ -159,7 +114,7 @@ int main()
 	if (!window.GetGLContext())
 	{
 		std::string error = SDL_GetError();
-		std::cout << "Failed to create OpenGL context!" << error << "\n";
+		F_ERROR("Failed to create OpenGL context! {0}", error);
 		running = false;
 		return -1;
 	}
@@ -170,7 +125,7 @@ int main()
 	// Initialize Glad
 	if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
 	{
-		std::cout << "Failed to initialize Glad!\n";
+		F_ERROR("Failed to initialize Glad!");
 		running = false;
 		return -1;
 	}
@@ -180,23 +135,20 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// TODO: temporary
-	// Load Texture
-	GLuint texID;
-	glGenTextures(1, &texID);
-	glBindTexture(GL_TEXTURE_2D, texID);
-
-	int width{ 0 }, height{ 0 };
-	if (!LoadTexture("assets/textures/Gem.png", width, height, false))
+	auto texture = Feather::TextureLoader::Create(Feather::Texture::TextureType::PIXEL, "assets/textures/Gem.png");
+	if (!texture)
 	{
-		F_ERROR("Failed to load texture!");
+		F_ERROR("Failed to create texture!");
 		return -1;
 	}
+
+	F_TRACE("Texture loaded w:{0} h:{1}", texture->GetWidth(), texture->GetHeight());
 
 	UVs uvs{};
 	auto generateUVs = [&](float startX, float startY, float spriteWidth, float spriteHeight)
 	{
-		uvs.width = spriteWidth / width;
-		uvs.height = spriteHeight / height;
+		uvs.width = spriteWidth / texture->GetWidth();
+		uvs.height = spriteHeight / texture->GetHeight();
 		uvs.u = startX * uvs.width;
 		uvs.v = startY * uvs.height;
 	};
@@ -224,7 +176,7 @@ int main()
 	auto shader = Feather::ShaderLoader::Create("assets/shaders/basicShader.vert", "assets/shaders/basicShader.frag");
 	if (!shader)
 	{
-		std::cout << "Failed to create shader!\n";
+		F_ERROR("Failed to create shader!");
 		return -1;
 	}
 
@@ -287,7 +239,7 @@ int main()
 		shader->SetUniformMat4("u_Projection", projection);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texID);
+		glBindTexture(GL_TEXTURE_2D, texture->GetID());
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
@@ -299,6 +251,6 @@ int main()
 		shader->Disable();
 	}
 
-	std::cout << "Closing..." << std::endl;
+	F_INFO("Closing...");
 	return 0;
 }

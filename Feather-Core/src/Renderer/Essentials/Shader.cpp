@@ -1,6 +1,5 @@
 #include "Shader.h"
-
-#include <iostream>
+#include "Logger/Logger.h"
 
 namespace Feather {
 
@@ -43,7 +42,7 @@ namespace Feather {
 		GLuint location = glGetUniformLocation(m_ShaderProgramID, uniformName.c_str());
 		if (location == GL_INVALID_INDEX)
 		{
-			std::cout << "Uniform '" << uniformName << "' not found in shader!\n";
+			F_ERROR("Uniform '{0}' not found in shader!", uniformName);
 			return -1;
 		}
 
