@@ -7,7 +7,9 @@ project "Feather-Core"
     files
     {
         "**.h",
-        "**.cpp"
+        "**.cpp",
+        "%{wks.location}/vendor/stb_image/**.cpp",
+        "%{wks.location}/vendor/stb_image/**.h"
     }
 
     defines
@@ -19,8 +21,8 @@ project "Feather-Core"
     {
         "src",
         "%{wks.location}/vendor/Glad/src/include",
-        "%{wks.location}/vendor/SOIL/include",
         "%{wks.location}/vendor/SDL/include",
+        "%{wks.location}/vendor/stb_image",
         "%{wks.location}/vendor/glm",
         "%{wks.location}/vendor/spdlog-1.12.0/include"
     }
@@ -33,7 +35,6 @@ project "Feather-Core"
     links
     {
         "Glad",
-        "SOIL",
         "SDL2.lib"
     }
 

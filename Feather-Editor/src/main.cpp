@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 #include <glad/glad.h>
-#include <SOIL/SOIL.h>
+#include <stb_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -66,11 +66,11 @@ struct UVs
 bool LoadTexture(const std::string& filepath, int& width, int& height, bool blended)
 {
 	int channels = 0;
-	unsigned char* image = SOIL_load_image(filepath.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO);
+	stbi_uc* image = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
 
 	if (!image)
 	{
-		std::cout << "Failed to load image '" << filepath << "' - " << SOIL_last_result() << "\n";
+		std::cout << "Failed to load image '" << filepath << "'\n";
 		return false;
 	}
 
@@ -101,7 +101,7 @@ bool LoadTexture(const std::string& filepath, int& width, int& height, bool blen
 
 	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, image);
 
-	SOIL_free_image_data(image);
+	stbi_image_free(image);
 
 	return true;
 }
