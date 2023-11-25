@@ -21,7 +21,8 @@ project "Feather-Core"
         "%{wks.location}/vendor/Glad/src/include",
         "%{wks.location}/vendor/SOIL/include",
         "%{wks.location}/vendor/SDL/include",
-        "%{wks.location}/vendor/glm"
+        "%{wks.location}/vendor/glm",
+        "%{wks.location}/vendor/spdlog-1.12.0/include"
     }
 
     libdirs
@@ -43,15 +44,18 @@ project "Feather-Core"
         systemversion "latest"
 
     filter "configurations:Debug"
+        defines { "DEBUG" }
         runtime "Debug"
         symbols "On"
 
     filter "configurations:Release"
+        defines { "RELEASE" }
         runtime "Release"
         optimize "On"
         symbols "On"
 
     filter "configurations:Dist"
+        defines { "DIST" }
         runtime "Release"
         optimize "On"
         symbols "Off"

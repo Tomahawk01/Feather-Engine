@@ -2,6 +2,7 @@
 
 #include <Windowing/Window/Window.h>
 #include <Renderer/Essentials/ShaderLoader.h>
+#include <Logger/Logger.h>
 
 #include <SDL.h>
 #include <glad/glad.h>
@@ -69,7 +70,7 @@ bool LoadTexture(const std::string& filepath, int& width, int& height, bool blen
 
 	if (!image)
 	{
-		std::cout << "Failed to load image '" << filepath << "' - " << SOIL_last_result();
+		std::cout << "Failed to load image '" << filepath << "' - " << SOIL_last_result() << "\n";
 		return false;
 	}
 
@@ -107,6 +108,8 @@ bool LoadTexture(const std::string& filepath, int& width, int& height, bool blen
 
 int main()
 {
+	Feather::Log::Init();
+
 	bool running{ true };
 
 	// Init SDL
@@ -185,7 +188,7 @@ int main()
 	int width{ 0 }, height{ 0 };
 	if (!LoadTexture("assets/textures/Gem.png", width, height, false))
 	{
-		std::cout << "Failed to load the texture!\n";
+		F_ERROR("Failed to load texture!");
 		return -1;
 	}
 
