@@ -3,55 +3,11 @@
 #include <Windowing/Window/Window.h>
 #include <Renderer/Essentials/ShaderLoader.h>
 #include <Renderer/Essentials/TextureLoader.h>
+#include <Renderer/Core/Camera2D.h>
 #include <Logger/Logger.h>
 
 #include <SDL.h>
 #include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-class Camera2D
-{
-public:
-	Camera2D()
-		: Camera2D(640, 480)
-	{}
-
-	Camera2D(int width, int height)
-		: m_Width{ width }, m_Height{ height }, m_Scale{ 1.0f }, m_Position{ glm::vec2{0} }, m_CameraMatrix{ 1.0f }, m_OrthoProjection{ 1.0f }, m_NeedUpdate{ true }
-	{
-		m_OrthoProjection = glm::ortho(0.0f, static_cast<float>(m_Width), static_cast<float>(m_Height), 0.0f, 0.0f, 1.0f);
-	}
-
-	inline void SetScale(float scale) { m_Scale = scale; m_NeedUpdate = true; }
-
-	inline glm::mat4 GetCameraMatrix() { return m_CameraMatrix; }
-
-	void Update()
-	{
-		if (!m_NeedUpdate)
-			return;
-		
-		// Translate
-		glm::vec3 translate{ -m_Position.x, -m_Position.y, 0.0f };
-		m_CameraMatrix = glm::translate(m_OrthoProjection, translate);
-
-		// Scale
-		glm::vec3 scale{ m_Scale, m_Scale, 0.0f };
-		m_CameraMatrix *= glm::scale(glm::mat4(1.0f), scale);
-
-		m_NeedUpdate = false;
-	}
-
-private:
-	int m_Width, m_Height;
-	float m_Scale;
-
-	glm::vec2 m_Position;
-	glm::mat4 m_CameraMatrix, m_OrthoProjection;
-
-	bool m_NeedUpdate;
-};
 
 struct UVs
 {
@@ -169,7 +125,7 @@ int main()
 	};
 
 	// Camera creation
-	Camera2D camera{};
+	Feather::Camera2D camera{};
 	camera.SetScale(5.0f);
 
 	// Shader creation
