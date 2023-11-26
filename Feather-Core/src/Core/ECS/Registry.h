@@ -32,7 +32,7 @@ namespace Feather {
 	template<typename TContext>
 	inline TContext& Registry::GetContext()
 	{
-		return m_Registry->ctx().get<>(TContext);
+		return m_Registry->ctx().get<TContext>();
 	}
 
 }
