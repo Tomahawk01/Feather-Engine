@@ -3,6 +3,10 @@
 
 namespace Feather {
 
+	Shader::Shader()
+		: Shader(0, "", "")
+	{}
+
 	Shader::Shader(GLuint program, const std::string vertexPath, const std::string& fragmentPath)
 		: m_ShaderProgramID{ program }, m_VertexPath{ vertexPath }, m_FragmentPath{ fragmentPath }
 	{}

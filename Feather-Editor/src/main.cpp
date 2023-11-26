@@ -11,6 +11,7 @@
 #include <Core/ECS/Components/Identification.h>
 #include <Core/ECS/Components/SpriteComponent.h>
 #include <Core/ECS/Components/TransformComponent.h>
+#include <Core/Resources/AssetManager.h>
 
 int main()
 {
@@ -85,15 +86,23 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Temp texture
-	auto texture = Feather::TextureLoader::Create(Feather::Texture::TextureType::PIXEL, "assets/textures/Gem.png");
-	if (!texture)
+	auto assetManager = std::make_shared<Feather::AssetManager>();
+	if (!assetManager)
 	{
-		F_ERROR("Failed to create texture!");
+		F_ERROR("Failed to create the asset manager!");
 		return -1;
 	}
 
-	F_TRACE("Texture loaded w:{0} h:{1}", texture->GetWidth(), texture->GetHeight());
+	if (!assetManager->AddTexure("gem", "assets/textures/Gem.png", true))
+	{
+		F_ERROR("Failed to create and add texture!");
+		return -1;
+	}
+
+	// Temp texture
+	auto texture = assetManager->GetTexture("gem");
+
+	F_TRACE("Texture loaded w:{0} h:{1}", texture.GetWidth(), texture.GetHeight());
 
 	// Create new test entity
 	auto pRegistry = std::make_unique<Feather::Registry>();
@@ -111,7 +120,7 @@ int main()
 					.start_x = 0,
 					.start_y = 0 });
 
-	sprite.generate_uvs(texture->GetWidth(), texture->GetHeight());
+	sprite.generate_uvs(texture.GetWidth(), texture.GetHeight());
 
 	std::vector<Feather::Vertex> vertices{};
 	Feather::Vertex vTL{}, vTR{}, vBL{}, vBR{};
@@ -213,7 +222,7 @@ int main()
 		shader->SetUniformMat4("u_Projection", projection);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture->GetID());
+		glBindTexture(GL_TEXTURE_2D, texture.GetID());
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
