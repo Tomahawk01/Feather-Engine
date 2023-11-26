@@ -1,4 +1,5 @@
 #define SDL_MAIN_HANDLED 1;
+#define NIMINMAX // include in premake?
 
 #include <Windowing/Window/Window.h>
 #include <Renderer/Essentials/ShaderLoader.h>
@@ -7,12 +8,35 @@
 #include <Renderer/Core/Camera2D.h>
 #include <Logger/Logger.h>
 
+#include <entt.hpp>
+
 struct UVs
 {
-	float u, v, width, height;
-	UVs()
-		: u{ 0.0f }, v{ 0.0f }, width{ 0.0f }, height{ 0.0f }
-	{}
+	float u{ 0.0f }, v{ 0.0f }, uv_width{ 0.0f }, uv_height{ 0.0f };
+};
+
+struct TransformComponent
+{
+	glm::vec2 position{ glm::vec2{0.0f} }, scale{ glm::vec2 {1.0f} };
+	float rotation{ 0.0f };
+};
+
+struct SpriteComponent
+{
+	float width{ 0.0f }, height{ 0.0f };
+	UVs uvs{ .u = 0.0f, .v = 0.0f, .uv_width = 0.0f, .uv_height = 0.0f };
+
+	Feather::Color color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+	int start_x{ 0 }, start_y{ 0 };
+
+	void generate_uvs(int textureWidth, int textureHeight)
+	{
+		uvs.uv_width = width / textureWidth;
+		uvs.uv_height = height / textureHeight;
+
+		uvs.u = start_x * uvs.uv_width;
+		uvs.v = start_y * uvs.uv_height;
+	}
 };
 
 int main()
@@ -87,7 +111,16 @@ int main()
 	// Enable alpha blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
+	// Create registry
+	auto pRegistry = std::make_unique<entt::registry>();
+	if (!pRegistry)
+	{
+		F_ERROR("Failed to create entt registry!");
+		return -1;
+	}
+
+	// Temp texture
 	auto texture = Feather::TextureLoader::Create(Feather::Texture::TextureType::PIXEL, "assets/textures/Gem.png");
 	if (!texture)
 	{
@@ -95,38 +128,44 @@ int main()
 		return -1;
 	}
 
+	// Temp UVs
+	UVs uVs{};
 	F_TRACE("Texture loaded w:{0} h:{1}", texture->GetWidth(), texture->GetHeight());
 
-	UVs uVs{};
-	auto generateUVs = [&](float startX, float startY, float spriteWidth, float spriteHeight)
-	{
-		uVs.width = spriteWidth / texture->GetWidth();
-		uVs.height = spriteHeight / texture->GetHeight();
-		uVs.u = startX * uVs.width;
-		uVs.v = startY * uVs.height;
-	};
+	// Create new test entity
+	auto ent1 = pRegistry->create();
+	auto& transform = pRegistry->emplace<TransformComponent>(ent1, TransformComponent{
+					.position = glm::vec2{10.0f, 10.0f},
+					.scale = glm::vec2{1.0f, 1.0f},
+					.rotation = 0.0f });
+	auto& sprite = pRegistry->emplace<SpriteComponent>(ent1, SpriteComponent{
+					.width = 32.0f,
+					.height = 32.0f,
+					.color = Feather::Color{.r = 0, .g = 255, .b = 0, .a = 255},
+					.start_x = 0,
+					.start_y = 0 });
 
-	generateUVs(0, 0, 32, 32);
+	sprite.generate_uvs(texture->GetWidth(), texture->GetHeight());
 
 	std::vector<Feather::Vertex> vertices{};
 	Feather::Vertex vTL{}, vTR{}, vBL{}, vBR{};
 
-	vTL.position = glm::vec2{ 10.0f, 26.0f };
-	vTL.uvs = glm::vec2{ uVs.u, (uVs.v + uVs.height) };
+	vTL.position = glm::vec2{ transform.position.x, transform.position.y + sprite.height };
+	vTL.uvs = glm::vec2{ sprite.uvs.u, sprite.uvs.v + sprite.uvs.uv_height };
 
-	vTR.position = glm::vec2{ 10.0f, 10.0f };
-	vTR.uvs = glm::vec2{ uVs.u, uVs.v, };
+	vTR.position = glm::vec2{ transform.position.x + sprite.width, transform.position.y + sprite.height };
+	vTR.uvs = glm::vec2{ sprite.uvs.u + sprite.uvs.uv_width, sprite.uvs.v + sprite.uvs.uv_height };
 
-	vBL.position = glm::vec2{ 26.0f, 10.0f };
-	vBL.uvs = glm::vec2{ (uVs.u + uVs.width), uVs.v };
+	vBL.position = glm::vec2{ transform.position.x, transform.position.y };
+	vBL.uvs = glm::vec2{ sprite.uvs.u, sprite.uvs.v };
 
-	vBR.position = glm::vec2{ 26.0f, 26.0f };
-	vBR.uvs = glm::vec2{ (uVs.u + uVs.width), (uVs.v + uVs.height) };
+	vBR.position = glm::vec2{ transform.position.x + sprite.width, transform.position.y };
+	vBR.uvs = glm::vec2{ sprite.uvs.u + sprite.uvs.uv_width, sprite.uvs.v };
 
 	vertices.push_back(vTL);
-	vertices.push_back(vTR);
 	vertices.push_back(vBL);
 	vertices.push_back(vBR);
+	vertices.push_back(vTR);
 
 	GLuint indices[] = {	// 2	1
 		0, 1, 2,			//

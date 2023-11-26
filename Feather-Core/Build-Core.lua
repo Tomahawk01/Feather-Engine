@@ -24,7 +24,8 @@ project "Feather-Core"
         "%{wks.location}/vendor/SDL/include",
         "%{wks.location}/vendor/stb_image",
         "%{wks.location}/vendor/glm",
-        "%{wks.location}/vendor/spdlog-1.12.0/include"
+        "%{wks.location}/vendor/spdlog-1.12.0/include",
+        "%{wks.location}/vendor/entt/include"
     }
 
     libdirs
