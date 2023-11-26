@@ -3,11 +3,9 @@
 #include <Windowing/Window/Window.h>
 #include <Renderer/Essentials/ShaderLoader.h>
 #include <Renderer/Essentials/TextureLoader.h>
+#include <Renderer/Essentials/Vertex.h>
 #include <Renderer/Core/Camera2D.h>
 #include <Logger/Logger.h>
-
-#include <SDL.h>
-#include <glad/glad.h>
 
 struct UVs
 {
@@ -89,8 +87,7 @@ int main()
 	// Enable alpha blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// TODO: temporary
+	
 	auto texture = Feather::TextureLoader::Create(Feather::Texture::TextureType::PIXEL, "assets/textures/Gem.png");
 	if (!texture)
 	{
@@ -100,24 +97,36 @@ int main()
 
 	F_TRACE("Texture loaded w:{0} h:{1}", texture->GetWidth(), texture->GetHeight());
 
-	UVs uvs{};
+	UVs uVs{};
 	auto generateUVs = [&](float startX, float startY, float spriteWidth, float spriteHeight)
 	{
-		uvs.width = spriteWidth / texture->GetWidth();
-		uvs.height = spriteHeight / texture->GetHeight();
-		uvs.u = startX * uvs.width;
-		uvs.v = startY * uvs.height;
+		uVs.width = spriteWidth / texture->GetWidth();
+		uVs.height = spriteHeight / texture->GetHeight();
+		uVs.u = startX * uVs.width;
+		uVs.v = startY * uVs.height;
 	};
 
 	generateUVs(0, 0, 32, 32);
 
-	// Flipped tex coords
-	float vertices[] = {
-		0.0f,  32.0f, 0.0f, uvs.u, (uvs.v + uvs.height),				// 0	last 2 is texture uvs
-		0.0f,  0.0f,  0.0f, uvs.u, uvs.v,								// 1
-		32.0f, 0.0f,  0.0f, (uvs.u + uvs.width), uvs.v,					// 2
-		32.0f, 32.0f, 0.0f, (uvs.u + uvs.width), (uvs.v + uvs.height)	// 3
-	};
+	std::vector<Feather::Vertex> vertices{};
+	Feather::Vertex vTL{}, vTR{}, vBL{}, vBR{};
+
+	vTL.position = glm::vec2{ 10.0f, 26.0f };
+	vTL.uvs = glm::vec2{ uVs.u, (uVs.v + uVs.height) };
+
+	vTR.position = glm::vec2{ 10.0f, 10.0f };
+	vTR.uvs = glm::vec2{ uVs.u, uVs.v, };
+
+	vBL.position = glm::vec2{ 26.0f, 10.0f };
+	vBL.uvs = glm::vec2{ (uVs.u + uVs.width), uVs.v };
+
+	vBR.position = glm::vec2{ 26.0f, 26.0f };
+	vBR.uvs = glm::vec2{ (uVs.u + uVs.width), (uVs.v + uVs.height) };
+
+	vertices.push_back(vTL);
+	vertices.push_back(vTR);
+	vertices.push_back(vBL);
+	vertices.push_back(vBR);
 
 	GLuint indices[] = {	// 2	1
 		0, 1, 2,			//
@@ -145,21 +154,22 @@ int main()
 	// Bind them
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) * 3 * sizeof(float), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Feather::Vertex), vertices.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Feather::Vertex), (void*)offsetof(Feather::Vertex, position));
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(sizeof(float) * 3));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Feather::Vertex), (void*)offsetof(Feather::Vertex, uvs));
 	glEnableVertexAttribArray(1);
 
+	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Feather::Vertex), (void*)offsetof(Feather::Vertex, color));
+	glEnableVertexAttribArray(2);
+
 	glBindVertexArray(0);
-	
-	// TODO: temporary end
 
 	SDL_Event event{};
 
