@@ -18,12 +18,15 @@ project "Feather-Editor"
         "%{wks.location}/vendor/Glad/src/include",
         "%{wks.location}/vendor/glm",
         "%{wks.location}/vendor/spdlog-1.12.0/include",
-        "%{wks.location}/vendor/entt/include"
+        "%{wks.location}/vendor/entt/include",
+        "%{wks.location}/vendor/lua_53/include",
+        "%{wks.location}/vendor/sol3"
     }
 
     libdirs
     {
-        "%{wks.location}/vendor/SDL/lib"
+        "%{wks.location}/vendor/SDL/lib",
+        "%{wks.location}/vendor/lua_53/lib"
     }
 
     links
@@ -31,7 +34,8 @@ project "Feather-Editor"
         "Feather-Core",
         "Glad",
         "SDL2.lib",
-        "opengl32.lib"
+        "opengl32.lib",
+        "lua53.lib"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")

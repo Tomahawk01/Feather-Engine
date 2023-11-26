@@ -10,6 +10,7 @@
 #include <Core/ECS/Components/SpriteComponent.h>
 #include <Core/ECS/Components/TransformComponent.h>
 #include <Core/Resources/AssetManager.h>
+#include <Core/Systems/ScriptingSystem.h>
 
 namespace Feather {
 
@@ -170,6 +171,46 @@ namespace Feather {
 			2, 3, 0				// 3	0
 		};
 
+		// Create Lua state
+		auto lua = std::make_shared<sol::state>();
+		if (!lua)
+		{
+			F_FATAL("Failed to create Lua state!");
+			return false;
+		}
+
+		lua->open_libraries(sol::lib::base,
+							sol::lib::math,
+							sol::lib::os,
+							sol::lib::table,
+							sol::lib::io,
+							sol::lib::string);
+
+		if (!m_Registry->AddToContext<std::shared_ptr<sol::state>>(lua))
+		{
+			F_FATAL("Failed to add the sol::state to the registry context!");
+			return false;
+		}
+
+		auto scriptSystem = std::make_shared<Feather::ScriptingSystem>(*m_Registry);
+		if (!scriptSystem)
+		{
+			F_FATAL("Failed to create script system!");
+			return false;
+		}
+
+		if (!scriptSystem->LoadMainScript(*lua))
+		{
+			F_FATAL("Failed to load main lua script");
+			return false;
+		}
+
+		if (!m_Registry->AddToContext<std::shared_ptr<Feather::ScriptingSystem>>(scriptSystem))
+		{
+			F_FATAL("Failed to add the script system to the registry context!");
+			return false;
+		}
+
 		// Camera creation
 		auto camera = std::make_shared<Feather::Camera2D>();
 		camera->SetScale(5.0f);
@@ -264,6 +305,9 @@ namespace Feather {
 		}
 
 		camera->Update();
+
+		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
+		scriptSystem->Update();
     }
 
     void Application::Render()
@@ -282,7 +326,7 @@ namespace Feather {
 
 		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		shader.Enable();
@@ -293,6 +337,9 @@ namespace Feather {
 		glActiveTexture(GL_TEXTURE0);
 		const auto& texture = assetManager->GetTexture("gem");
 		glBindTexture(GL_TEXTURE_2D, texture.GetID());
+
+		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
+		scriptSystem->Render();
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 

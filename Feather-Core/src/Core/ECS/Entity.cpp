@@ -17,4 +17,15 @@ namespace Feather {
 									 .entity_id = static_cast<int32_t>(m_Entity)});
 	}
 
+	Entity::Entity(Registry& registry, const entt::entity& entity)
+		: m_Registry(registry), m_Entity(entity), m_Name{ "" }, m_Group{ "" }
+	{
+		if (HasComponent<Identification>())
+		{
+			auto id = GetComponent<Identification>();
+			m_Name = id.name;
+			m_Group = id.group;
+		}
+	}
+
 }

@@ -8,6 +8,7 @@ project "Feather-Core"
     {
         "**.h",
         "**.cpp",
+        "**.inl",
         "%{wks.location}/vendor/stb_image/**.cpp",
         "%{wks.location}/vendor/stb_image/**.h"
     }
@@ -25,18 +26,22 @@ project "Feather-Core"
         "%{wks.location}/vendor/stb_image",
         "%{wks.location}/vendor/glm",
         "%{wks.location}/vendor/spdlog-1.12.0/include",
-        "%{wks.location}/vendor/entt/include"
+        "%{wks.location}/vendor/entt/include",
+        "%{wks.location}/vendor/lua_53/include",
+        "%{wks.location}/vendor/sol3"
     }
 
     libdirs
     {
-        "%{wks.location}/vendor/SDL/lib"
+        "%{wks.location}/vendor/SDL/lib",
+        "%{wks.location}/vendor/lua_53/lib"
     }
 
     links
     {
         "Glad",
-        "SDL2.lib"
+        "SDL2.lib",
+        "lua53.lib"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
