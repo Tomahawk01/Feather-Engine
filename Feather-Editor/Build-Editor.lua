@@ -54,10 +54,8 @@ project "Feather-Editor"
         defines { "RELEASE" }
         runtime "Release"
         optimize "On"
-        symbols "On"
 
     filter "configurations:Dist"
         defines { "DIST" }
         runtime "Release"
         optimize "On"
-        symbols "Off"

@@ -8,3 +8,6 @@
 # Binaries
 **/bin/
 bin-int/
+
+# Feather files
+*.log
