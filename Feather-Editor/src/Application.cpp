@@ -11,6 +11,7 @@
 #include <Core/ECS/Components/TransformComponent.h>
 #include <Core/Resources/AssetManager.h>
 #include <Core/Systems/ScriptingSystem.h>
+#include <Core/Systems/RenderSystem.h>
 
 namespace Feather {
 
@@ -132,44 +133,21 @@ namespace Feather {
 
 		auto& transform = entity1.AddComponent<Feather::TransformComponent>(Feather::TransformComponent{
 						.position = glm::vec2{10.0f, 10.0f},
-						.scale = glm::vec2{1.0f, 1.0f},
+						.scale = glm::vec2{4.0f, 4.0f},
 						.rotation = 0.0f });
 		auto& sprite = entity1.AddComponent<Feather::SpriteComponent>(Feather::SpriteComponent{
 						.width = 32.0f,
 						.height = 32.0f,
 						.color = Feather::Color{.r = 0, .g = 255, .b = 0, .a = 255},
 						.start_x = 0,
-						.start_y = 0 });
+						.start_y = 0,
+						.layer = 0,
+						.texture_name = "gem"});
 
 		sprite.generate_uvs(texture.GetWidth(), texture.GetHeight());
 
-		std::vector<Feather::Vertex> vertices{};
-		Feather::Vertex vTL{}, vTR{}, vBL{}, vBR{};
-
-		vTL.position = glm::vec2{ transform.position.x, transform.position.y + sprite.height };
-		vTL.uvs = glm::vec2{ sprite.uvs.u, sprite.uvs.v + sprite.uvs.uv_height };
-
-		vTR.position = glm::vec2{ transform.position.x + sprite.width, transform.position.y + sprite.height };
-		vTR.uvs = glm::vec2{ sprite.uvs.u + sprite.uvs.uv_width, sprite.uvs.v + sprite.uvs.uv_height };
-
-		vBL.position = glm::vec2{ transform.position.x, transform.position.y };
-		vBL.uvs = glm::vec2{ sprite.uvs.u, sprite.uvs.v };
-
-		vBR.position = glm::vec2{ transform.position.x + sprite.width, transform.position.y };
-		vBR.uvs = glm::vec2{ sprite.uvs.u + sprite.uvs.uv_width, sprite.uvs.v };
-
-		vertices.push_back(vTL);
-		vertices.push_back(vBL);
-		vertices.push_back(vBR);
-		vertices.push_back(vTR);
-
 		auto& id = entity1.GetComponent<Feather::Identification>();
 		F_INFO("Name: {0}, Group: {1}, ID: {2}", id.name, id.group, id.entity_id);
-
-		GLuint indices[] = {	// 2	1
-			0, 1, 2,			//
-			2, 3, 0				// 3	0
-		};
 
 		// Create Lua state
 		auto lua = std::make_shared<sol::state>();
@@ -211,9 +189,21 @@ namespace Feather {
 			return false;
 		}
 
+		auto renderSystem = std::make_shared<Feather::RenderSystem>(*m_Registry);
+		if (!renderSystem)
+		{
+			F_FATAL("Failed to create render system!");
+			return false;
+		}
+
+		if (!m_Registry->AddToContext<std::shared_ptr<Feather::RenderSystem>>(renderSystem))
+		{
+			F_FATAL("Failed to add the render system to the registry context!");
+			return false;
+		}
+
 		// Camera creation
 		auto camera = std::make_shared<Feather::Camera2D>();
-		camera->SetScale(5.0f);
 
 		if (!m_Registry->AddToContext<std::shared_ptr<Feather::AssetManager>>(assetManager))
 		{
@@ -233,29 +223,7 @@ namespace Feather {
 			return false;
 		}
 
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-
-		// Bind them
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Feather::Vertex), vertices.data(), GL_STATIC_DRAW);
-
-		glGenBuffers(1, &IBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), indices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Feather::Vertex), (void*)offsetof(Feather::Vertex, position));
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Feather::Vertex), (void*)offsetof(Feather::Vertex, uvs));
-		glEnableVertexAttribArray(1);
-
-		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Feather::Vertex), (void*)offsetof(Feather::Vertex, color));
-		glEnableVertexAttribArray(2);
-
-		glBindVertexArray(0);
+		return true;
     }
 
     bool Application::LoadShaders()
@@ -308,46 +276,50 @@ namespace Feather {
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
 		scriptSystem->Update();
+
+		auto view = m_Registry->GetRegistry().view<Feather::TransformComponent, Feather::SpriteComponent>();
+		static float rotation{ 0.0f };
+		static float x_pos{ 10.0f };
+		static bool move_right{ true };
+
+		if (rotation >= 360.0f)
+			rotation = 0.0f;
+
+		if (move_right && x_pos < 300.0f)
+			x_pos += 3;
+		else if (move_right && x_pos >= 300.0f)
+			move_right = false;
+
+		if (!move_right && x_pos > 10.0f)
+			x_pos -= 3;
+		else if (!move_right && x_pos <= 10.0f)
+			move_right = true;
+
+		for (const auto& entity : view)
+		{
+			Feather::Entity ent{ *m_Registry, entity };
+			auto& transform = ent.GetComponent<Feather::TransformComponent>();
+			transform.rotation = rotation;
+			transform.position.x = x_pos;
+		}
+
+		rotation += move_right ? 9 : -9;
     }
 
     void Application::Render()
     {
-		auto& assetManager = m_Registry->GetContext<std::shared_ptr<Feather::AssetManager>>();
-		auto& camera = m_Registry->GetContext<std::shared_ptr<Feather::Camera2D>>();
-
-		auto& shader = assetManager->GetShader("basic");
-		auto projection = camera->GetCameraMatrix();
-
-		if (shader.ShaderProgramID() == 0)
-		{
-			F_FATAL("Shader program has not been created correctly!");
-			return;
-		}
+		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<Feather::RenderSystem>>();
 
 		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		shader.Enable();
-		glBindVertexArray(VAO);
-
-		shader.SetUniformMat4("u_Projection", projection);
-
-		glActiveTexture(GL_TEXTURE0);
-		const auto& texture = assetManager->GetTexture("gem");
-		glBindTexture(GL_TEXTURE_2D, texture.GetID());
-
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
 		scriptSystem->Render();
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-		glBindVertexArray(0);
+		renderSystem->Update();
 
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
-
-		shader.Disable();
     }
 
     void Application::CleanUp()
@@ -357,7 +329,6 @@ namespace Feather {
 
     Application::Application()
         : m_Window{ nullptr }, m_Registry{ nullptr }, m_Event{}, m_IsRunning{ true }
-        , VAO{ 0 }, VBO{ 0 }, IBO{ 0 } // TODO: temporary
     {}
 
 }

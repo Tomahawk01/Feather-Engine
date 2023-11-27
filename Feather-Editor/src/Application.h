@@ -22,8 +22,6 @@ namespace Feather {
 		SDL_Event m_Event;
 		bool m_IsRunning;
 
-		// TODO: temporary
-		GLuint VAO, VBO, IBO;
 	private:
 		bool Initialize();
 		bool LoadShaders();

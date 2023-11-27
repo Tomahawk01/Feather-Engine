@@ -15,7 +15,9 @@ namespace Feather {
 		UVs uvs{ .u = 0.0f, .v = 0.0f, .uv_width = 0.0f, .uv_height = 0.0f };
 
 		Feather::Color color{ .r = 255, .g = 255, .b = 255, .a = 255 };
-		int start_x{ 0 }, start_y{ 0 };
+		int start_x{ 0 }, start_y{ 0 }, layer{ 0 };
+
+		std::string texture_name{ "" };
 
 		void generate_uvs(int textureWidth, int textureHeight)
 		{
