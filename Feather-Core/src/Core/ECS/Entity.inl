@@ -4,15 +4,6 @@
 
 namespace Feather {
 
-	template<typename TComponent>
-	inline void Entity::RegisterMetaComponent()
-	{
-		using namespace entt::literals;
-		entt::meta<TComponent>()
-			.type(entt::type_hash<TComponent>::value())
-			.template func<&add_component<TComponent>>("add_component"_hs);
-	}
-
 	template <typename TComponent, typename ...Args>
 	TComponent& Entity::AddComponent(Args&& ...args)
 	{
@@ -45,7 +36,7 @@ namespace Feather {
 	}
 
 	template <typename TComponent>
-	void Entity::RemoveComponent()
+	auto Entity::RemoveComponent()
 	{
 		auto& registry = m_Registry.GetRegistry();
 		return registry.remove<TComponent>(m_Entity);
@@ -58,6 +49,37 @@ namespace Feather {
 			comp.valid() ? comp.as<TComponent>() : TComponent{});
 
 		return sol::make_reference(s, std::ref(component));
+	}
+
+	template<typename TComponent>
+	bool has_component(Entity& entity)
+	{
+		return entity.HasComponent<TComponent>();
+	}
+
+	template<typename TComponent>
+	auto get_component(Entity& entity, sol::this_state s)
+	{
+		auto& comp = entity.GetComponent<TComponent>();
+		return sol::make_reference(s, std::ref(comp));
+	}
+
+	template<typename TComponent>
+	auto remove_component(Entity& entity)
+	{
+		return entity.RemoveComponent<TComponent>();
+	}
+
+	template<typename TComponent>
+	inline void Entity::RegisterMetaComponent()
+	{
+		using namespace entt::literals;
+		entt::meta<TComponent>()
+			.type(entt::type_hash<TComponent>::value())
+			.template func<&add_component<TComponent>>("add_component"_hs)
+			.template func<&has_component<TComponent>>("has_component"_hs)
+			.template func<&get_component<TComponent>>("get_component"_hs)
+			.template func<&remove_component<TComponent>>("remove_component"_hs);
 	}
 
 }

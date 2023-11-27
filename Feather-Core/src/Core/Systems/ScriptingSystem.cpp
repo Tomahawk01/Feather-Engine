@@ -106,12 +106,16 @@ namespace Feather {
 
 	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Feather::Registry& registry)
 	{
+		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);
 		TransformComponent::CreateLuaTransformBind(lua);
 		SpriteComponent::CreateSpriteLuaBind(lua, registry);
 
 		Entity::RegisterMetaComponent<TransformComponent>();
 		Entity::RegisterMetaComponent<SpriteComponent>();
+
+		Registry::RegisterMetaComponent<TransformComponent>();
+		Registry::RegisterMetaComponent<SpriteComponent>();
 	}
 
 }

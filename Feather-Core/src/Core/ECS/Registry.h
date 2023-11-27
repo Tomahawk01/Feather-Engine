@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entt.hpp>
+#include <sol/sol.hpp>
 
 namespace Feather {
 	
@@ -19,20 +20,21 @@ namespace Feather {
 		template <typename TContext>
 		TContext& GetContext();
 
+		static void CreateLuaRegistryBind(sol::state& lua, Registry& registry);
+
+		template <typename TComponent>
+		static void RegisterMetaComponent();
+
 	private:
 		std::unique_ptr<entt::registry> m_Registry;
 	};
 
-	template<typename TContext>
-	inline TContext Registry::AddToContext(TContext context)
-	{
-		return m_Registry->ctx().emplace<TContext>(context);
-	}
+	template <typename TComponent>
+	entt::runtime_view& add_component_to_view(Registry* registry, entt::runtime_view& view);
 
-	template<typename TContext>
-	inline TContext& Registry::GetContext()
-	{
-		return m_Registry->ctx().get<TContext>();
-	}
+	template <typename TComponent>
+	entt::runtime_view& exclude_component_from_view(Registry* registry, entt::runtime_view& view);
 
 }
+
+#include "Registry.inl"
