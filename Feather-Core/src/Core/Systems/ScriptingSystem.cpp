@@ -1,10 +1,11 @@
 #include "ScriptingSystem.h"
 
-#include <Logger/Logger.h>
+#include "Logger/Logger.h"
 #include "Core/ECS/Components/ScriptComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/ECS/Components/SpriteComponent.h"
 #include "Core/ECS/Entity.h"
+#include "Core/Scripting/GlmLuaBindings.h"
 
 namespace Feather {
 
@@ -44,8 +45,8 @@ namespace Feather {
 		sol::table render_script = main_lua[2];
 		sol::function render = render_script["render"];
 
-		Feather::Entity mainLuaScript{ m_Registry, "main_script", "" };
-		mainLuaScript.AddComponent<Feather::ScriptComponent>(Feather::ScriptComponent{
+		Entity mainLuaScript{ m_Registry, "main_script", "" };
+		mainLuaScript.AddComponent<ScriptComponent>(ScriptComponent{
 					.update = update,
 					.render = render });
 
@@ -62,14 +63,14 @@ namespace Feather {
 			return;
 		}
 
-		auto view = m_Registry.GetRegistry().view<Feather::ScriptComponent>();
+		auto view = m_Registry.GetRegistry().view<ScriptComponent>();
 		for (const auto& entity : view)
 		{
-			Feather::Entity ent{ m_Registry, entity };
+			Entity ent{ m_Registry, entity };
 			if (ent.GetName() != "main_script")
 				continue;
 			
-			auto& script = ent.GetComponent<Feather::ScriptComponent>();
+			auto& script = ent.GetComponent<ScriptComponent>();
 			auto error = script.update(entity);
 			if (!error.valid())
 			{
@@ -87,14 +88,14 @@ namespace Feather {
 			return;
 		}
 
-		auto view = m_Registry.GetRegistry().view<Feather::ScriptComponent>();
+		auto view = m_Registry.GetRegistry().view<ScriptComponent>();
 		for (const auto& entity : view)
 		{
-			Feather::Entity ent{ m_Registry, entity };
+			Entity ent{ m_Registry, entity };
 			if (ent.GetName() != "main_script")
 				continue;
 
-			auto& script = ent.GetComponent<Feather::ScriptComponent>();
+			auto& script = ent.GetComponent<ScriptComponent>();
 			auto error = script.render(entity);
 			if (!error.valid())
 			{
@@ -104,8 +105,10 @@ namespace Feather {
 		}
 	}
 
-	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Feather::Registry& registry)
+	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Registry& registry)
 	{
+		GLMBinding::CreateGLMBindings(lua);
+
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);
 		TransformComponent::CreateLuaTransformBind(lua);
