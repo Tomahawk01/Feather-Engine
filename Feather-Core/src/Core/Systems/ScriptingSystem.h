@@ -16,6 +16,8 @@ namespace Feather {
 		void Update();
 		void Render();
 
+		static void RegisterLuaBindings(sol::state& lua, Feather::Registry& registry);
+
 	private:
 		Feather::Registry& m_Registry;
 		bool m_MainLoaded;

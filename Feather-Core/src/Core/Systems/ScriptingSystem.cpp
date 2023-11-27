@@ -2,6 +2,8 @@
 
 #include <Logger/Logger.h>
 #include "Core/ECS/Components/ScriptComponent.h"
+#include "Core/ECS/Components/TransformComponent.h"
+#include "Core/ECS/Components/SpriteComponent.h"
 #include "Core/ECS/Entity.h"
 
 namespace Feather {
@@ -100,6 +102,16 @@ namespace Feather {
 				F_ERROR("Error running the Render script: {0}", err.what());
 			}
 		}
+	}
+
+	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Feather::Registry& registry)
+	{
+		Entity::CreateLuaEntityBind(lua, registry);
+		TransformComponent::CreateLuaTransformBind(lua);
+		SpriteComponent::CreateSpriteLuaBind(lua, registry);
+
+		Entity::RegisterMetaComponent<TransformComponent>();
+		Entity::RegisterMetaComponent<SpriteComponent>();
 	}
 
 }

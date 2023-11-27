@@ -1,6 +1,9 @@
 #pragma once
 
+#include <sol/sol.hpp>
+
 #include <Renderer/Essentials/Vertex.h>
+#include "Core/ECS/Registry.h"
 
 namespace Feather {
 
@@ -27,6 +30,8 @@ namespace Feather {
 			uvs.u = start_x * uvs.uv_width;
 			uvs.v = start_y * uvs.uv_height;
 		}
+
+		static void CreateSpriteLuaBind(sol::state& lua, Feather::Registry& registry);
 	};
 
 }

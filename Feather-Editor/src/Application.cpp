@@ -121,33 +121,8 @@ namespace Feather {
 			return false;
 		}
 
-		// Temp texture
-		auto texture = assetManager->GetTexture("gem");
-
-		F_TRACE("Texture loaded w:{0} h:{1}", texture.GetWidth(), texture.GetHeight());
-
 		// Create new test entity
 		m_Registry = std::make_unique<Feather::Registry>();
-
-		Feather::Entity entity1{ *m_Registry, "TestEntity1", "Test" };
-
-		auto& transform = entity1.AddComponent<Feather::TransformComponent>(Feather::TransformComponent{
-						.position = glm::vec2{10.0f, 10.0f},
-						.scale = glm::vec2{4.0f, 4.0f},
-						.rotation = 0.0f });
-		auto& sprite = entity1.AddComponent<Feather::SpriteComponent>(Feather::SpriteComponent{
-						.width = 32.0f,
-						.height = 32.0f,
-						.color = Feather::Color{.r = 0, .g = 255, .b = 0, .a = 255},
-						.start_x = 0,
-						.start_y = 0,
-						.layer = 0,
-						.texture_name = "gem"});
-
-		sprite.generate_uvs(texture.GetWidth(), texture.GetHeight());
-
-		auto& id = entity1.GetComponent<Feather::Identification>();
-		F_INFO("Name: {0}, Group: {1}, ID: {2}", id.name, id.group, id.entity_id);
 
 		// Create Lua state
 		auto lua = std::make_shared<sol::state>();
@@ -174,12 +149,6 @@ namespace Feather {
 		if (!scriptSystem)
 		{
 			F_FATAL("Failed to create script system!");
-			return false;
-		}
-
-		if (!scriptSystem->LoadMainScript(*lua))
-		{
-			F_FATAL("Failed to load main lua script");
 			return false;
 		}
 
@@ -220,6 +189,14 @@ namespace Feather {
 		if (!LoadShaders())
 		{
 			F_FATAL("Failed to load shaders!");
+			return false;
+		}
+
+		Feather::ScriptingSystem::RegisterLuaBindings(*lua, *m_Registry);
+
+		if (!scriptSystem->LoadMainScript(*lua))
+		{
+			F_FATAL("Failed to load main lua script");
 			return false;
 		}
 
@@ -276,34 +253,6 @@ namespace Feather {
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
 		scriptSystem->Update();
-
-		auto view = m_Registry->GetRegistry().view<Feather::TransformComponent, Feather::SpriteComponent>();
-		static float rotation{ 0.0f };
-		static float x_pos{ 10.0f };
-		static bool move_right{ true };
-
-		if (rotation >= 360.0f)
-			rotation = 0.0f;
-
-		if (move_right && x_pos < 300.0f)
-			x_pos += 3;
-		else if (move_right && x_pos >= 300.0f)
-			move_right = false;
-
-		if (!move_right && x_pos > 10.0f)
-			x_pos -= 3;
-		else if (!move_right && x_pos <= 10.0f)
-			move_right = true;
-
-		for (const auto& entity : view)
-		{
-			Feather::Entity ent{ *m_Registry, entity };
-			auto& transform = ent.GetComponent<Feather::TransformComponent>();
-			transform.rotation = rotation;
-			transform.position.x = x_pos;
-		}
-
-		rotation += move_right ? 9 : -9;
     }
 
     void Application::Render()

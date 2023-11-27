@@ -2,6 +2,8 @@
 
 #include "Registry.h"
 
+#include "sol/sol.hpp"
+
 namespace Feather {
 
 	class Entity
@@ -17,6 +19,11 @@ namespace Feather {
 		inline std::uint32_t Kill() { return m_Registry.GetRegistry().destroy(m_Entity); }
 		inline entt::entity& GetEntity() { return m_Entity; }
 		inline entt::registry& GetRegistry() { return m_Registry.GetRegistry(); }
+
+		static void CreateLuaEntityBind(sol::state& lua, Registry& registry);
+
+		template <typename TComponent>
+		static void RegisterMetaComponent();
 
 		template <typename TComponent, typename ...Args>
 		TComponent& AddComponent(Args&& ...args);
@@ -38,6 +45,9 @@ namespace Feather {
 		entt::entity m_Entity;
 		std::string m_Name, m_Group;
 	};
+
+	template <typename TComponent>
+	auto add_component(Entity& entity, const sol::table& comp, sol::this_state s);
 
 }
 
