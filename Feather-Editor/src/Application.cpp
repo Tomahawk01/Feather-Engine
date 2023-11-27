@@ -12,6 +12,7 @@
 #include <Core/Resources/AssetManager.h>
 #include <Core/Systems/ScriptingSystem.h>
 #include <Core/Systems/RenderSystem.h>
+#include <Core/Systems/AnimationSystem.h>
 
 namespace Feather {
 
@@ -120,6 +121,11 @@ namespace Feather {
 			F_FATAL("Failed to create and add texture!");
 			return false;
 		}
+		if (!assetManager->AddTexure("gem_animation", "assets/textures/Gem_SpriteSheet.png", true))
+		{
+			F_FATAL("Failed to create and add texture!");
+			return false;
+		}
 
 		// Create new test entity
 		m_Registry = std::make_unique<Feather::Registry>();
@@ -151,7 +157,6 @@ namespace Feather {
 			F_FATAL("Failed to create script system!");
 			return false;
 		}
-
 		if (!m_Registry->AddToContext<std::shared_ptr<Feather::ScriptingSystem>>(scriptSystem))
 		{
 			F_FATAL("Failed to add the script system to the registry context!");
@@ -164,10 +169,21 @@ namespace Feather {
 			F_FATAL("Failed to create render system!");
 			return false;
 		}
-
 		if (!m_Registry->AddToContext<std::shared_ptr<Feather::RenderSystem>>(renderSystem))
 		{
 			F_FATAL("Failed to add the render system to the registry context!");
+			return false;
+		}
+
+		auto animationSystem = std::make_shared<Feather::AnimationSystem>(*m_Registry);
+		if (!animationSystem)
+		{
+			F_FATAL("Failed to create animation system!");
+			return false;
+		}
+		if (!m_Registry->AddToContext<std::shared_ptr<Feather::AnimationSystem>>(animationSystem))
+		{
+			F_FATAL("Failed to add the animation system to the registry context!");
 			return false;
 		}
 
@@ -253,6 +269,9 @@ namespace Feather {
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
 		scriptSystem->Update();
+
+		auto& animationSystem = m_Registry->GetContext<std::shared_ptr<Feather::AnimationSystem>>();
+		animationSystem->Update();
     }
 
     void Application::Render()

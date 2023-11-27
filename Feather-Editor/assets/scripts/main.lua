@@ -3,16 +3,13 @@
 gEntity = Entity("TestEntity", "GroupTest")
 gEntity2 = Entity("Second_TestEntity", "GroupTest")
 
-local transform = gEntity:add_component(
-	Transform(vec2(100, 100), vec2(10, 10), 0)
-)
-
 gEntity2:add_component(Transform(200, 100, 10, 10, 0))
+local sprite2 = gEntity2:add_component(Sprite("gem_animation", 32.0, 32.0, 0, 0, 0))
+gEntity2:add_component(Animation(18, 10, 0, false))
+sprite2:generate_uvs()
 
-local sprite = gEntity:add_component(
-	Sprite("gem", 32.0, 32.0, 0, 0, 0)
-)
-
+local transform = gEntity:add_component(Transform(vec2(100, 100), vec2(10, 10), 0))
+local sprite = gEntity:add_component(Sprite("gem", 32.0, 32.0, 0, 0, 0))
 sprite:generate_uvs()
 
 local rotation = 0.0
