@@ -3,7 +3,7 @@
 namespace Feather {
 
     InputManager::InputManager()
-        : m_Keyboard{std::make_unique<Keyboard>()}
+        : m_Keyboard{ std::make_unique<Keyboard>() }, m_Mouse{ std::make_unique<Mouse>() }
     {}
 
 	InputManager& InputManager::GetInstance()
@@ -15,16 +15,29 @@ namespace Feather {
 	void InputManager::CreateLuaInputBindings(sol::state& lua)
 	{
         RegisterLuaKeyNames(lua);
+        RegisterLuaMouseButtonNames(lua);
 
         auto& inputManager = GetInstance();
-        auto& keyboard = inputManager.GetKeyboard();
 
+        auto& keyboard = inputManager.GetKeyboard();
         lua.new_usertype<Keyboard>(
             "Keyboard",
             sol::no_constructor,
             "just_pressed", [&](int key) { return keyboard.IsKeyJustPressed(key); },
             "just_released", [&](int key) { return keyboard.IsKeyJustReleased(key); },
             "pressed", [&](int key) { return keyboard.IsKeyPressed(key); }
+        );
+
+        auto& mouse = inputManager.GetMouse();
+        lua.new_usertype<Mouse>(
+            "Mouse",
+            sol::no_constructor,
+            "just_pressed", [&](int btn) { return mouse.IsButtonJustPressed(btn); },
+            "just_released", [&](int btn) { return mouse.IsButtonJustReleased(btn); },
+            "pressed", [&](int btn) { return mouse.IsButtonPressed(btn); },
+            "screen_position", [&]() { return mouse.GetMouseScreenPosition(); },
+            "wheel_x", [&]() { return mouse.GetMouseWheelX(); },
+            "wheel_y", [&]() { return mouse.GetMouseWheelY(); }
         );
 	}
 
@@ -109,5 +122,12 @@ namespace Feather {
         lua.set("KP_KEY_9", F_KEY_KP9);
         lua.set("KP_KEY_ENTER", F_KEY_KP_ENTER);
 	}
+
+    void InputManager::RegisterLuaMouseButtonNames(sol::state& lua)
+    {
+        lua.set("LEFT_BUTTON", F_MOUSE_LEFT);
+        lua.set("MIDDLE_BUTTON", F_MOUSE_MIDDLE);
+        lua.set("RIGHT_BUTTON", F_MOUSE_RIGHT);
+    }
 
 }

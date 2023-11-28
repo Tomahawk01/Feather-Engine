@@ -12,5 +12,3 @@ void Feather::Button::Reset()
 	JustPressed = false;
 	JustReleased = false;
 }
-
-

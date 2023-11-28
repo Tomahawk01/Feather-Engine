@@ -14,7 +14,6 @@
 #include <Core/Systems/RenderSystem.h>
 #include <Core/Systems/AnimationSystem.h>
 #include <Core/Scripting/InputManager.h>
-#include <Windowing/Input/Keyboard.h>
 
 namespace Feather {
 
@@ -242,6 +241,7 @@ namespace Feather {
     {
 		auto& inputManager = InputManager::GetInstance();
 		auto& keyboard = inputManager.GetKeyboard();
+		auto& mouse = inputManager.GetMouse();
 
 		// Process Events
 		while (SDL_PollEvent(&m_Event))
@@ -258,6 +258,19 @@ namespace Feather {
 				break;
 			case SDL_KEYUP:
 				keyboard.OnKeyReleased(m_Event.key.keysym.sym);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				mouse.OnButtonPressed(m_Event.button.button);
+				break;
+			case SDL_MOUSEBUTTONUP:
+				mouse.OnButtonReleased(m_Event.button.button);
+				break;
+			case SDL_MOUSEWHEEL:
+				mouse.SetMouseWheelX(m_Event.wheel.x);
+				mouse.SetMouseWheelY(m_Event.wheel.y);
+				break;
+			case SDL_MOUSEMOTION:
+				mouse.SetMouseMoving(true);
 				break;
 			default:
 				break;
@@ -285,6 +298,8 @@ namespace Feather {
 		auto& inputManager = InputManager::GetInstance();
 		auto& keyboard = inputManager.GetKeyboard();
 		keyboard.Update();
+		auto& mouse = inputManager.GetMouse();
+		mouse.Update();
     }
 
     void Application::Render()

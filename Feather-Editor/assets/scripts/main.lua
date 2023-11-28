@@ -75,14 +75,25 @@ main = {
 			transform.scale = vec2(scale, scale)
 			
 			if Keyboard.pressed(KEY_W) then
-				print("Key W was just pressed!")
+				print("Key 'W' pressed!")
 			elseif Keyboard.just_pressed(KEY_A) then
-				print("Key A was just pressed!")
+				print("Key 'A' just pressed!")
 			elseif Keyboard.just_pressed(KEY_S) then
-				print("Key S was just pressed!")
+				print("Key 'S' just pressed!")
 			elseif Keyboard.just_pressed(KEY_D) then
-				print("Key D was just pressed!")
+				print("Key 'D' just pressed!")
 			end
+
+			if Mouse.just_pressed(LEFT_BUTTON) then
+				print("Mouse 'Left Button' just pressed!")
+			elseif Mouse.just_pressed(MIDDLE_BUTTON) then
+				print("Mouse 'Middle Button' just pressed!")
+			elseif Mouse.just_pressed(RIGHT_BUTTON) then
+				print("Mouse 'Right Button' just pressed!")
+			end
+
+			local mouse_x, mouse_y = Mouse.screen_position()
+			print("Mouse pos '"..mouse_x..", "..mouse_y.."'")
 		end
 	},
 	[2] = {
