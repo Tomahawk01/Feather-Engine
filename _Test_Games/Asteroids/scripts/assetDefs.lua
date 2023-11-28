@@ -4,7 +4,8 @@ AssetDefs =
     {
         { name = "ship", path = "../_Test_Games/Asteroids/textures/ship.png" , pixel_art = false },
         { name = "ast_1", path = "../_Test_Games/Asteroids/textures/meteor_big.png" , pixel_art = false },
-        { name = "ast_2", path = "../_Test_Games/Asteroids/textures/meteor_small.png" , pixel_art = false }
+        { name = "ast_2", path = "../_Test_Games/Asteroids/textures/meteor_small.png" , pixel_art = false },
+        { name = "bg", path = "../_Test_Games/Asteroids/textures/background.png" , pixel_art = false }
     }
 }
 

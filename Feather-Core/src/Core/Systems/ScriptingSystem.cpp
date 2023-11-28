@@ -1,6 +1,7 @@
 #include "ScriptingSystem.h"
 
 #include "Logger/Logger.h"
+#include "Utils/Timer.h"
 #include "Core/ECS/Components/ScriptComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/ECS/Components/SpriteComponent.h"
@@ -108,11 +109,35 @@ namespace Feather {
 		}
 	}
 
+	auto create_timer = [](sol::state& lua){
+		lua.new_usertype<Timer>(
+			"Timer",
+			sol::call_constructor,
+			sol::factories([]() { return Timer{}; }),
+			"start", &Timer::Start,
+			"stop", &Timer::Stop,
+			"pause", &Timer::Pause,
+			"resume", &Timer::Resume,
+			"is_paused", &Timer::IsPaused,
+			"is_running", &Timer::IsRunning,
+			"elapsed_ms", &Timer::ElapsedMS,
+			"elapsed_sec", &Timer::ElapsedSec,
+			"restart", [](Timer& timer)
+			{
+				if (timer.IsRunning())
+					timer.Stop();
+				timer.Start();
+			}
+		);
+	};
+
 	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Registry& registry)
 	{
 		GLMBinding::CreateGLMBindings(lua);
 		InputManager::CreateLuaInputBindings(lua);
 		AssetManager::CreateLuaAssetManager(lua, registry);
+
+		create_timer(lua);
 
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);

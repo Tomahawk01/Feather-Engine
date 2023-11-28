@@ -15,7 +15,7 @@ function Ship:Create(def)
     return this
 end
 
-function Ship:UpdateShip()
+function Ship:Update()
     local ship = Entity(self.m_EntityID)
     local transform = ship:get_component(Transform)
     local sprite = ship:get_component(Sprite)
