@@ -1,5 +1,7 @@
 #include "InputManager.h"
 
+#include "Logger/Logger.h"
+
 namespace Feather {
 
     InputManager::InputManager()
@@ -16,6 +18,7 @@ namespace Feather {
 	{
         RegisterLuaKeyNames(lua);
         RegisterLuaMouseButtonNames(lua);
+        RegisterLuaGamepadButtonNames(lua);
 
         auto& inputManager = GetInstance();
 
@@ -39,7 +42,184 @@ namespace Feather {
             "wheel_x", [&]() { return mouse.GetMouseWheelX(); },
             "wheel_y", [&]() { return mouse.GetMouseWheelY(); }
         );
+
+        lua.new_usertype<Gamepad>(
+            "Gamepad",
+            sol::no_constructor,
+            "just_pressed", [&](int index, int btn)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    return false;
+                }
+                return gamepad->IsButtonJustPressed(btn);
+            },
+            "just_released", [&](int index, int btn)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    return false;
+                }
+                return gamepad->IsButtonJustReleased(btn);
+            },
+            "pressed", [&](int index, int btn)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    return false;
+                }
+                return gamepad->IsButtonPressed(btn);
+            },
+            "get_axis_position", [&](int index, int axis)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    return Sint16{ 0 };
+                }
+                return gamepad->GetAxisPosition(axis);
+            },
+            "get_hat_value", [&](int index)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    return Uint8{ 0 };
+                }
+                return gamepad->GetJoystickHatValue();
+            }
+        );
 	}
+
+    std::shared_ptr<Gamepad> InputManager::GetController(int index)
+    {
+        auto gamepadItr = m_GameControllers.find(index);
+        if (gamepadItr == m_GameControllers.end())
+        {
+            F_ERROR("Failed to get gamepad at index '{0}' - Does not exist!", index);
+            return nullptr;
+        }
+
+        return gamepadItr->second;
+    }
+
+    bool InputManager::AddGamepad(Sint32 gamepadID)
+    {
+        if (m_GameControllers.size() >= MAX_CONTROLLERS)
+        {
+            F_ERROR("Trying to add too many controllers! Max controllers allowed = {0}", MAX_CONTROLLERS);
+            return false;
+        }
+
+        std::shared_ptr<Gamepad> gamepad{ nullptr };
+        try
+        {
+            gamepad = std::make_shared<Gamepad>(
+                std::move(make_shared_controller(SDL_GameControllerOpen(gamepadID))));
+        }
+        catch (...)
+        {
+            std::string error{ SDL_GetError() };
+            F_ERROR("Failed to open gamepad device: {0}", error);
+            return false;
+        }
+
+        for (int i = 1; i <= MAX_CONTROLLERS; i++)
+        {
+            if (m_GameControllers.contains(i))
+                continue;
+
+            m_GameControllers.emplace(i, std::move(gamepad));
+            F_TRACE("Gamepad '{0}' added at index {1}", gamepadID, i);
+            return true;
+        }
+
+        F_ASSERT(false && "Failed to add the new controller!");
+        F_ERROR("Failed to add the new controller!");
+        return false;
+    }
+
+    bool InputManager::RemoveGamepad(Sint32 gamepadID)
+    {
+        auto gamepadRemoved = std::erase_if(m_GameControllers,
+            [&](auto& gamepad) { return gamepad.second->CheckJoystickID(gamepadID); }
+        );
+
+        if (gamepadRemoved > 0)
+        {
+            F_TRACE("Gamepad '{0}' removed", gamepadID);
+            return true;
+        }
+
+        F_ASSERT(false && "Failed to remove gamepad! Gamepad must not have been mapped");
+        F_ERROR("Failed to remove gamepad! Gamepad '{0}' must not have been mapped", gamepadID);
+        return false;
+    }
+
+    void InputManager::GamepadButtonPressed(const SDL_Event& event)
+    {
+        for (const auto& [index, gamepad] : m_GameControllers)
+        {
+            if (gamepad && gamepad->CheckJoystickID(event.jdevice.which))
+            {
+                gamepad->OnButtonPressed(event.cbutton.button);
+                break;
+            }
+        }
+    }
+
+    void InputManager::GamepadButtonReleased(const SDL_Event& event)
+    {
+        for (const auto& [index, gamepad] : m_GameControllers)
+        {
+            if (gamepad && gamepad->CheckJoystickID(event.jdevice.which))
+            {
+                gamepad->OnButtonReleased(event.cbutton.button);
+                break;
+            }
+        }
+    }
+
+    void InputManager::GamepadAxisValues(const SDL_Event& event)
+    {
+        for (const auto& [index, gamepad] : m_GameControllers)
+        {
+            if (gamepad && gamepad->CheckJoystickID(event.jdevice.which))
+            {
+                gamepad->SetAxisPositionValue(event.jaxis.axis, event.jaxis.value);
+                break;
+            }
+        }
+    }
+
+    void InputManager::GamepadHatValues(const SDL_Event& event)
+    {
+        for (const auto& [index, gamepad] : m_GameControllers)
+        {
+            if (gamepad && gamepad->CheckJoystickID(event.jdevice.which))
+            {
+                gamepad->SetJoystickHatValue(event.jhat.value);
+                break;
+            }
+        }
+    }
+
+    void InputManager::UpdateGamepads()
+    {
+        for (const auto& [index, gamepad] : m_GameControllers)
+        {
+            if (gamepad)
+                gamepad->Update();
+        }
+    }
 
 	void InputManager::RegisterLuaKeyNames(sol::state& lua)
 	{
@@ -128,6 +308,35 @@ namespace Feather {
         lua.set("LEFT_BUTTON", F_MOUSE_LEFT);
         lua.set("MIDDLE_BUTTON", F_MOUSE_MIDDLE);
         lua.set("RIGHT_BUTTON", F_MOUSE_RIGHT);
+    }
+
+    void InputManager::RegisterLuaGamepadButtonNames(sol::state& lua)
+    {
+        lua.set("GP_BUTTON_A", F_GP_A);
+        lua.set("GP_BUTTON_B", F_GP_B);
+        lua.set("GP_BUTTON_X", F_GP_X);
+        lua.set("GP_BUTTON_Y", F_GP_Y);
+
+        lua.set("GP_BUTTON_BACK", F_GP_BACK);
+        lua.set("GP_BUTTON_GUIDE", F_GP_GUIDE);
+        lua.set("GP_BUTTON_START", F_GP_START);
+
+        lua.set("GP_LSTICK", F_GP_LSTICK);
+        lua.set("GP_RSTICK", F_GP_RSTICK);
+
+        lua.set("GP_LSHOULDER", F_GP_LSHOULDER);
+        lua.set("GP_RSHOULDER", F_GP_RSHOULDER);
+
+        lua.set("GP_DPAD_UP", F_GP_DPAD_UP);
+        lua.set("GP_DPAD_DOWN", F_GP_DPAD_DOWN);
+        lua.set("GP_DPAD_LEFT", F_GP_DPAD_LEFT);
+        lua.set("GP_DPAD_RIGHT", F_GP_DPAD_RIGHT);
+
+        lua.set("GP_AXIS_X1", 0); lua.set("GP_AXIS_Y1", 1);
+        lua.set("GP_AXIS_X2", 2); lua.set("GP_AXIS_Y2", 3);
+
+        // NOTE: bottom triggers
+        lua.set("GP_AXIS_Z1", 4); lua.set("GP_AXIS_Z2", 5);
     }
 
 }

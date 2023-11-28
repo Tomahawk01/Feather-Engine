@@ -74,26 +74,20 @@ main = {
 
 			transform.scale = vec2(scale, scale)
 			
-			if Keyboard.pressed(KEY_W) then
-				print("Key 'W' pressed!")
-			elseif Keyboard.just_pressed(KEY_A) then
-				print("Key 'A' just pressed!")
-			elseif Keyboard.just_pressed(KEY_S) then
-				print("Key 'S' just pressed!")
-			elseif Keyboard.just_pressed(KEY_D) then
-				print("Key 'D' just pressed!")
-			end
+			local r_stick_LR = Gamepad.get_axis_position(1, 2)
+			print("r_stick LeftRight value: " ..r_stick_LR)
+			local r_stick_UD = Gamepad.get_axis_position(1, 3)
+			print("r_stick UpDown value: " ..r_stick_UD)
 
-			if Mouse.just_pressed(LEFT_BUTTON) then
-				print("Mouse 'Left Button' just pressed!")
-			elseif Mouse.just_pressed(MIDDLE_BUTTON) then
-				print("Mouse 'Middle Button' just pressed!")
-			elseif Mouse.just_pressed(RIGHT_BUTTON) then
-				print("Mouse 'Right Button' just pressed!")
-			end
+			local l_stick_LR = Gamepad.get_axis_position(1, 0)
+			print("l_stick LeftRight value: " ..l_stick_LR)
+			local l_stick_UD = Gamepad.get_axis_position(1, 1)
+			print("l_stick UpDown value: " ..l_stick_UD)
 
-			local mouse_x, mouse_y = Mouse.screen_position()
-			print("Mouse pos '"..mouse_x..", "..mouse_y.."'")
+			local l_trigger = Gamepad.get_axis_position(1, 4)
+			print("l_trigger value: " ..l_trigger)
+			local r_trigger = Gamepad.get_axis_position(1, 5)
+			print("r_trigger value: " ..r_trigger)
 		end
 	},
 	[2] = {

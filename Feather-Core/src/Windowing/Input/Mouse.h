@@ -3,7 +3,7 @@
 #include <map>
 
 #include "Button.h"
-#include "MouseButton.h"
+#include "MouseButtons.h"
 
 namespace Feather {
 

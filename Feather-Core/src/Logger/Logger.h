@@ -33,3 +33,5 @@ namespace Feather {
 #define F_ERROR(...) ::Feather::Log::GetLogger()->error(__VA_ARGS__)
 #define F_FATAL(...) ::Feather::Log::GetLogger()->critical(__VA_ARGS__)
 #endif
+
+#define F_ASSERT(x) assert(x)
