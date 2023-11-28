@@ -6,6 +6,8 @@
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/ECS/Components/SpriteComponent.h"
 #include "Core/ECS/Components/AnimationComponent.h"
+#include "Core/ECS/Components/BoxColliderComponent.h"
+#include "Core/ECS/Components/CircleColliderComponent.h"
 #include "Core/ECS/Entity.h"
 #include "Core/Scripting/GlmLuaBindings.h"
 #include "Core/Scripting/InputManager.h"
@@ -144,14 +146,20 @@ namespace Feather {
 		TransformComponent::CreateLuaTransformBind(lua);
 		SpriteComponent::CreateSpriteLuaBind(lua, registry);
 		AnimationComponent::CreateAnimationLuaBind(lua);
+		BoxColliderComponent::CreateLuaBoxColliderBind(lua);
+		CircleColliderComponent::CreateLuaCircleColliderBind(lua);
 
 		Entity::RegisterMetaComponent<TransformComponent>();
 		Entity::RegisterMetaComponent<SpriteComponent>();
 		Entity::RegisterMetaComponent<AnimationComponent>();
+		Entity::RegisterMetaComponent<BoxColliderComponent>();
+		Entity::RegisterMetaComponent<CircleColliderComponent>();
 
 		Registry::RegisterMetaComponent<TransformComponent>();
 		Registry::RegisterMetaComponent<SpriteComponent>();
 		Registry::RegisterMetaComponent<AnimationComponent>();
+		Registry::RegisterMetaComponent<BoxColliderComponent>();
+		Registry::RegisterMetaComponent<CircleColliderComponent>();
 	}
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua)
