@@ -52,13 +52,13 @@ ShipDefs =
             transform = 
             {
                 position = {x = 320, y = 240},
-                rotation = 0,
+                rotation = -90,
                 scale = {x = 1, y = 1}
             },
             sprite =
             {
                 asset_name = "ship",
-                width = 136, height = 84,
+                width = 84, height = 136,
                 start_x = 0, start_y = 0,
                 layer = 2
             }
