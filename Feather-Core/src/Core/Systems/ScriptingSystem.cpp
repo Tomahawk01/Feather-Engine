@@ -7,6 +7,7 @@
 #include "Core/ECS/Components/AnimationComponent.h"
 #include "Core/ECS/Entity.h"
 #include "Core/Scripting/GlmLuaBindings.h"
+#include "Core/Scripting/InputManager.h"
 
 namespace Feather {
 
@@ -109,6 +110,7 @@ namespace Feather {
 	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Registry& registry)
 	{
 		GLMBinding::CreateGLMBindings(lua);
+		InputManager::CreateLuaInputBindings(lua);
 
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);

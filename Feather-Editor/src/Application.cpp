@@ -13,6 +13,8 @@
 #include <Core/Systems/ScriptingSystem.h>
 #include <Core/Systems/RenderSystem.h>
 #include <Core/Systems/AnimationSystem.h>
+#include <Core/Scripting/InputManager.h>
+#include <Windowing/Input/Keyboard.h>
 
 namespace Feather {
 
@@ -238,6 +240,9 @@ namespace Feather {
 
     void Application::ProcessEvents()
     {
+		auto& inputManager = InputManager::GetInstance();
+		auto& keyboard = inputManager.GetKeyboard();
+
 		// Process Events
 		while (SDL_PollEvent(&m_Event))
 		{
@@ -247,8 +252,12 @@ namespace Feather {
 				m_IsRunning = false;
 				break;
 			case SDL_KEYDOWN:
-				if (m_Event.key.keysym.sym = SDLK_ESCAPE)
+				if (m_Event.key.keysym.sym == SDLK_ESCAPE)
 					m_IsRunning = false;
+				keyboard.OnKeyPressed(m_Event.key.keysym.sym);
+				break;
+			case SDL_KEYUP:
+				keyboard.OnKeyReleased(m_Event.key.keysym.sym);
 				break;
 			default:
 				break;
@@ -264,7 +273,6 @@ namespace Feather {
 			F_FATAL("Failed to get the camera from the registry context!");
 			return;
 		}
-
 		camera->Update();
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
@@ -272,6 +280,11 @@ namespace Feather {
 
 		auto& animationSystem = m_Registry->GetContext<std::shared_ptr<Feather::AnimationSystem>>();
 		animationSystem->Update();
+
+		// Updating inputs
+		auto& inputManager = InputManager::GetInstance();
+		auto& keyboard = inputManager.GetKeyboard();
+		keyboard.Update();
     }
 
     void Application::Render()
