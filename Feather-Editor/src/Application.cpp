@@ -46,7 +46,7 @@ namespace Feather {
 
     bool Application::Initialize()
     {
-		Feather::Log::Init();
+		Log::Init();
 
 		// Init SDL
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -79,7 +79,7 @@ namespace Feather {
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 		// Create the Window
-		m_Window = std::make_unique<Feather::Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL);
+		m_Window = std::make_unique<Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL);
 
 		if (!m_Window->GetWindow())
 		{
@@ -110,26 +110,14 @@ namespace Feather {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		auto assetManager = std::make_shared<Feather::AssetManager>();
+		auto assetManager = std::make_shared<AssetManager>();
 		if (!assetManager)
 		{
 			F_FATAL("Failed to create the asset manager!");
 			return false;
 		}
 
-		if (!assetManager->AddTexure("gem", "assets/textures/Gem.png", true))
-		{
-			F_FATAL("Failed to create and add texture!");
-			return false;
-		}
-		if (!assetManager->AddTexure("gem_animation", "assets/textures/Gem_SpriteSheet.png", true))
-		{
-			F_FATAL("Failed to create and add texture!");
-			return false;
-		}
-
-		// Create new test entity
-		m_Registry = std::make_unique<Feather::Registry>();
+		m_Registry = std::make_unique<Registry>();
 
 		// Create Lua state
 		auto lua = std::make_shared<sol::state>();
@@ -152,52 +140,52 @@ namespace Feather {
 			return false;
 		}
 
-		auto scriptSystem = std::make_shared<Feather::ScriptingSystem>(*m_Registry);
+		auto scriptSystem = std::make_shared<ScriptingSystem>(*m_Registry);
 		if (!scriptSystem)
 		{
 			F_FATAL("Failed to create script system!");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<Feather::ScriptingSystem>>(scriptSystem))
+		if (!m_Registry->AddToContext<std::shared_ptr<ScriptingSystem>>(scriptSystem))
 		{
 			F_FATAL("Failed to add the script system to the registry context!");
 			return false;
 		}
 
-		auto renderSystem = std::make_shared<Feather::RenderSystem>(*m_Registry);
+		auto renderSystem = std::make_shared<RenderSystem>(*m_Registry);
 		if (!renderSystem)
 		{
 			F_FATAL("Failed to create render system!");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<Feather::RenderSystem>>(renderSystem))
+		if (!m_Registry->AddToContext<std::shared_ptr<RenderSystem>>(renderSystem))
 		{
 			F_FATAL("Failed to add the render system to the registry context!");
 			return false;
 		}
 
-		auto animationSystem = std::make_shared<Feather::AnimationSystem>(*m_Registry);
+		auto animationSystem = std::make_shared<AnimationSystem>(*m_Registry);
 		if (!animationSystem)
 		{
 			F_FATAL("Failed to create animation system!");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<Feather::AnimationSystem>>(animationSystem))
+		if (!m_Registry->AddToContext<std::shared_ptr<AnimationSystem>>(animationSystem))
 		{
 			F_FATAL("Failed to add the animation system to the registry context!");
 			return false;
 		}
 
 		// Camera creation
-		auto camera = std::make_shared<Feather::Camera2D>();
+		auto camera = std::make_shared<Camera2D>();
 
-		if (!m_Registry->AddToContext<std::shared_ptr<Feather::AssetManager>>(assetManager))
+		if (!m_Registry->AddToContext<std::shared_ptr<AssetManager>>(assetManager))
 		{
 			F_FATAL("Failed to add asset manager to the registry context!");
 			return false;
 		}
 
-		if (!m_Registry->AddToContext<std::shared_ptr<Feather::Camera2D>>(camera))
+		if (!m_Registry->AddToContext<std::shared_ptr<Camera2D>>(camera))
 		{
 			F_FATAL("Failed to add camera to the registry context!");
 			return false;
@@ -209,7 +197,8 @@ namespace Feather {
 			return false;
 		}
 
-		Feather::ScriptingSystem::RegisterLuaBindings(*lua, *m_Registry);
+		ScriptingSystem::RegisterLuaBindings(*lua, *m_Registry);
+		ScriptingSystem::RegisterLuaFunctions(*lua);
 
 		if (!scriptSystem->LoadMainScript(*lua))
 		{
@@ -222,7 +211,7 @@ namespace Feather {
 
     bool Application::LoadShaders()
     {
-		auto& assetManager = m_Registry->GetContext<std::shared_ptr<Feather::AssetManager>>();
+		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
 		if (!assetManager)
 		{
 			F_FATAL("Failed to get asset shader from the registry context!");
@@ -298,7 +287,7 @@ namespace Feather {
 
     void Application::Update()
     {
-		auto& camera = m_Registry->GetContext<std::shared_ptr<Feather::Camera2D>>();
+		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
 		if (!camera)
 		{
 			F_FATAL("Failed to get the camera from the registry context!");
@@ -306,10 +295,10 @@ namespace Feather {
 		}
 		camera->Update();
 
-		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
+		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Update();
 
-		auto& animationSystem = m_Registry->GetContext<std::shared_ptr<Feather::AnimationSystem>>();
+		auto& animationSystem = m_Registry->GetContext<std::shared_ptr<AnimationSystem>>();
 		animationSystem->Update();
 
 		// Updating inputs
@@ -323,14 +312,14 @@ namespace Feather {
 
     void Application::Render()
     {
-		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<Feather::RenderSystem>>();
+		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<RenderSystem>>();
 
 		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<Feather::ScriptingSystem>>();
+		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Render();
 		renderSystem->Update();
 

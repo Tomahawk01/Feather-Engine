@@ -1,11 +1,13 @@
 #pragma once
 
-#include "Renderer/Essentials/Shader.h"
-#include "Renderer/Essentials/Texture.h"
-
 #include <map>
 #include <memory>
 #include <string>
+#include <sol/sol.hpp>
+
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
+#include "Core/ECS/Registry.h"
 
 namespace Feather {
 	
@@ -20,6 +22,8 @@ namespace Feather {
 
 		bool AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath);
 		Feather::Shader& GetShader(const std::string& shaderName);
+
+		static void CreateLuaAssetManager(sol::state& lua, Registry& registry);
 
 	private:
 		std::map<std::string, std::shared_ptr<Feather::Texture>> m_mapTextures{};

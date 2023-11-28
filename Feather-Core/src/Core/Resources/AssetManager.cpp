@@ -72,4 +72,23 @@ namespace Feather {
         return *shaderIter->second;
     }
 
+    void AssetManager::CreateLuaAssetManager(sol::state& lua, Registry& registry)
+    {
+        auto& asset_manager = registry.GetContext<std::shared_ptr<AssetManager>>();
+        if (!asset_manager)
+        {
+            F_ERROR("Failed to bind asset manager to lua - Does not exist in registry!");
+            return;
+        }
+
+        lua.new_usertype<AssetManager>(
+            "AssetManager",
+            sol::no_constructor,
+            "add_texture", [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
+            {
+                return asset_manager->AddTexure(assetName, filepath, pixel_art);
+            }
+        );
+    }
+
 }

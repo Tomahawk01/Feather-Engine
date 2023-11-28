@@ -8,6 +8,7 @@
 #include "Core/ECS/Entity.h"
 #include "Core/Scripting/GlmLuaBindings.h"
 #include "Core/Scripting/InputManager.h"
+#include "Core/Resources/AssetManager.h"
 
 namespace Feather {
 
@@ -111,6 +112,7 @@ namespace Feather {
 	{
 		GLMBinding::CreateGLMBindings(lua);
 		InputManager::CreateLuaInputBindings(lua);
+		AssetManager::CreateLuaAssetManager(lua, registry);
 
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);
@@ -125,6 +127,26 @@ namespace Feather {
 		Registry::RegisterMetaComponent<TransformComponent>();
 		Registry::RegisterMetaComponent<SpriteComponent>();
 		Registry::RegisterMetaComponent<AnimationComponent>();
+	}
+
+	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua)
+	{
+		lua.set_function(
+			"run_script", [&](const std::string& path)
+			{
+				try
+				{
+					lua.safe_script_file(path);
+				}
+				catch (const sol::error& error)
+				{
+					F_ERROR("Failed to load lua script: {0}", error.what());
+					return false;
+				}
+
+				return true;
+			}
+		);
 	}
 
 }
