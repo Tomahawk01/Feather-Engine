@@ -41,7 +41,7 @@ namespace Feather {
 			const auto& transform = view.get<TransformComponent>(entity);
 			const auto& sprite = view.get<SpriteComponent>(entity);
 
-			if (sprite.texture_name.empty())
+			if (sprite.texture_name.empty() || sprite.hidden)
 				continue;
 
 			const auto& texture = assetManager->GetTexture(sprite.texture_name);

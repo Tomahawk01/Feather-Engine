@@ -34,4 +34,21 @@ function GameData:RemoveLife()
     self.m_NumLives = clamp(self.m_NumLives - 1, 0, self.m_MaxLives)
 end
 
+function GameData:AddScore(value)
+    self.m_Score = clamp(self.m_Score + value, 0, 99999)
+end
+
+function GameData:GetScore()
+    return self.m_Score
+end
+
+function GameData:Reset()
+    self.m_NumAsteroids = 0
+    self.m_NumLives = 3
+    self.m_Score = 0
+end
+
 gData = GameData:Create()
+
+SMALL_ASTEROID_SCORE = 25
+BIG_ASTEROID_SCORE = 100

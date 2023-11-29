@@ -17,6 +17,18 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua, Feather::Reg
 		"a", &Color::a
 	);
 
+	lua.new_usertype<UVs>(
+		"UVs",
+		sol::call_constructor,
+		sol::factories(
+			[](float u, float v) { return UVs{ .u = u, .v = v }; }
+		),
+		"u", &UVs::u,
+		"v", &UVs::v,
+		"uv_width", &UVs::uv_width,
+		"uv_height", &UVs::uv_height
+	);
+
 	lua.new_usertype<SpriteComponent>(
 		"Sprite",
 		"type_id", &entt::type_hash<SpriteComponent>::value,
@@ -42,6 +54,8 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua, Feather::Reg
 		"start_x", &SpriteComponent::start_x,
 		"start_y", &SpriteComponent::start_y,
 		"layer", &SpriteComponent::layer,
+		"hidden", &SpriteComponent::hidden,
+		"uvs", &SpriteComponent::uvs,
 		"color", &SpriteComponent::color,
 		"generate_uvs", [&](SpriteComponent& sprite)
 		{

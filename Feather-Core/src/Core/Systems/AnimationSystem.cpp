@@ -22,7 +22,12 @@ namespace Feather {
 			auto& sprite = view.get<SpriteComponent>(entity);
 			auto& animation = view.get<AnimationComponent>(entity);
 
-			animation.currentFrame = (SDL_GetTicks() * animation.frameRate / 1000) % animation.numFrames;
+			if (animation.numFrames <= 0)
+				continue;
+			if (!animation.isLooped && animation.currentFrame >= animation.numFrames - 1)
+				continue;
+
+			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameRate / 1000) % animation.numFrames;
 
 			if (animation.isVertical)
 			{

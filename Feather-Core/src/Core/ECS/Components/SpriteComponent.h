@@ -2,7 +2,7 @@
 
 #include <sol/sol.hpp>
 
-#include <Renderer/Essentials/Vertex.h>
+#include "Renderer/Essentials/Vertex.h"
 #include "Core/ECS/Registry.h"
 
 namespace Feather {
@@ -20,6 +20,7 @@ namespace Feather {
 		Feather::Color color{ .r = 255, .g = 255, .b = 255, .a = 255 };
 		int start_x{ 0 }, start_y{ 0 }, layer{ 0 };
 
+		bool hidden{ false };
 		std::string texture_name{ "" };
 
 		void generate_uvs(int textureWidth, int textureHeight)

@@ -41,12 +41,25 @@ function LoadEntity(def)
             )
         )
         sprite:generate_uvs()
+        sprite.hidden = def.components.sprite.hidden or false
     end
 
     if def.components.circle_collider then
         newEntity:add_component(
             CircleCollider(
                 def.components.circle_collider.radius
+            )
+        )
+    end
+
+    if def.components.animation then
+        newEntity:add_component(
+            Animation(
+                def.components.animation.num_frames,
+                def.components.animation.frame_rate,
+                def.components.animation.frame_offset,
+                def.components.animation.is_vertical,
+                def.components.animation.is_looped
             )
         )
     end
@@ -118,9 +131,9 @@ function RemoveAsteroid(asteroid_id)
             -- Check asteroid type
             if v.m_Type == "big" then
                 CreateSmallFromBig(v)
-                -- TODO: Add score
+                gData:AddScore(BIG_ASTEROID_SCORE)
             elseif v.m_Type == "small" then
-                -- TODO: Add score
+                gData:AddScore(SMALL_ASTEROID_SCORE)
             end
 
             local asteroid = Entity(v.m_EntityID)
@@ -161,6 +174,14 @@ function SpawnAsteroid()
     end
 end
 
+function ResetAsteroids()
+    for k, v in pairs(Asteroids) do
+        local asteroid = Entity(v.m_EntityID)
+        asteroid:kill()
+        Asteroids[k] = nil
+    end
+end
+
 Projectiles = {}
 
 function AddProjectile(projectile)
@@ -176,4 +197,18 @@ function UpdateProjectiles()
             v:Update()
         end
     end
+end
+
+function ResetProjectiles()
+    for k, v in pairs(Projectiles) do
+        local projectile = Entity(v.m_EntityID)
+        projectile:kill()
+        Projectiles[k] = nil
+    end
+end
+
+function GetDigit(num, digit)
+    local n = 10 ^ digit
+    local n1 = 10 ^ (digit - 1)
+    return math.floor((num % n) / n1)
 end
