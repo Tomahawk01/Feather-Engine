@@ -6,6 +6,8 @@ run_script("../_Test_Games/Asteroids/scripts/utilities.lua")
 run_script("../_Test_Games/Asteroids/scripts/ship.lua")
 run_script("../_Test_Games/Asteroids/scripts/asteroid.lua")
 run_script("../_Test_Games/Asteroids/scripts/collision_system.lua")
+run_script("../_Test_Games/Asteroids/scripts/projectile.lua")
+run_script("../_Test_Games/Asteroids/scripts/game_data.lua")
 
 math.randomseed(os.time())
 
@@ -21,6 +23,7 @@ main = {
 		update = function()
 			gShip:Update()
 			UpdateAsteroids()
+			UpdateProjectiles()
 			gCollisionSystem:Update()
 			SpawnAsteroid()
 		end

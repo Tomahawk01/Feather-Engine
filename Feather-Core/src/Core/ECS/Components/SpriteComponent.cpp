@@ -5,6 +5,18 @@
 
 void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua, Feather::Registry& registry)
 {
+	lua.new_usertype<Color>(
+		"Color",
+		sol::call_constructor,
+		sol::factories(
+			[](GLubyte r, GLubyte g, GLubyte b, GLubyte a) { return Color{ .r = r, .g = g, .b = b, .a = a }; }
+		),
+		"r", &Color::r,
+		"g", &Color::g,
+		"b", &Color::b,
+		"a", &Color::a
+	);
+
 	lua.new_usertype<SpriteComponent>(
 		"Sprite",
 		"type_id", &entt::type_hash<SpriteComponent>::value,
@@ -30,6 +42,7 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua, Feather::Reg
 		"start_x", &SpriteComponent::start_x,
 		"start_y", &SpriteComponent::start_y,
 		"layer", &SpriteComponent::layer,
+		"color", &SpriteComponent::color,
 		"generate_uvs", [&](SpriteComponent& sprite)
 		{
 			auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();

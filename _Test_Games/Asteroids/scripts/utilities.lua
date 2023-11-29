@@ -112,6 +112,34 @@ function UpdateAsteroids()
     end
 end
 
+function RemoveAsteroid(asteroid_id)
+    for k, v in pairs(Asteroids) do
+        if v.m_EntityID == asteroid_id then
+            -- Check asteroid type
+            if v.m_Type == "big" then
+                CreateSmallFromBig(v)
+                -- TODO: Add score
+            elseif v.m_Type == "small" then
+                -- TODO: Add score
+            end
+
+            local asteroid = Entity(v.m_EntityID)
+            asteroid:kill()
+            Asteroids[k] = nil
+        end
+    end
+end
+
+function CreateSmallFromBig(asteroid)
+    local transform = Entity(asteroid.m_EntityID):get_component(Transform)
+    for i = 1, 2 do
+        local small = Asteroid:Create("asteroid_small")
+        local small_transform = Entity(small.m_EntityID):get_component(Transform)
+        small_transform.position = transform.position
+        AddAsteroid(small)
+    end
+end
+
 gSpawnTimer = Timer()
 function SpawnAsteroid()
     if not gSpawnTimer:is_running() then
@@ -123,14 +151,29 @@ function SpawnAsteroid()
         if val == 1 then
             local asteroid = Asteroid:Create("asteroid_big")
             AddAsteroid(asteroid)
-            print("big asteroid spawned")
         elseif val == 2 then
             local asteroid = Asteroid:Create("asteroid_small")
             AddAsteroid(asteroid)
-            print("small asteroid spawned")
         elseif val == 3 then
             -- TODO: Create new enemies
         end
         gSpawnTimer:stop()
+    end
+end
+
+Projectiles = {}
+
+function AddProjectile(projectile)
+    table.insert(Projectiles, projectile)
+end
+
+function UpdateProjectiles()
+    for k, v in pairs(Projectiles) do
+        if v:TimesUp() then
+            v:Destroy()
+            Projectiles[k] = nil
+        else
+            v:Update()
+        end
     end
 end
