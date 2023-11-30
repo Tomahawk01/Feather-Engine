@@ -6,16 +6,16 @@
 
 namespace Feather {
 
-    bool Feather::AssetManager::AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt)
+    bool AssetManager::AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt)
     {
         if (m_mapTextures.find(textureName) != m_mapTextures.end())
         {
-            F_ERROR("Failed to add texture '{0}' - Already exists!", textureName);
+            F_ERROR("Failed to add texture '{0}': Already exists!", textureName);
             return false;
         }
 
-        auto texture = std::move(Feather::TextureLoader::Create(
-                pixelArt ? Feather::Texture::TextureType::PIXEL : Feather::Texture::TextureType::BLENDED,
+        auto texture = std::move(TextureLoader::Create(
+                pixelArt ? Texture::TextureType::PIXEL : Texture::TextureType::BLENDED,
                 texturePath));
         if (!texture)
         {
@@ -28,27 +28,27 @@ namespace Feather {
         return true;
     }
 
-    const Feather::Texture& Feather::AssetManager::GetTexture(const std::string& textureName)
+    const Texture& AssetManager::GetTexture(const std::string& textureName)
     {
         auto texIter = m_mapTextures.find(textureName);
         if (texIter == m_mapTextures.end())
         {
-            F_ERROR("Failed to get texture '{0}' - Does not exist!", textureName);
-            return Feather::Texture();
+            F_ERROR("Failed to get texture '{0}': Does not exist!", textureName);
+            return Texture();
         }
 
         return *texIter->second;
     }
 
-    bool Feather::AssetManager::AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath)
+    bool AssetManager::AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath)
     {
         if (m_mapShaders.find(shaderName) != m_mapShaders.end())
         {
-            F_ERROR("Failed to add shader '{0}' - Already exists!", shaderName);
+            F_ERROR("Failed to add shader '{0}': Already exists!", shaderName);
             return false;
         }
 
-        auto shader = std::move(Feather::ShaderLoader::Create(vertexPath, fragmentPath));
+        auto shader = std::move(ShaderLoader::Create(vertexPath, fragmentPath));
         if (!shader)
         {
             F_ERROR("Failed to load shader '{0}' at vert path '{1}' and frag path '{2}'", shaderName, vertexPath, fragmentPath);
@@ -59,17 +59,60 @@ namespace Feather {
         return true;
     }
 
-    Feather::Shader& Feather::AssetManager::GetShader(const std::string& shaderName)
+    Shader& AssetManager::GetShader(const std::string& shaderName)
     {
         auto shaderIter = m_mapShaders.find(shaderName);
         if (shaderIter == m_mapShaders.end())
         {
-            F_ERROR("Failed to get shader '{0}' - Does not exist!", shaderName);
-            Feather::Shader shader{};
+            F_ERROR("Failed to get shader '{0}': Does not exist!", shaderName);
+            Shader shader{};
             return shader;
         }
 
         return *shaderIter->second;
+    }
+
+    bool AssetManager::AddMusic(const std::string& musicName, const std::string& filepath)
+    {
+        if (m_mapMusic.find(musicName) != m_mapMusic.end())
+        {
+            F_ERROR("Failed to add music '{0}': Already exist!", musicName);
+            return false;
+        }
+
+        Mix_Music* music = Mix_LoadMUS(filepath.c_str());
+
+        if (!music)
+        {
+            std::string error{ Mix_GetError() };
+            F_ERROR("Failed to load '{0}' at path '{1}': Mixer Error - {2}", musicName, filepath, error);
+            return false;
+        }
+
+        SoundParams params{ .name = musicName, .filename = filepath, .duration = Mix_MusicDuration(music) };
+
+        auto musicPtr = std::make_shared<Music>(params, MusicPtr{ music });
+        if (!musicPtr)
+        {
+            F_ERROR("Failed to create music ptr for '{0}'", musicName);
+            return false;
+        }
+
+        m_mapMusic.emplace(musicName, std::move(musicPtr));
+
+        return true;
+    }
+
+    std::shared_ptr<Music> AssetManager::GetMusic(const std::string& musicName)
+    {
+        auto musicItr = m_mapMusic.find(musicName);
+        if (musicItr == m_mapMusic.end())
+        {
+            F_ERROR("Failed to get '{0}': Does not exist!", musicName);
+            return nullptr;
+        }
+
+        return musicItr->second;
     }
 
     void AssetManager::CreateLuaAssetManager(sol::state& lua, Registry& registry)
@@ -77,7 +120,7 @@ namespace Feather {
         auto& asset_manager = registry.GetContext<std::shared_ptr<AssetManager>>();
         if (!asset_manager)
         {
-            F_ERROR("Failed to bind asset manager to lua - Does not exist in registry!");
+            F_ERROR("Failed to bind asset manager to lua: Does not exist in registry!");
             return;
         }
 
@@ -87,6 +130,10 @@ namespace Feather {
             "add_texture", [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
             {
                 return asset_manager->AddTexure(assetName, filepath, pixel_art);
+            },
+            "add_music", [&](const std::string& musicName, const std::string& filepath)
+            {
+                return asset_manager->AddMusic(musicName, filepath);
             }
         );
     }

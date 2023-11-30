@@ -11,6 +11,7 @@
 #include "Core/ECS/Entity.h"
 #include "Core/Scripting/GlmLuaBindings.h"
 #include "Core/Scripting/InputManager.h"
+#include "Core/Scripting/SoundBindings.h"
 #include "Core/Resources/AssetManager.h"
 
 namespace Feather {
@@ -138,6 +139,7 @@ namespace Feather {
 		GLMBinding::CreateGLMBindings(lua);
 		InputManager::CreateLuaInputBindings(lua);
 		AssetManager::CreateLuaAssetManager(lua, registry);
+		SoundBinder::CreateSoundBind(lua, registry);
 
 		create_timer(lua);
 

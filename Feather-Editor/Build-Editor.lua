@@ -34,6 +34,7 @@ project "Feather-Editor"
         "Feather-Core",
         "Glad",
         "SDL2.lib",
+        "SDL2_mixer.lib",
         "opengl32.lib",
         "lua53.lib"
     }

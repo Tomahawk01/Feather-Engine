@@ -41,6 +41,7 @@ project "Feather-Core"
     {
         "Glad",
         "SDL2.lib",
+        "SDL2_mixer.lib",
         "lua53.lib"
     }
 
