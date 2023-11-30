@@ -40,23 +40,34 @@ namespace Feather {
 
 	void MusicPlayer::Pause()
 	{
+		Mix_PauseMusic();
 	}
 
 	void MusicPlayer::Resume()
 	{
+		Mix_ResumeMusic();
 	}
 
 	void MusicPlayer::Stop()
 	{
+		Mix_HaltMusic();
 	}
 
 	void MusicPlayer::SetVolume(int volume)
 	{
+		if (volume < 0 || volume > 100)
+		{
+			F_ERROR("Failed to set volume. Must be between 0 - 100: Input '{0}'", volume);
+			return;
+		}
+
+		int volume_changed = static_cast<int>((volume / 100.0f) * 128);
+		Mix_VolumeMusic(volume_changed);
 	}
 
 	bool MusicPlayer::IsPlaying()
 	{
-		return false;
+		return Mix_PlayingMusic();
 	}
 
 }

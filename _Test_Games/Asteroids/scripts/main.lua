@@ -12,6 +12,9 @@ gHud = Hud:Create()
 
 AsteroidsLoaded = true
 
+Music.play("bg_music")
+Music.set_volume(30)
+
 function RunAsteroids()
     gShip:Update()
 	UpdateAsteroids()

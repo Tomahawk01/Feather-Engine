@@ -15,6 +15,7 @@
 #include <Core/Systems/AnimationSystem.h>
 #include <Core/Scripting/InputManager.h>
 #include <Sounds/MusicPlayer/MusicPlayer.h>
+#include <Sounds/SoundPlayer/SoundFXPlayer.h>
 
 namespace Feather {
 
@@ -186,6 +187,18 @@ namespace Feather {
 		if (!m_Registry->AddToContext<std::shared_ptr<MusicPlayer>>(musicPlayer))
 		{
 			F_FATAL("Failed to add music player to the registry context!");
+			return false;
+		}
+
+		auto soundPlayer = std::make_shared<SoundFXPlayer>();
+		if (!soundPlayer)
+		{
+			F_FATAL("Failed to create the sound effects player!");
+			return false;
+		}
+		if (!m_Registry->AddToContext<std::shared_ptr<SoundFXPlayer>>(soundPlayer))
+		{
+			F_FATAL("Failed to add sound effects player to the registry context!");
 			return false;
 		}
 

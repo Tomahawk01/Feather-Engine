@@ -115,6 +115,42 @@ namespace Feather {
         return musicItr->second;
     }
 
+    bool AssetManager::AddSoundFx(const std::string& soundFxName, const std::string& filepath)
+    {
+        if (m_mapSoundFX.find(soundFxName) != m_mapSoundFX.end())
+        {
+            F_ERROR("Failed to add sound effect '{0}': Already exist!", soundFxName);
+            return false;
+        }
+
+        Mix_Chunk* chunk = Mix_LoadWAV(filepath.c_str());
+        if (!chunk)
+        {
+            std::string error{ Mix_GetError() };
+            F_ERROR("Failed to load '{0}' at path '{1}': Mixer Error - {2}", soundFxName, filepath, error);
+            return false;
+        }
+
+        SoundParams params{ .name = soundFxName, .filename = filepath, .duration = chunk->alen / 179.4 };
+
+        auto pSoundFx = std::make_shared<SoundFX>(params, SoundFXPtr{ chunk });
+        m_mapSoundFX.emplace(soundFxName, std::move(pSoundFx));
+
+        return true;
+    }
+
+    std::shared_ptr<SoundFX> AssetManager::GetSoundFx(const std::string& soundFxName)
+    {
+        auto soundItr = m_mapSoundFX.find(soundFxName);
+        if (soundItr == m_mapSoundFX.end())
+        {
+            F_ERROR("Failed to get sound effect '{0}': Does not exist!", soundFxName);
+            return nullptr;
+        }
+
+        return soundItr->second;
+    }
+
     void AssetManager::CreateLuaAssetManager(sol::state& lua, Registry& registry)
     {
         auto& asset_manager = registry.GetContext<std::shared_ptr<AssetManager>>();
@@ -134,6 +170,10 @@ namespace Feather {
             "add_music", [&](const std::string& musicName, const std::string& filepath)
             {
                 return asset_manager->AddMusic(musicName, filepath);
+            },
+            "add_sound", [&](const std::string& soundFxName, const std::string& filepath)
+            {
+                return asset_manager->AddSoundFx(soundFxName, filepath);
             }
         );
     }

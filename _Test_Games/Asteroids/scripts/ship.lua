@@ -81,6 +81,7 @@ function Ship:Update()
             )
             self.m_CooldownTimer:start()
             AddProjectile(projectile)
+            Sound.play("laser")
         end
     elseif self.m_CooldownTimer:elapsed_ms() >= self.m_Cooldown then
         self.m_CooldownTimer:stop()
@@ -117,6 +118,8 @@ function Ship:CheckDeath()
 
         self.m_NumLives = numLives
         self.m_DeathTimer:start()
+        Sound.play("ship_explosion")
+        Sound.set_volume(-1, 40)
     end
 
     if self.m_InvincibleTimer:is_running() then
