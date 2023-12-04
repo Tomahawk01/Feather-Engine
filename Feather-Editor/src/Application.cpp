@@ -81,7 +81,7 @@ namespace Feather {
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 		// Create the Window
-		m_Window = std::make_unique<Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL);
+		m_Window = std::make_unique<Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
 		if (!m_Window->GetWindow())
 		{
@@ -305,6 +305,16 @@ namespace Feather {
 			case SDL_JOYHATMOTION:
 				inputManager.GamepadHatValues(m_Event);
 				break;
+			case SDL_WINDOWEVENT:
+				switch (m_Event.window.event)
+				{
+				case SDL_WINDOWEVENT_SIZE_CHANGED:
+					m_Window->SetWidth(m_Event.window.data1);
+					m_Window->SetHeight(m_Event.window.data2);
+					break;
+				default:
+					break;
+				}
 			default:
 				break;
 			}

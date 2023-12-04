@@ -11,3 +11,5 @@ bin-int/
 
 # Feather files
 *.log
+*.tiled-project
+*.tiled-session
