@@ -12,7 +12,7 @@ namespace Feather {
 	RenderSystem::RenderSystem(Registry& registry)
 		: m_Registry(registry), m_BatchRenderer{nullptr}
 	{
-		m_BatchRenderer = std::make_unique<BatchRenderer>();
+		m_BatchRenderer = std::make_unique<SpriteBatchRenderer>();
 	}
 
 	void RenderSystem::Update()

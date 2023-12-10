@@ -15,7 +15,7 @@ namespace Feather {
 
 	private:
 		Feather::Registry& m_Registry;
-		std::unique_ptr<Feather::BatchRenderer> m_BatchRenderer;
+		std::unique_ptr<Feather::SpriteBatchRenderer> m_BatchRenderer;
 	};
 
 }
