@@ -20,10 +20,10 @@ namespace Feather {
 		~AssetManager() = default;
 
 		bool AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt = true);
-		const Texture& GetTexture(const std::string& textureName);
+		std::shared_ptr<Texture> GetTexture(const std::string& textureName);
 
 		bool AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath);
-		Shader& GetShader(const std::string& shaderName);
+		std::shared_ptr<Shader> GetShader(const std::string& shaderName);
 
 		bool AddMusic(const std::string& musicName, const std::string& filepath);
 		std::shared_ptr<Music> GetMusic(const std::string& musicName);

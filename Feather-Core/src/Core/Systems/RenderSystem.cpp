@@ -20,18 +20,18 @@ namespace Feather {
 		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
 		auto& assetManager = m_Registry.GetContext<std::shared_ptr<AssetManager>>();
 
-		auto& spriteShader = assetManager->GetShader("basic");
+		const auto& spriteShader = assetManager->GetShader("basic");
 		auto cam_mat = camera->GetCameraMatrix();
 
-		if (spriteShader.ShaderProgramID() == 0)
+		if (spriteShader->ShaderProgramID() == 0)
 		{
 			F_ERROR("Sprite shader program has not been set correctly!");
 			return;
 		}
 
 		// Enable shader
-		spriteShader.Enable();
-		spriteShader.SetUniformMat4("u_Projection", cam_mat);
+		spriteShader->Enable();
+		spriteShader->SetUniformMat4("u_Projection", cam_mat);
 
 		m_BatchRenderer->Begin();
 		auto view = m_Registry.GetRegistry().view<SpriteComponent, TransformComponent>();
@@ -45,7 +45,7 @@ namespace Feather {
 				continue;
 
 			const auto& texture = assetManager->GetTexture(sprite.texture_name);
-			if (texture.GetID() == 0)
+			if (!texture)
 			{
 				F_ERROR("Texture '{0}' was not created correctly!", sprite.texture_name);
 				return;
@@ -70,13 +70,13 @@ namespace Feather {
 				model = glm::translate(model, glm::vec3{ -transform.position, 0.0f });
 			}
 
-			m_BatchRenderer->AddSprite(spriteRect, uvRect, texture.GetID(), sprite.layer, model, sprite.color);
+			m_BatchRenderer->AddSprite(spriteRect, uvRect, texture->GetID(), sprite.layer, model, sprite.color);
 		}
 
 		m_BatchRenderer->End();
 		m_BatchRenderer->Render();
 
-		spriteShader.Disable();
+		spriteShader->Disable();
 	}
 
 }

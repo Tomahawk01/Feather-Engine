@@ -1,10 +1,13 @@
 #include "Application.h"
 
 #include <Logger/Logger.h>
+
 #include <Renderer/Essentials/ShaderLoader.h>
 #include <Renderer/Essentials/TextureLoader.h>
 #include <Renderer/Essentials/Vertex.h>
 #include <Renderer/Core/Camera2D.h>
+#include <Renderer/Core/Renderer.h>
+
 #include <Core/ECS/Entity.h>
 #include <Core/ECS/Components/Identification.h>
 #include <Core/ECS/Components/SpriteComponent.h>
@@ -14,6 +17,7 @@
 #include <Core/Systems/RenderSystem.h>
 #include <Core/Systems/AnimationSystem.h>
 #include <Core/Scripting/InputManager.h>
+
 #include <Sounds/MusicPlayer/MusicPlayer.h>
 #include <Sounds/SoundPlayer/SoundFXPlayer.h>
 
@@ -108,6 +112,8 @@ namespace Feather {
 			return false;
 		}
 
+		auto renderer = std::make_shared<Renderer>();
+
 		// Enable alpha blending
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -120,6 +126,12 @@ namespace Feather {
 		}
 
 		m_Registry = std::make_unique<Registry>();
+
+		if (!m_Registry->AddToContext<std::shared_ptr<Renderer>>(renderer))
+		{
+			F_FATAL("Failed to add the Renderer to the registry context!");
+			return false;
+		}
 
 		// Create Lua state
 		auto lua = std::make_shared<sol::state>();
@@ -232,6 +244,8 @@ namespace Feather {
 			return false;
 		}
 
+		renderer->DrawLine(Line{ .p1 = glm::vec2{50.0f}, .p2 = glm::vec2{200.0f}, .color = Color{0, 255, 0, 255} });
+
 		return true;
     }
 
@@ -245,7 +259,12 @@ namespace Feather {
 		}
 		if (!assetManager->AddShader("basic", "assets/shaders/basicShader.vert", "assets/shaders/basicShader.frag"))
 		{
-			F_FATAL("Failed to add shader to the asset manager!");
+			F_FATAL("Failed to add basicShader to the asset manager!");
+			return false;
+		}
+		if (!assetManager->AddShader("color", "assets/shaders/colorShader.vert", "assets/shaders/colorShader.frag"))
+		{
+			F_FATAL("Failed to add colorShader to the asset manager!");
 			return false;
 		}
 
@@ -349,6 +368,11 @@ namespace Feather {
     void Application::Render()
     {
 		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<RenderSystem>>();
+		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
+		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
+		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
+
+		auto shader = assetManager->GetShader("color");
 
 		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 
@@ -358,6 +382,7 @@ namespace Feather {
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Render();
 		renderSystem->Update();
+		renderer->DrawLines(*shader, *camera);
 
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
     }

@@ -28,16 +28,16 @@ namespace Feather {
         return true;
     }
 
-    const Texture& AssetManager::GetTexture(const std::string& textureName)
+    std::shared_ptr<Texture> AssetManager::GetTexture(const std::string& textureName)
     {
         auto texIter = m_mapTextures.find(textureName);
         if (texIter == m_mapTextures.end())
         {
             F_ERROR("Failed to get texture '{0}': Does not exist!", textureName);
-            return Texture();
+            return nullptr;
         }
 
-        return *texIter->second;
+        return texIter->second;
     }
 
     bool AssetManager::AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath)
@@ -59,17 +59,16 @@ namespace Feather {
         return true;
     }
 
-    Shader& AssetManager::GetShader(const std::string& shaderName)
+    std::shared_ptr<Shader> AssetManager::GetShader(const std::string& shaderName)
     {
         auto shaderIter = m_mapShaders.find(shaderName);
         if (shaderIter == m_mapShaders.end())
         {
             F_ERROR("Failed to get shader '{0}': Does not exist!", shaderName);
-            Shader shader{};
-            return shader;
+            return nullptr;
         }
 
-        return *shaderIter->second;
+        return shaderIter->second;
     }
 
     bool AssetManager::AddMusic(const std::string& musicName, const std::string& filepath)
