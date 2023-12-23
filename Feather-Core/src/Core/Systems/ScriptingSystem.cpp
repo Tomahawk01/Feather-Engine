@@ -2,16 +2,21 @@
 
 #include "Logger/Logger.h"
 #include "Utils/Timer.h"
+
 #include "Core/ECS/Components/ScriptComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/ECS/Components/SpriteComponent.h"
 #include "Core/ECS/Components/AnimationComponent.h"
 #include "Core/ECS/Components/BoxColliderComponent.h"
 #include "Core/ECS/Components/CircleColliderComponent.h"
+
 #include "Core/ECS/Entity.h"
+
 #include "Core/Scripting/GlmLuaBindings.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/Scripting/SoundBindings.h"
+#include "Core/Scripting/RendererBindings.h"
+
 #include "Core/Resources/AssetManager.h"
 
 namespace Feather {
@@ -140,6 +145,7 @@ namespace Feather {
 		InputManager::CreateLuaInputBindings(lua);
 		AssetManager::CreateLuaAssetManager(lua, registry);
 		SoundBinder::CreateSoundBind(lua, registry);
+		RendererBinder::CreateRenderingBind(lua, registry);
 
 		create_timer(lua);
 

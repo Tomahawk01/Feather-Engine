@@ -244,7 +244,8 @@ namespace Feather {
 			return false;
 		}
 
-		renderer->DrawLine(Line{ .p1 = glm::vec2{50.0f}, .p2 = glm::vec2{200.0f}, .color = Color{0, 255, 0, 255} });
+		// TODO: temp
+		glLineWidth(4.0f);
 
 		return true;
     }
