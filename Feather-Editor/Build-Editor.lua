@@ -15,6 +15,7 @@ project "Feather-Editor"
         "%{wks.location}/Feather-Core/src",
         "%{wks.location}/vendor/SDL/include",
         "%{wks.location}/vendor/stb_image",
+        "%{wks.location}/vendor/stb_truetype",
         "%{wks.location}/vendor/Glad/src/include",
         "%{wks.location}/vendor/glm",
         "%{wks.location}/vendor/spdlog-1.12.0/include",
