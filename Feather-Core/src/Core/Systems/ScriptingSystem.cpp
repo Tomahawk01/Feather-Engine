@@ -90,6 +90,9 @@ namespace Feather {
 				F_ERROR("Error running the Update script: {0}", err.what());
 			}
 		}
+
+		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
+		lua->collect_garbage();
 	}
 
 	void ScriptingSystem::Render()
@@ -115,6 +118,9 @@ namespace Feather {
 				F_ERROR("Error running the Render script: {0}", err.what());
 			}
 		}
+
+		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
+		lua->collect_garbage();
 	}
 
 	auto create_timer = [](sol::state& lua){

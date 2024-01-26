@@ -244,8 +244,33 @@ namespace Feather {
 			return false;
 		}
 
+		renderer->SetLineWidth(4.0f);
+
+		// Temp load font
+		if (!assetManager->AddFont("testFont", "./assets/fonts/Raleway-Regular.ttf"))
+		{
+			F_ERROR("Failed to load test font!");
+			return false;
+		}
+
 		// TODO: temp
-		glLineWidth(4.0f);
+		auto pFont = assetManager->GetFont("testFont");
+		renderer->DrawText2D(
+			Text{
+				.position = glm::vec2{ 225.f, 200.f },
+				.textStr = "Feather Engine",
+				.pFont = pFont
+			}
+		);
+
+		renderer->DrawText2D(
+			Text{
+			.position = glm::vec2{ 0.f, 300.f },
+				.textStr = "TEXT BATCH RENDERING!",
+				.pFont = pFont
+			}
+		);
+		// TODO: temp
 
 		return true;
     }
@@ -266,6 +291,16 @@ namespace Feather {
 		if (!assetManager->AddShader("color", "assets/shaders/colorShader.vert", "assets/shaders/colorShader.frag"))
 		{
 			F_FATAL("Failed to add colorShader to the asset manager!");
+			return false;
+		}
+		if (!assetManager->AddShader("circle", "assets/shaders/circleShader.vert", "assets/shaders/circleShader.frag"))
+		{
+			F_FATAL("Failed to add the color shader to the asset manager");
+			return false;
+		}
+		if (!assetManager->AddShader("font", "assets/shaders/fontShader.vert", "assets/shaders/fontShader.frag"))
+		{
+			F_FATAL("Failed to add the font shader to the asset manager");
 			return false;
 		}
 
@@ -374,6 +409,8 @@ namespace Feather {
 		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
 
 		auto shader = assetManager->GetShader("color");
+		auto circleShader = assetManager->GetShader("circle");
+		auto fontShader = assetManager->GetShader("font");
 
 		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 
@@ -383,9 +420,15 @@ namespace Feather {
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Render();
 		renderSystem->Update();
+
 		renderer->DrawLines(*shader, *camera);
+		renderer->DrawFilledRects(*shader, *camera);
+		renderer->DrawCircles(*circleShader, *camera);
+		renderer->DrawAllText(*fontShader, *camera);
 
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
+
+		renderer->ClearPrimitives();
     }
 
     void Application::CleanUp()

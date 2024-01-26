@@ -37,4 +37,11 @@ namespace Feather {
 		}
 	};
 
+	struct CircleVertex
+	{
+		glm::vec2 position, uvs;
+		Color color;
+		float lineThickness;
+	};
+
 }
