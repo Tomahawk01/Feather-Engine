@@ -246,31 +246,12 @@ namespace Feather {
 
 		renderer->SetLineWidth(4.0f);
 
-		// Temp load font
+		// TODO: temp load font
 		if (!assetManager->AddFont("testFont", "./assets/fonts/Raleway-Regular.ttf"))
 		{
 			F_ERROR("Failed to load test font!");
 			return false;
 		}
-
-		// TODO: temp
-		auto pFont = assetManager->GetFont("testFont");
-		renderer->DrawText2D(
-			Text{
-				.position = glm::vec2{ 225.f, 200.f },
-				.textStr = "Feather Engine",
-				.pFont = pFont
-			}
-		);
-
-		renderer->DrawText2D(
-			Text{
-			.position = glm::vec2{ 0.f, 300.f },
-				.textStr = "TEXT BATCH RENDERING!",
-				.pFont = pFont
-			}
-		);
-		// TODO: temp
 
 		return true;
     }

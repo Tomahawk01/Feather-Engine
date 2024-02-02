@@ -1,6 +1,7 @@
 #include "RendererBindings.h"
 
 #include "Logger/Logger.h"
+#include "Core/Resources/AssetManager.h"
 #include "Renderer/Essentials/Primitives.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
@@ -9,6 +10,9 @@ namespace Feather {
 
 	void RendererBinder::CreateRenderingBind(sol::state& lua, Registry& registry)
 	{
+		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
+
+		// Primitives bind
 		lua.new_usertype<Line>(
 			"Line",
 			sol::call_constructor,
@@ -51,6 +55,34 @@ namespace Feather {
 			"lineThickness", &Circle::lineThickness,
 			"radius", &Circle::radius,
 			"color", &Circle::color
+		);
+
+		lua.new_usertype<Text>(
+			"Text",
+			sol::call_constructor,
+			sol::factories(
+				[&](const glm::vec2& position, const std::string& textStr, const std::string& fontName, float wrap, const Color& color)
+				{
+					auto font = assetManager->GetFont(fontName);
+					if (!font)
+					{
+						F_ERROR("Failed to get font '{0}': Does not exist in asset manager!", fontName);
+						return Text{};
+					}
+
+					return Text{
+						.position = position,
+						.textStr = textStr,
+						.wrap = wrap,
+						.pFont = font,
+						.color = color
+					};
+				}
+			),
+			"position", &Text::position,
+			"textStr", &Text::textStr,
+			"wrap", &Text::wrap,
+			"color", &Text::color
 		);
 
 		auto& renderer = registry.GetContext<std::shared_ptr<Renderer>>();
@@ -103,6 +135,13 @@ namespace Feather {
 			"DrawFilledRect", [&](const Rect& rect)
 			{
 				renderer->DrawFilledRect(rect);
+			}
+		);
+
+		lua.set_function(
+			"DrawText", [&](const Text& text)
+			{
+				renderer->DrawText2D(text);
 			}
 		);
 

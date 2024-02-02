@@ -1,5 +1,7 @@
 #include "TextBatchRenderer.h"
 
+#include "Logger/Logger.h"
+
 namespace Feather {
 
 	TextBatchRenderer::TextBatchRenderer()
@@ -78,10 +80,60 @@ namespace Feather {
 			std::vector<std::string> textChunks{};
 			std::string text_holder{ "" };
 			glm::vec2 temp_pos = textGlyph->position;
+			auto fontSize = textGlyph->font->GetFontSize();
 
-			if (textGlyph->wrap > 1.0f)
+			if (textGlyph->wrap > 100.0f)
 			{
 				// Create the text chunks for each line
+				for (int i = 0; i < textGlyph->textStr.size(); i++)
+				{
+					auto character = textGlyph->textStr[i];
+					text_holder += character;
+					bool newLine = character == '\n';
+					size_t text_size = text_holder.size();
+					// Move temp_pos with each character
+					textGlyph->font->GetNextCharPos(character, temp_pos);
+
+					if (text_size > 0 && (temp_pos.x > (textGlyph->wrap + textGlyph->position.x) || character == '\0' || newLine))
+					{
+						if (!newLine)
+						{
+							while (textGlyph->textStr[i] != ' ' && textGlyph->textStr[i] != '.' && textGlyph->textStr[i] != '!' && textGlyph->textStr[i] != '?' && text_size > 0)
+							{
+								i--;
+								if (i < 0)
+								{
+									F_ERROR("Failed to draw text '{0}': Wrap '{1}', is too small for the text to wrap successfully!", textGlyph->textStr, textGlyph->wrap);
+									return;
+								}
+
+								if (!text_holder.empty())
+								{
+									text_holder.pop_back();
+									text_size = text_holder.size();
+									temp_pos.x -= fontSize;
+								}
+							}
+						}
+						else
+						{
+							text_holder.pop_back();
+						}
+
+						if (text_size > 0)
+						{
+							textChunks.push_back(text_holder);
+							temp_pos = textGlyph->position;
+							text_holder.clear();
+						}
+					}
+				}
+
+				if (!text_holder.empty())
+				{
+					textChunks.push_back(text_holder);
+					text_holder.clear();
+				}
 			}
 			else
 			{
