@@ -21,13 +21,15 @@ project "Feather-Editor"
         "%{wks.location}/vendor/spdlog-1.12.0/include",
         "%{wks.location}/vendor/entt/include",
         "%{wks.location}/vendor/lua_53/include",
-        "%{wks.location}/vendor/sol3"
+        "%{wks.location}/vendor/sol3",
+        "%{wks.location}/vendor/box2d/include"
     }
 
     libdirs
     {
         "%{wks.location}/vendor/SDL/lib",
-        "%{wks.location}/vendor/lua_53/lib"
+        "%{wks.location}/vendor/lua_53/lib",
+        "%{wks.location}/vendor/box2d/lib"
     }
 
     links
@@ -37,7 +39,8 @@ project "Feather-Editor"
         "SDL2.lib",
         "SDL2_mixer.lib",
         "opengl32.lib",
-        "lua53.lib"
+        "lua53.lib",
+        "box2d.lib"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
