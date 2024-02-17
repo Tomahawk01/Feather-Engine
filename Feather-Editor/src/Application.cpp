@@ -12,10 +12,17 @@
 #include <Core/ECS/Components/Identification.h>
 #include <Core/ECS/Components/SpriteComponent.h>
 #include <Core/ECS/Components/TransformComponent.h>
+#include <Core/ECS/Components/PhysicsComponent.h>
+#include <Core/ECS/Components/BoxColliderComponent.h>
+#include <Core/ECS/Components/CircleColliderComponent.h>
+
 #include <Core/Resources/AssetManager.h>
+
 #include <Core/Systems/ScriptingSystem.h>
 #include <Core/Systems/RenderSystem.h>
 #include <Core/Systems/AnimationSystem.h>
+#include <Core/Systems/PhysicsSystem.h>
+
 #include <Core/Scripting/InputManager.h>
 
 #include <Sounds/MusicPlayer/MusicPlayer.h>
@@ -229,6 +236,21 @@ namespace Feather {
 			return false;
 		}
 
+		// Create Physics World
+		PhysicsWorld physicsWorld = std::make_shared<b2World>(b2Vec2{ 0.0f, 9.8f });
+		if (!m_Registry->AddToContext<PhysicsWorld>(physicsWorld))
+		{
+			F_FATAL("Failed to add physics world to the registry context!");
+			return false;
+		}
+
+		auto physicsSystem = std::make_shared<PhysicsSystem>(*m_Registry);
+		if (!m_Registry->AddToContext<std::shared_ptr<PhysicsSystem>>(physicsSystem))
+		{
+			F_FATAL("Failed to add physics system to the registry context!");
+			return false;
+		}
+
 		if (!LoadShaders())
 		{
 			F_FATAL("Failed to load shaders!");
@@ -252,6 +274,65 @@ namespace Feather {
 			F_ERROR("Failed to load test font!");
 			return false;
 		}
+
+		// Physics test ==================================================
+		assetManager->AddTexure("TestGem", "assets/textures/Gem.png");
+		auto texture = assetManager->GetTexture("TestGem");
+
+		auto& reg = m_Registry->GetRegistry();
+
+		// Gem entity
+		auto ent1 = reg.create();
+		auto& transform1 = reg.emplace<TransformComponent>(
+			ent1, TransformComponent{ .position = glm::vec2{320.0f, 0.0f}, .scale = glm::vec2{1.0f} }
+		);
+		auto& circle1 = reg.emplace<CircleColliderComponent>(
+			ent1, CircleColliderComponent{ .radius = 32.0f }
+		);
+		auto& physics1 = reg.emplace<PhysicsComponent>(
+			ent1, PhysicsComponent{ physicsWorld, PhysicsAttributes{
+				.eType = RigidBodyType::DYNAMIC,
+				.density = 100.0f,
+				.friction = 0.5f,
+				.restitution = 0.9f,
+				.radius = circle1.radius * PIXELS_TO_METERS,
+				.gravityScale = 5.0f,
+				.position = transform1.position,
+				.scale = transform1.scale,
+				.isCircle = true,
+				.isFixedRotation = false }
+			}
+		);
+		physics1.Init(640, 480);
+		auto& sprite = reg.emplace<SpriteComponent>(
+			ent1, SpriteComponent{ .width = 32.0f, .height = 32.0f, .start_x = 0, .start_y = 0, .texture_name = "TestGem" }
+		);
+		sprite.generate_uvs(32, 32);
+
+		// Floor entity
+		auto ent2 = reg.create();
+		auto& transform2 = reg.emplace<TransformComponent>(
+			ent2, TransformComponent{ .position = glm::vec2{0.0f, 400.0f}, .scale = glm::vec2{1.0f} }
+		);
+		auto& box2 = reg.emplace<BoxColliderComponent>(
+			ent2, BoxColliderComponent{ .width = 480, .height = 48 }
+		);
+		auto& physics2 = reg.emplace<PhysicsComponent>(
+			ent2, PhysicsComponent{ physicsWorld, PhysicsAttributes{
+				.eType = RigidBodyType::STATIC,
+				.density = 1000.0f,
+				.friction = 0.5f,
+				.restitution = 0.0f,
+				.gravityScale = 0.0f,
+				.position = transform2.position,
+				.scale = transform2.scale,
+				.boxSize = glm::vec2{ box2.width, box2.height },
+				.isBoxShape = true,
+				.isFixedRotation = true }
+			}
+		);
+		physics2.Init(640, 480);
+		// end Physics test ==================================================
 
 		return true;
     }
@@ -369,6 +450,11 @@ namespace Feather {
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Update();
+
+		auto& physicsWorld = m_Registry->GetContext<PhysicsWorld>();
+		physicsWorld->Step(1.0f / 60.0f, 10, 8);
+		auto& physicsSystem = m_Registry->GetContext<std::shared_ptr<PhysicsSystem>>();
+		physicsSystem->Update(m_Registry->GetRegistry());
 
 		auto& animationSystem = m_Registry->GetContext<std::shared_ptr<AnimationSystem>>();
 		animationSystem->Update();
