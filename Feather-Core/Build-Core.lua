@@ -47,7 +47,7 @@ project "Feather-Core"
         "SDL2.lib",
         "SDL2_mixer.lib",
         "lua53.lib",
-        "box2d.lib"
+        "Box2D"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")

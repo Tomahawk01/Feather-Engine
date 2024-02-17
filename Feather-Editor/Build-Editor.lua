@@ -40,7 +40,7 @@ project "Feather-Editor"
         "SDL2_mixer.lib",
         "opengl32.lib",
         "lua53.lib",
-        "box2d.lib"
+        "Box2D"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")

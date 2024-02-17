@@ -21,6 +21,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "vendor/Glad/Build-Glad.lua"
+    include "vendor/box2d/Build-Box2D.lua"
 group ""
 
 include "Feather-Core/Build-Core.lua"
