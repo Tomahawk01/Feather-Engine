@@ -481,7 +481,7 @@ namespace Feather {
 
 		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
 
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
