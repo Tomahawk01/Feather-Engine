@@ -81,7 +81,133 @@ namespace Feather {
 
 	void PhysicsComponent::CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry)
 	{
-		// TODO: Create lua bindings
+		lua.new_enum<RigidBodyType>(
+			"BodyType", {
+				{ "Static", RigidBodyType::STATIC },
+				{ "Kinematic", RigidBodyType::KINEMATIC },
+				{ "Dynamic", RigidBodyType::DYNAMIC }
+			}
+		);
+
+		lua.new_usertype<PhysicsAttributes>(
+			"PhysicsAttributes",
+			sol::call_constructor,
+			sol::factories(
+				[] { return PhysicsAttributes{}; }
+				// TODO: Add more specific ctor
+			),
+			"type", &PhysicsAttributes::eType,
+			"density", &PhysicsAttributes::density,
+			"friction", &PhysicsAttributes::friction,
+			"restitution", &PhysicsAttributes::restitution,
+			"restitutionThreshold", &PhysicsAttributes::restitutionThreshold,
+			"radius", &PhysicsAttributes::radius,
+			"gravityScale", &PhysicsAttributes::gravityScale,
+			"position", &PhysicsAttributes::position,
+			"scale", &PhysicsAttributes::scale,
+			"boxSize", &PhysicsAttributes::boxSize,
+			"offset", &PhysicsAttributes::offset,
+			"isCircle", &PhysicsAttributes::isCircle,
+			"isBox", &PhysicsAttributes::isBoxShape,
+			"isFixedRotation", &PhysicsAttributes::isFixedRotation
+			// TODO: Add filters and other properties as needed
+		);
+
+		auto& physicsWorld = registry.ctx().get<PhysicsWorld>();
+		if (!physicsWorld)
+			return;
+		
+		lua.new_usertype<PhysicsComponent>(
+			"PhysicsComponent",
+			"type_id", &entt::type_hash<PhysicsComponent>::value,
+			sol::call_constructor,
+			sol::factories(
+				[&](const PhysicsAttributes& attrs)
+				{
+					PhysicsComponent pc{ attrs };
+					pc.Init(physicsWorld, 640, 480); // TODO: Change based on window values
+					return pc;
+				}
+			),
+			"linear_impulse", [](PhysicsComponent& pc, const glm::vec2& impulse)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->ApplyLinearImpulse(b2Vec2{ impulse.x, impulse.y }, body->GetPosition(), true);
+			},
+			"angular_impulse", [](PhysicsComponent& pc, float impulse)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->ApplyAngularImpulse(impulse, true);
+			},
+			"set_linear_velocity", [](PhysicsComponent& pc, const glm::vec2& velocity)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->SetLinearVelocity(b2Vec2{velocity.x, velocity.y});
+			},
+			"get_linear_velocity", [](PhysicsComponent& pc)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return glm::vec2{ 0.0f };
+				}
+
+				const auto& linearVelocity = body->GetLinearVelocity();
+				return glm::vec2{ linearVelocity.x, linearVelocity.y };
+			},
+			"set_angular_velocity", [](PhysicsComponent& pc, float angularVelocity)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->SetAngularVelocity(angularVelocity);
+			},
+			"get_angular_velocity", [](PhysicsComponent& pc)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return 0.0f;
+				}
+
+				return body->GetAngularVelocity();
+			},
+			"set_gravity_scale", [](PhysicsComponent& pc, float gravityScale)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->SetGravityScale(gravityScale);
+			}
+		);
 	}
 
 }
