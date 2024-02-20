@@ -34,16 +34,16 @@ namespace Feather {
 	class PhysicsComponent
 	{
 	public:
-		PhysicsComponent(PhysicsWorld physicsWorld, const PhysicsAttributes& physicsAttribs);
+		PhysicsComponent();
+		PhysicsComponent(const PhysicsAttributes& physicsAttrs);
 		~PhysicsComponent() = default;
 
-		void Init(int windowWidth, int windowHeight);
+		void Init(PhysicsWorld physicsWorld, int windowWidth, int windowHeight);
 		b2Body* GetBody();
 
 		static void CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry);
 
 	private:
-		PhysicsWorld m_PhysicsWorld;
 		std::shared_ptr<b2Body> m_RigidBody;
 
 		PhysicsAttributes m_InitialAttributes;

@@ -4,13 +4,17 @@
 
 namespace Feather {
 
-	PhysicsComponent::PhysicsComponent(PhysicsWorld physicsWorld, const PhysicsAttributes& physicsAttribs)
-		: m_PhysicsWorld{ physicsWorld }, m_RigidBody{ nullptr }, m_InitialAttributes{ physicsAttribs }
+	PhysicsComponent::PhysicsComponent()
+		: PhysicsComponent(PhysicsAttributes{})
 	{}
 
-	void PhysicsComponent::Init(int windowWidth, int windowHeight)
+	PhysicsComponent::PhysicsComponent(const PhysicsAttributes& physicsAttrs)
+		: m_RigidBody{ nullptr }, m_InitialAttributes{ physicsAttrs }
+	{}
+
+	void PhysicsComponent::Init(PhysicsWorld physicsWorld, int windowWidth, int windowHeight)
 	{
-		if (!m_PhysicsWorld)
+		if (!physicsWorld)
 		{
 			F_FATAL("Failed to initialize physics component: Physics world is nullptr!");
 			return;
@@ -27,7 +31,7 @@ namespace Feather {
 		bodyDef.gravityScale = m_InitialAttributes.gravityScale;
 		bodyDef.fixedRotation = m_InitialAttributes.isFixedRotation;
 
-		m_RigidBody = MakeSharedBody(m_PhysicsWorld->CreateBody(&bodyDef));
+		m_RigidBody = MakeSharedBody(physicsWorld->CreateBody(&bodyDef));
 		if (!m_RigidBody)
 		{
 			F_ERROR("Failed to create RigidBody");
@@ -38,7 +42,7 @@ namespace Feather {
 		b2CircleShape circleShape;
 		if (isCircle)
 		{
-			circleShape.m_radius = m_InitialAttributes.radius;
+			circleShape.m_radius = m_InitialAttributes.radius * m_InitialAttributes.scale.x;
 		}
 		else if (m_InitialAttributes.isBoxShape)
 		{

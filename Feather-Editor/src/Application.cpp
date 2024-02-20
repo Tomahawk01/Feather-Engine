@@ -20,6 +20,7 @@
 
 #include <Core/Systems/ScriptingSystem.h>
 #include <Core/Systems/RenderSystem.h>
+#include <Core/Systems/RenderShapeSystem.h>
 #include <Core/Systems/AnimationSystem.h>
 #include <Core/Systems/PhysicsSystem.h>
 
@@ -185,6 +186,18 @@ namespace Feather {
 			return false;
 		}
 
+		auto renderShapeSystem = std::make_shared<RenderShapeSystem>(*m_Registry);
+		if (!renderShapeSystem)
+		{
+			F_FATAL("Failed to create render shape system!");
+			return false;
+		}
+		if (!m_Registry->AddToContext<std::shared_ptr<RenderShapeSystem>>(renderShapeSystem))
+		{
+			F_FATAL("Failed to add the render shape system to the registry context!");
+			return false;
+		}
+
 		auto animationSystem = std::make_shared<AnimationSystem>(*m_Registry);
 		if (!animationSystem)
 		{
@@ -287,14 +300,14 @@ namespace Feather {
 			ent1, TransformComponent{ .position = glm::vec2{320.0f, 0.0f}, .scale = glm::vec2{1.0f} }
 		);
 		auto& circle1 = reg.emplace<CircleColliderComponent>(
-			ent1, CircleColliderComponent{ .radius = 32.0f }
+			ent1, CircleColliderComponent{ .radius = 16.0f }
 		);
 		auto& physics1 = reg.emplace<PhysicsComponent>(
-			ent1, PhysicsComponent{ physicsWorld, PhysicsAttributes{
+			ent1, PhysicsComponent{ PhysicsAttributes{
 				.eType = RigidBodyType::DYNAMIC,
 				.density = 100.0f,
 				.friction = 0.5f,
-				.restitution = 0.9f,
+				.restitution = 0.7f,
 				.radius = circle1.radius * PIXELS_TO_METERS,
 				.gravityScale = 5.0f,
 				.position = transform1.position,
@@ -303,7 +316,7 @@ namespace Feather {
 				.isFixedRotation = false }
 			}
 		);
-		physics1.Init(640, 480);
+		physics1.Init(physicsWorld, 640, 480);
 		auto& sprite = reg.emplace<SpriteComponent>(
 			ent1, SpriteComponent{ .width = 32.0f, .height = 32.0f, .start_x = 0, .start_y = 0, .texture_name = "TestGem" }
 		);
@@ -318,8 +331,8 @@ namespace Feather {
 			ent2, BoxColliderComponent{ .width = 480, .height = 48 }
 		);
 		auto& physics2 = reg.emplace<PhysicsComponent>(
-			ent2, PhysicsComponent{ physicsWorld, PhysicsAttributes{
-				.eType = RigidBodyType::STATIC,
+			ent2, PhysicsComponent{ PhysicsAttributes{
+				.eType = RigidBodyType::DYNAMIC,
 				.density = 1000.0f,
 				.friction = 0.5f,
 				.restitution = 0.0f,
@@ -328,10 +341,10 @@ namespace Feather {
 				.scale = transform2.scale,
 				.boxSize = glm::vec2{ box2.width, box2.height },
 				.isBoxShape = true,
-				.isFixedRotation = true }
+				.isFixedRotation = false }
 			}
 		);
-		physics2.Init(640, 480);
+		physics2.Init(physicsWorld, 640, 480);
 		// end Physics test ==================================================
 
 		return true;
@@ -471,6 +484,7 @@ namespace Feather {
     void Application::Render()
     {
 		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<RenderSystem>>();
+		auto& renderShapeSystem = m_Registry->GetContext<std::shared_ptr<RenderShapeSystem>>();
 		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
 		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
 		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
@@ -487,6 +501,7 @@ namespace Feather {
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Render();
 		renderSystem->Update();
+		renderShapeSystem->Update();
 
 		renderer->DrawLines(*shader, *camera);
 		renderer->DrawFilledRects(*shader, *camera);
