@@ -4,8 +4,7 @@ void Feather::TransformComponent::CreateLuaTransformBind(sol::state& lua)
 {
 	lua.new_usertype<TransformComponent>(
 		"Transform",
-		"type_id",
-		&entt::type_hash<TransformComponent>::value,
+		"type_id", &entt::type_hash<TransformComponent>::value,
 		sol::call_constructor,
 		sol::factories(
 			[](glm::vec2 position, glm::vec2 scale, float rotation)

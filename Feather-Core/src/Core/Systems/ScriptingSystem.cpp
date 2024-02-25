@@ -10,6 +10,7 @@
 #include "Core/ECS/Components/BoxColliderComponent.h"
 #include "Core/ECS/Components/CircleColliderComponent.h"
 #include "Core/ECS/Components/PhysicsComponent.h"
+#include "Core/ECS/Components/TextComponent.h"
 
 #include "Core/ECS/Entity.h"
 
@@ -164,6 +165,7 @@ namespace Feather {
 		BoxColliderComponent::CreateLuaBoxColliderBind(lua);
 		CircleColliderComponent::CreateLuaCircleColliderBind(lua);
 		PhysicsComponent::CreatePhysicsLuaBind(lua, registry.GetRegistry());
+		TextComponent::CreateLuaTextBindings(lua);
 
 		Entity::RegisterMetaComponent<TransformComponent>();
 		Entity::RegisterMetaComponent<SpriteComponent>();
@@ -171,6 +173,7 @@ namespace Feather {
 		Entity::RegisterMetaComponent<BoxColliderComponent>();
 		Entity::RegisterMetaComponent<CircleColliderComponent>();
 		Entity::RegisterMetaComponent<PhysicsComponent>();
+		Entity::RegisterMetaComponent<TextComponent>();
 
 		Registry::RegisterMetaComponent<TransformComponent>();
 		Registry::RegisterMetaComponent<SpriteComponent>();
@@ -178,6 +181,7 @@ namespace Feather {
 		Registry::RegisterMetaComponent<BoxColliderComponent>();
 		Registry::RegisterMetaComponent<CircleColliderComponent>();
 		Registry::RegisterMetaComponent<PhysicsComponent>();
+		Registry::RegisterMetaComponent<TextComponent>();
 	}
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua)

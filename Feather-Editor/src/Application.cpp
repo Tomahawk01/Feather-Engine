@@ -20,6 +20,7 @@
 
 #include <Core/Systems/ScriptingSystem.h>
 #include <Core/Systems/RenderSystem.h>
+#include <Core/Systems/RenderUISystem.h>
 #include <Core/Systems/RenderShapeSystem.h>
 #include <Core/Systems/AnimationSystem.h>
 #include <Core/Systems/PhysicsSystem.h>
@@ -185,6 +186,18 @@ namespace Feather {
 		if (!m_Registry->AddToContext<std::shared_ptr<RenderSystem>>(renderSystem))
 		{
 			F_FATAL("Failed to add the render system to the registry context!");
+			return false;
+		}
+
+		auto renderUISystem = std::make_shared<RenderUISystem>(*m_Registry);
+		if (!renderUISystem)
+		{
+			F_FATAL("Failed to create render UI system!");
+			return false;
+		}
+		if (!m_Registry->AddToContext<std::shared_ptr<RenderUISystem>>(renderUISystem))
+		{
+			F_FATAL("Failed to add the render UI system to the registry context!");
 			return false;
 		}
 
@@ -427,6 +440,7 @@ namespace Feather {
     void Application::Render()
     {
 		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<RenderSystem>>();
+		auto& renderUISystem = m_Registry->GetContext<std::shared_ptr<RenderUISystem>>();
 		auto& renderShapeSystem = m_Registry->GetContext<std::shared_ptr<RenderShapeSystem>>();
 		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
 		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
@@ -445,6 +459,7 @@ namespace Feather {
 		scriptSystem->Render();
 		renderSystem->Update();
 		renderShapeSystem->Update();
+		renderUISystem->Update(m_Registry->GetRegistry());
 
 		renderer->DrawLines(*shader, *camera);
 		renderer->DrawFilledRects(*shader, *camera);

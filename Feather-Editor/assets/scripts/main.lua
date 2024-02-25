@@ -99,6 +99,15 @@ topPhys.isFixedRotation = true
 topEnt:add_component(PhysicsComponent(topPhys))
 -- ============================================================================
 
+local ballCount = 0
+local countEnt = Entity("", "")
+countEnt:add_component(Transform(vec2(10, 32), vec2(1, 1), 0))
+countEnt:add_component(TextComponent("testFont", "Ball Count: ", Color(255, 255, 255, 255), 4, -1.0))
+
+local valEnt = Entity("", "")
+valEnt:add_component(Transform(vec2(150, 32), vec2(1, 1), 0))
+local valText = valEnt:add_component(TextComponent("testFont", "0", Color(255, 255, 255, 255), 4, -1.0))
+
 function createGem()
 	if (Mouse.just_released(LEFT_BUTTON)) then
 		local pos_x, pos_y = Mouse.screen_position()
@@ -122,6 +131,8 @@ function createGem()
 
 		local sprite = gem:add_component(Sprite("TestGem", 32, 32, 0, 0, 0))
 		sprite:generate_uvs()
+
+		ballCount = ballCount + 1
 	end
 end
 
@@ -154,6 +165,8 @@ main = {
 		update = function()
 			createGem()
 			updateEntity(gem)
+
+			valText.textStr = tostring(ballCount)
 		end
 	},
 	[2] = {
