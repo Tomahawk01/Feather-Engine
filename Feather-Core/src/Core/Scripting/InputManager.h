@@ -6,6 +6,7 @@
 #include "Windowing/Input/Keyboard.h"
 #include "Windowing/Input/Mouse.h"
 #include "Windowing/Input/Gamepad.h"
+#include "Core/ECS/Registry.h"
 
 constexpr int MAX_CONTROLLERS = 4;
 
@@ -15,7 +16,7 @@ namespace Feather {
 	{
 	public:
 		static InputManager& GetInstance();
-		static void CreateLuaInputBindings(sol::state& lua);
+		static void CreateLuaInputBindings(sol::state& lua, Registry& registry);
 
 		inline Keyboard& GetKeyboard() { return *m_Keyboard; }
 		inline Mouse& GetMouse() { return *m_Mouse; }

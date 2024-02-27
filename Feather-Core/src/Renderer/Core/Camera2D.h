@@ -16,16 +16,21 @@ namespace Feather {
 
 		inline const glm::vec2 GetPosition() const { return m_Position; }
 		inline const float GetScale() const { return m_Scale; }
+		inline const int GetWidth() const { return m_Width; }
+		inline const int GetHeight() const { return m_Height; }
 
 		inline glm::mat4 GetCameraMatrix() { return m_CameraMatrix; }
 
 		void Update();
 
+		glm::vec2 ScreenCoordsToWorld(const glm::vec2& screenCoords);
+		glm::vec2 WorldCoordsToScreen(const glm::vec2& worldCoords);
+
 	private:
 		int m_Width, m_Height;
 		float m_Scale;
 
-		glm::vec2 m_Position;
+		glm::vec2 m_Position, m_ScreenOffset;
 		glm::mat4 m_CameraMatrix, m_OrthoProjection;
 
 		bool m_NeedUpdate;

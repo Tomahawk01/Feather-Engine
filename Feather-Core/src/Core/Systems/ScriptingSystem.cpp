@@ -150,7 +150,7 @@ namespace Feather {
 	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Registry& registry)
 	{
 		GLMBinding::CreateGLMBindings(lua);
-		InputManager::CreateLuaInputBindings(lua);
+		InputManager::CreateLuaInputBindings(lua, registry);
 		AssetManager::CreateLuaAssetManager(lua, registry);
 		SoundBinder::CreateSoundBind(lua, registry);
 		RendererBinder::CreateRenderingBind(lua, registry);

@@ -1,6 +1,9 @@
 #include "InputManager.h"
 
 #include "Logger/Logger.h"
+#include "Renderer/Core/Camera2D.h"
+
+#include <glm/glm.hpp>
 
 namespace Feather {
 
@@ -14,13 +17,14 @@ namespace Feather {
 		return instance;
 	}
 
-	void InputManager::CreateLuaInputBindings(sol::state& lua)
+	void InputManager::CreateLuaInputBindings(sol::state& lua, Registry& registry)
 	{
         RegisterLuaKeyNames(lua);
         RegisterLuaMouseButtonNames(lua);
         RegisterLuaGamepadButtonNames(lua);
 
         auto& inputManager = GetInstance();
+        auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
 
         auto& keyboard = inputManager.GetKeyboard();
         lua.new_usertype<Keyboard>(
@@ -38,7 +42,14 @@ namespace Feather {
             "just_pressed", [&](int btn) { return mouse.IsButtonJustPressed(btn); },
             "just_released", [&](int btn) { return mouse.IsButtonJustReleased(btn); },
             "pressed", [&](int btn) { return mouse.IsButtonPressed(btn); },
-            "screen_position", [&]() { return mouse.GetMouseScreenPosition(); },
+            "screen_position", [&]() {
+                auto [x, y] = mouse.GetMouseScreenPosition();
+                return glm::vec2{ x, y };
+            },
+            "world_position", [&]() {
+                auto [x, y] = mouse.GetMouseScreenPosition();
+                return camera->ScreenCoordsToWorld(glm::vec2{ x, y });
+            },
             "wheel_x", [&]() { return mouse.GetMouseWheelX(); },
             "wheel_y", [&]() { return mouse.GetMouseWheelY(); }
         );
