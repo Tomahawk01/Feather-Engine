@@ -8,9 +8,6 @@
 
 namespace Feather {
 
-	constexpr float METERS_TO_PIXELS = 12.0f;
-	constexpr float PIXELS_TO_METERS = 1.0f / METERS_TO_PIXELS;
-
 	enum class RigidBodyType
 	{
 		STATIC = 0,

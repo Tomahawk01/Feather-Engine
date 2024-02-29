@@ -6,6 +6,8 @@
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/ECS/Components/PhysicsComponent.h"
 
+#include "Core/CoreUtils/CoreEngineData.h"
+
 namespace Feather {
 
 	PhysicsSystem::PhysicsSystem(Registry& registry)
@@ -15,8 +17,10 @@ namespace Feather {
 	void PhysicsSystem::Update(entt::registry& registry)
 	{
 		auto boxView = registry.view<PhysicsComponent, TransformComponent, BoxColliderComponent>();
-		auto scaledWidth = 640.0f / METERS_TO_PIXELS;
-		auto scaledHeight = 480.0f / METERS_TO_PIXELS;
+		auto& coreEngine = CoreEngineData::GetInstance();
+
+		float scaledWidth = coreEngine.ScaledWidth() * 0.5f;
+		float scaledHeight = coreEngine.ScaledHeight() * 0.5f;
 
 		for (auto entity : boxView)
 		{
@@ -30,8 +34,8 @@ namespace Feather {
 
 			const auto& bodyPosition = RigidBody->GetPosition();
 
-			transform.position.x = ((scaledWidth / 2.0f) + bodyPosition.x) * METERS_TO_PIXELS - (boxCollider.width * transform.scale.x) / 2.0f - boxCollider.offset.x;
-			transform.position.y = ((scaledHeight / 2.0f) + bodyPosition.y) * METERS_TO_PIXELS - (boxCollider.height * transform.scale.y) / 2.0f - boxCollider.offset.y;
+			transform.position.x = (scaledWidth + bodyPosition.x) * coreEngine.MetersToPixels() - (boxCollider.width * transform.scale.x) / 2.0f - boxCollider.offset.x;
+			transform.position.y = (scaledHeight + bodyPosition.y) * coreEngine.MetersToPixels() - (boxCollider.height * transform.scale.y) / 2.0f - boxCollider.offset.y;
 			if (!RigidBody->IsFixedRotation())
 				transform.rotation = glm::degrees(RigidBody->GetAngle());
 		}
@@ -49,8 +53,8 @@ namespace Feather {
 
 			const auto& bodyPosition = RigidBody->GetPosition();
 
-			transform.position.x = ((scaledWidth / 2.0f) + bodyPosition.x) * METERS_TO_PIXELS - (circleCollider.radius * transform.scale.x) - circleCollider.offset.x;
-			transform.position.y = ((scaledHeight / 2.0f) + bodyPosition.y) * METERS_TO_PIXELS - (circleCollider.radius * transform.scale.y) - circleCollider.offset.y;
+			transform.position.x = (scaledWidth + bodyPosition.x) * coreEngine.MetersToPixels() - (circleCollider.radius * transform.scale.x) - circleCollider.offset.x;
+			transform.position.y = (scaledHeight + bodyPosition.y) * coreEngine.MetersToPixels() - (circleCollider.radius * transform.scale.y) - circleCollider.offset.y;
 			if (!RigidBody->IsFixedRotation())
 				transform.rotation = glm::degrees(RigidBody->GetAngle());
 		}

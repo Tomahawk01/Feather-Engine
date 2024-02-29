@@ -1,6 +1,7 @@
 #include "PhysicsComponent.h"
 
 #include "Logger/Logger.h"
+#include "Core/CoreUtils/CoreEngineData.h"
 
 namespace Feather {
 
@@ -21,6 +22,8 @@ namespace Feather {
 		}
 
 		bool isCircle{ m_InitialAttributes.isCircle };
+
+		auto PIXELS_TO_METERS = CoreEngineData::GetInstance().PixelsToMeters();
 
 		b2BodyDef bodyDef{};
 		bodyDef.type = static_cast<b2BodyType>(m_InitialAttributes.eType);

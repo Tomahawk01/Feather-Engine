@@ -3,18 +3,7 @@
 -- run_script("assets/scripts/TestProject/assetDefs.lua")
 -- run_script("assets/scripts/TestProject/testmap.lua")
 -- run_script("assets/scripts/utilities.lua")
-run_script("assets/scripts/follow_cam.lua")
-
--- Create follow camera
-gCam = Camera.get()
-gFollowCam = FollowCam:Create(gCam,
-	{
-		scale = 1,
-		max_x = 20000,
-		max_y = 2000,
-		springback = 0.2
-	}
-)
+-- run_script("assets/scripts/follow_cam.lua")
 
 -- Create a Gem
 local gem = Entity("", "")
@@ -37,6 +26,17 @@ gem:add_component(PhysicsComponent(physAttrs))
 
 local sprite = gem:add_component(Sprite("TestGem", 32, 32, 0, 0, 0))
 sprite:generate_uvs()
+
+-- Create follow camera
+gFollowCam = FollowCamera(
+	FollowCamParams({
+		scale = 1,
+		max_x = 20000,
+		max_y = 2000,
+		springback = 0.2
+	}),
+	gem
+)
 
 -- Create a bottom box
 local bottomEnt = Entity("", "")
@@ -178,7 +178,7 @@ main = {
 		update = function()
 			createGem()
 			updateEntity(gem)
-			gFollowCam:Update(gem:id())
+			gFollowCam:update()
 			valText.textStr = tostring(ballCount)
 		end
 	},

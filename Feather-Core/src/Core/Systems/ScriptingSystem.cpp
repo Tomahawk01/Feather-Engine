@@ -21,6 +21,8 @@
 
 #include "Core/Resources/AssetManager.h"
 
+#include "Core/CoreUtils/FollowCamera.h"
+
 namespace Feather {
 
 	ScriptingSystem::ScriptingSystem(Feather::Registry& registry)
@@ -154,6 +156,7 @@ namespace Feather {
 		AssetManager::CreateLuaAssetManager(lua, registry);
 		SoundBinder::CreateSoundBind(lua, registry);
 		RendererBinder::CreateRenderingBind(lua, registry);
+		FollowCamera::CreateLuaFollowCamera(lua, registry);
 
 		create_timer(lua);
 
