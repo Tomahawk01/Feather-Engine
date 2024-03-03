@@ -4,6 +4,7 @@
 #include "Core/ECS/Components/CircleColliderComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/CoreUtils/CoreEngineData.h"
 
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Essentials/Primitives.h"
@@ -16,6 +17,9 @@ namespace Feather {
 
 	void RenderShapeSystem::Update()
 	{
+		if (!CoreEngineData::GetInstance().RenderCollidersEnabled())
+			return;
+
 		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
 		auto& assetManager = m_Registry.GetContext<std::shared_ptr<AssetManager>>();
 

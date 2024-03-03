@@ -286,7 +286,7 @@ namespace Feather {
 		}
 
 		ScriptingSystem::RegisterLuaBindings(*lua, *m_Registry);
-		ScriptingSystem::RegisterLuaFunctions(*lua);
+		ScriptingSystem::RegisterLuaFunctions(*lua, *m_Registry);
 
 		if (!scriptSystem->LoadMainScript(*lua))
 		{

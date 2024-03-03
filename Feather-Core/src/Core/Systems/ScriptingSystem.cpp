@@ -2,6 +2,7 @@
 
 #include "Logger/Logger.h"
 #include "Utils/Timer.h"
+#include "Utils/RandomGenerator.h"
 
 #include "Core/ECS/Components/ScriptComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
@@ -10,6 +11,7 @@
 #include "Core/ECS/Components/BoxColliderComponent.h"
 #include "Core/ECS/Components/CircleColliderComponent.h"
 #include "Core/ECS/Components/PhysicsComponent.h"
+#include "Core/ECS/Components/RigidBodyComponent.h"
 #include "Core/ECS/Components/TextComponent.h"
 
 #include "Core/ECS/Entity.h"
@@ -168,6 +170,7 @@ namespace Feather {
 		BoxColliderComponent::CreateLuaBoxColliderBind(lua);
 		CircleColliderComponent::CreateLuaCircleColliderBind(lua);
 		PhysicsComponent::CreatePhysicsLuaBind(lua, registry.GetRegistry());
+		RigidBodyComponent::CreateRigidBodyLuaBind(lua);
 		TextComponent::CreateLuaTextBindings(lua);
 
 		Entity::RegisterMetaComponent<TransformComponent>();
@@ -176,6 +179,7 @@ namespace Feather {
 		Entity::RegisterMetaComponent<BoxColliderComponent>();
 		Entity::RegisterMetaComponent<CircleColliderComponent>();
 		Entity::RegisterMetaComponent<PhysicsComponent>();
+		Entity::RegisterMetaComponent<RigidBodyComponent>();
 		Entity::RegisterMetaComponent<TextComponent>();
 
 		Registry::RegisterMetaComponent<TransformComponent>();
@@ -184,10 +188,11 @@ namespace Feather {
 		Registry::RegisterMetaComponent<BoxColliderComponent>();
 		Registry::RegisterMetaComponent<CircleColliderComponent>();
 		Registry::RegisterMetaComponent<PhysicsComponent>();
+		Registry::RegisterMetaComponent<RigidBodyComponent>();
 		Registry::RegisterMetaComponent<TextComponent>();
 	}
 
-	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua)
+	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)
 	{
 		lua.set_function(
 			"run_script", [&](const std::string& path)
@@ -204,6 +209,42 @@ namespace Feather {
 
 				return true;
 			}
+		);
+
+		lua.set_function("get_ticks", [] { return SDL_GetTicks(); });
+
+		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
+		lua.set_function(
+			"measure_text", [&](const std::string& text, const std::string& fontName) {
+				const auto& pFont = assetManager->GetFont(fontName);
+				if (!pFont)
+				{
+					F_ERROR("Failed to get font '{}': Does not exist in asset manager!", fontName);
+					return -1.f;
+				}
+
+				glm::vec2 position{ 0.f }, temp_pos{ position };
+				for (const auto& character : text)
+					pFont->GetNextCharPos(character, temp_pos);
+
+				return std::abs((position - temp_pos).x);
+			}
+		);
+
+		auto& engine = CoreEngineData::GetInstance();
+		lua.set_function("GetDeltaTime", [&] { return engine.GetDeltaTime(); });
+		lua.set_function("WindowWidth", [&] { return engine.WindowWidth(); });
+		lua.set_function("WindowHeight", [&] { return engine.WindowHeight(); });
+		lua.set_function("DisablePhysics", [&] { engine.DisablePhysics(); });
+		lua.set_function("EnablePhysics", [&] { engine.EnablePhysics(); });
+		lua.set_function("IsPhysicsEnabled", [&] { return engine.IsPhysicsEnabled(); });
+
+		lua.new_usertype<RandomGenerator>(
+			"Random",
+			sol::call_constructor,
+			sol::constructors<RandomGenerator(uint32_t, uint32_t), RandomGenerator()>(),
+			"get_float", &RandomGenerator::GetFloat,
+			"get_int", &RandomGenerator::GetInt
 		);
 	}
 

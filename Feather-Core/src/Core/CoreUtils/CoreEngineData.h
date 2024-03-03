@@ -19,6 +19,10 @@ namespace Feather {
 		inline const int WindowWidth() const { return m_WindowWidth; }
 		inline const int WindowHeight() const { return m_WindowHeight; }
 
+		inline void EnableColliderRender() { m_RenderColliders = true; }
+		inline void DisableColliderRender() { m_RenderColliders = false; }
+		inline const bool RenderCollidersEnabled() { return m_RenderColliders; }
+
 		inline const float ScaledWidth() const { return m_ScaledWidth; }
 		inline const float ScaledHeight() const { return m_ScaledHeight; }
 
