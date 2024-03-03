@@ -1,10 +1,16 @@
 -- Main Lua Script!
 
--- run_script("assets/scripts/TestProject/assetDefs.lua")
--- run_script("assets/scripts/TestProject/testmap.lua")
--- run_script("assets/scripts/utilities.lua")
--- run_script("assets/scripts/follow_cam.lua")
+run_script("assets/scripts/TestProject/assetDefs.lua")
+run_script("assets/scripts/TestProject/testmap.lua")
+run_script("assets/scripts/utilities.lua")
+run_script("assets/scripts/rain_generator.lua")
 
+local tilemap = CreateTestMap()
+assert(tilemap)
+LoadAssets(AssetDefs)
+LoadMap(tilemap)
+
+--[[
 -- Create a Gem
 local gem = Entity("", "")
 local circle = gem:add_component(CircleCollider(16.0))
@@ -55,6 +61,7 @@ bottomPhys.isBox = true
 bottomPhys.isFixedRotation = true
 
 bottomEnt:add_component(PhysicsComponent(bottomPhys))
+--]]
 --[[
 -- Create a left box
 local leftEnt = Entity("", "")
@@ -111,7 +118,7 @@ topPhys.isFixedRotation = true
 topEnt:add_component(PhysicsComponent(topPhys))
 --]]
 -- ============================================================================
-
+--[[
 local ballCount = 0
 local countEnt = Entity("", "")
 countEnt:add_component(Transform(vec2(10, 32), vec2(1, 1), 0))
@@ -172,14 +179,20 @@ function updateEntity(entity)
 		physics:linear_impulse(vec2(0, -300000))
 	end
 end
+--]]
+
+local rainGen = RainGenerator:Create()
+Sound.play("rain", -1, 1)
 
 main = {
 	[1] = {
 		update = function()
-			createGem()
-			updateEntity(gem)
-			gFollowCam:update()
-			valText.textStr = tostring(ballCount)
+			--createGem()
+			--updateEntity(gem)
+			--gFollowCam:update()
+			--valText.textStr = tostring(ballCount)
+
+			rainGen:Update(0.016)
 		end
 	},
 	[2] = {
