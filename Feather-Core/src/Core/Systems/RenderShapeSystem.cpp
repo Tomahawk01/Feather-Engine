@@ -3,6 +3,7 @@
 #include "Core/ECS/Components/BoxColliderComponent.h"
 #include "Core/ECS/Components/CircleColliderComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
+#include "Core/ECS/Components/PhysicsComponent.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 
@@ -53,11 +54,20 @@ namespace Feather {
 				model = glm::translate(model, glm::vec3{ -transform.position, 0.0f });
 			}
 
+			auto color = Color{ 255, 0, 0, 100 };
+
+			if (m_Registry.GetRegistry().all_of<PhysicsComponent>(entity))
+			{
+				auto& physics = m_Registry.GetRegistry().get<PhysicsComponent>(entity);
+				if (physics.IsTrigger())
+					color = Color{ 0, 255, 0, 100 };
+			}
+
 			Rect rect{
-				.position = glm::vec2{transform.position.x + boxCollider.offset.x, transform.position.y + boxCollider.offset.y},
+				.position = glm::vec2{ transform.position.x + boxCollider.offset.x, transform.position.y + boxCollider.offset.y },
 				.width = boxCollider.width * transform.scale.x,
 				.height = boxCollider.height * transform.scale.y,
-				.color = Color{ 255, 0, 0, 100 }
+				.color = color
 			};
 			m_RectRenderer->AddRect(rect, model);
 		}

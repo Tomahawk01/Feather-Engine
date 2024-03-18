@@ -22,7 +22,7 @@ namespace Feather {
 		float restitutionThreshold{ 1.0f }, radius{ 0.0f }, gravityScale{ 1.0f };
 
 		glm::vec2 position{ 0.0f }, scale{ 1.0f }, boxSize{ 0.0f }, offset{ 0.0f };
-		bool isCircle{ false }, isBoxShape{ true }, isFixedRotation{ false };
+		bool isCircle{ false }, isBoxShape{ true }, isFixedRotation{ false }, isTrigger{ false };
 
 		uint16_t filterCategory{ 0 }, filterMask{ 0 };
 		int16_t groupIndex{ 0 };
@@ -37,6 +37,7 @@ namespace Feather {
 
 		void Init(PhysicsWorld physicsWorld, int windowWidth, int windowHeight);
 		b2Body* GetBody();
+		const bool IsTrigger() const;
 
 		static void CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry);
 

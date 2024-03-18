@@ -45,7 +45,7 @@ namespace Feather {
 		b2CircleShape circleShape;
 		if (isCircle)
 		{
-			circleShape.m_radius = m_InitialAttributes.radius * m_InitialAttributes.scale.x;
+			circleShape.m_radius = PIXELS_TO_METERS * m_InitialAttributes.radius * m_InitialAttributes.scale.x;
 		}
 		else if (m_InitialAttributes.isBoxShape)
 		{
@@ -69,6 +69,7 @@ namespace Feather {
 		fixtureDef.friction = m_InitialAttributes.friction;
 		fixtureDef.restitution = m_InitialAttributes.restitution;
 		fixtureDef.restitutionThreshold = m_InitialAttributes.restitutionThreshold;
+		fixtureDef.isSensor = m_InitialAttributes.isTrigger;
 
 		auto fixture = m_RigidBody->CreateFixture(&fixtureDef);
 		if (!fixture)
@@ -80,6 +81,14 @@ namespace Feather {
 	b2Body* PhysicsComponent::GetBody()
 	{
 		return m_RigidBody.get();
+	}
+
+	const bool PhysicsComponent::IsTrigger() const
+	{
+		if (!m_RigidBody)
+			return false;
+
+		return m_RigidBody->GetFixtureList()->IsSensor();
 	}
 
 	void PhysicsComponent::CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry)
@@ -111,8 +120,9 @@ namespace Feather {
 			"boxSize", &PhysicsAttributes::boxSize,
 			"offset", &PhysicsAttributes::offset,
 			"isCircle", &PhysicsAttributes::isCircle,
-			"isBox", &PhysicsAttributes::isBoxShape,
-			"isFixedRotation", &PhysicsAttributes::isFixedRotation
+			"isBoxShape", &PhysicsAttributes::isBoxShape,
+			"isFixedRotation", &PhysicsAttributes::isFixedRotation,
+			"isTrigger", &PhysicsAttributes::isTrigger
 			// TODO: Add filters and other properties as needed
 		);
 

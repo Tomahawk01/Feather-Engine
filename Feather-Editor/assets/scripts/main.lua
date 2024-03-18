@@ -2,197 +2,135 @@
 
 run_script("assets/scripts/TestProject/assetDefs.lua")
 run_script("assets/scripts/TestProject/testmap.lua")
+run_script("assets/scripts/TestProject/test_platformer.lua")
 run_script("assets/scripts/utilities.lua")
 run_script("assets/scripts/rain_generator.lua")
 
-local tilemap = CreateTestMap()
+local tilemap = CreateTestPlatformerMap()
 assert(tilemap)
 LoadAssets(AssetDefs)
 LoadMap(tilemap)
 
---[[
--- Create a Gem
-local gem = Entity("", "")
-local circle = gem:add_component(CircleCollider(16.0))
-local transform = gem:add_component(Transform(vec2(320, 64), vec2(2, 2), 0))
+local rainGen = RainGenerator:Create()
+Sound.play("rain", -1, 1)
+Sound.set_volume(1, 50)
 
-local physAttrs = PhysicsAttributes()
-physAttrs.type = BodyType.Dynamic
-physAttrs.density = 1000.0
-physAttrs.friction = 0.5
-physAttrs.restitution = 0.2
-physAttrs.radius = circle.radius * (1.0 / 12.0)
-physAttrs.gravityScale = 2.0
-physAttrs.position = transform.position
-physAttrs.scale = transform.scale
-physAttrs.isCircle = true
-physAttrs.isFixedRotation = false
+Music.play("ambience_song", -1)
+Music.set_volume(40)
 
-gem:add_component(PhysicsComponent(physAttrs))
+-- Create lightning and darkness
+local darkness = Entity("", "")
+darkness:add_component(Transform(vec2(0, 0), vec2(WindowWidth(), WindowHeight()), 0))
 
-local sprite = gem:add_component(Sprite("TestGem", 32, 32, 0, 0, 0))
-sprite:generate_uvs()
+local darkSprite = darkness:add_component(Sprite("white_box", 16, 16, 0, 0, 4))
+darkSprite.color = Color(0, 0, 0, 100)
+darkSprite:generate_uvs()
 
--- Create follow camera
-gFollowCam = FollowCamera(
-	FollowCamParams({
-		scale = 1,
-		max_x = 20000,
-		max_y = 2000,
-		springback = 0.2
-	}),
-	gem
-)
+gTimer = Timer()
+gTimer:start()
 
--- Create a bottom box
-local bottomEnt = Entity("", "")
-local bottomBox = bottomEnt:add_component(BoxCollider(10000, 16, vec2(0, 0)))
-local bottomTransform = bottomEnt:add_component(Transform(vec2(0, 464), vec2(1, 1), 0))
+function UpdateLightning(entity)
+	local darkSprite = entity:get_component(Sprite)
 
-local bottomPhys = PhysicsAttributes()
-bottomPhys.type = BodyType.Static
-bottomPhys.density = 1000.0
-bottomPhys.friction = 0.5
-bottomPhys.restitution = 0.0
-bottomPhys.position = bottomTransform.position
-bottomPhys.scale = bottomTransform.scale
-bottomPhys.boxSize = vec2(bottomBox.width, bottomBox.height)
-bottomPhys.isBox = true
-bottomPhys.isFixedRotation = true
+	if gTimer:elapsed_ms() > 3000 then
+		darkSprite.color = Color(255, 255, 255, 25)
+	end
 
-bottomEnt:add_component(PhysicsComponent(bottomPhys))
---]]
---[[
--- Create a left box
-local leftEnt = Entity("", "")
-local leftBox = leftEnt:add_component(BoxCollider(16, 464, vec2(0, 0)))
-local leftTransform = leftEnt:add_component(Transform(vec2(0, 0), vec2(1, 1), 0))
-
-local leftPhys = PhysicsAttributes()
-leftPhys.type = BodyType.Static
-leftPhys.density = 1000.0
-leftPhys.friction = 0.5
-leftPhys.restitution = 0.0
-leftPhys.position = leftTransform.position
-leftPhys.scale = leftTransform.scale
-leftPhys.boxSize = vec2(leftBox.width, leftBox.height)
-leftPhys.isBox = true
-leftPhys.isFixedRotation = true
-
-leftEnt:add_component(PhysicsComponent(leftPhys))
-
--- Create a right box
-local rightEnt = Entity("", "")
-local rightBox = rightEnt:add_component(BoxCollider(16, 480, vec2(0, 0)))
-local rightTransform = rightEnt:add_component(Transform(vec2(624, 0), vec2(1, 1), 0))
-
-local rightPhys = PhysicsAttributes()
-rightPhys.type = BodyType.Static
-rightPhys.density = 1000.0
-rightPhys.friction = 0.5
-rightPhys.restitution = 0.0
-rightPhys.position = rightTransform.position
-rightPhys.scale = rightTransform.scale
-rightPhys.boxSize = vec2(rightBox.width, rightBox.height)
-rightPhys.isBox = true
-rightPhys.isFixedRotation = true
-
-rightEnt:add_component(PhysicsComponent(rightPhys))
-
--- Create a top box
-local topEnt = Entity("", "")
-local topBox = topEnt:add_component(BoxCollider(608, 16, vec2(0, 0)))
-local topTransform = topEnt:add_component(Transform(vec2(16, 0), vec2(1, 1), 0))
-
-local topPhys = PhysicsAttributes()
-topPhys.type = BodyType.Static
-topPhys.density = 1000.0
-topPhys.friction = 0.5
-topPhys.restitution = 0.0
-topPhys.position = topTransform.position
-topPhys.scale = topTransform.scale
-topPhys.boxSize = vec2(topBox.width, topBox.height)
-topPhys.isBox = true
-topPhys.isFixedRotation = true
-
-topEnt:add_component(PhysicsComponent(topPhys))
---]]
--- ============================================================================
---[[
-local ballCount = 0
-local countEnt = Entity("", "")
-countEnt:add_component(Transform(vec2(10, 32), vec2(1, 1), 0))
-countEnt:add_component(TextComponent("testFont", "Ball Count: ", Color(255, 255, 255, 255), 4, -1.0))
-
-local valEnt = Entity("", "")
-valEnt:add_component(Transform(vec2(150, 32), vec2(1, 1), 0))
-local valText = valEnt:add_component(TextComponent("testFont", "0", Color(255, 255, 255, 255), 4, -1.0))
-
-function createGem()
-	if (Mouse.just_released(LEFT_BUTTON)) then
-		local pos = Mouse.world_position()
-		local gem = Entity("", "")
-		local circle = gem:add_component(CircleCollider(16.0))
-		local transform = gem:add_component(Transform(vec2(pos.x, pos.y), vec2(1, 1), 0))
-
-		local physAttrs = PhysicsAttributes()
-		physAttrs.type = BodyType.Dynamic
-		physAttrs.density = 1000.0
-		physAttrs.friction = 0.5
-		physAttrs.restitution = 0.2
-		physAttrs.radius = circle.radius * (1.0 / 12.0)
-		physAttrs.gravityScale = 2.0
-		physAttrs.position = transform.position
-		physAttrs.scale = transform.scale
-		physAttrs.isCircle = true
-		physAttrs.isFixedRotation = false
-
-		gem:add_component(PhysicsComponent(physAttrs))
-
-		local sprite = gem:add_component(Sprite("TestGem", 32, 32, 0, 0, 0))
-		sprite:generate_uvs()
-
-		ballCount = ballCount + 1
+	if gTimer:elapsed_ms() > 3100 and gTimer:elapsed_ms() < 3200 then
+		darkSprite.color = Color(0, 0, 0, 100)
+	elseif gTimer:elapsed_ms() > 3200 and gTimer:elapsed_ms() < 3400 then
+		darkSprite.color = Color(255, 255, 255, 25)
+	elseif gTimer:elapsed_ms() > 3400 then
+		darkSprite.color = Color(0, 0, 0, 100)
+		gTimer:stop()
+		gTimer:start()
 	end
 end
 
-function updateEntity(entity)
-	local physics = entity:get_component(PhysicsComponent)
-	local transform = entity:get_component(Transform)
+-- Create Player
+gPlayer = Entity("player", "")
+local playerTransform = gPlayer:add_component(Transform(vec2(20 * 16, 32 * 16), vec2(1, 1), 0))
+local sprite = gPlayer:add_component(Sprite("player", 16, 16, 0, 0, 2))
+sprite:generate_uvs()
+gPlayer:add_component(Animation(4, 6, 0, false, true))
+local circleCollider = gPlayer:add_component(CircleCollider(8))
 
+local playerPhysAttrs = PhysicsAttributes()
+playerPhysAttrs.type = BodyType.Dynamic
+playerPhysAttrs.density = 75.0
+playerPhysAttrs.friction = 1.0
+playerPhysAttrs.restitution = 0.0
+playerPhysAttrs.position = playerTransform.position
+playerPhysAttrs.radius = circleCollider.radius
+playerPhysAttrs.isCircle = true
+playerPhysAttrs.isFixedRotation = true
+gPlayer:add_component(PhysicsComponent(playerPhysAttrs))
+
+isFacingLeft = false
+
+function UpdatePlayer(player)
+	local physics = player:get_component(PhysicsComponent)
 	local velocity = physics:get_linear_velocity()
+	local sprite = player:get_component(Sprite)
 
-	-- if velocity.y > 0.0 then
-	-- 	physics:set_gravity_scale(15.0)
-	-- else
-	-- 	physics:set_gravity_scale(2.0)
-	-- end
+	physics:set_linear_velocity(vec2(0, velocity.y))
 
-	if Keyboard.pressed(KEY_D) then
-		physics:set_linear_velocity(vec2(25, velocity.y))
-	elseif Keyboard.pressed(KEY_A) then
-		physics:set_linear_velocity(vec2(-25, velocity.y))
+	if Keyboard.pressed(KEY_A) then
+		physics:set_linear_velocity(vec2(-10, velocity.y))
+		isFacingLeft = true
+		sprite.start_y = 3
+	elseif Keyboard.pressed(KEY_D) then
+		physics:set_linear_velocity(vec2(10, velocity.y))
+		isFacingLeft = false
+		sprite.start_y = 2
 	end
 
 	if Keyboard.just_pressed(KEY_SPACE) then
 		physics:set_linear_velocity(vec2(velocity.x, 0))
-		physics:linear_impulse(vec2(0, -300000))
+		physics:linear_impulse(vec2(velocity.x, -1250))
 	end
-end
---]]
 
-local rainGen = RainGenerator:Create()
-Sound.play("rain", -1, 1)
+	if velocity.y < 0 then
+		physics:set_gravity_scale(2)
+	elseif velocity.y > 0 then
+		physics:set_gravity_scale(5)
+	end
+
+	-- Reset to Idle animation
+	if velocity.x == 0.0 then
+		if isFacingLeft then
+			sprite.start_y = 1
+		else
+			sprite.start_y = 0
+		end
+	end
+
+	sprite.uvs.v = sprite.start_y * sprite.uvs.uv_height
+end
+
+-- Follow camera
+Camera.get().set_scale(2.0)
+gFollowCam = FollowCamera(
+	FollowCamParams(
+		{
+			min_x = 0,
+			min_y = 0,
+			max_x = 960,
+			max_y = 960,
+			scale = 2
+		}
+	), gPlayer
+)
 
 main = {
 	[1] = {
 		update = function()
-			--createGem()
-			--updateEntity(gem)
-			--gFollowCam:update()
-			--valText.textStr = tostring(ballCount)
-
+			UpdatePlayer(gPlayer)
+			gFollowCam:update()
 			rainGen:Update(0.016)
+			UpdateLightning(darkness)
+
+			Debug()
 		end
 	},
 	[2] = {
