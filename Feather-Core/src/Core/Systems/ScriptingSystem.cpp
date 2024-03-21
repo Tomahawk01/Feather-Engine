@@ -20,6 +20,7 @@
 #include "Core/Scripting/InputManager.h"
 #include "Core/Scripting/SoundBindings.h"
 #include "Core/Scripting/RendererBindings.h"
+#include "Core/Scripting/UserDataBindings.h"
 
 #include "Core/Resources/AssetManager.h"
 
@@ -158,6 +159,7 @@ namespace Feather {
 		AssetManager::CreateLuaAssetManager(lua, registry);
 		SoundBinder::CreateSoundBind(lua, registry);
 		RendererBinder::CreateRenderingBind(lua, registry);
+		UserDataBinder::CreateLuaUserData(lua);
 		FollowCamera::CreateLuaFollowCamera(lua, registry);
 
 		create_timer(lua);
@@ -190,6 +192,9 @@ namespace Feather {
 		Registry::RegisterMetaComponent<PhysicsComponent>();
 		Registry::RegisterMetaComponent<RigidBodyComponent>();
 		Registry::RegisterMetaComponent<TextComponent>();
+
+		// Register user data types
+		UserDataBinder::register_user_meta_data<ObjectData>();
 	}
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Physics/Box2DWrappers.h"
+#include "Physics/UserData.h"
 
 #include <sol/sol.hpp>
 #include <glm/glm.hpp>
@@ -26,6 +27,7 @@ namespace Feather {
 
 		uint16_t filterCategory{ 0 }, filterMask{ 0 };
 		int16_t groupIndex{ 0 };
+		ObjectData objectData{};
 	};
 
 	class PhysicsComponent
@@ -36,13 +38,15 @@ namespace Feather {
 		~PhysicsComponent() = default;
 
 		void Init(PhysicsWorld physicsWorld, int windowWidth, int windowHeight);
-		b2Body* GetBody();
-		const bool IsTrigger() const;
+		b2Body* GetBody() { return m_RigidBody.get(); }
+		UserData* GetUserData() { return m_UserData.get(); }
 
+		const bool IsTrigger() const;
 		static void CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry);
 
 	private:
 		std::shared_ptr<b2Body> m_RigidBody;
+		std::shared_ptr<UserData> m_UserData;
 
 		PhysicsAttributes m_InitialAttributes;
 	};

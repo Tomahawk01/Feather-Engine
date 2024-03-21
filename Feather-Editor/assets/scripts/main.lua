@@ -49,7 +49,7 @@ end
 
 -- Create Player
 gPlayer = Entity("player", "")
-local playerTransform = gPlayer:add_component(Transform(vec2(20 * 16, 32 * 16), vec2(1, 1), 0))
+local playerTransform = gPlayer:add_component(Transform(vec2(10 * 16, 33 * 16), vec2(1, 1), 0))
 local sprite = gPlayer:add_component(Sprite("player", 16, 16, 0, 0, 2))
 sprite:generate_uvs()
 gPlayer:add_component(Animation(4, 6, 0, false, true))
@@ -121,6 +121,18 @@ gFollowCam = FollowCamera(
 		}
 	), gPlayer
 )
+
+-- Test Data
+local objectData = ObjectData("test_tag", "test_group", true, true, 9998)
+local userData = UserData.create_user_data(objectData)
+
+local objData1 = userData:get_user_data()
+print(objData1:to_string())
+
+userData:set_user_data(ObjectData("New Tag", "New Group", false, true, 19029))
+
+local objData2 = userData:get_user_data()
+print(objData2:to_string())
 
 main = {
 	[1] = {

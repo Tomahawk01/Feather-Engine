@@ -10,7 +10,7 @@ namespace Feather {
 	{}
 
 	PhysicsComponent::PhysicsComponent(const PhysicsAttributes& physicsAttrs)
-		: m_RigidBody{ nullptr }, m_InitialAttributes{ physicsAttrs }
+		: m_RigidBody{ nullptr }, m_UserData{ nullptr }, m_InitialAttributes { physicsAttrs }
 	{}
 
 	void PhysicsComponent::Init(PhysicsWorld physicsWorld, int windowWidth, int windowHeight)
@@ -59,6 +59,12 @@ namespace Feather {
 			// TODO: Polygon shape
 		}
 
+		// Create user data
+		m_UserData = std::make_shared<UserData>();
+		m_UserData->userData = m_InitialAttributes.objectData;
+		m_UserData->type_id = entt::type_hash<ObjectData>::value();
+
+		// Create fixture definition
 		b2FixtureDef fixtureDef{};
 		if (isCircle)
 			fixtureDef.shape = &circleShape;
@@ -70,17 +76,13 @@ namespace Feather {
 		fixtureDef.restitution = m_InitialAttributes.restitution;
 		fixtureDef.restitutionThreshold = m_InitialAttributes.restitutionThreshold;
 		fixtureDef.isSensor = m_InitialAttributes.isTrigger;
-
+		fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(m_UserData.get());
+		
 		auto fixture = m_RigidBody->CreateFixture(&fixtureDef);
 		if (!fixture)
 		{
 			F_ERROR("Failed to create the RigidBody fixture!");
 		}
-	}
-
-	b2Body* PhysicsComponent::GetBody()
-	{
-		return m_RigidBody.get();
 	}
 
 	const bool PhysicsComponent::IsTrigger() const
@@ -93,6 +95,35 @@ namespace Feather {
 
 	void PhysicsComponent::CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry)
 	{
+		lua.new_usertype<ObjectData>(
+			"ObjectData",
+			"type_id", entt::type_hash<ObjectData>::value,
+			sol::call_constructor,
+			sol::factories(
+				[](const std::string& tag, const std::string& group, bool isCollider, bool isTrigger, std::uint32_t entityID)
+				{
+					return ObjectData {
+						.tag = tag,
+						.group = group,
+						.isCollider = isCollider,
+						.isTrigger = isTrigger,
+						.entityID = entityID
+					};
+				},
+				[](const sol::table& objectData)
+				{
+					return ObjectData{
+						.tag = objectData["tag"].get_or(std::string{""}),
+						.group = objectData["group"].get_or(std::string{""}),
+						.isCollider = objectData["isCollider"].get_or(false),
+						.isTrigger = objectData["isTrigger"].get_or(false),
+						.entityID = objectData["entityID"].get_or((std::uint32_t)0)
+					};
+				}
+			),
+			"to_string", &ObjectData::to_string
+		);
+
 		lua.new_enum<RigidBodyType>(
 			"BodyType", {
 				{ "Static", RigidBodyType::STATIC },
@@ -105,8 +136,47 @@ namespace Feather {
 			"PhysicsAttributes",
 			sol::call_constructor,
 			sol::factories(
-				[] { return PhysicsAttributes{}; }
-				// TODO: Add more specific ctor
+				[] { return PhysicsAttributes{}; },
+				[](const sol::table& physAttr) {
+					return PhysicsAttributes {
+						.eType = physAttr["type"].get_or(RigidBodyType::STATIC),
+						.density = physAttr["density"].get_or(100.0f),
+						.friction = physAttr["friction"].get_or(0.2f),
+						.restitution = physAttr["restitution"].get_or(0.2f),
+						.restitutionThreshold = physAttr["restitutionThreshold"].get_or(0.2f),
+						.radius = physAttr["radius"].get_or(0.0f),
+						.gravityScale = physAttr["gravityScale"].get_or(1.0f),
+						.position = glm::vec2 {
+							physAttr["position"]["x"].get_or(0.0f),
+							physAttr["position"]["y"].get_or(0.0f)
+						},
+						.scale = glm::vec2 {
+							physAttr["scale"]["x"].get_or(0.0f),
+							physAttr["scale"]["y"].get_or(0.0f)
+						},
+						.boxSize = glm::vec2 {
+							physAttr["boxSize"]["x"].get_or(0.0f),
+							physAttr["boxSize"]["y"].get_or(0.0f)
+						},
+						.offset = glm::vec2 {
+							physAttr["offset"]["x"].get_or(0.0f),
+							physAttr["offset"]["y"].get_or(0.0f)
+						},
+						.isCircle = physAttr["isCircle"].get_or(false),
+						.isBoxShape = physAttr["isBoxShape"].get_or(true),
+						.isFixedRotation = physAttr["isFixedRotation"].get_or(true),
+						.isTrigger = physAttr["isTrigger"].get_or(false),
+						.filterCategory = physAttr["filterCategory"].get_or((uint16_t)0),
+						.filterMask = physAttr["filterMask"].get_or((uint16_t)0),
+						.objectData = ObjectData {
+							.tag = physAttr["objectData"]["tag"].get_or(std::string{""}),
+							.group = physAttr["objectData"]["group"].get_or(std::string{""}),
+							.isCollider = physAttr["objectData"]["isCollider"].get_or(false),
+							.isTrigger = physAttr["objectData"]["isTrigger"].get_or(false),
+							.entityID = physAttr["objectData"]["entityID"].get_or((std::uint32_t)0)
+						}
+					};
+				}
 			),
 			"type", &PhysicsAttributes::eType,
 			"density", &PhysicsAttributes::density,
@@ -122,7 +192,8 @@ namespace Feather {
 			"isCircle", &PhysicsAttributes::isCircle,
 			"isBoxShape", &PhysicsAttributes::isBoxShape,
 			"isFixedRotation", &PhysicsAttributes::isFixedRotation,
-			"isTrigger", &PhysicsAttributes::isTrigger
+			"isTrigger", &PhysicsAttributes::isTrigger,
+			"objectData", &PhysicsAttributes::objectData
 			// TODO: Add filters and other properties as needed
 		);
 
