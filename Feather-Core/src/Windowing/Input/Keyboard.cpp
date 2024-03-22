@@ -10,13 +10,13 @@ namespace Feather {
         {F_KEY_RETURN, Button{}}, {F_KEY_PAUSE, Button{}}, {F_KEY_ESCAPE, Button{}}, {F_KEY_SPACE, Button{}},
         {F_KEY_EXCLAIM, Button{}}, {F_KEY_QUOTEDBL, Button{}}, {F_KEY_HASH, Button{}}, {F_KEY_DOLLAR, Button{}},
         {F_KEY_AMPERSAND, Button{}}, {F_KEY_QUOTE, Button{}}, {F_KEY_LEFTPAREN, Button{}}, {F_KEY_RIGHTPAREN, Button{}},
-        {F_KEY_ASTERISK, Button{}}, {F_KEY_PLUS, Button{}}, {F_KEY_COMMA, Button{}}, {F_KEY_PERIOD, Button{}},
-        {F_KEY_SLASH, Button{}}, {F_KEY_0, Button{}}, {F_KEY_2, Button{}}, {F_KEY_3, Button{}},
+        {F_KEY_ASTERISK, Button{}}, {F_KEY_PLUS, Button{}}, {F_KEY_COMMA, Button{}}, {F_KEY_MINUS, Button{}}, {F_KEY_PERIOD, Button{}},
+        {F_KEY_SLASH, Button{}}, {F_KEY_0, Button{}}, {F_KEY_1, Button{}}, {F_KEY_2, Button{}}, {F_KEY_3, Button{}},
         {F_KEY_4, Button{}}, {F_KEY_5, Button{}}, {F_KEY_6, Button{}}, {F_KEY_7, Button{}},
         {F_KEY_8, Button{}}, {F_KEY_9, Button{}}, {F_KEY_COLON, Button{}}, {F_KEY_SEMICOLON, Button{}},
         {F_KEY_LESS, Button{}}, {F_KEY_EQUALS, Button{}}, {F_KEY_GREATER, Button{}}, {F_KEY_QUESTION, Button{}},
         {F_KEY_AT, Button{}}, {F_KEY_LEFTBRACKET, Button{}}, {F_KEY_BACKSLASH, Button{}}, {F_KEY_RIGHTBRACKET, Button{}},
-        {F_KEY_CARET, Button{}}, {F_KEY_UNDERSCORE, Button{}}, {F_KEY_A, Button{}}, {F_KEY_B, Button{}},
+        {F_KEY_CARET, Button{}}, {F_KEY_UNDERSCORE, Button{}}, {F_KEY_BACKQUOTE, Button{}}, {F_KEY_A, Button{}}, {F_KEY_B, Button{}},
         {F_KEY_C, Button{}}, {F_KEY_D, Button{}}, {F_KEY_E, Button{}}, {F_KEY_F, Button{}},
         {F_KEY_G, Button{}}, {F_KEY_H, Button{}}, {F_KEY_I, Button{}}, {F_KEY_J, Button{}},
         {F_KEY_K, Button{}}, {F_KEY_L, Button{}}, {F_KEY_M, Button{}}, {F_KEY_N, Button{}},
@@ -26,7 +26,7 @@ namespace Feather {
         {F_KEY_DELETE, Button{}}, {F_KEY_CAPSLOCK, Button{}}, {F_KEY_F1, Button{}}, {F_KEY_F2, Button{}},
         {F_KEY_F3, Button{}}, {F_KEY_F4, Button{}}, {F_KEY_F5, Button{}}, {F_KEY_F6, Button{}},
         {F_KEY_F7, Button{}}, {F_KEY_F8, Button{}}, {F_KEY_F9, Button{}}, {F_KEY_F10, Button{}},
-        {F_KEY_F11, Button{}}, {F_KEY_F12, Button{}}, {F_KEY_SCROLLOCK, Button{}}, {F_KEY_INSERT, Button{}},
+        {F_KEY_F11, Button{}}, {F_KEY_F12, Button{}}, {F_KEY_SCROLLOCK, Button{}}, {F_KEY_PRINTSCREEN, Button{}}, {F_KEY_INSERT, Button{}},
         {F_KEY_HOME, Button{}}, {F_KEY_PAGEUP, Button{}}, {F_KEY_PAGEDOWN, Button{}}, {F_KEY_END, Button{}},
         {F_KEY_RIGHT, Button{}}, {F_KEY_LEFT, Button{}}, {F_KEY_DOWN, Button{}}, {F_KEY_UP, Button{}},
         {F_KEY_NUMLOCK, Button{}}, {F_KEY_KP_DIVIDE, Button{}}, {F_KEY_KP_MULTIPLY, Button{}}, {F_KEY_KP_MINUS, Button{}},
@@ -36,7 +36,16 @@ namespace Feather {
         {F_KEY_KP_PERIOD, Button{}}, {F_KEY_LCTRL, Button{}}, {F_KEY_LSHIFT, Button{}},
         {F_KEY_LALT, Button{}}, {F_KEY_RCTRL, Button{}}, {F_KEY_RSHIFT, Button{}}, {F_KEY_RALT, Button{}}
         }
-    {}
+    {
+        // Emplace windows specific keys
+#ifdef _WIN32
+        m_Buttons.emplace(F_KEY_LWIN, Button{});
+        m_Buttons.emplace(F_KEY_RWIN, Button{});
+#else
+        m_Buttons.emplace(F_KEY_LGUI, Button{});
+        m_Buttons.emplace(F_KEY_RGUI, Button{});
+#endif
+    }
 
     void Keyboard::Update()
     {

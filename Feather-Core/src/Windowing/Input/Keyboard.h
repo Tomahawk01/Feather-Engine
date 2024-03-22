@@ -21,6 +21,8 @@ namespace Feather {
 		const bool IsKeyJustPressed(int key) const;
 		const bool IsKeyJustReleased(int key) const;
 
+		const std::map<int, Button>& GetButtonMap() const { return m_Buttons; }
+
 	private:
 		std::map<int, Button> m_Buttons;
 	};

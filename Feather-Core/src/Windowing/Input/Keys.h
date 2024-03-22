@@ -25,6 +25,7 @@ constexpr int F_KEY_COMMA			= SDLK_COMMA;
 constexpr int F_KEY_MINUS			= SDLK_MINUS;
 constexpr int F_KEY_PERIOD			= SDLK_PERIOD;
 constexpr int F_KEY_SLASH			= SDLK_SLASH;
+
 constexpr int F_KEY_0				= SDLK_0;
 constexpr int F_KEY_1				= SDLK_1;
 constexpr int F_KEY_2				= SDLK_2;
@@ -35,6 +36,7 @@ constexpr int F_KEY_6				= SDLK_6;
 constexpr int F_KEY_7				= SDLK_7;
 constexpr int F_KEY_8				= SDLK_8;
 constexpr int F_KEY_9				= SDLK_9;
+
 constexpr int F_KEY_COLON			= SDLK_COLON;
 constexpr int F_KEY_SEMICOLON		= SDLK_SEMICOLON;
 constexpr int F_KEY_LESS			= SDLK_LESS;
@@ -92,6 +94,7 @@ constexpr int F_KEY_F10				= SDLK_F10;
 constexpr int F_KEY_F11				= SDLK_F11;
 constexpr int F_KEY_F12				= SDLK_F12;
 
+constexpr int F_KEY_PRINTSCREEN		= SDLK_PRINTSCREEN;
 constexpr int F_KEY_SCROLLOCK		= SDLK_SCROLLLOCK;
 
 constexpr int F_KEY_INSERT			= SDLK_INSERT;
@@ -129,3 +132,12 @@ constexpr int F_KEY_LALT			= SDLK_LALT;
 constexpr int F_KEY_RCTRL			= SDLK_RCTRL;
 constexpr int F_KEY_RSHIFT			= SDLK_RSHIFT;
 constexpr int F_KEY_RALT			= SDLK_RALT;
+
+// Windows specific keys
+#ifdef _WIN32
+constexpr int F_KEY_LWIN			= SDLK_LGUI;
+constexpr int F_KEY_RWIN			= SDLK_RGUI;
+#else 
+constexpr int F_KEY_LGUI			= SDLK_LGUI;
+constexpr int F_KEY_RGUI			= SDLK_RGUI;
+#endif

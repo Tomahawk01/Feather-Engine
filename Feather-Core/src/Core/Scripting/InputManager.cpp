@@ -32,7 +32,16 @@ namespace Feather {
             sol::no_constructor,
             "just_pressed", [&](int key) { return keyboard.IsKeyJustPressed(key); },
             "just_released", [&](int key) { return keyboard.IsKeyJustReleased(key); },
-            "pressed", [&](int key) { return keyboard.IsKeyPressed(key); }
+            "pressed", [&](int key) { return keyboard.IsKeyPressed(key); },
+            "pressed_keys", [&]() {
+                std::vector<int> keys;
+                for (const auto& [key, button] : keyboard.GetButtonMap())
+                {
+                    if (button.IsPressed)
+                        keys.push_back(key);
+                }
+                return keys;
+            }
         );
 
         auto& mouse = inputManager.GetMouse();
@@ -283,6 +292,25 @@ namespace Feather {
         lua.set("KEY_LSHIFT", F_KEY_LSHIFT);
         lua.set("KEY_RSHIFT", F_KEY_RSHIFT);
 
+        // Register Punctuation Keys
+        lua.set("KEY_COLON", F_KEY_COLON);
+        lua.set("KEY_SEMICOLON", F_KEY_SEMICOLON);
+        lua.set("KEY_QUOTE", F_KEY_QUOTE);
+        lua.set("KEY_BACKQUOTE", F_KEY_BACKQUOTE);
+        lua.set("KEY_CARET", F_KEY_CARET);
+        lua.set("KEY_UNDERSCORE", F_KEY_UNDERSCORE);
+        lua.set("KEY_RIGHTBRACKET", F_KEY_RIGHTBRACKET);
+        lua.set("KEY_LEFTBRACKET", F_KEY_LEFTBRACKET);
+        lua.set("KEY_SLASH", F_KEY_SLASH);
+        lua.set("KEY_ASTERISK", F_KEY_ASTERISK);
+        lua.set("KEY_LEFTPAREN", F_KEY_LEFTPAREN);
+        lua.set("KEY_RIGHTPAREN", F_KEY_RIGHTPAREN);
+        lua.set("KEY_QUESTION", F_KEY_QUESTION);
+        lua.set("KEY_AMPERSAND", F_KEY_AMPERSAND);
+        lua.set("KEY_DOLLAR", F_KEY_DOLLAR);
+        lua.set("KEY_EXCLAIM", F_KEY_EXCLAIM);
+        lua.set("KEY_BACKSLASH", F_KEY_BACKSLASH);
+
         lua.set("KEY_F1", F_KEY_F1);
         lua.set("KEY_F2", F_KEY_F2);
         lua.set("KEY_F3", F_KEY_F3);
@@ -311,7 +339,23 @@ namespace Feather {
         lua.set("KP_KEY_7", F_KEY_KP7);
         lua.set("KP_KEY_8", F_KEY_KP8);
         lua.set("KP_KEY_9", F_KEY_KP9);
+
+        lua.set("KP_KEY_DIVIDE", F_KEY_KP_DIVIDE);
+        lua.set("KP_KEY_MULTIPLY", F_KEY_KP_MULTIPLY);
+        lua.set("KP_KEY_MINUS", F_KEY_KP_MINUS);
+        lua.set("KP_KEY_PLUS", F_KEY_KP_PLUS);
         lua.set("KP_KEY_ENTER", F_KEY_KP_ENTER);
+        lua.set("KP_KEY_PERIOD", F_KEY_KP_PERIOD);
+        lua.set("KEY_NUM_LOCK", F_KEY_NUMLOCK);
+
+        // Windows specific keys
+#ifdef _WIN32
+        lua.set("KEY_LWIN", F_KEY_LWIN);
+        lua.set("KEY_RWIN", F_KEY_RWIN);
+#else 
+        lua.set("KEY_LGUI", F_KEY_LGUI);
+        lua.set("KEY_RGUI", F_KEY_RGUI);
+#endif
 	}
 
     void InputManager::RegisterLuaMouseButtonNames(sol::state& lua)
