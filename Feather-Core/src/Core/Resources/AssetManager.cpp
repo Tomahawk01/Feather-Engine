@@ -114,6 +114,20 @@ namespace Feather {
         return true;
     }
 
+    bool AssetManager::AddShaderFromMemory(const std::string& shaderName, const char* vertexShader, const char* fragmentShader)
+    {
+        if (m_mapShaders.find(shaderName) != m_mapShaders.end())
+        {
+            F_ERROR("Failed to add shader - '{0}' -- Already exists!", shaderName);
+            return false;
+        }
+
+        auto shader = std::move(ShaderLoader::CreateFromMemory(vertexShader, fragmentShader));
+        m_mapShaders.insert(std::make_pair(shaderName, std::move(shader)));
+
+        return true;
+    }
+
     std::shared_ptr<Shader> AssetManager::GetShader(const std::string& shaderName)
     {
         auto shaderIter = m_mapShaders.find(shaderName);

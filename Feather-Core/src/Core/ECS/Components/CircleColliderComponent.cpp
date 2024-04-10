@@ -2,6 +2,16 @@
 
 #include "entt.hpp"
 
+std::string Feather::CircleColliderComponent::to_string() const
+{
+	std::stringstream ss;
+	ss << "==== Circle Collider Component ==== \n" << std::boolalpha <<
+		  "Radius: " << radius << "\n" <<
+		  "Offset: x = " << offset.x << ", y = " << offset.y << "\n";
+
+	return ss.str();
+}
+
 void Feather::CircleColliderComponent::CreateLuaCircleColliderBind(sol::state& lua)
 {
 	lua.new_usertype<CircleColliderComponent>(

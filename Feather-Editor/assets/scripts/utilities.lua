@@ -201,6 +201,9 @@ function LoadMap(mapDef)
 
                         if tileset.name == "trigger" then
                             physicsAttribs.isTrigger = true
+                            physicsAttribs.objectData = ObjectData("", "hole_triggers", false, true, tile:id())
+                        else
+                            physicsAttribs.objectData = ObjectData("", "colliders", true, false, tile:id())
                         end
 
                         tile:add_component(PhysicsComponent(physicsAttribs))

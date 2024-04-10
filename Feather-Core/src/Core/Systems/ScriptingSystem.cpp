@@ -4,16 +4,6 @@
 #include "Utils/Timer.h"
 #include "Utils/RandomGenerator.h"
 
-#include "Core/ECS/Components/ScriptComponent.h"
-#include "Core/ECS/Components/TransformComponent.h"
-#include "Core/ECS/Components/SpriteComponent.h"
-#include "Core/ECS/Components/AnimationComponent.h"
-#include "Core/ECS/Components/BoxColliderComponent.h"
-#include "Core/ECS/Components/CircleColliderComponent.h"
-#include "Core/ECS/Components/PhysicsComponent.h"
-#include "Core/ECS/Components/RigidBodyComponent.h"
-#include "Core/ECS/Components/TextComponent.h"
-
 #include "Core/ECS/Entity.h"
 
 #include "Core/Scripting/GlmLuaBindings.h"
@@ -21,10 +11,12 @@
 #include "Core/Scripting/SoundBindings.h"
 #include "Core/Scripting/RendererBindings.h"
 #include "Core/Scripting/UserDataBindings.h"
+#include "Core/Scripting/ContactListenerBindings.h"
 
 #include "Core/Resources/AssetManager.h"
 
 #include "Core/CoreUtils/FollowCamera.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 
 namespace Feather {
 
@@ -160,6 +152,8 @@ namespace Feather {
 		SoundBinder::CreateSoundBind(lua, registry);
 		RendererBinder::CreateRenderingBind(lua, registry);
 		UserDataBinder::CreateLuaUserData(lua);
+		ContactListenerBinder::CreateLuaContactListener(lua, registry.GetRegistry());
+
 		FollowCamera::CreateLuaFollowCamera(lua, registry);
 
 		create_timer(lua);
@@ -257,6 +251,14 @@ namespace Feather {
 			sol::constructors<RandomGenerator(uint32_t, uint32_t), RandomGenerator()>(),
 			"get_float", &RandomGenerator::GetFloat,
 			"get_int", &RandomGenerator::GetInt
+		);
+
+		lua.set_function(
+			"S2D_EntityInView",
+			[&](const TransformComponent& transform, float width, float height) {
+				auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
+				return EntityInView(transform, width, height, *camera);
+			}
 		);
 	}
 

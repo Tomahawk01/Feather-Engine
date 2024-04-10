@@ -20,17 +20,11 @@ namespace Feather {
 		Feather::Color color{ .r = 255, .g = 255, .b = 255, .a = 255 };
 		int start_x{ 0 }, start_y{ 0 }, layer{ 0 };
 
-		bool hidden{ false };
+		bool isHidden{ false };
 		std::string texture_name{ "" };
 
-		void generate_uvs(int textureWidth, int textureHeight)
-		{
-			uvs.uv_width = width / textureWidth;
-			uvs.uv_height = height / textureHeight;
-
-			uvs.u = start_x * uvs.uv_width;
-			uvs.v = start_y * uvs.uv_height;
-		}
+		void generate_uvs(int textureWidth, int textureHeight);
+		[[nodiscard]] std::string to_string() const;
 
 		static void CreateSpriteLuaBind(sol::state& lua, Feather::Registry& registry);
 	};

@@ -77,8 +77,8 @@ constexpr int F_KEY_W				= SDLK_w;
 constexpr int F_KEY_X				= SDLK_x;
 constexpr int F_KEY_Y				= SDLK_y;
 constexpr int F_KEY_Z				= SDLK_z;
-constexpr int F_KEY_DELETE			= SDLK_DELETE;
 
+constexpr int F_KEY_DELETE			= SDLK_DELETE;
 constexpr int F_KEY_CAPSLOCK		= SDLK_CAPSLOCK;
 
 constexpr int F_KEY_F1				= SDLK_F1;
@@ -114,6 +114,7 @@ constexpr int F_KEY_KP_MULTIPLY		= SDLK_KP_MULTIPLY;
 constexpr int F_KEY_KP_MINUS		= SDLK_KP_MINUS;
 constexpr int F_KEY_KP_PLUS			= SDLK_KP_PLUS;
 constexpr int F_KEY_KP_ENTER		= SDLK_KP_ENTER;
+
 constexpr int F_KEY_KP1				= SDLK_KP_1;
 constexpr int F_KEY_KP2				= SDLK_KP_2;
 constexpr int F_KEY_KP3				= SDLK_KP_3;
@@ -124,6 +125,7 @@ constexpr int F_KEY_KP7				= SDLK_KP_7;
 constexpr int F_KEY_KP8				= SDLK_KP_8;
 constexpr int F_KEY_KP9				= SDLK_KP_9;
 constexpr int F_KEY_KP0				= SDLK_KP_0;
+
 constexpr int F_KEY_KP_PERIOD		= SDLK_KP_PERIOD;
 
 constexpr int F_KEY_LCTRL			= SDLK_LCTRL;

@@ -2,6 +2,24 @@
 
 #include <entt.hpp>
 
+std::string Feather::TextComponent::to_string()
+{
+	std::stringstream ss;
+	ss << "==== Text Component ==== \n" << std::boolalpha <<
+		  "Text: " << textStr << "\n" <<
+		  "Font Name: " << fontName << "\n" <<
+		  "Padding: " << padding << "\n" <<
+		  "Wrap: " << wrap << "\n" <<
+		  "IsHidden: " << isHidden << "\n" <<
+		  "Color: \n\t" <<
+		  "Red: " << color.r << "\n\t" <<
+		  "Green: " << color.g << "\n\t" <<
+		  "Blue: " << color.b << "\n\t" <<
+		  "Alpha: " << color.a << "\n";
+
+	return ss.str();
+}
+
 namespace Feather {
 
 	void TextComponent::CreateLuaTextBindings(sol::state& lua)
@@ -27,7 +45,8 @@ namespace Feather {
 			"padding", &TextComponent::padding,
 			"wrap", &TextComponent::wrap,
 			"color", &TextComponent::color,
-			"isHidden", &TextComponent::isHidden
+			"isHidden", &TextComponent::isHidden,
+			"to_string", &TextComponent::to_string
 		);
 	}
 

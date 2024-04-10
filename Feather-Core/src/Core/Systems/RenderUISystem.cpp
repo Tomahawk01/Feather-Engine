@@ -1,8 +1,8 @@
 #include "RenderUISystem.h"
 
 #include "Logger/Logger.h"
-#include "Core/ECS/Components/TextComponent.h"
-#include "Core/ECS/Components/TransformComponent.h"
+#include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Resources/AssetManager.h"
 #include "Renderer/Essentials/Font.h"
 
@@ -14,12 +14,22 @@ namespace Feather {
 		m_TextRenderer{ std::make_unique<TextBatchRenderer>() },
 		m_Camera2D{ nullptr }
 	{
-		m_Camera2D = std::make_unique<Camera2D>(640, 480); // TODO: Change based on window values
+		auto& coreEngine = CoreEngineData::GetInstance();
+
+		m_Camera2D = std::make_unique<Camera2D>(
+			coreEngine.WindowWidth(),
+			coreEngine.WindowHeight()
+		);
 		m_Camera2D->Update();
 	}
 
 	void RenderUISystem::Update(entt::registry& registry)
 	{
+		// If there are no entities in the view, leave
+		auto textView = registry.view<TextComponent, TransformComponent>();
+		if (textView.size_hint() < 1)
+			return;
+
 		auto& assetManager = m_Registry.GetContext<std::shared_ptr<AssetManager>>();
 		auto fontShader = assetManager->GetShader("font");
 
@@ -30,7 +40,6 @@ namespace Feather {
 		}
 
 		auto cam_mat = m_Camera2D->GetCameraMatrix();
-		auto textView = registry.view<TextComponent, TransformComponent>();
 
 		fontShader->Enable();
 		fontShader->SetUniformMat4("uProjection", cam_mat);
@@ -51,22 +60,9 @@ namespace Feather {
 			}
 
 			const auto& transform = textView.get<TransformComponent>(entity);
+			const auto fontSize = font->GetFontSize();
 
-			glm::mat4 model{ 1.0f };
-			if (transform.rotation > 0.0f || transform.rotation < 0.0f ||
-				transform.scale.x > 1.0f || transform.scale.x < 1.0f ||
-				transform.scale.y > 1.0f || transform.scale.y < 1.0f)
-			{
-				model = glm::translate(model, glm::vec3{ transform.position, 0.0f });
-				model = glm::translate(model, glm::vec3{ (font->GetFontSize() * transform.scale.x) * 0.5f, (font->GetFontSize() * transform.scale.y) * 0.5f, 0.0f });
-
-				model = glm::rotate(model, glm::radians(transform.rotation), glm::vec3{ 0.0f, 0.0f, 1.0f });
-				model = glm::translate(model, glm::vec3{ (font->GetFontSize() * transform.scale.x) * -0.5f, (font->GetFontSize() * transform.scale.y) * -0.5f, 0.0f });
-
-				model = glm::scale(model, glm::vec3{ transform.scale, 1.0f });
-
-				model = glm::translate(model, glm::vec3{ -transform.position, 0.0f });
-			}
+			glm::mat4 model = TRSModel(transform, fontSize, fontSize);
 
 			m_TextRenderer->AddText(text.textStr, font, transform.position, text.padding, text.wrap, text.color, model);
 		}

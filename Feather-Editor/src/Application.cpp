@@ -10,11 +10,8 @@
 
 #include <Core/ECS/Entity.h>
 #include <Core/ECS/Components/Identification.h>
-#include <Core/ECS/Components/SpriteComponent.h>
-#include <Core/ECS/Components/TransformComponent.h>
-#include <Core/ECS/Components/PhysicsComponent.h>
-#include <Core/ECS/Components/BoxColliderComponent.h>
-#include <Core/ECS/Components/CircleColliderComponent.h>
+
+#include <Core/CoreUtils/CoreUtilities.h>
 
 #include <Core/Resources/AssetManager.h>
 
@@ -29,6 +26,8 @@
 
 #include <Sounds/MusicPlayer/MusicPlayer.h>
 #include <Sounds/SoundPlayer/SoundFXPlayer.h>
+
+#include <Physics/ContactListener.h>
 
 namespace Feather {
 
@@ -63,6 +62,7 @@ namespace Feather {
     {
 		Log::Init();
 
+		// TODO: Load core engine data
 		// Init SDL
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
@@ -124,8 +124,11 @@ namespace Feather {
 		auto renderer = std::make_shared<Renderer>();
 
 		// Enable alpha blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		renderer->SetCapability(Renderer::GLCapability::BLEND, true);
+		renderer->SetBlendCapability(
+			Renderer::BlendingFactors::SRC_ALPHA,
+			Renderer::BlendingFactors::ONE_MINUS_SRC_ALPHA
+		);
 
 		auto assetManager = std::make_shared<AssetManager>();
 		if (!assetManager)
@@ -278,6 +281,15 @@ namespace Feather {
 			F_FATAL("Failed to add physics system to the registry context!");
 			return false;
 		}
+
+		auto contactListener = std::make_shared<ContactListener>();
+		if (!m_Registry->AddToContext<std::shared_ptr<ContactListener>>(contactListener))
+		{
+			F_FATAL("Failed to add contact listener to the registry context!");
+			return false;
+		}
+
+		physicsWorld->SetContactListener(contactListener.get());
 
 		if (!LoadShaders())
 		{
@@ -450,10 +462,9 @@ namespace Feather {
 		auto circleShader = assetManager->GetShader("circle");
 		auto fontShader = assetManager->GetShader("font");
 
-		glViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
-
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		renderer->SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
+		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		renderer->ClearBuffers(true, false, false);
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Render();

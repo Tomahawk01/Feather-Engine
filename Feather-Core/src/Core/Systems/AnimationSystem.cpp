@@ -2,9 +2,7 @@
 
 #include <SDL.h>
 
-#include "Core/ECS/Components/AnimationComponent.h"
-#include "Core/ECS/Components/SpriteComponent.h"
-#include "Core/ECS/Components/TransformComponent.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 
 namespace Feather {
 
@@ -15,12 +13,19 @@ namespace Feather {
 	void AnimationSystem::Update()
 	{
 		auto view = m_Registry.GetRegistry().view<AnimationComponent, SpriteComponent, TransformComponent>();
+		if (view.size_hint() < 1)
+			return;
+
+		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
 
 		for (auto entity : view)
 		{
 			const auto& transform = view.get<TransformComponent>(entity);
 			auto& sprite = view.get<SpriteComponent>(entity);
 			auto& animation = view.get<AnimationComponent>(entity);
+
+			if (!EntityInView(transform, sprite.width, sprite.height, *camera))
+				continue;
 
 			if (animation.numFrames <= 0)
 				continue;

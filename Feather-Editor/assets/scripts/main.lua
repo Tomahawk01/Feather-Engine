@@ -5,13 +5,28 @@ run_script("assets/scripts/TestProject/testmap.lua")
 run_script("assets/scripts/TestProject/test_platformer.lua")
 run_script("assets/scripts/utilities.lua")
 run_script("assets/scripts/rain_generator.lua")
+run_script("assets/scripts/events/event_manager.lua")
+run_script("assets/scripts/events/collision_event.lua")
+run_script("assets/scripts/systems/trigger_system.lua")
 
 local tilemap = CreateTestPlatformerMap()
 assert(tilemap)
 LoadAssets(AssetDefs)
 LoadMap(tilemap)
 
-local rainGen = RainGenerator:Create()
+gCollisionEvent = CollisionEvent:Create() 
+gTriggerSystem = TriggerSystem:Create() 
+gCollisionEvent:SubscribeToEvent(gTriggerSystem)
+
+local rainGen = RainGenerator:Create(
+	{
+		scale = 0.5,
+		rain_vel_min = 10,
+		rain_vel_max = 100,
+		rain_life_min = 250,
+		rain_life_max = 500
+	}
+)
 Sound.play("rain", -1, 1)
 Sound.set_volume(1, 50)
 
@@ -64,6 +79,7 @@ playerPhysAttrs.position = playerTransform.position
 playerPhysAttrs.radius = circleCollider.radius
 playerPhysAttrs.isCircle = true
 playerPhysAttrs.isFixedRotation = true
+playerPhysAttrs.objectData = (ObjectData("player", "", true, false, gPlayer:id()))
 gPlayer:add_component(PhysicsComponent(playerPhysAttrs))
 
 isFacingLeft = false
@@ -122,18 +138,6 @@ gFollowCam = FollowCamera(
 	), gPlayer
 )
 
--- Test Data
-local objectData = ObjectData("test_tag", "test_group", true, true, 9998)
-local userData = UserData.create_user_data(objectData)
-
-local objData1 = userData:get_user_data()
-print(objData1:to_string())
-
-userData:set_user_data(ObjectData("New Tag", "New Group", false, true, 19029))
-
-local objData2 = userData:get_user_data()
-print(objData2:to_string())
-
 main = {
 	[1] = {
 		update = function()
@@ -143,6 +147,11 @@ main = {
 			UpdateLightning(darkness)
 
 			Debug()
+
+			local uda, udb = ContactListener.get_user_data()
+			if uda and udb then
+				gCollisionEvent:EmitEvent(uda, udb)
+			end
 		end
 	},
 	[2] = {

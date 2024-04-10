@@ -17,10 +17,6 @@ namespace Feather {
 		F_INFO("Window created successfully!");
 	}
 
-	Window::~Window()
-	{
-	}
-
 	void Window::SetPosition(int x, int y)
 	{
 		SDL_SetWindowPosition(m_pWindow.get(), x, y);

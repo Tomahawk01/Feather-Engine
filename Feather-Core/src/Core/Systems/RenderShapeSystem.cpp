@@ -1,11 +1,8 @@
 #include "RenderShapeSystem.h"
 
-#include "Core/ECS/Components/BoxColliderComponent.h"
-#include "Core/ECS/Components/CircleColliderComponent.h"
-#include "Core/ECS/Components/TransformComponent.h"
-#include "Core/ECS/Components/PhysicsComponent.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Essentials/Primitives.h"
@@ -38,21 +35,10 @@ namespace Feather {
 			const auto& transform = boxView.get<TransformComponent>(entity);
 			const auto& boxCollider = boxView.get<BoxColliderComponent>(entity);
 
-			glm::mat4 model{ 1.0f };
-			if (transform.rotation > 0.0f || transform.rotation < 0.0f ||
-				transform.scale.x > 1.0f || transform.scale.x < 1.0f ||
-				transform.scale.y > 1.0f || transform.scale.y < 1.0f)
-			{
-				model = glm::translate(model, glm::vec3{ transform.position, 0.0f });
-				model = glm::translate(model, glm::vec3{ (boxCollider.width * transform.scale.x) * 0.5f, (boxCollider.height * transform.scale.y) * 0.5f, 0.0f });
+			if (!EntityInView(transform, static_cast<float>(boxCollider.width), static_cast<float>(boxCollider.height), *camera))
+				continue;
 
-				model = glm::rotate(model, glm::radians(transform.rotation), glm::vec3{ 0.0f, 0.0f, 1.0f });
-				model = glm::translate(model, glm::vec3{ (boxCollider.width * transform.scale.x) * -0.5f, (boxCollider.height * transform.scale.y) * -0.5f, 0.0f });
-
-				model = glm::scale(model, glm::vec3{ transform.scale, 1.0f });
-
-				model = glm::translate(model, glm::vec3{ -transform.position, 0.0f });
-			}
+			glm::mat4 model = TRSModel(transform, boxCollider.width, boxCollider.height);
 
 			auto color = Color{ 255, 0, 0, 100 };
 

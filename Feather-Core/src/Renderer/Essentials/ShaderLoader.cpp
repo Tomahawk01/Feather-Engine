@@ -1,4 +1,5 @@
 #include "ShaderLoader.h"
+
 #include "Logger/Logger.h"
 
 #include <fstream>
@@ -13,6 +14,26 @@ namespace Feather {
             return std::make_shared<Shader>(program, vertexShaderPath, fragmentShaderPath);
 
         return nullptr;
+    }
+
+    std::shared_ptr<Shader> ShaderLoader::CreateFromMemory(const char* vertexShader, const char* fragmentShader)
+    {
+        GLuint program = CreateProgram(vertexShader, fragmentShader);
+
+        // From memory holds onto the shader itself, not the path
+        if (program)
+            return std::make_shared<Shader>(program, vertexShader, fragmentShader);
+
+        return nullptr;
+    }
+
+    bool ShaderLoader::Destroy(Shader* pShader)
+    {
+        if (pShader->ShaderProgramID() <= 0)
+            return false;
+
+        glDeleteShader(pShader->ShaderProgramID());
+        return true;
     }
 
     GLuint ShaderLoader::CreateProgram(const std::string& vertexShader, const std::string& fragmentShader)
@@ -66,6 +87,41 @@ namespace Feather {
         }
 
         return shaderID;
+    }
+
+    GLuint ShaderLoader::CreateProgram(const char* vertexShader, const char* fragmentShader)
+    {
+        const GLuint program = glCreateProgram();
+
+        const GLuint vertex = CompileShader(GL_VERTEX_SHADER, vertexShader);
+        const GLuint fragment = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+        if (vertex == 0 || fragment == 0)
+            return 0;
+
+        if (!LinkShaders(program, vertex, fragment))
+        {
+            F_ERROR("Failed to link shaders!");
+            return 0;
+        }
+
+        return program;
+    }
+
+    GLuint ShaderLoader::CompileShader(GLuint type, const char* shader)
+    {
+        const GLuint id = glCreateShader(type);
+        glShaderSource(id, 1, &shader, nullptr);
+
+        glCompileShader(id);
+
+        if (!CompileSuccess(id))
+        {
+            F_ERROR("Failed to compile shader from memory!");
+            return 0;
+        }
+
+        return id;
     }
 
     bool ShaderLoader::CompileSuccess(GLuint shader)

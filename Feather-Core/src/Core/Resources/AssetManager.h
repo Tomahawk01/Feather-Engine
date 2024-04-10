@@ -28,6 +28,7 @@ namespace Feather {
 		std::shared_ptr<Font> GetFont(const std::string& fontName);
 
 		bool AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath);
+		bool AddShaderFromMemory(const std::string& shaderName, const char* vertexShader, const char* fragmentShader);
 		std::shared_ptr<Shader> GetShader(const std::string& shaderName);
 
 		bool AddMusic(const std::string& musicName, const std::string& filepath);

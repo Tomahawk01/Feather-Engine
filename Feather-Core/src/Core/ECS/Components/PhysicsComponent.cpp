@@ -121,6 +121,11 @@ namespace Feather {
 					};
 				}
 			),
+			"tag", &ObjectData::tag,
+			"group", &ObjectData::group,
+			"isCollider", &ObjectData::isCollider,
+			"isTrigger", &ObjectData::isTrigger,
+			"entityID", &ObjectData::entityID,
 			"to_string", &ObjectData::to_string
 		);
 

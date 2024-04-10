@@ -14,6 +14,8 @@ namespace Feather {
 		Color color{ 255,255,255,255 };
 		bool isHidden{ false };
 
+		[[nodiscard]] std::string to_string();
+
 		static void CreateLuaTextBindings(sol::state& lua);
 	};
 

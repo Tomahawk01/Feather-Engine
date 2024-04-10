@@ -2,6 +2,19 @@
 
 #include <entt.hpp>
 
+std::string Feather::AnimationComponent::to_string() const
+{
+	std::stringstream ss;
+	ss << "==== Animation Component ==== \n" << std::boolalpha <<
+		  "Num Frames: " << numFrames << "\n" <<
+		  "Frame Rate: " << frameRate << "\n" <<
+		  "Frame Offset: " << frameOffset << "\n" <<
+		  "IsVertical: " << isVertical << "\n" <<
+		  "IsLooped: " << isLooped << "\n";
+
+	return ss.str();
+}
+
 void Feather::AnimationComponent::CreateAnimationLuaBind(sol::state& lua)
 {
 	lua.new_usertype<AnimationComponent>(
@@ -29,6 +42,7 @@ void Feather::AnimationComponent::CreateAnimationLuaBind(sol::state& lua)
 		{
 			anim.currentFrame = 0;
 			anim.startTime = SDL_GetTicks();
-		}
+		},
+		"to_string", &AnimationComponent::to_string
 	);
 }
