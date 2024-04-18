@@ -16,4 +16,8 @@ end
 
 function TriggerSystem:OnPlayerTriggered(trigger, player)
 	print(trigger.group .. "has been activated by " ..player.tag)
+	local playerEntity = Entity(player.entityID)
+	local physics = playerEntity:get_component(PhysicsComponent)
+	physics:set_transform(vec2(10 * 16, 33 * 16))
+	physics:linear_impulse(vec2(0, 5))
 end

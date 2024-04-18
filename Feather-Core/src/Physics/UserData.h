@@ -3,6 +3,7 @@
 #include <any>
 #include <string>
 #include <sstream>
+#include <vector>
 
 namespace Feather {
 
@@ -17,20 +18,13 @@ namespace Feather {
 		std::string tag{ "" }, group{ "" };
 		bool isCollider{ false }, isTrigger{ false };
 		std::uint32_t entityID{};
+		std::vector<ObjectData> contactEntities;
 
-		[[nodiscard]] std::string to_string() const
-		{
-			std::stringstream ss;
-			ss <<
-				"==== Object Data ====\n" << std::boolalpha <<
-				"Tag: " << tag << "\n" <<
-				"Group: " << group << "\n" <<
-				"isCollider: " << isCollider << "\n" <<
-				"isTrigger: " << isTrigger << "\n" <<
-				"EntityID: " << entityID << "\n";
-			
-			return ss.str();
-		}
+		friend bool operator==(const ObjectData& a, const ObjectData& b);
+		bool AddContact(const ObjectData& objectData);
+		bool RemoveContact(const ObjectData& objectData);
+
+		[[nodiscard]] std::string to_string() const;
 	};
 
 }

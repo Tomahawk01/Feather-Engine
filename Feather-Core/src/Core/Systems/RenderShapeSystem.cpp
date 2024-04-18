@@ -81,7 +81,7 @@ namespace Feather {
 				circleCollider.radius * transform.scale.x * 2,
 				circleCollider.radius * transform.scale.y * 2
 			};
-			m_CircleRenderer->AddCircle(circle, Color{ 255, 0, 0, 100 }, 1.0f);
+			m_CircleRenderer->AddCircle(circle, Color{ 0, 0, 255, 100 }, 1.0f);
 		}
 
 		m_CircleRenderer->End();

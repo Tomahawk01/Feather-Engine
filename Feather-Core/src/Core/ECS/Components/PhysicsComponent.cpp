@@ -126,6 +126,7 @@ namespace Feather {
 			"isCollider", &ObjectData::isCollider,
 			"isTrigger", &ObjectData::isTrigger,
 			"entityID", &ObjectData::entityID,
+			"contactEntities", &ObjectData::contactEntities,
 			"to_string", &ObjectData::to_string
 		);
 
@@ -295,6 +296,26 @@ namespace Feather {
 				}
 
 				body->SetGravityScale(gravityScale);
+			},
+			"set_transform", [](PhysicsComponent& pc, const glm::vec2& position)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				auto& engineData = CoreEngineData::GetInstance();
+				const auto p2m = engineData.PixelsToMeters();
+
+				const auto scaleHalfHeight = engineData.ScaledHeight() * 0.5f;
+				const auto scaleHalfWidth = engineData.ScaledWidth() * 0.5f;
+
+				auto bx = position.x * p2m - scaleHalfWidth;
+				auto by = position.y * p2m - scaleHalfHeight;
+
+				body->SetTransform(b2Vec2{ bx, by }, 0.0f);
 			}
 		);
 	}
