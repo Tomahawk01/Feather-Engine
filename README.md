@@ -21,6 +21,20 @@ Run the `Win-GenProjects.bat` file. This will generate a Visual Studio solution 
 
 If you are using Visual Studio 2022 press `F5` key.
 
+## Technologies used
+* [SDL2](https://github.com/libsdl-org/SDL) for windowing and input functionality
+* [Glad](https://glad.dav1d.de/) as OpenGL loader
+* [glm](https://github.com/g-truc/glm) math library
+* [spdlog](https://github.com/gabime/spdlog) for logging
+* [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h) for image loading
+* [stb_truetype](https://github.com/nothings/stb/blob/master/stb_truetype.h) for characters rasterisation
+* [entt](https://github.com/skypjack/entt) for Entity Component System
+* [Box2D](https://github.com/erincatto/box2d) for a physics system
+* [Lua](https://www.lua.org/download.html) scripting language
+* [Premake](https://premake.github.io/) for project building automatization
+* [Sol](https://github.com/ThePhD/sol2) to bind Lua functions, user types, etc. 
+* [ImGui](https://github.com/ocornut/imgui) for editor GUI
+
 ## Games made using Feather Engine
 To play any available game created by the developer of this engine check [Releases](https://github.com/Tomahawk01/Feather-Engine/releases) tab.
 
