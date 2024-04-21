@@ -11,7 +11,6 @@ namespace Feather {
 	{
 	public:
 		static Application& GetInstance();
-		~Application();
 
 		void Run();
 
@@ -32,7 +31,16 @@ namespace Feather {
 
 		void CleanUp();
 
+		// Temp ImGui testing
+		bool InitImGui();
+		void BeginImGui();
+		void EndImGui();
+		void RenderImGui();
+
 		Application();
+		~Application() = default;
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
 	};
 
 }

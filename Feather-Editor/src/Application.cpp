@@ -29,6 +29,12 @@
 
 #include <Physics/ContactListener.h>
 
+// IMGUI testing
+#include <imgui.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <SDL_opengl.h>
+
 namespace Feather {
 
     Application& Application::GetInstance()
@@ -36,9 +42,6 @@ namespace Feather {
 		static Application app{};
 		return app;
     }
-
-    Application::~Application()
-    {}
 
     void Application::Run()
     {
@@ -94,7 +97,7 @@ namespace Feather {
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 		// Create the Window
-		m_Window = std::make_unique<Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+		m_Window = std::make_unique<Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MOUSE_CAPTURE);
 
 		if (!m_Window->GetWindow())
 		{
@@ -291,6 +294,12 @@ namespace Feather {
 
 		physicsWorld->SetContactListener(contactListener.get());
 
+		if (!InitImGui())
+		{
+			F_FATAL("Failed to initialize ImGui!");
+			return false;
+		}
+
 		if (!LoadShaders())
 		{
 			F_FATAL("Failed to load shaders!");
@@ -359,6 +368,8 @@ namespace Feather {
 		// Process Events
 		while (SDL_PollEvent(&m_Event))
 		{
+			ImGui_ImplSDL2_ProcessEvent(&m_Event);
+
 			switch (m_Event.type)
 			{
 			case SDL_QUIT:
@@ -472,6 +483,10 @@ namespace Feather {
 		renderShapeSystem->Update();
 		renderUISystem->Update(m_Registry->GetRegistry());
 
+		BeginImGui();
+		RenderImGui();
+		EndImGui();
+
 		renderer->DrawLines(*shader, *camera);
 		renderer->DrawFilledRects(*shader, *camera);
 		renderer->DrawCircles(*circleShader, *camera);
@@ -486,6 +501,67 @@ namespace Feather {
     {
 		SDL_Quit();
     }
+
+	bool Application::InitImGui()
+	{
+		const char* glslVersion = "#version 450 core";
+		IMGUI_CHECKVERSION();
+
+		if (!ImGui::CreateContext())
+		{
+			F_FATAL("Failed to create ImGui context!");
+			return false;
+		}
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+		if (!ImGui_ImplSDL2_InitForOpenGL(m_Window->GetWindow().get(), m_Window->GetGLContext()))
+		{
+			F_FATAL("Failed to initialize ImGui SDL2 for OpenGL!");
+			return false;
+		}
+
+		if (!ImGui_ImplOpenGL3_Init(glslVersion))
+		{
+			F_FATAL("Failed to initialize ImGui OpenGL3!");
+			return false;
+		}
+
+		return true;
+	}
+
+	void Application::BeginImGui()
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void Application::EndImGui()
+	{
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+
+			SDL_GL_MakeCurrent(m_Window->GetWindow().get(), backupContext);
+		}
+	}
+
+	void Application::RenderImGui()
+	{
+		ImGui::ShowDemoWindow();
+	}
 
     Application::Application()
         : m_Window{ nullptr }, m_Registry{ nullptr }, m_Event{}, m_IsRunning{ true }
