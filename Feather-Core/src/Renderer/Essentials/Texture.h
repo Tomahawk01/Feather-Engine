@@ -11,8 +11,9 @@ namespace Feather {
 	public:
 		enum class TextureType
 		{
-			PIXEL,
+			PIXEL = 0,
 			BLENDED,
+			FRAMEBUFFER,
 			NONE
 		};
 

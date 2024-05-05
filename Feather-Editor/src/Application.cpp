@@ -7,6 +7,7 @@
 #include <Renderer/Essentials/Vertex.h>
 #include <Renderer/Core/Camera2D.h>
 #include <Renderer/Core/Renderer.h>
+#include <Renderer/Buffers/Framebuffer.h>
 
 #include <Core/ECS/Entity.h>
 #include <Core/ECS/Components/Identification.h>
@@ -35,6 +36,8 @@
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <SDL_opengl.h>
+
+#include "Editor/Displays/SceneDisplay.h"
 
 namespace Feather {
 
@@ -97,8 +100,11 @@ namespace Feather {
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
+		SDL_DisplayMode displayMode;
+		SDL_GetCurrentDisplayMode(0, &displayMode);
+
 		// Create the Window
-		m_Window = std::make_unique<Window>("Test Window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MOUSE_CAPTURE);
+		m_Window = std::make_unique<Window>("Test Window", displayMode.w, displayMode.h, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MOUSE_CAPTURE | SDL_WINDOW_MAXIMIZED);
 
 		if (!m_Window->GetWindow())
 		{
@@ -325,6 +331,32 @@ namespace Feather {
 			return false;
 		}
 
+		// TODO: temporary framebuffer
+		auto framebuffer = std::make_shared<Framebuffer>(640, 480, true);
+		if (!framebuffer)
+		{
+			F_ERROR("Failed to create a framebuffer");
+			return false;
+		}
+		if (!m_Registry->AddToContext<std::shared_ptr<Framebuffer>>(framebuffer))
+		{
+			F_ERROR("Failed to add a framebuffer to registry context");
+			return false;
+		}
+
+		// TODO: temporary scene display
+		auto sceneDisplay = std::make_shared<SceneDisplay>(*m_Registry);
+		if (!sceneDisplay)
+		{
+			F_ERROR("Failed to create a SceneDisplay");
+			return false;
+		}
+		if (!m_Registry->AddToContext<std::shared_ptr<SceneDisplay>>(sceneDisplay))
+		{
+			F_ERROR("Failed to add a SceneDisplay to registry context");
+			return false;
+		}
+
 		return true;
     }
 
@@ -475,28 +507,33 @@ namespace Feather {
 		auto shader = assetManager->GetShader("color");
 		auto circleShader = assetManager->GetShader("circle");
 		auto fontShader = assetManager->GetShader("font");
-
-		renderer->SetViewport(0, 0, m_Window->GetWidth(), m_Window->GetHeight());
-		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		renderer->ClearBuffers(true, false, false);
-
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
+
+		const auto& fb = m_Registry->GetContext<std::shared_ptr<Framebuffer>>();
+
+		fb->Bind();
+		renderer->SetViewport(0, 0, fb->GetWidth(), fb->GetHeight());
+		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		renderer->ClearBuffers(true, true, false);
+
 		scriptSystem->Render();
 		renderSystem->Update();
 		renderShapeSystem->Update();
 		renderUISystem->Update(m_Registry->GetRegistry());
+		fb->Unbind();
 
 		BeginImGui();
 		RenderImGui();
 		EndImGui();
 
-		renderer->DrawLines(*shader, *camera);
+		/*renderer->DrawLines(*shader, *camera);
 		renderer->DrawFilledRects(*shader, *camera);
 		renderer->DrawCircles(*circleShader, *camera);
-		renderer->DrawAllText(*fontShader, *camera);
+		renderer->DrawAllText(*fontShader, *camera);*/
+
+		fb->CheckResize();
 
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
-
 		renderer->ClearPrimitives();
     }
 
@@ -563,6 +600,11 @@ namespace Feather {
 
 	void Application::RenderImGui()
 	{
+		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
+		auto& sceneDisplay = m_Registry->GetContext<std::shared_ptr<SceneDisplay>>();
+		sceneDisplay->Draw();
+
 		ImGui::ShowDemoWindow();
 	}
 

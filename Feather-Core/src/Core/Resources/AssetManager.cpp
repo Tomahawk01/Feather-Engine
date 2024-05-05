@@ -29,6 +29,28 @@ namespace Feather {
         return true;
     }
 
+    bool AssetManager::AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt)
+    {
+        if (m_mapTextures.contains(textureName))
+        {
+            F_ERROR("AssetManager: Texture '{}': Already exists!", textureName);
+            return false;
+        }
+
+        auto texture = std::move(TextureLoader::CreateFromMemory(imageData, length));
+        // Load texture
+        if (!texture)
+        {
+            F_ERROR("Unable to load texture '{}' from memory", textureName);
+            return false;
+        }
+
+        // Insert texture into the map
+        m_mapTextures.emplace(textureName, std::move(texture));
+
+        return true;
+    }
+
     std::shared_ptr<Texture> AssetManager::GetTexture(const std::string& textureName)
     {
         auto texIter = m_mapTextures.find(textureName);
