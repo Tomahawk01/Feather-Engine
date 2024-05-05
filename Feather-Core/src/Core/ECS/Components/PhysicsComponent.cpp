@@ -297,6 +297,17 @@ namespace Feather {
 
 				body->SetGravityScale(gravityScale);
 			},
+			"get_gravity_scale", [](PhysicsComponent& pc)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return 0.0f;
+				}
+
+				return body->GetGravityScale();
+			},
 			"set_transform", [](PhysicsComponent& pc, const glm::vec2& position)
 			{
 				auto body = pc.GetBody();
@@ -316,6 +327,56 @@ namespace Feather {
 				auto by = position.y * p2m - scaleHalfHeight;
 
 				body->SetTransform(b2Vec2{ bx, by }, 0.0f);
+			},
+			"get_transform", [](const PhysicsComponent& pc) {
+
+			},
+			"set_body_type", [&](PhysicsComponent& pc, RigidBodyType type) {
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				b2BodyType bodyType = b2_dynamicBody;
+
+				switch (type)
+				{
+				case RigidBodyType::STATIC:
+					bodyType = b2_staticBody;
+					break;
+				case RigidBodyType::KINEMATIC:
+					bodyType = b2_kinematicBody;
+					break;
+				case RigidBodyType::DYNAMIC:
+					bodyType = b2_dynamicBody;
+					break;
+				default:
+					break;
+				}
+
+				body->SetType(bodyType);
+			},
+			"set_bullet", [&](PhysicsComponent& pc, bool bullet) {
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->SetBullet(bullet);
+			},
+			"is_bullet", [&](PhysicsComponent& pc) {
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return false;
+				}
+
+				return body->IsBullet();
 			}
 		);
 	}

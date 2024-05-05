@@ -14,6 +14,7 @@
 #include <Core/CoreUtils/CoreUtilities.h>
 
 #include <Core/Resources/AssetManager.h>
+#include <Core/CoreUtils/CoreEngineData.h>
 
 #include <Core/Systems/ScriptingSystem.h>
 #include <Core/Systems/RenderSystem.h>
@@ -418,8 +419,7 @@ namespace Feather {
 				switch (m_Event.window.event)
 				{
 				case SDL_WINDOWEVENT_SIZE_CHANGED:
-					m_Window->SetWidth(m_Event.window.data1);
-					m_Window->SetHeight(m_Event.window.data2);
+					m_Window->SetSize(m_Event.window.data1, m_Event.window.data2);
 					break;
 				default:
 					break;
@@ -432,6 +432,9 @@ namespace Feather {
 
     void Application::Update()
     {
+		auto& engineData = CoreEngineData::GetInstance();
+		engineData.UpdateDeltaTime();
+
 		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
 		if (!camera)
 		{

@@ -24,6 +24,13 @@ namespace Feather {
 		m_YPos = y;
 	}
 
+	void Window::SetSize(int width, int height)
+	{
+		SDL_SetWindowSize(m_pWindow.get(), width, height);
+		m_Width = width;
+		m_Height = height;
+	}
+
 	void Window::SetWindowName(const std::string& name)
 	{
 		m_Title = name;

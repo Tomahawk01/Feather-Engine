@@ -18,6 +18,7 @@ namespace Feather {
 		~Window() = default;
 
 		void SetPosition(int x, int y);
+		void SetSize(int width, int height);
 
 		inline void SetGLContext(SDL_GLContext gl_context) { m_GLContext = gl_context; }
 		inline SDL_GLContext& GetGLContext() { return m_GLContext; }
@@ -29,8 +30,6 @@ namespace Feather {
 		inline const int GetYPos() const { return m_YPos; }
 		inline const int SetYPos(int y_pos) { m_YPos = y_pos; }
 
-		inline void SetWidth(int width) { m_Width = width; }
-		inline void SetHeight(int height) { m_Height = height; }
 		inline const int GetWidth() const { return m_Width; }
 		inline const int GetHeight() const { return m_Height; }
 
