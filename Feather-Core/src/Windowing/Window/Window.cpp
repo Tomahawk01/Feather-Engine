@@ -26,7 +26,6 @@ namespace Feather {
 
 	void Window::SetSize(int width, int height)
 	{
-		SDL_SetWindowSize(m_pWindow.get(), width, height);
 		m_Width = width;
 		m_Height = height;
 	}

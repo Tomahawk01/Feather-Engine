@@ -104,7 +104,7 @@ namespace Feather {
 		SDL_GetCurrentDisplayMode(0, &displayMode);
 
 		// Create the Window
-		m_Window = std::make_unique<Window>("Test Window", displayMode.w, displayMode.h, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MOUSE_CAPTURE | SDL_WINDOW_MAXIMIZED);
+		m_Window = std::make_unique<Window>("Feather Engine", displayMode.w, displayMode.h, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MOUSE_CAPTURE | SDL_WINDOW_MAXIMIZED);
 
 		if (!m_Window->GetWindow())
 		{
@@ -504,9 +504,6 @@ namespace Feather {
 		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
 		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
 
-		auto shader = assetManager->GetShader("color");
-		auto circleShader = assetManager->GetShader("circle");
-		auto fontShader = assetManager->GetShader("font");
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 
 		const auto& fb = m_Registry->GetContext<std::shared_ptr<Framebuffer>>();
@@ -522,19 +519,15 @@ namespace Feather {
 		renderUISystem->Update(m_Registry->GetRegistry());
 		fb->Unbind();
 
+		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		renderer->ClearBuffers(true, true, false);
+
 		BeginImGui();
 		RenderImGui();
 		EndImGui();
 
-		/*renderer->DrawLines(*shader, *camera);
-		renderer->DrawFilledRects(*shader, *camera);
-		renderer->DrawCircles(*circleShader, *camera);
-		renderer->DrawAllText(*fontShader, *camera);*/
-
 		fb->CheckResize();
-
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
-		renderer->ClearPrimitives();
     }
 
     void Application::CleanUp()
