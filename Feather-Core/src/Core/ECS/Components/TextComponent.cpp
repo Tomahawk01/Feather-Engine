@@ -38,6 +38,13 @@ namespace Feather {
 						.wrap = wrap,
 						.color = color
 					};
+				},
+				[](const std::string& fontName, const std::string textStr)
+				{
+					return TextComponent{
+						.fontName = fontName,
+						.textStr = textStr
+					};
 				}
 			),
 			"textStr", &TextComponent::textStr,

@@ -18,6 +18,9 @@
 #include "Core/CoreUtils/FollowCamera.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 
+#include "Core/States/State.h"
+#include "Core/States/StateStack.h"
+
 namespace Feather {
 
 	ScriptingSystem::ScriptingSystem(Feather::Registry& registry)
@@ -157,6 +160,9 @@ namespace Feather {
 		FollowCamera::CreateLuaFollowCamera(lua, registry);
 
 		create_timer(lua);
+
+		State::CreateLuaStateBind(lua);
+		StateStack::CreateLuaStateStackBind(lua);
 
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);
