@@ -32,7 +32,7 @@
 #include <Physics/ContactListener.h>
 
 // IMGUI testing
-#include <imgui.h>
+#include <imgui_internal.h>
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <SDL_opengl.h>
@@ -170,7 +170,8 @@ namespace Feather {
 							sol::lib::os,
 							sol::lib::table,
 							sol::lib::io,
-							sol::lib::string);
+							sol::lib::string,
+							sol::lib::package);
 
 		if (!m_Registry->AddToContext<std::shared_ptr<sol::state>>(lua))
 		{
@@ -593,7 +594,22 @@ namespace Feather {
 
 	void Application::RenderImGui()
 	{
-		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+		const auto dockSpaceId = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+		if (static auto firstTime = true; firstTime) [[unlikely]]
+		{
+			firstTime = false;
+
+			ImGui::DockBuilderRemoveNode(dockSpaceId);
+			ImGui::DockBuilderAddNode(dockSpaceId);
+
+			auto centerNodeId = dockSpaceId;
+			const auto leftNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Left, 0.2f, nullptr, &centerNodeId);
+
+			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
+			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
+
+			ImGui::DockBuilderFinish(dockSpaceId);
+		}
 
 		auto& sceneDisplay = m_Registry->GetContext<std::shared_ptr<SceneDisplay>>();
 		sceneDisplay->Draw();
