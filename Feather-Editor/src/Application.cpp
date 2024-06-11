@@ -147,8 +147,6 @@ namespace Feather {
 			return false;
 		}
 
-		assetManager->AddTexure("TestGem", "assets/textures/Gem.png");
-
 		m_Registry = std::make_unique<Registry>();
 
 		if (!m_Registry->AddToContext<std::shared_ptr<Renderer>>(renderer))
@@ -326,11 +324,11 @@ namespace Feather {
 		renderer->SetLineWidth(4.0f);
 
 		// TODO: temp load font
-		if (!assetManager->AddFont("testFont", "./assets/fonts/Raleway-Regular.ttf"))
-		{
-			F_ERROR("Failed to load test font!");
-			return false;
-		}
+		//if (!assetManager->AddFont("testFont", "./assets/fonts/Raleway-Regular.ttf"))
+		//{
+		//	F_ERROR("Failed to load test font!");
+		//	return false;
+		//}
 
 		// TODO: temporary framebuffer
 		auto framebuffer = std::make_shared<Framebuffer>(640, 480, true);
