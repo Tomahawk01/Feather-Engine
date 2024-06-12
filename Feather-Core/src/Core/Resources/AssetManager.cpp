@@ -5,7 +5,22 @@
 #include "Renderer/Essentials/ShaderLoader.h"
 #include "Renderer/Essentials/FontLoader.h"
 
+#include "Core/Resources/fonts/default_fonts.h"
+
 namespace Feather {
+
+    bool AssetManager::CreateDefaultFonts()
+    {
+        if (!AddFontFromMemory("defaultFont", pixel_font))
+        {
+            F_ERROR("Failed to create default pixel font");
+            return false;
+        }
+
+        // TODO: Add more default fonts
+
+        return true;
+    }
 
     bool AssetManager::AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt)
     {

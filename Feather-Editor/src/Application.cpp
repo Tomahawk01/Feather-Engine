@@ -323,12 +323,11 @@ namespace Feather {
 
 		renderer->SetLineWidth(4.0f);
 
-		// TODO: temp load font
-		//if (!assetManager->AddFont("testFont", "./assets/fonts/Raleway-Regular.ttf"))
-		//{
-		//	F_ERROR("Failed to load test font!");
-		//	return false;
-		//}
+		if (!assetManager->CreateDefaultFonts())
+		{
+			F_ERROR("Failed to create default fonts!");
+			return false;
+		}
 
 		// TODO: temporary framebuffer
 		auto framebuffer = std::make_shared<Framebuffer>(640, 480, true);

@@ -13,3 +13,4 @@ bin-int/
 *.log
 *.tiled-project
 *.tiled-session
+imgui.ini

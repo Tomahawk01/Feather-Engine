@@ -20,6 +20,8 @@ namespace Feather {
 		AssetManager() = default;
 		~AssetManager() = default;
 
+		bool CreateDefaultFonts();
+
 		bool AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt = true);
 		bool AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt = true);
 		std::shared_ptr<Texture> GetTexture(const std::string& textureName);
