@@ -38,25 +38,9 @@ function GameState:Initialize()
 
     -- Create the player
     if not gPlayer then
-        gPlayer = Entity("player", "")
-
-        local playerTransform = gPlayer:add_component(Transform(vec2(10 * 16, 33 * 16), vec2(1, 1), 0))
-        local sprite = gPlayer:add_component(Sprite("player", 16, 16, 0, 0, 2))
-        sprite:generate_uvs()
-        gPlayer:add_component(Animation(4, 6, 0, false, true))
-        local circleCollider = gPlayer:add_component(CircleCollider(8))
-
-        local playerPhysAttrs = PhysicsAttributes()
-        playerPhysAttrs.type = BodyType.Dynamic
-        playerPhysAttrs.density = 75.0
-        playerPhysAttrs.friction = 1.0
-        playerPhysAttrs.restitution = 0.0
-        playerPhysAttrs.position = playerTransform.position
-        playerPhysAttrs.radius = circleCollider.radius
-        playerPhysAttrs.isCircle = true
-        playerPhysAttrs.isFixedRotation = true
-        playerPhysAttrs.objectData = (ObjectData("player", "", true, false, gPlayer:id()))
-        gPlayer:add_component(PhysicsComponent(playerPhysAttrs))
+        local character = Character:Create({name = "player"})
+		gPlayer = Entity(character.m_EntityID)
+		AddActiveCharacter(gPlayer:id(), character)
     end
 
     if not gFollowCam then
@@ -89,8 +73,8 @@ function GameState:OnExit()
 end
 
 function GameState:OnUpdate(dt)
-    self:UpdatePlayer(gPlayer)
     self:UpdateContacts()
+	UpdateActiveCharacters(dt)
     gFollowCam:update()
     self.m_SceneDimmer.m_OnUpdate()
     self.m_SceneDimmer:UpdateRainGen(dt)
@@ -104,46 +88,6 @@ function GameState:HandleInputs()
 		self.m_Stack:pop()
 		return
 	end
-end
-
-function GameState:UpdatePlayer(player)
-	local physics = player:get_component(PhysicsComponent)
-	local velocity = physics:get_linear_velocity()
-	local sprite = player:get_component(Sprite)
-
-	physics:set_linear_velocity(vec2(0, velocity.y))
-
-	if Keyboard.pressed(KEY_A) then
-		physics:set_linear_velocity(vec2(-10, velocity.y))
-		isFacingLeft = true
-		sprite.start_y = 3
-	elseif Keyboard.pressed(KEY_D) then
-		physics:set_linear_velocity(vec2(10, velocity.y))
-		isFacingLeft = false
-		sprite.start_y = 2
-	end
-
-	if Keyboard.just_pressed(KEY_SPACE) then
-		physics:set_linear_velocity(vec2(velocity.x, 0))
-		physics:linear_impulse(vec2(velocity.x, -1250))
-	end
-
-	if velocity.y < 0 then
-		physics:set_gravity_scale(2)
-	elseif velocity.y > 0 then
-		physics:set_gravity_scale(5)
-	end
-
-	-- Reset to Idle animation
-	if velocity.x == 0.0 then
-		if isFacingLeft then
-			sprite.start_y = 1
-		else
-			sprite.start_y = 0
-		end
-	end
-
-	sprite:inpect_y()
 end
 
 function GameState:UpdateContacts()

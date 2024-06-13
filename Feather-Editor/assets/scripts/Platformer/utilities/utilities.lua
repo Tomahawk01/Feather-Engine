@@ -1,5 +1,28 @@
 -- Helper functions
 
+ActiveCharacters = {}
+
+function AddActiveCharacter(entity_id, character)
+    ActiveCharacters[entity_id] = character
+end
+
+function GetActiveCharacter(entity_id)
+    assert(ActiveCharacters[entity_id], string.format("Character with ID '%d' does not exist", entity_id))
+    return ActiveCharacters[entity_id]
+end
+
+function ClearCharacters()
+    for k, v in pairs(ActiveCharacters) do
+        ActiveCharacters[k] = nil
+    end
+end
+
+function UpdateActiveCharacters(dt)
+    for _, v in pairs(ActiveCharacters) do
+        v.m_Controller:update(dt)
+    end
+end
+
 function LoadEntity(def)
     assert(def, "Definition does not exist!")
 
@@ -18,14 +41,8 @@ function LoadEntity(def)
     if def.components.transform then
         newEntity:add_component(
             Transform(
-                vec2(
-                    def.components.transform.position.x,
-                    def.components.transform.position.y
-                ),
-                vec2(
-                    def.components.transform.scale.x,
-                    def.components.transform.scale.y
-                ),
+                def.components.transform.position,
+                def.components.transform.scale,
                 def.components.transform.rotation
             )
         )
@@ -34,7 +51,7 @@ function LoadEntity(def)
     if def.components.sprite then
         local sprite = newEntity:add_component(
             Sprite(
-                def.components.sprite.asset_name,
+                def.components.sprite.texture,
                 def.components.sprite.width,
                 def.components.sprite.height,
                 def.components.sprite.start_x,
@@ -49,7 +66,8 @@ function LoadEntity(def)
     if def.components.circle_collider then
         newEntity:add_component(
             CircleCollider(
-                def.components.circle_collider.radius
+                def.components.circle_collider.radius,
+                def.components.circle_collider.offset
             )
         )
     end
@@ -64,6 +82,30 @@ function LoadEntity(def)
                 def.components.animation.is_looped
             )
         )
+    end
+
+    if def.components.physics_attributes then
+        local physicsAttr = def.components.physics_attributes
+        local newPhysicsAttr = PhysicsAttributes()
+
+        newPhysicsAttr.type = physicsAttr.type
+        newPhysicsAttr.density = physicsAttr.density
+        newPhysicsAttr.friction = physicsAttr.friction
+        newPhysicsAttr.restitution = physicsAttr.restitution
+        newPhysicsAttr.position = physicsAttr.position
+        newPhysicsAttr.radius = physicsAttr.radius
+        newPhysicsAttr.isCircle = physicsAttr.isCircle or false
+        newPhysicsAttr.isFixedRotation = physicsAttr.isFixedRotation or false
+        newPhysicsAttr.isTrigger = physicsAttr.isTrigger or false
+        newPhysicsAttr.objectData = ObjectData(
+            physicsAttr.object_data.tag,
+            physicsAttr.object_data.group,
+            physicsAttr.object_data.isCollider,
+            physicsAttr.object_data.isTrigger,
+            newEntity:id()
+        )
+
+        newEntity:add_component(PhysicsComponent(newPhysicsAttr))
     end
 
     return newEntity:id()

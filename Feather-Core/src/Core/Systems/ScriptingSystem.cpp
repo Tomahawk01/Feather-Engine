@@ -20,6 +20,7 @@
 
 #include "Core/States/State.h"
 #include "Core/States/StateStack.h"
+#include "Core/States/StateMachine.h"
 
 namespace Feather {
 
@@ -163,6 +164,7 @@ namespace Feather {
 
 		State::CreateLuaStateBind(lua);
 		StateStack::CreateLuaStateStackBind(lua);
+		StateMachine::CreateLuaStateMachineBind(lua);
 
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);
@@ -200,7 +202,7 @@ namespace Feather {
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)
 	{
 		lua.set_function(
-			"run_script", [&](const std::string& path)
+			"F_run_script", [&](const std::string& path)
 			{
 				try
 				{
@@ -216,11 +218,37 @@ namespace Feather {
 			}
 		);
 
-		lua.set_function("get_ticks", [] { return SDL_GetTicks(); });
+		lua.set_function("F_load_script_table", [&](const sol::table& scriptList) {
+			if (!scriptList.valid())
+			{
+				F_ERROR("Failed to load script list: Table is invalid");
+				return;
+			}
+
+			for (const auto& [index, script] : scriptList)
+			{
+				try
+				{
+					auto result = lua.safe_script_file(script.as<std::string>());
+					if (!result.valid())
+					{
+						sol::error error = result;
+						throw error;
+					}
+				}
+				catch (const sol::error& error)
+				{
+					F_ERROR("Failed to load script '{}', Error: {}", script.as<std::string>(), error.what());
+					return;
+				}
+			}
+		});
+
+		lua.set_function("F_get_ticks", [] { return SDL_GetTicks(); });
 
 		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
 		lua.set_function(
-			"measure_text", [&](const std::string& text, const std::string& fontName) {
+			"F_measure_text", [&](const std::string& text, const std::string& fontName) {
 				const auto& pFont = assetManager->GetFont(fontName);
 				if (!pFont)
 				{
@@ -260,7 +288,7 @@ namespace Feather {
 		);
 
 		lua.set_function(
-			"S2D_EntityInView",
+			"F_EntityInView",
 			[&](const TransformComponent& transform, float width, float height) {
 				auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
 				return EntityInView(transform, width, height, *camera);
