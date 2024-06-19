@@ -26,7 +26,7 @@ namespace Feather {
 		void generate_uvs(int textureWidth, int textureHeight);
 		[[nodiscard]] std::string to_string() const;
 
-		static void CreateSpriteLuaBind(sol::state& lua, Feather::Registry& registry);
+		static void CreateSpriteLuaBind(sol::state& lua);
 	};
 
 }

@@ -2,6 +2,7 @@
 
 #include "Logger/Logger.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Essentials/Shader.h"
@@ -20,10 +21,12 @@ namespace Feather {
 		if (view.size_hint() < 1)
 			return;
 
-		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
-		auto& assetManager = m_Registry.GetContext<std::shared_ptr<AssetManager>>();
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& assetManager = mainRegistry.GetAssetManager();
 
-		const auto& spriteShader = assetManager->GetShader("basic");
+		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
+
+		const auto& spriteShader = assetManager.GetShader("basic");
 		auto cam_mat = camera->GetCameraMatrix();
 
 		if (spriteShader->ShaderProgramID() == 0)
@@ -49,8 +52,8 @@ namespace Feather {
 			if (sprite.texture_name.empty() || sprite.isHidden)
 				continue;
 
-			const auto& texture = assetManager->GetTexture(sprite.texture_name);
-			if (!texture)
+			const auto& pTexture = assetManager.GetTexture(sprite.texture_name);
+			if (!pTexture)
 			{
 				F_ERROR("Texture '{0}' was not created correctly!", sprite.texture_name);
 				return;
@@ -61,7 +64,7 @@ namespace Feather {
 
 			glm::mat4 model = TRSModel(transform, sprite.width, sprite.height);
 
-			m_BatchRenderer->AddSprite(spriteRect, uvRect, texture->GetID(), sprite.layer, model, sprite.color);
+			m_BatchRenderer->AddSprite(spriteRect, uvRect, pTexture->GetID(), sprite.layer, model, sprite.color);
 		}
 
 		m_BatchRenderer->End();

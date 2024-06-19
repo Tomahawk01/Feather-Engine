@@ -11,6 +11,7 @@
 
 #include <Core/ECS/Entity.h>
 #include <Core/ECS/Components/Identification.h>
+#include <Core/ECS/MainRegistry.h>
 
 #include <Core/CoreUtils/CoreUtilities.h>
 
@@ -140,12 +141,8 @@ namespace Feather {
 			Renderer::BlendingFactors::ONE_MINUS_SRC_ALPHA
 		);
 
-		auto assetManager = std::make_shared<AssetManager>();
-		if (!assetManager)
-		{
-			F_FATAL("Failed to create the asset manager!");
-			return false;
-		}
+		auto& mainRegistry = MAIN_REGISTRY();
+		mainRegistry.Initialize();
 
 		m_Registry = std::make_unique<Registry>();
 
@@ -237,38 +234,8 @@ namespace Feather {
 			return false;
 		}
 
-		auto musicPlayer = std::make_shared<MusicPlayer>();
-		if (!musicPlayer)
-		{
-			F_FATAL("Failed to create the music player!");
-			return false;
-		}
-		if (!m_Registry->AddToContext<std::shared_ptr<MusicPlayer>>(musicPlayer))
-		{
-			F_FATAL("Failed to add music player to the registry context!");
-			return false;
-		}
-
-		auto soundPlayer = std::make_shared<SoundFXPlayer>();
-		if (!soundPlayer)
-		{
-			F_FATAL("Failed to create the sound effects player!");
-			return false;
-		}
-		if (!m_Registry->AddToContext<std::shared_ptr<SoundFXPlayer>>(soundPlayer))
-		{
-			F_FATAL("Failed to add sound effects player to the registry context!");
-			return false;
-		}
-
 		// Camera creation
 		auto camera = std::make_shared<Camera2D>();
-
-		if (!m_Registry->AddToContext<std::shared_ptr<AssetManager>>(assetManager))
-		{
-			F_FATAL("Failed to add asset manager to the registry context!");
-			return false;
-		}
 
 		if (!m_Registry->AddToContext<std::shared_ptr<Camera2D>>(camera))
 		{
@@ -323,7 +290,7 @@ namespace Feather {
 
 		renderer->SetLineWidth(4.0f);
 
-		if (!assetManager->CreateDefaultFonts())
+		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
 		{
 			F_ERROR("Failed to create default fonts!");
 			return false;
@@ -360,28 +327,25 @@ namespace Feather {
 
     bool Application::LoadShaders()
     {
-		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
-		if (!assetManager)
-		{
-			F_FATAL("Failed to get asset shader from the registry context!");
-			return false;
-		}
-		if (!assetManager->AddShader("basic", "assets/shaders/basicShader.vert", "assets/shaders/basicShader.frag"))
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& assetManager = mainRegistry.GetAssetManager();
+
+		if (!assetManager.AddShader("basic", "assets/shaders/basicShader.vert", "assets/shaders/basicShader.frag"))
 		{
 			F_FATAL("Failed to add basicShader to the asset manager!");
 			return false;
 		}
-		if (!assetManager->AddShader("color", "assets/shaders/colorShader.vert", "assets/shaders/colorShader.frag"))
+		if (!assetManager.AddShader("color", "assets/shaders/colorShader.vert", "assets/shaders/colorShader.frag"))
 		{
 			F_FATAL("Failed to add colorShader to the asset manager!");
 			return false;
 		}
-		if (!assetManager->AddShader("circle", "assets/shaders/circleShader.vert", "assets/shaders/circleShader.frag"))
+		if (!assetManager.AddShader("circle", "assets/shaders/circleShader.vert", "assets/shaders/circleShader.frag"))
 		{
 			F_FATAL("Failed to add the color shader to the asset manager");
 			return false;
 		}
-		if (!assetManager->AddShader("font", "assets/shaders/fontShader.vert", "assets/shaders/fontShader.frag"))
+		if (!assetManager.AddShader("font", "assets/shaders/fontShader.vert", "assets/shaders/fontShader.frag"))
 		{
 			F_FATAL("Failed to add the font shader to the asset manager");
 			return false;
@@ -500,7 +464,6 @@ namespace Feather {
 		auto& renderShapeSystem = m_Registry->GetContext<std::shared_ptr<RenderShapeSystem>>();
 		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
 		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
-		auto& assetManager = m_Registry->GetContext<std::shared_ptr<AssetManager>>();
 
 		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 

@@ -6,6 +6,7 @@
 #include "Renderer/Essentials/FontLoader.h"
 
 #include "Core/Resources/fonts/default_fonts.h"
+#include "Core/ECS/MainRegistry.h"
 
 namespace Feather {
 
@@ -256,33 +257,29 @@ namespace Feather {
         return soundItr->second;
     }
 
-    void AssetManager::CreateLuaAssetManager(sol::state& lua, Registry& registry)
+    void AssetManager::CreateLuaAssetManager(sol::state& lua)
     {
-        auto& asset_manager = registry.GetContext<std::shared_ptr<AssetManager>>();
-        if (!asset_manager)
-        {
-            F_ERROR("Failed to bind asset manager to lua: Does not exist in registry!");
-            return;
-        }
+        auto& mainRegistry = MAIN_REGISTRY();
+        auto& asset_manager = mainRegistry.GetAssetManager();
 
         lua.new_usertype<AssetManager>(
             "AssetManager",
             sol::no_constructor,
             "add_texture", [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
             {
-                return asset_manager->AddTexure(assetName, filepath, pixel_art);
+                return asset_manager.AddTexure(assetName, filepath, pixel_art);
             },
             "add_music", [&](const std::string& musicName, const std::string& filepath)
             {
-                return asset_manager->AddMusic(musicName, filepath);
+                return asset_manager.AddMusic(musicName, filepath);
             },
             "add_sound", [&](const std::string& soundFxName, const std::string& filepath)
             {
-                return asset_manager->AddSoundFx(soundFxName, filepath);
+                return asset_manager.AddSoundFx(soundFxName, filepath);
             },
             "add_font", [&](const std::string& fontName, const std::string& fontPath, float fontSize)
             {
-                return asset_manager->AddFont(fontName, fontPath, fontSize);
+                return asset_manager.AddFont(fontName, fontPath, fontSize);
             }
         );
     }

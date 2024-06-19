@@ -2,6 +2,7 @@
 
 #include "Logger/Logger.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/ECS/MainRegistry.h"
 
 void Feather::SpriteComponent::generate_uvs(int textureWidth, int textureHeight)
 {
@@ -37,8 +38,11 @@ std::string Feather::SpriteComponent::to_string() const
 	return ss.str();
 }
 
-void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua, Feather::Registry& registry)
+void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 {
+	auto& mainRegistry = MAIN_REGISTRY();
+	auto& assetManager = mainRegistry.GetAssetManager();
+
 	lua.new_usertype<Color>(
 		"Color",
 		sol::call_constructor,
@@ -93,16 +97,15 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua, Feather::Reg
 		"color", &SpriteComponent::color,
 		"generate_uvs", [&](SpriteComponent& sprite)
 		{
-			auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
-			auto texture = assetManager->GetTexture(sprite.texture_name);
+			auto pTexture = assetManager.GetTexture(sprite.texture_name);
 
-			if (!texture)
+			if (!pTexture)
 			{
 				F_ERROR("Failed to generate uvs - texture '{0}' does not exists or invalid!", sprite.texture_name);
 				return;
 			}
 
-			sprite.generate_uvs(texture->GetWidth(), texture->GetHeight());
+			sprite.generate_uvs(pTexture->GetWidth(), pTexture->GetHeight());
 		},
 		"inspect_uvs", [](SpriteComponent& sprite) {
 			sprite.uvs.u = sprite.start_x * sprite.uvs.uv_width;

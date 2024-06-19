@@ -1,6 +1,7 @@
 #include "RenderUISystem.h"
 
 #include "Logger/Logger.h"
+#include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Resources/AssetManager.h"
@@ -25,13 +26,15 @@ namespace Feather {
 
 	void RenderUISystem::Update(entt::registry& registry)
 	{
+		auto& mainRegistry = MAIN_REGISTRY();
+
 		// If there are no entities in the view, leave
 		auto textView = registry.view<TextComponent, TransformComponent>();
 		if (textView.size_hint() < 1)
 			return;
 
-		auto& assetManager = m_Registry.GetContext<std::shared_ptr<AssetManager>>();
-		auto fontShader = assetManager->GetShader("font");
+		auto& assetManager = mainRegistry.GetAssetManager();
+		auto fontShader = assetManager.GetShader("font");
 
 		if (!fontShader)
 		{
@@ -52,7 +55,7 @@ namespace Feather {
 			if (text.fontName.empty() || text.isHidden)
 				continue;
 
-			const auto& font = assetManager->GetFont(text.fontName);
+			const auto& font = assetManager.GetFont(text.fontName);
 			if (!font)
 			{
 				F_ERROR("Font '{}' does not exist in the asset manager!", text.fontName);

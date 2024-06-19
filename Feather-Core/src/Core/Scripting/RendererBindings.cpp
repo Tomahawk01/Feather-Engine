@@ -2,6 +2,7 @@
 
 #include "Logger/Logger.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/ECS/MainRegistry.h"
 #include "Renderer/Essentials/Primitives.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
@@ -10,7 +11,8 @@ namespace Feather {
 
 	void RendererBinder::CreateRenderingBind(sol::state& lua, Registry& registry)
 	{
-		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& assetManager = mainRegistry.GetAssetManager();
 
 		// Primitives bind
 		lua.new_usertype<Line>(
@@ -63,7 +65,7 @@ namespace Feather {
 			sol::factories(
 				[&](const glm::vec2& position, const std::string& textStr, const std::string& fontName, float wrap, const Color& color)
 				{
-					auto font = assetManager->GetFont(fontName);
+					auto font = assetManager.GetFont(fontName);
 					if (!font)
 					{
 						F_ERROR("Failed to get font '{0}': Does not exist in asset manager!", fontName);

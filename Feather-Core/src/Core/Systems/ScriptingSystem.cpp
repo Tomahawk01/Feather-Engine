@@ -5,6 +5,7 @@
 #include "Utils/RandomGenerator.h"
 
 #include "Core/ECS/Entity.h"
+#include "Core/ECS/MainRegistry.h"
 
 #include "Core/Scripting/GlmLuaBindings.h"
 #include "Core/Scripting/InputManager.h"
@@ -279,8 +280,8 @@ namespace Feather {
 	{
 		GLMBinding::CreateGLMBindings(lua);
 		InputManager::CreateLuaInputBindings(lua, registry);
-		AssetManager::CreateLuaAssetManager(lua, registry);
-		SoundBinder::CreateSoundBind(lua, registry);
+		AssetManager::CreateLuaAssetManager(lua);
+		SoundBinder::CreateSoundBind(lua);
 		RendererBinder::CreateRenderingBind(lua, registry);
 		UserDataBinder::CreateLuaUserData(lua);
 		ContactListenerBinder::CreateLuaContactListener(lua, registry.GetRegistry());
@@ -297,7 +298,7 @@ namespace Feather {
 		Registry::CreateLuaRegistryBind(lua, registry);
 		Entity::CreateLuaEntityBind(lua, registry);
 		TransformComponent::CreateLuaTransformBind(lua);
-		SpriteComponent::CreateSpriteLuaBind(lua, registry);
+		SpriteComponent::CreateSpriteLuaBind(lua);
 		AnimationComponent::CreateAnimationLuaBind(lua);
 		BoxColliderComponent::CreateLuaBoxColliderBind(lua);
 		CircleColliderComponent::CreateLuaCircleColliderBind(lua);
@@ -329,6 +330,8 @@ namespace Feather {
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)
 	{
+		auto& mainRegistry = MAIN_REGISTRY();
+
 		lua.set_function(
 			"F_run_script", [&](const std::string& path)
 			{
@@ -374,10 +377,10 @@ namespace Feather {
 
 		lua.set_function("F_get_ticks", [] { return SDL_GetTicks(); });
 
-		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
+		auto& assetManager = mainRegistry.GetAssetManager();
 		lua.set_function(
 			"F_measure_text", [&](const std::string& text, const std::string& fontName) {
-				const auto& pFont = assetManager->GetFont(fontName);
+				const auto& pFont = assetManager.GetFont(fontName);
 				if (!pFont)
 				{
 					F_ERROR("Failed to get font '{}': Does not exist in asset manager!", fontName);

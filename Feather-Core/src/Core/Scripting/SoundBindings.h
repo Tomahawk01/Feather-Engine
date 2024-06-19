@@ -8,7 +8,7 @@ namespace Feather {
 
 	struct SoundBinder
 	{
-		static void CreateSoundBind(sol::state& lua, Registry& registry);
+		static void CreateSoundBind(sol::state& lua);
 	};
 
 }

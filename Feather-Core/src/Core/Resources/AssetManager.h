@@ -40,7 +40,7 @@ namespace Feather {
 		bool AddSoundFx(const std::string& soundFxName, const std::string& filepath);
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
 
-		static void CreateLuaAssetManager(sol::state& lua, Registry& registry);
+		static void CreateLuaAssetManager(sol::state& lua);
 
 	private:
 		std::map<std::string, std::shared_ptr<Texture>> m_mapTextures{};
