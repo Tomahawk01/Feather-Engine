@@ -148,6 +148,133 @@ namespace Feather {
 		);
 	};
 
+	auto create_lua_logger = [&](sol::state& lua) {
+		auto& logger = Log::GetLuaLogger();
+
+		lua.new_usertype<Log>(
+			"Logger",
+			sol::no_constructor,
+			"trace", [&](const std::string_view message) { logger->trace(message); },
+			"info", [&](const std::string_view message) { logger->info(message); },
+			"warn", [&](const std::string_view message) { logger->warn(message); },
+			"error", [&](const std::string_view message) { logger->error(message); }
+		);
+
+		auto traceResult = lua.safe_script(R"(
+				function XXX_Trace(message, ...)
+					Logger.trace(string.format(message, ...))
+				end
+			)");
+		if (!traceResult.valid())
+			F_ERROR("Failed to initialize lua traces!");
+
+		auto infoResult = lua.safe_script(R"(
+				function XXX_Info(message, ...)
+					Logger.info(string.format(message, ...))
+				end
+			)");
+		if (!infoResult.valid())
+			F_ERROR("Failed to initialize lua infos!");
+
+		auto warnResult = lua.safe_script(R"(
+				function XXX_Warn(message, ...)
+					Logger.warn(string.format(message, ...))
+				end
+			)");
+		if (!warnResult.valid())
+			F_ERROR("Failed to initialize lua warnings!");
+
+		auto errorResult = lua.safe_script(R"(
+				function XXX_Error(message, ...)
+					Logger.error(string.format(message, ...))
+				end
+			)");
+		if (!errorResult.valid())
+			F_ERROR("Failed to initialize lua errors!");
+
+		lua.set_function("F_trace", [](const std::string& message, const sol::variadic_args& args, sol::this_state s) {
+			try
+			{
+				sol::state_view L = s;
+				sol::protected_function log = L["XXX_Trace"];
+				auto result = log(message, args);
+				if (!result.valid())
+				{
+					sol::error error = result;
+					throw error;
+				}
+			}
+			catch (const sol::error& error)
+			{
+				F_ERROR("Failed to get lua traces: {}", error.what());
+			}
+		});
+
+		lua.set_function("F_info", [](const std::string& message, const sol::variadic_args& args, sol::this_state s) {
+			try
+			{
+				sol::state_view L = s;
+				sol::protected_function info = L["XXX_Info"];
+				auto result = info(message, args);
+				if (!result.valid())
+				{
+					sol::error error = result;
+					throw error;
+				}
+			}
+			catch (const sol::error& error)
+			{
+				F_ERROR("Failed to get lua infos: {}", error.what());
+			}
+		});
+
+		lua.set_function("F_warn", [](const std::string& message, const sol::variadic_args& args, sol::this_state s) {
+			try
+			{
+				sol::state_view L = s;
+				sol::protected_function warn = L["XXX_Warn"];
+				auto result = warn(message, args);
+				if (!result.valid())
+				{
+					sol::error error = result;
+					throw error;
+				}
+			}
+			catch (const sol::error& error)
+			{
+				F_ERROR("Failed to get lua warnings: {}", error.what());
+			}
+		});
+
+		lua.set_function("F_error", [](const std::string& message, const sol::variadic_args& args, sol::this_state s) {
+			try
+			{
+				sol::state_view L = s;
+				sol::protected_function err = L["XXX_Error"];
+				auto result = err(message, args);
+				if (!result.valid())
+				{
+					sol::error error = result;
+					throw error;
+				}
+			}
+			catch (const sol::error& error)
+			{
+				F_ERROR("Failed to get lua errors: {}", error.what());
+			}
+		});
+
+		auto assertResult = lua.safe_script(R"(
+				F_assert = assert
+				assert = function(arg1, message, ...)
+					if not arg1 then 
+						Logger.error(string.format(message, ...))
+					end 
+					F_assert(arg1)
+				end
+			)");
+	};
+
 	void ScriptingSystem::RegisterLuaBindings(sol::state& lua, Registry& registry)
 	{
 		GLMBinding::CreateGLMBindings(lua);
@@ -161,6 +288,7 @@ namespace Feather {
 		FollowCamera::CreateLuaFollowCamera(lua, registry);
 
 		create_timer(lua);
+		create_lua_logger(lua);
 
 		State::CreateLuaStateBind(lua);
 		StateStack::CreateLuaStateStackBind(lua);

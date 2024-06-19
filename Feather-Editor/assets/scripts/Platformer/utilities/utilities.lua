@@ -276,25 +276,25 @@ end
 function LoadAssets(assets)
     for k, v in pairs(assets.textures) do
         if not AssetManager.add_texture(v.name, v.path, v.pixel_art) then
-            print("Failed to load texture file '"..v.name.."' at path '"..v.path.."'")
+            F_error("Failed to load texture file '%s' at path '%s'", v.name, v.path)
         else
-            print("Loaded texture '"..v.name.."'")
+            F_trace("Loaded texture '%s'", v.name)
         end
     end
 
     for k, v in pairs(assets.music) do
         if not AssetManager.add_music(v.name, v.path) then
-            print("Failed to load music file '"..v.name.."' at path '"..v.path.."'")
+            F_error("Failed to load music file '%s' at path '%s'", v.name, v.path)
         else
-            print("Loaded music '"..v.name.."'")
+            F_trace("Loaded music '%s'", v.name)
         end
     end
 
     for k, v in pairs(assets.sound_fx) do
         if not AssetManager.add_sound(v.name, v.path) then
-            print("Failed to load sound effect file '"..v.name.."' at path '"..v.path.."'")
+            F_error("Failed to load sound effect file '%s' at path '%s'", v.name, v.path)
         else
-            print("Loaded sound effect '"..v.name.."'")
+            F_trace("Loaded sound effect '%s'", v.name)
         end
     end
 end

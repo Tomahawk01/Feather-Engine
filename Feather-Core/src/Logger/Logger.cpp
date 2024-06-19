@@ -6,6 +6,7 @@
 namespace Feather {
 
 	std::shared_ptr<spdlog::logger> Log::s_Logger;
+	std::shared_ptr<spdlog::logger> Log::s_LuaLogger;
 
 	void Log::Init()
 	{
@@ -20,6 +21,11 @@ namespace Feather {
 		spdlog::register_logger(s_Logger);
 		s_Logger->set_level(spdlog::level::trace);
 		s_Logger->flush_on(spdlog::level::trace);
+
+		s_LuaLogger = std::make_shared<spdlog::logger>("Lua", begin(logSinks), end(logSinks));
+		spdlog::register_logger(s_LuaLogger);
+		s_LuaLogger->set_level(spdlog::level::trace);
+		s_LuaLogger->flush_on(spdlog::level::trace);
 	}
 
 }
