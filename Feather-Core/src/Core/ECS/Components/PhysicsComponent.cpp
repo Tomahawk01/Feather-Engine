@@ -100,13 +100,14 @@ namespace Feather {
 			"type_id", entt::type_hash<ObjectData>::value,
 			sol::call_constructor,
 			sol::factories(
-				[](const std::string& tag, const std::string& group, bool isCollider, bool isTrigger, std::uint32_t entityID)
+				[](const std::string& tag, const std::string& group, bool isCollider, bool isTrigger, bool isFriendly, std::uint32_t entityID)
 				{
 					return ObjectData {
 						.tag = tag,
 						.group = group,
 						.isCollider = isCollider,
 						.isTrigger = isTrigger,
+						.isFriendly = isFriendly,
 						.entityID = entityID
 					};
 				},
@@ -117,6 +118,7 @@ namespace Feather {
 						.group = objectData["group"].get_or(std::string{""}),
 						.isCollider = objectData["isCollider"].get_or(false),
 						.isTrigger = objectData["isTrigger"].get_or(false),
+						.isFriendly = objectData["isFriendly"].get_or(false),
 						.entityID = objectData["entityID"].get_or((std::uint32_t)0)
 					};
 				}
@@ -125,6 +127,7 @@ namespace Feather {
 			"group", &ObjectData::group,
 			"isCollider", &ObjectData::isCollider,
 			"isTrigger", &ObjectData::isTrigger,
+			"isFriendly", &ObjectData::isFriendly,
 			"entityID", &ObjectData::entityID,
 			"contactEntities", &ObjectData::contactEntities,
 			"to_string", &ObjectData::to_string

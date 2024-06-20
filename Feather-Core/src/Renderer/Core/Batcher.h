@@ -92,7 +92,7 @@ namespace Feather {
 		GLuint offset{ 0 };
 		GLuint indices[NUM_SPRITE_INDICES] = { 0, 1, 2, 2, 3, 0 };
 
-		auto indicesArr = std::make_unique<GLuint[]>(MAX_INDICES);
+		auto indicesArr = std::make_unique_for_overwrite<GLuint[]>(MAX_INDICES);
 		for (size_t i = 0; i < MAX_INDICES; i += NUM_SPRITE_INDICES)
 		{
 			for (size_t j = 0; j < NUM_SPRITE_INDICES; j++)

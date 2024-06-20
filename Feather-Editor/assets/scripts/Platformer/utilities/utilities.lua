@@ -100,8 +100,9 @@ function LoadEntity(def)
         newPhysicsAttr.objectData = ObjectData(
             physicsAttr.object_data.tag,
             physicsAttr.object_data.group,
-            physicsAttr.object_data.isCollider,
-            physicsAttr.object_data.isTrigger,
+            physicsAttr.object_data.isCollider or false,
+            physicsAttr.object_data.isTrigger or false,
+            physicsAttr.object_data.isFriendly or false,
             newEntity:id()
         )
 
@@ -217,7 +218,7 @@ function LoadMap(mapDef)
 
                 local isCollider = false
 
-                if tileset.name == "collider" or tileset.name == "trigger" then
+                if tileset.name == "collider" or tileset.name == "trigger" or tileset.name == "ground" then
                     local width = tileset.tilewidth / scale
                     local height = tileset.tileheight / scale
                     tile:add_component(
@@ -243,9 +244,10 @@ function LoadMap(mapDef)
 
                         if tileset.name == "trigger" then
                             physicsAttribs.isTrigger = true
-                            physicsAttribs.objectData = ObjectData("", "hole_triggers", false, true, tile:id())
-                        else
-                            physicsAttribs.objectData = ObjectData("", "colliders", true, false, tile:id())
+                            physicsAttribs.objectData = ObjectData("", "hole_triggers", false, true, false, tile:id())
+                        elseif tileset.name == "ground" then
+                            physicsAttribs.isTrigger = true
+                            physicsAttribs.objectData = ObjectData("", "ground", true, true, true, tile:id())
                         end
 
                         tile:add_component(PhysicsComponent(physicsAttribs))
