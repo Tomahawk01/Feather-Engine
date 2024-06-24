@@ -25,7 +25,6 @@ If you are using Visual Studio 2022 press `F5` key.
 * [SDL2](https://github.com/libsdl-org/SDL) for windowing and input functionality
 * [Glad](https://glad.dav1d.de/) as OpenGL loader
 * [glm](https://github.com/g-truc/glm) math library
-* [spdlog](https://github.com/gabime/spdlog) for logging
 * [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h) for image loading
 * [stb_truetype](https://github.com/nothings/stb/blob/master/stb_truetype.h) for characters rasterisation
 * [entt](https://github.com/skypjack/entt) for Entity Component System
@@ -40,10 +39,18 @@ To play any available game created by the developer of this engine check [Releas
 
 ### Asteroids clone (Feather [v0.1](https://github.com/Tomahawk01/Feather-Engine/releases/tag/v0.1))
 
--- Description --
+### *Description*
+As a title says this is a remake of Asteroids game from 1979.
+The main goal was to test capabilities of the engine at that point of time.
+### *Images*
 
--- Images here --
+### *Contorls*
 
--- Contorls --
+`W S` - Move forward, backward <br>
+`A D` - Rotate left, right <br>
+`Space` or `LMB` - Shoot <br>
+`Shift` - Speed up <br>
+
+`Enter` - Restart after Game Over <br>
 
 this is WIP
