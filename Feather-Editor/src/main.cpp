@@ -4,6 +4,12 @@
 
 int main()
 {
+#ifndef NDEBUG
+	// TODO: hide console
+#else
+	// TODO: show console
+#endif
+
 	auto& app = Feather::Application::GetInstance();
 	app.Run();
 	

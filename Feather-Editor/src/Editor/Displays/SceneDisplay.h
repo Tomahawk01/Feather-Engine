@@ -1,16 +1,17 @@
 #pragma once
 
+#include "IDisplay.h"
 #include "Core/ECS/Registry.h"
 
 namespace Feather {
 
-	class SceneDisplay
+	class SceneDisplay : public IDisplay
 	{
 	public:
 		SceneDisplay(Registry& registry);
 		~SceneDisplay() = default;
 
-		void Draw();
+		virtual void Draw() override;
 
 	private:
 		Registry& m_Registry;

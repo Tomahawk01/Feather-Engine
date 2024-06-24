@@ -38,7 +38,9 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <SDL_opengl.h>
 
+// Displays
 #include "Editor/Displays/SceneDisplay.h"
+#include "Editor/Displays/LogDisplay.h"
 
 namespace Feather {
 
@@ -68,7 +70,7 @@ namespace Feather {
 
     bool Application::Initialize()
     {
-		Log::Init();
+		F_INIT_LOGS(true, true);
 
 		// TODO: Load core engine data
 		// Init SDL
@@ -288,6 +290,12 @@ namespace Feather {
 			return false;
 		}
 
+		if (!CreateDisplays())
+		{
+			F_ERROR("Failed to create displays!");
+			return false;
+		}
+
 		renderer->SetLineWidth(4.0f);
 
 		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
@@ -306,19 +314,6 @@ namespace Feather {
 		if (!m_Registry->AddToContext<std::shared_ptr<Framebuffer>>(framebuffer))
 		{
 			F_ERROR("Failed to add a framebuffer to registry context");
-			return false;
-		}
-
-		// TODO: temporary scene display
-		auto sceneDisplay = std::make_shared<SceneDisplay>(*m_Registry);
-		if (!sceneDisplay)
-		{
-			F_ERROR("Failed to create a SceneDisplay");
-			return false;
-		}
-		if (!m_Registry->AddToContext<std::shared_ptr<SceneDisplay>>(sceneDisplay))
-		{
-			F_ERROR("Failed to add a SceneDisplay to registry context");
 			return false;
 		}
 
@@ -496,6 +491,39 @@ namespace Feather {
 		SDL_Quit();
     }
 
+	bool Application::CreateDisplays()
+	{
+		auto& mainRegistry = MAIN_REGISTRY();
+
+		auto displayHolder = std::make_shared<DisplayHolder>();
+		if (!mainRegistry.AddToContext<std::shared_ptr<DisplayHolder>>(displayHolder))
+		{
+			F_ERROR("Failed to add display holder to main registry");
+			return false;
+		}
+
+		auto sceneDisplay = std::make_unique<SceneDisplay>(*m_Registry);
+		if (!sceneDisplay)
+		{
+			F_ERROR("Failed to create a Scene Display");
+			return false;
+		}
+
+		auto logDisplay = std::make_unique<LogDisplay>();
+		if (!logDisplay)
+		{
+			F_ERROR("Failed to create a Log Display");
+			return false;
+		}
+
+		// TODO: Add other Displays here as needed
+
+		displayHolder->displays.push_back(std::move(sceneDisplay));
+		displayHolder->displays.push_back(std::move(logDisplay));
+
+		return true;
+	}
+
 	bool Application::InitImGui()
 	{
 		const char* glslVersion = "#version 450 core";
@@ -564,15 +592,20 @@ namespace Feather {
 
 			auto centerNodeId = dockSpaceId;
 			const auto leftNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Left, 0.2f, nullptr, &centerNodeId);
+			const auto logNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Down, 0.25f, nullptr, &centerNodeId);
 
 			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
+			ImGui::DockBuilderDockWindow("Logs", logNodeId);
 
 			ImGui::DockBuilderFinish(dockSpaceId);
 		}
 
-		auto& sceneDisplay = m_Registry->GetContext<std::shared_ptr<SceneDisplay>>();
-		sceneDisplay->Draw();
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& displayHolder = mainRegistry.GetContext<std::shared_ptr<DisplayHolder>>();
+
+		for (const auto& display : displayHolder->displays)
+			display->Draw();
 
 		ImGui::ShowDemoWindow();
 	}

@@ -31,7 +31,7 @@ namespace Feather {
 
 		void CleanUp();
 
-		// Temp ImGui testing
+		bool CreateDisplays();
 		bool InitImGui();
 		void BeginImGui();
 		void EndImGui();

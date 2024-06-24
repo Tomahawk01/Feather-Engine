@@ -1,31 +1,152 @@
-#include "Logger.h"
-
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include "Logger/Logger.h"
 
 namespace Feather {
 
-	std::shared_ptr<spdlog::logger> Log::s_Logger;
-	std::shared_ptr<spdlog::logger> Log::s_LuaLogger;
+	Log::LogTime::LogTime(const std::string& date)
+		: time{ date.substr(11, 8) }
+	{}
 
-	void Log::Init()
+	std::string Log::CurrentDateTime()
 	{
-		std::vector<spdlog::sink_ptr> logSinks;
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Feather-Engine.log", true));
+		auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
-		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
+		char buf[30];
+		ctime_s(buf, sizeof(buf), &time);
+		LogTime logTime{ std::string{ buf } };
+		return std::format("[{0}]", logTime.time);
+	}
 
-		s_Logger = std::make_shared<spdlog::logger>("Feather", begin(logSinks), end(logSinks));
-		spdlog::register_logger(s_Logger);
-		s_Logger->set_level(spdlog::level::trace);
-		s_Logger->flush_on(spdlog::level::trace);
+	Log& Log::GetInstance()
+	{
+		static Log instance{};
+		return instance;
+	}
 
-		s_LuaLogger = std::make_shared<spdlog::logger>("Lua", begin(logSinks), end(logSinks));
-		spdlog::register_logger(s_LuaLogger);
-		s_LuaLogger->set_level(spdlog::level::trace);
-		s_LuaLogger->flush_on(spdlog::level::trace);
+	void Log::Init(bool consoleLog, bool retainLogs)
+	{
+		assert(!m_Initialized && "Don not call Initialize more than once!");
+
+		if (m_Initialized)
+		{
+			std::cout << "Logger has already been initialized!" << std::endl;
+			return;
+		}
+
+		m_ConsoleLog = consoleLog;
+		m_RetainLogs = retainLogs;
+		m_Initialized = true;
+	}
+
+	void Log::LuaTrace(const std::string_view message)
+	{
+		assert(m_Initialized && "Logger must be initialized before it is used!");
+
+		if (!m_Initialized)
+		{
+			std::cout << "Logger must be initialized before it is used!" << std::endl;
+			return;
+		}
+
+		std::stringstream ss;
+		ss << CurrentDateTime() << " Lua [TRACE]: " << message << "\n";
+
+		if (m_ConsoleLog)
+		{
+			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute(hConsole, WHITE);
+			std::cout << ss.str();
+			SetConsoleTextAttribute(hConsole, WHITE);
+		}
+
+		if (m_RetainLogs)
+		{
+			m_LogEntries.emplace_back(LogEntry::LogType::TRACE, ss.str());
+			m_LogAdded = true;
+		}
+	}
+
+	void Log::LuaInfo(const std::string_view message)
+	{
+		assert(m_Initialized && "Logger must be initialized before it is used!");
+
+		if (!m_Initialized)
+		{
+			std::cout << "Logger must be initialized before it is used!" << std::endl;
+			return;
+		}
+
+		std::stringstream ss;
+		ss << CurrentDateTime() << " Lua [INFO]: " << message << "\n";
+
+		if (m_ConsoleLog)
+		{
+			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute(hConsole, GREEN);
+			std::cout << ss.str();
+			SetConsoleTextAttribute(hConsole, WHITE);
+		}
+
+		if (m_RetainLogs)
+		{
+			m_LogEntries.emplace_back(LogEntry::LogType::INFO, ss.str());
+			m_LogAdded = true;
+		}
+	}
+
+	void Log::LuaWarn(const std::string_view message)
+	{
+		assert(m_Initialized && "Logger must be initialized before it is used!");
+
+		if (!m_Initialized)
+		{
+			std::cout << "Logger must be initialized before it is used!" << std::endl;
+			return;
+		}
+
+		std::stringstream ss;
+		ss << CurrentDateTime() << " Lua [WARN]: " << message << "\n";
+
+		if (m_ConsoleLog)
+		{
+			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute(hConsole, YELLOW);
+			std::cout << ss.str();
+			SetConsoleTextAttribute(hConsole, WHITE);
+		}
+
+		if (m_RetainLogs)
+		{
+			m_LogEntries.emplace_back(LogEntry::LogType::WARN, ss.str());
+			m_LogAdded = true;
+		}
+	}
+
+	void Log::LuaError(const std::string_view message)
+	{
+		assert(m_Initialized && "Logger must be initialized before it is used!");
+
+		if (!m_Initialized)
+		{
+			std::cout << "Logger must be initialized before it is used!" << std::endl;
+			return;
+		}
+
+		std::stringstream ss;
+		ss << CurrentDateTime() << " Lua [ERROR]: " << message << "\n";
+
+		if (m_ConsoleLog)
+		{
+			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute(hConsole, RED);
+			std::cout << ss.str();
+			SetConsoleTextAttribute(hConsole, WHITE);
+		}
+
+		if (m_RetainLogs)
+		{
+			m_LogEntries.emplace_back(LogEntry::LogType::ERR, ss.str());
+			m_LogAdded = true;
+		}
 	}
 
 }

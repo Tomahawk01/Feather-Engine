@@ -150,15 +150,15 @@ namespace Feather {
 	};
 
 	auto create_lua_logger = [&](sol::state& lua) {
-		auto& logger = Log::GetLuaLogger();
+		auto& logger = Log::GetInstance();
 
 		lua.new_usertype<Log>(
 			"Logger",
 			sol::no_constructor,
-			"trace", [&](const std::string_view message) { logger->trace(message); },
-			"info", [&](const std::string_view message) { logger->info(message); },
-			"warn", [&](const std::string_view message) { logger->warn(message); },
-			"error", [&](const std::string_view message) { logger->error(message); }
+			"trace", [&](const std::string_view message) { logger.LuaTrace(message); },
+			"info", [&](const std::string_view message) { logger.LuaInfo(message); },
+			"warn", [&](const std::string_view message) { logger.LuaWarn(message); },
+			"error", [&](const std::string_view message) { logger.LuaError(message); }
 		);
 
 		auto traceResult = lua.safe_script(R"(
