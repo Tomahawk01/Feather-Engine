@@ -96,7 +96,7 @@ namespace Feather {
 		}
 
 		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
-		lua->collect_garbage();
+		if (lua) lua->collect_garbage();
 	}
 
 	void ScriptingSystem::Render()
@@ -124,7 +124,7 @@ namespace Feather {
 		}
 
 		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
-		lua->collect_garbage();
+		if (lua) lua->collect_garbage();
 	}
 
 	auto create_timer = [](sol::state& lua){
@@ -149,7 +149,7 @@ namespace Feather {
 		);
 	};
 
-	auto create_lua_logger = [&](sol::state& lua) {
+	auto create_lua_logger = [](sol::state& lua) {
 		auto& logger = Log::GetInstance();
 
 		lua.new_usertype<Log>(

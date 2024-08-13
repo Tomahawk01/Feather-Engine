@@ -14,6 +14,7 @@ project "Feather-Editor"
     {
         "%{wks.location}/Feather-Core/src",
         "%{wks.location}/vendor/SDL/include",
+        "%{wks.location}/vendor/soil/include",
         "%{wks.location}/vendor/stb_image",
         "%{wks.location}/vendor/stb_truetype",
         "%{wks.location}/vendor/Glad/src/include",
@@ -40,7 +41,8 @@ project "Feather-Editor"
         "lua53.lib",
         "Glad",
         "Box2D",
-        "ImGui"
+        "ImGui",
+        "SOIL"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")

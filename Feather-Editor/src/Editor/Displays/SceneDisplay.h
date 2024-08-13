@@ -12,8 +12,15 @@ namespace Feather {
 		~SceneDisplay() = default;
 
 		virtual void Draw() override;
+		virtual void Update() override;
+
+	private:
+		void LoadScene();
+		void UnloadScene();
 
 	private:
 		Registry& m_Registry;
+		bool m_PlayScene;
+		bool m_SceneLoaded;
 	};
 }

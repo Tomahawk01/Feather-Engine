@@ -15,15 +15,9 @@ namespace Feather {
 		void Run();
 
 	private:
-		std::unique_ptr<Feather::Window> m_Window;
-		std::unique_ptr<Feather::Registry> m_Registry;
-
-		SDL_Event m_Event;
-		bool m_IsRunning;
-
-	private:
 		bool Initialize();
 		bool LoadShaders();
+		bool LoadEditorTextures();
 
 		void ProcessEvents();
 		void Update();
@@ -41,6 +35,13 @@ namespace Feather {
 		~Application() = default;
 		Application(const Application&) = delete;
 		Application& operator=(const Application&) = delete;
+
+	private:
+		std::unique_ptr<Feather::Window> m_Window;
+		std::unique_ptr<Feather::Registry> m_Registry;
+
+		SDL_Event m_Event;
+		bool m_IsRunning;
 	};
 
 }

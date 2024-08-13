@@ -23,6 +23,7 @@ group "Dependencies"
     include "vendor/Glad/Build-Glad.lua"
     include "vendor/box2d/Build-Box2D.lua"
     include "vendor/ImGui/Build-ImGui.lua"
+    include "vendor/soil/Build-SOIL.lua"
 group ""
 
 include "Feather-Core/Build-Core.lua"

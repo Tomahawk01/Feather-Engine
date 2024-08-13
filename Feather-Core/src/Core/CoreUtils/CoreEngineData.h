@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#define CORE_GLOBALS() Feather::CoreEngineData::GetInstance()
+
 namespace Feather {
 
 	class CoreEngineData

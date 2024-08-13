@@ -42,6 +42,8 @@
 #include "Editor/Displays/SceneDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
 
+#include "Editor/Utilities/editor_textures.h"
+
 namespace Feather {
 
     Application& Application::GetInstance()
@@ -162,14 +164,6 @@ namespace Feather {
 			return false;
 		}
 
-		lua->open_libraries(sol::lib::base,
-							sol::lib::math,
-							sol::lib::os,
-							sol::lib::table,
-							sol::lib::io,
-							sol::lib::string,
-							sol::lib::package);
-
 		if (!m_Registry->AddToContext<std::shared_ptr<sol::state>>(lua))
 		{
 			F_FATAL("Failed to add the sol::state to the registry context!");
@@ -281,18 +275,15 @@ namespace Feather {
 			return false;
 		}
 
-		ScriptingSystem::RegisterLuaBindings(*lua, *m_Registry);
-		ScriptingSystem::RegisterLuaFunctions(*lua, *m_Registry);
-
-		if (!scriptSystem->LoadMainScript(*lua))
+		if (!LoadEditorTextures())
 		{
-			F_FATAL("Failed to load main lua script");
+			F_FATAL("Failed to load editor textures!");
 			return false;
 		}
 
 		if (!CreateDisplays())
 		{
-			F_ERROR("Failed to create displays!");
+			F_FATAL("Failed to create displays!");
 			return false;
 		}
 
@@ -300,7 +291,7 @@ namespace Feather {
 
 		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
 		{
-			F_ERROR("Failed to create default fonts!");
+			F_FATAL("Failed to create default fonts!");
 			return false;
 		}
 
@@ -308,12 +299,12 @@ namespace Feather {
 		auto framebuffer = std::make_shared<Framebuffer>(640, 480, true);
 		if (!framebuffer)
 		{
-			F_ERROR("Failed to create a framebuffer");
+			F_FATAL("Failed to create a framebuffer");
 			return false;
 		}
 		if (!m_Registry->AddToContext<std::shared_ptr<Framebuffer>>(framebuffer))
 		{
-			F_ERROR("Failed to add a framebuffer to registry context");
+			F_FATAL("Failed to add a framebuffer to registry context");
 			return false;
 		}
 
@@ -348,6 +339,26 @@ namespace Feather {
 
 		return true;
     }
+
+	bool Application::LoadEditorTextures()
+	{
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& assetManager = mainRegistry.GetAssetManager();
+
+		if (!assetManager.AddTextureFromMemory("play_button", play_button, sizeof(play_button) / sizeof(play_button[0])))
+		{
+			F_ERROR("Failed to load texture 'play_button' from memory");
+			return false;
+		}
+
+		if (!assetManager.AddTextureFromMemory("stop_button", stop_button, sizeof(stop_button) / sizeof(stop_button[0])))
+		{
+			F_ERROR("Failed to load texture 'stop_button' from memory");
+			return false;
+		}
+
+		return true;
+	}
 
     void Application::ProcessEvents()
     {
@@ -424,24 +435,11 @@ namespace Feather {
 		auto& engineData = CoreEngineData::GetInstance();
 		engineData.UpdateDeltaTime();
 
-		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
-		if (!camera)
-		{
-			F_FATAL("Failed to get the camera from the registry context!");
-			return;
-		}
-		camera->Update();
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& displayHolder = mainRegistry.GetContext<std::shared_ptr<DisplayHolder>>();
 
-		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
-		scriptSystem->Update();
-
-		auto& physicsWorld = m_Registry->GetContext<PhysicsWorld>();
-		physicsWorld->Step(1.0f / 60.0f, 10, 8);
-		auto& physicsSystem = m_Registry->GetContext<std::shared_ptr<PhysicsSystem>>();
-		physicsSystem->Update(m_Registry->GetRegistry());
-
-		auto& animationSystem = m_Registry->GetContext<std::shared_ptr<AnimationSystem>>();
-		animationSystem->Update();
+		for (const auto& display : displayHolder->displays)
+			display->Update();
 
 		// Updating inputs
 		auto& inputManager = InputManager::GetInstance();
@@ -460,7 +458,7 @@ namespace Feather {
 		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
 		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
 
-		auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
+		//auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
 
 		const auto& fb = m_Registry->GetContext<std::shared_ptr<Framebuffer>>();
 
@@ -469,7 +467,7 @@ namespace Feather {
 		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		renderer->ClearBuffers(true, true, false);
 
-		scriptSystem->Render();
+		//scriptSystem->Render();
 		renderSystem->Update();
 		renderShapeSystem->Update();
 		renderUISystem->Update(m_Registry->GetRegistry());

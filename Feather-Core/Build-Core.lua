@@ -9,8 +9,6 @@ project "Feather-Core"
         "**.h",
         "**.cpp",
         "**.inl",
-        "%{wks.location}/vendor/stb_image/**.cpp",
-        "%{wks.location}/vendor/stb_image/**.h",
         "%{wks.location}/vendor/stb_truetype/**.h"
     }
 
@@ -25,6 +23,7 @@ project "Feather-Core"
         "src",
         "%{wks.location}/vendor/Glad/src/include",
         "%{wks.location}/vendor/SDL/include",
+        "%{wks.location}/vendor/soil/include",
         "%{wks.location}/vendor/stb_image",
         "%{wks.location}/vendor/stb_truetype",
         "%{wks.location}/vendor/glm",
@@ -47,7 +46,8 @@ project "Feather-Core"
         "SDL2.lib",
         "SDL2_mixer.lib",
         "lua53.lib",
-        "Box2D"
+        "Box2D",
+        "SOIL"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
