@@ -5,6 +5,8 @@ ScriptList =
     "assets/scripts/Platformer/utilities/utilities.lua",
     "assets/scripts/Platformer/utilities/rain_generator.lua",
     "assets/scripts/Platformer/utilities/scene_dimmer.lua",
+    "assets/scripts/Platformer/projectiles/projectileDefs.lua",
+    "assets/scripts/Platformer/projectiles/projectile.lua",
     "assets/scripts/Platformer/events/event_manager.lua",
     "assets/scripts/Platformer/events/collision_event.lua",
     "assets/scripts/Platformer/systems/trigger_system.lua",

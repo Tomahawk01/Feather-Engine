@@ -111,10 +111,10 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 			sprite.uvs.u = sprite.start_x * sprite.uvs.uv_width;
 			sprite.uvs.v = sprite.start_y * sprite.uvs.uv_height;
 		},
-		"inpect_x", [](SpriteComponent& sprite) {
+		"inspect_x", [](SpriteComponent& sprite) {
 			sprite.uvs.u = sprite.start_x * sprite.uvs.uv_width;
 		},
-		"inpect_y", [](SpriteComponent& sprite) {
+		"inspect_y", [](SpriteComponent& sprite) {
 			sprite.uvs.v = sprite.start_y * sprite.uvs.uv_height;
 		}
 	);

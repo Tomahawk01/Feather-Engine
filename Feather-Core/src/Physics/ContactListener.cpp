@@ -40,7 +40,8 @@ namespace Feather {
 		}
 		catch (const std::bad_any_cast& ex)
 		{
-			F_ERROR("Failed to cast user contacts: {}", ex.what());
+			// Ignore this exception for now
+			//F_ERROR("Failed to cast user contacts: {}", ex.what());
 			SetUserContacts(nullptr, nullptr);
 		}
 	}
@@ -80,7 +81,8 @@ namespace Feather {
 		}
 		catch (const std::bad_any_cast& ex)
 		{
-			F_ERROR("Failed to cast user contacts: {}", ex.what());
+			// Ignore this exception for now
+			//F_ERROR("Failed to cast user contacts: {}", ex.what());
 		}
 
 		SetUserContacts(nullptr, nullptr);

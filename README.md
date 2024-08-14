@@ -25,6 +25,7 @@ If you are using Visual Studio 2022 press `F5` key.
 * [SDL2](https://github.com/libsdl-org/SDL) for windowing and input functionality
 * [Glad](https://glad.dav1d.de/) as OpenGL loader
 * [glm](https://github.com/g-truc/glm) math library
+* [soil](https://github.com/littlstar/soil) for editor embedded textures loading
 * [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h) for image loading
 * [stb_truetype](https://github.com/nothings/stb/blob/master/stb_truetype.h) for characters rasterisation
 * [entt](https://github.com/skypjack/entt) for Entity Component System

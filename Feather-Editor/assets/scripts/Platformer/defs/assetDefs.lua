@@ -8,7 +8,8 @@ AssetDefs =
         { name = "platforms", path = "assets/textures/village_ground.png" , pixel_art = true },
         { name = "background", path = "assets/textures/background.png" , pixel_art = true },
         { name = "white_box", path = "assets/textures/white_box.png" , pixel_art = true },
-        { name = "player", path = "assets/textures/player_SpriteSheet.png" , pixel_art = true }
+        { name = "player", path = "assets/textures/player_SpriteSheet.png" , pixel_art = true },
+        { name = "projectile_atlas", path = "assets/textures/projectile_atlas.png" , pixel_art = true }
     },
     music =
     {

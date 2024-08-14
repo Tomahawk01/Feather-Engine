@@ -52,7 +52,7 @@ function MoveState:OnUpdate(dt)
 	-- Attack
 	if Keyboard.just_pressed(KEY_ENTER) then
 		self.m_IsAttacking = true
-		--self:ShootProjectile()
+		self:ShootProjectile()
 	elseif Keyboard.pressed(KEY_ENTER) then
 		-- TODO: Charge for stronger projectile
 		self.m_IsAttacking = true
@@ -145,5 +145,29 @@ function MoveState:OnUpdate(dt)
 		end
 	end
 
-	sprite:inpect_y()
+	sprite:inspect_y()
+end
+
+function MoveState:ShootProjectile()
+	local player = Entity(self.m_EntityID)
+	local transform = player:get_component(Transform)
+
+	local projDir = 1
+	local position = transform.position
+	if self.m_Character.m_IsFacingLeft then
+		projDir = -1
+		position = position + vec2(8, 16)
+	else
+		position = position + vec2(24, 16)
+	end
+
+	AddProjectile(Projectile:Create(
+		{
+			def = "regular_shot",
+			dir = projDir,
+			start_pos = position,
+			life_time = 1000
+		}
+	))
+	-- TODO: Add Sound
 end

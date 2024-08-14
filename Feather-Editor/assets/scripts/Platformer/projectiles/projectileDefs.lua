@@ -1,34 +1,25 @@
-assert(MoveState, "MoveState does not exist")
-CharacterStates =
+ProjectileDefs = 
 {
-    move = MoveState
-}
-
-PlayerDefs =
-{
-    player =
-    {
-        tag = "player",
-        group = "",
-        type = "PLAYER",
-        components =
-        {
+    regular_shot = {
+        tag = "regular_shot",
+        group = "projectile",
+        components = {
             transform = {
-                position = vec2(10 * 16, 33 * 16),
+                position = vec2(0, 0),
                 scale = vec2(1, 1),
                 rotation = 0.0
             },
             sprite = {
-                texture = "player",
+                texture = "projectile_atlas",
                 width = 32,
                 height = 32,
                 start_x = 0,
-                start_y = 0,
+                start_y = 2,
                 layer = 3
             },
             animation = {
                 num_frames = 4,
-                frame_rate = 10,
+                frame_rate = 20,
                 frame_offset = 0,
                 is_vertical = false,
                 is_looped = true
@@ -39,23 +30,22 @@ PlayerDefs =
             },
             physics_attributes = {
                 type = BodyType.Dynamic,
-                density = 75.0,
+                density = 1.0,
                 friction = 1.0,
                 restitution = 0.0,
-                position = vec2(10 * 16, 33 * 16),
+                position = vec2(0, 0),
                 radius = 8,
                 isCircle = true,
+                isTrigger = true,
                 isFixedRotation = true,
                 object_data = {
-                    tag = "player",
-                    group = "",
-                    isCollider = true,
-                    isTrigger = false,
+                    tag = "shot",
+                    group = "projectile",
+                    isCollider = false,
+                    isTrigger = true,
                     isFriendly = true
                 }
             }
-        },
-        controller = {"move"},
-        default_state = "move"
+        }
     }
 }

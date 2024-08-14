@@ -72,7 +72,7 @@ namespace Feather {
 
     bool Application::Initialize()
     {
-		F_INIT_LOGS(true, true);
+		F_INIT_LOGS(false, true);
 
 		// TODO: Load core engine data
 		// Init SDL

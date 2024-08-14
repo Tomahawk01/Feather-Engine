@@ -23,6 +23,30 @@ function UpdateActiveCharacters(dt)
     end
 end
 
+Projectiles = {}
+
+function AddProjectile(projectile)
+    Projectiles[projectile.m_EntityID] = projectile
+end
+
+function UpdateProjectiles(dt)
+    for k, v in pairs(Projectiles) do
+        if v:TimesUp() then
+            v:Destroy()
+            Projectiles[k] = nil
+        else
+            v:Update(dt)
+        end
+    end
+end
+
+function ResetProjectiles()
+    for _, v in pairs(Projectiles) do
+        v:Destroy()
+        Projectiles[k] = nil
+    end
+end
+
 function LoadEntity(def)
     assert(def, "Definition does not exist!")
 
