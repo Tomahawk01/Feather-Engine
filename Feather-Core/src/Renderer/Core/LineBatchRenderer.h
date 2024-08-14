@@ -10,7 +10,7 @@ namespace Feather {
 	{
 	public:
 		LineBatchRenderer();
-		~LineBatchRenderer() = default;
+		virtual ~LineBatchRenderer() = default;
 
 		virtual void End() override;
 		virtual void Render() override;

@@ -22,9 +22,11 @@ namespace Feather {
 
 		bool CreateDefaultFonts();
 
-		bool AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt = true);
-		bool AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt = true);
+		bool AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt = true, bool isTileset = false);
+		bool AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt = true, bool isTileset = false);
 		std::shared_ptr<Texture> GetTexture(const std::string& textureName);
+
+		std::vector<std::string> GetTilesetNames() const;
 
 		bool AddFont(const std::string& fontName, const std::string& fontPath, float fontSize = 32.0f);
 		bool AddFontFromMemory(const std::string& fontName, unsigned char* fontData, float fontSize = 32.0f);
@@ -39,6 +41,8 @@ namespace Feather {
 
 		bool AddSoundFx(const std::string& soundFxName, const std::string& filepath);
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
+
+		inline const std::map<std::string, std::shared_ptr<Texture>>& GetAllTextures() const { return m_mapTextures; }
 
 		static void CreateLuaAssetManager(sol::state& lua);
 

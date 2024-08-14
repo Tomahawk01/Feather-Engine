@@ -8,6 +8,8 @@
 #include "Core/Resources/fonts/default_fonts.h"
 #include "Core/ECS/MainRegistry.h"
 
+#include "Utils/FeatherUtilities.h"
+
 namespace Feather {
 
     bool AssetManager::CreateDefaultFonts()
@@ -23,7 +25,7 @@ namespace Feather {
         return true;
     }
 
-    bool AssetManager::AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt)
+    bool AssetManager::AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt, bool isTileset)
     {
         if (m_mapTextures.find(textureName) != m_mapTextures.end())
         {
@@ -33,7 +35,7 @@ namespace Feather {
 
         auto texture = std::move(TextureLoader::Create(
                 pixelArt ? Texture::TextureType::PIXEL : Texture::TextureType::BLENDED,
-                texturePath));
+                texturePath, isTileset));
         if (!texture)
         {
             F_ERROR("Failed to load texture '{0}' at path '{1}'", textureName, texturePath);
@@ -45,7 +47,7 @@ namespace Feather {
         return true;
     }
 
-    bool AssetManager::AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt)
+    bool AssetManager::AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt, bool isTileset)
     {
         if (m_mapTextures.contains(textureName))
         {
@@ -53,7 +55,7 @@ namespace Feather {
             return false;
         }
 
-        auto texture = std::move(TextureLoader::CreateFromMemory(imageData, length));
+        auto texture = std::move(TextureLoader::CreateFromMemory(imageData, length, pixelArt, isTileset));
         // Load texture
         if (!texture)
         {
@@ -77,6 +79,11 @@ namespace Feather {
         }
 
         return texIter->second;
+    }
+
+    std::vector<std::string> AssetManager::GetTilesetNames() const
+    {
+        return GetKeys(m_mapTextures, [](const auto& pair) { return pair.second->IsTileset(); });
     }
 
     bool AssetManager::AddFont(const std::string& fontName, const std::string& fontPath, float fontSize)
@@ -265,19 +272,29 @@ namespace Feather {
         lua.new_usertype<AssetManager>(
             "AssetManager",
             sol::no_constructor,
-            "add_texture", [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
-            {
-                return asset_manager.AddTexure(assetName, filepath, pixel_art);
-            },
-            "add_music", [&](const std::string& musicName, const std::string& filepath)
+            "add_texture",
+            sol::overload(
+                [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
+                {
+                    return asset_manager.AddTexure(assetName, filepath, pixel_art, false);
+                },
+                [&](const std::string& assetName, const std::string& filepath, bool pixel_art, bool isTileset)
+                {
+                    return asset_manager.AddTexure(assetName, filepath, pixel_art, isTileset);
+                }
+            ),
+            "add_music",
+            [&](const std::string& musicName, const std::string& filepath)
             {
                 return asset_manager.AddMusic(musicName, filepath);
             },
-            "add_sound", [&](const std::string& soundFxName, const std::string& filepath)
+            "add_sound",
+            [&](const std::string& soundFxName, const std::string& filepath)
             {
                 return asset_manager.AddSoundFx(soundFxName, filepath);
             },
-            "add_font", [&](const std::string& fontName, const std::string& fontPath, float fontSize)
+            "add_font",
+            [&](const std::string& fontName, const std::string& fontPath, float fontSize)
             {
                 return asset_manager.AddFont(fontName, fontPath, fontSize);
             }

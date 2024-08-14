@@ -9,7 +9,7 @@ namespace Feather {
 	{
 	public:
 		CircleBatchRenderer();
-		~CircleBatchRenderer() = default;
+		virtual ~CircleBatchRenderer() = default;
 
 		virtual void End() override;
 		virtual void Render() override;

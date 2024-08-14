@@ -301,7 +301,12 @@ end
 
 function LoadAssets(assets)
     for k, v in pairs(assets.textures) do
-        if not AssetManager.add_texture(v.name, v.path, v.pixel_art) then
+        local isTileset = false
+        if v.isTileset then
+            isTileset = v.isTileset
+        end
+
+        if not AssetManager.add_texture(v.name, v.path, v.pixel_art, isTileset) then
             F_error("Failed to load texture file '%s' at path '%s'", v.name, v.path)
         else
             F_trace("Loaded texture '%s'", v.name)

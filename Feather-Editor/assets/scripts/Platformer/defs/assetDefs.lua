@@ -5,8 +5,8 @@ AssetDefs =
         { name = "collider", path = "assets/textures/collider.png" , pixel_art = true },
         { name = "trigger", path = "assets/textures/trigger.png" , pixel_art = true },
         { name = "rain", path = "assets/textures/Rain_SpriteSheet.png" , pixel_art = true },
-        { name = "platforms", path = "assets/textures/village_ground.png" , pixel_art = true },
-        { name = "background", path = "assets/textures/background.png" , pixel_art = true },
+        { name = "platforms", path = "assets/textures/village_ground.png" , pixel_art = true, isTileset = true },
+        { name = "background", path = "assets/textures/background.png" , pixel_art = true, isTileset = true },
         { name = "white_box", path = "assets/textures/white_box.png" , pixel_art = true },
         { name = "player", path = "assets/textures/player_SpriteSheet.png" , pixel_art = true },
         { name = "projectile_atlas", path = "assets/textures/projectile_atlas.png" , pixel_art = true }

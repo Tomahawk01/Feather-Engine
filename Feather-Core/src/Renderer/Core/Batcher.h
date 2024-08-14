@@ -19,7 +19,7 @@ namespace Feather {
 	public:
 		Batcher();
 		Batcher(bool UseIBO);
-		~Batcher();
+		virtual ~Batcher();
 
 		void Begin();
 

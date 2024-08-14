@@ -45,5 +45,5 @@ end
 
 function Projectile:Destroy()
     Entity(self.m_EntityID):kill()
-    F_trace("Destroyed projectile with id: %d", self.m_EntityID)
+    F_warn("Destroyed projectile with id: %d", self.m_EntityID)
 end

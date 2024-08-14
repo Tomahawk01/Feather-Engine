@@ -9,7 +9,7 @@ namespace Feather {
 	{
 	public:
 		TextBatchRenderer();
-		~TextBatchRenderer() = default;
+		virtual ~TextBatchRenderer() = default;
 
 		virtual void End() override;
 		virtual void Render() override;

@@ -41,6 +41,7 @@
 // Displays
 #include "Editor/Displays/SceneDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
+#include "Editor/Displays/TilesetDisplay.h"
 
 #include "Editor/Utilities/editor_textures.h"
 
@@ -514,10 +515,18 @@ namespace Feather {
 			return false;
 		}
 
-		// TODO: Add other Displays here as needed
+		auto tilesetDisplay = std::make_unique<TilesetDisplay>();
+		if (!tilesetDisplay)
+		{
+			F_ERROR("Failed to create a Tileset Display");
+			return false;
+		}
+
+		// Add other Displays here as needed
 
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
+		displayHolder->displays.push_back(std::move(tilesetDisplay));
 
 		return true;
 	}
