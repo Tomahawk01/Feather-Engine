@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#define MAIN_REGISTRY() Feather::MainRegistry::GetInstance();
+#define MAIN_REGISTRY() Feather::MainRegistry::GetInstance()
 
 namespace Feather {
 

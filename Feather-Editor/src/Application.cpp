@@ -42,8 +42,12 @@
 #include "Editor/Displays/SceneDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
 #include "Editor/Displays/TilesetDisplay.h"
+#include "Editor/Displays/TilemapDisplay.h"
 
+#include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/editor_textures.h"
+
+#include "Editor/Systems/GridSystem.h"
 
 namespace Feather {
 
@@ -149,13 +153,13 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 		mainRegistry.Initialize();
 
-		m_Registry = std::make_unique<Registry>();
-
-		if (!m_Registry->AddToContext<std::shared_ptr<Renderer>>(renderer))
+		if (!mainRegistry.AddToContext<std::shared_ptr<Renderer>>(renderer))
 		{
 			F_FATAL("Failed to add the Renderer to the registry context!");
 			return false;
 		}
+
+		m_Registry = std::make_unique<Registry>();
 
 		// Create Lua state
 		auto lua = std::make_shared<sol::state>();
@@ -189,7 +193,7 @@ namespace Feather {
 			F_FATAL("Failed to create render system!");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<RenderSystem>>(renderSystem))
+		if (!mainRegistry.AddToContext<std::shared_ptr<RenderSystem>>(renderSystem))
 		{
 			F_FATAL("Failed to add the render system to the registry context!");
 			return false;
@@ -201,7 +205,7 @@ namespace Feather {
 			F_FATAL("Failed to create render UI system!");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<RenderUISystem>>(renderUISystem))
+		if (!mainRegistry.AddToContext<std::shared_ptr<RenderUISystem>>(renderUISystem))
 		{
 			F_FATAL("Failed to add the render UI system to the registry context!");
 			return false;
@@ -213,7 +217,7 @@ namespace Feather {
 			F_FATAL("Failed to create render shape system!");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<RenderShapeSystem>>(renderShapeSystem))
+		if (!mainRegistry.AddToContext<std::shared_ptr<RenderShapeSystem>>(renderShapeSystem))
 		{
 			F_FATAL("Failed to add the render shape system to the registry context!");
 			return false;
@@ -296,16 +300,24 @@ namespace Feather {
 			return false;
 		}
 
-		// TODO: temporary framebuffer
-		auto framebuffer = std::make_shared<Framebuffer>(640, 480, true);
-		if (!framebuffer)
+		auto editorFramebuffers = std::make_shared<EditorFramebuffers>();
+		if (!editorFramebuffers)
 		{
-			F_FATAL("Failed to create a framebuffer");
+			F_FATAL("Failed to create editor framebuffers to context");
 			return false;
 		}
-		if (!m_Registry->AddToContext<std::shared_ptr<Framebuffer>>(framebuffer))
+		if (!mainRegistry.AddToContext<std::shared_ptr<EditorFramebuffers>>(editorFramebuffers))
 		{
-			F_FATAL("Failed to add a framebuffer to registry context");
+			F_FATAL("Failed to add editor framebuffers to registry context");
+			return false;
+		}
+
+		editorFramebuffers->mapFramebuffers.emplace(FramebufferType::SCENE, std::make_shared<Framebuffer>(640, 480, false));
+		editorFramebuffers->mapFramebuffers.emplace(FramebufferType::TILEMAP, std::make_shared<Framebuffer>(640, 480, false));
+
+		if (!mainRegistry.AddToContext<std::shared_ptr<GridSystem>>(std::make_shared<GridSystem>()))
+		{
+			F_FATAL("Failed to add grid system to registry context");
 			return false;
 		}
 
@@ -425,6 +437,7 @@ namespace Feather {
 				default:
 					break;
 				}
+				break;
 			default:
 				break;
 			}
@@ -453,35 +466,10 @@ namespace Feather {
 
     void Application::Render()
     {
-		auto& renderSystem = m_Registry->GetContext<std::shared_ptr<RenderSystem>>();
-		auto& renderUISystem = m_Registry->GetContext<std::shared_ptr<RenderUISystem>>();
-		auto& renderShapeSystem = m_Registry->GetContext<std::shared_ptr<RenderShapeSystem>>();
-		auto& camera = m_Registry->GetContext<std::shared_ptr<Camera2D>>();
-		auto& renderer = m_Registry->GetContext<std::shared_ptr<Renderer>>();
-
-		//auto& scriptSystem = m_Registry->GetContext<std::shared_ptr<ScriptingSystem>>();
-
-		const auto& fb = m_Registry->GetContext<std::shared_ptr<Framebuffer>>();
-
-		fb->Bind();
-		renderer->SetViewport(0, 0, fb->GetWidth(), fb->GetHeight());
-		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		renderer->ClearBuffers(true, true, false);
-
-		//scriptSystem->Render();
-		renderSystem->Update();
-		renderShapeSystem->Update();
-		renderUISystem->Update(m_Registry->GetRegistry());
-		fb->Unbind();
-
-		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		renderer->ClearBuffers(true, true, false);
-
 		BeginImGui();
 		RenderImGui();
 		EndImGui();
 
-		fb->CheckResize();
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
     }
 
@@ -522,11 +510,19 @@ namespace Feather {
 			return false;
 		}
 
+		auto tilemapDisplay = std::make_unique<TilemapDisplay>();
+		if (!tilemapDisplay)
+		{
+			F_ERROR("Failed to create a Tilemap Display");
+			return false;
+		}
+
 		// Add other Displays here as needed
 
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
 		displayHolder->displays.push_back(std::move(tilesetDisplay));
+		displayHolder->displays.push_back(std::move(tilemapDisplay));
 
 		return true;
 	}
@@ -603,7 +599,10 @@ namespace Feather {
 
 			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
+			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
+
+			ImGui::DockBuilderDockWindow("Tileset", logNodeId);
 
 			ImGui::DockBuilderFinish(dockSpaceId);
 		}

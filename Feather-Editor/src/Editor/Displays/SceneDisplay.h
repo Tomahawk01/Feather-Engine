@@ -18,6 +18,8 @@ namespace Feather {
 		void LoadScene();
 		void UnloadScene();
 
+		void RenderScene();
+
 	private:
 		Registry& m_Registry;
 		bool m_PlayScene;

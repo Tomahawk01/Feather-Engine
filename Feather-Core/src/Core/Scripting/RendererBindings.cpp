@@ -87,7 +87,7 @@ namespace Feather {
 			"color", &Text::color
 		);
 
-		auto& renderer = registry.GetContext<std::shared_ptr<Renderer>>();
+		auto& renderer = mainRegistry.GetContext<std::shared_ptr<Renderer>>();
 		if (!renderer)
 		{
 			F_FATAL("Failed to bind Renderer to Lua! Not in the registry context!");

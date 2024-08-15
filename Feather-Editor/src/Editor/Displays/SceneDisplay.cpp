@@ -1,15 +1,20 @@
 #include "SceneDisplay.h"
 #include "Renderer/Buffers/Framebuffer.h"
 #include "Renderer/Core/Camera2D.h"
+#include "Renderer/Core/Renderer.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Systems/PhysicsSystem.h"
 #include "Core/Systems/ScriptingSystem.h"
+#include "Core/Systems/RenderSystem.h"
+#include "Core/Systems/RenderUISystem.h"
+#include "Core/Systems/RenderShapeSystem.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/Resources/AssetManager.h"
 #include "Sounds/MusicPlayer/MusicPlayer.h"
 #include "Sounds/SoundPlayer/SoundFXPlayer.h"
 #include "Physics/Box2DWrappers.h"
+#include "../Utilities/EditorFramebuffers.h"
 #include "Logger/Logger.h"
 
 #include <imgui.h>
@@ -64,6 +69,8 @@ namespace Feather {
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
 		}
 
+		RenderScene();
+
 		if (ImGui::ImageButton((ImTextureID)stopTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && m_SceneLoaded)
 		{
 			UnloadScene();
@@ -75,7 +82,8 @@ namespace Feather {
 
 		if (ImGui::BeginChild("##SceneChild", ImVec2{ 0.0f, 0.0f }, NULL, ImGuiWindowFlags_NoScrollWithMouse))
 		{
-			const auto& fb = m_Registry.GetContext<std::shared_ptr<Framebuffer>>();
+			auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
+			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
 
 			ImGui::SetCursorPos(ImVec2{ 0.0f, 0.0f });
 
@@ -172,5 +180,29 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 		mainRegistry.GetMusicPlayer().Stop();
 		mainRegistry.GetSoundPlayer().Stop(-1);
+	}
+
+	void SceneDisplay::RenderScene()
+	{
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
+		auto& renderer = mainRegistry.GetContext<std::shared_ptr<Renderer>>();
+
+		auto& renderSystem = mainRegistry.GetContext<std::shared_ptr<RenderSystem>>();
+		auto& renderUISystem = mainRegistry.GetContext<std::shared_ptr<RenderUISystem>>();
+		auto& renderShapeSystem = mainRegistry.GetContext<std::shared_ptr<RenderShapeSystem>>();
+
+		const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
+
+		fb->Bind();
+		renderer->SetViewport(0, 0, fb->GetWidth(), fb->GetHeight());
+		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		renderer->ClearBuffers(true, true, false);
+
+		renderSystem->Update();
+		renderShapeSystem->Update();
+		renderUISystem->Update(m_Registry.GetRegistry());
+		fb->Unbind();
+		fb->CheckResize();
 	}
 }
