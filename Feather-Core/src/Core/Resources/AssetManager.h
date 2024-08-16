@@ -14,6 +14,8 @@
 
 namespace Feather {
 	
+	enum class AssetType;
+
 	class AssetManager
 	{
 	public:
@@ -43,6 +45,11 @@ namespace Feather {
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
 
 		inline const std::map<std::string, std::shared_ptr<Texture>>& GetAllTextures() const { return m_mapTextures; }
+
+		std::vector<std::string> GetAssetKeyNames(AssetType assetType) const;
+
+		bool ChangeAssetName(const std::string& oldName, const std::string& newName, AssetType assetType);
+		bool HasAsset(const std::string& assetName, AssetType assetType);
 
 		static void CreateLuaAssetManager(sol::state& lua);
 

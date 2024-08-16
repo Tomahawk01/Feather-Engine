@@ -264,6 +264,63 @@ namespace Feather {
         return soundItr->second;
     }
 
+    std::vector<std::string> AssetManager::GetAssetKeyNames(AssetType assetType) const
+    {
+        switch (assetType)
+        {
+        case AssetType::TEXTURE:
+            return GetKeys(m_mapTextures, [](const auto& pair) { return !pair.second->IsEditorTexture(); });
+        case AssetType::FONT:
+            return GetKeys(m_mapFonts);
+        case AssetType::SOUNDFX:
+            return GetKeys(m_mapSoundFX);
+        case AssetType::MUSIC:
+            return GetKeys(m_mapMusic);
+        default:
+            F_ASSERT(false && "Cannot get this type!");
+        }
+
+        return std::vector<std::string>{};
+    }
+
+    bool AssetManager::ChangeAssetName(const std::string& oldName, const std::string& newName, AssetType assetType)
+    {
+        switch (assetType)
+        {
+        case AssetType::TEXTURE:
+            return KeyChange(m_mapTextures, oldName, newName);
+        case AssetType::FONT:
+            return KeyChange(m_mapFonts, oldName, newName);
+        case AssetType::SOUNDFX:
+            return KeyChange(m_mapSoundFX, oldName, newName);
+        case AssetType::MUSIC:
+            return KeyChange(m_mapMusic, oldName, newName);
+        default:
+            F_ASSERT(false && "Cannot get this type!");
+        }
+
+        return false;
+    }
+
+    bool AssetManager::HasAsset(const std::string& assetName, AssetType assetType)
+    {
+        switch (assetType)
+        {
+        case AssetType::TEXTURE:
+            return m_mapTextures.contains(assetName);
+        case AssetType::FONT:
+            return m_mapFonts.contains(assetName);
+        case AssetType::SOUNDFX:
+            return m_mapSoundFX.contains(assetName);
+        case AssetType::MUSIC:
+            return m_mapMusic.contains(assetName);
+        default:
+            F_ASSERT(false && "Cannot get this type!");
+        }
+
+        return false;
+    }
+
     void AssetManager::CreateLuaAssetManager(sol::state& lua)
     {
         auto& mainRegistry = MAIN_REGISTRY();

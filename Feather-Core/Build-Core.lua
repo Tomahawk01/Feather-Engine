@@ -8,8 +8,7 @@ project "Feather-Core"
     {
         "**.h",
         "**.cpp",
-        "**.inl",
-        "%{wks.location}/vendor/stb_truetype/**.h"
+        "**.inl"
     }
 
     defines

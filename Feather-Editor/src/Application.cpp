@@ -43,6 +43,7 @@
 #include "Editor/Displays/LogDisplay.h"
 #include "Editor/Displays/TilesetDisplay.h"
 #include "Editor/Displays/TilemapDisplay.h"
+#include "Editor/Displays/AssetDisplay.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/editor_textures.h"
@@ -363,12 +364,28 @@ namespace Feather {
 			F_ERROR("Failed to load texture 'play_button' from memory");
 			return false;
 		}
+		assetManager.GetTexture("play_button")->SetIsEditorTexture(true);
 
 		if (!assetManager.AddTextureFromMemory("stop_button", stop_button, sizeof(stop_button) / sizeof(stop_button[0])))
 		{
 			F_ERROR("Failed to load texture 'stop_button' from memory");
 			return false;
 		}
+		assetManager.GetTexture("stop_button")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("music_icon", music_icon, sizeof(music_icon) / sizeof(music_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'music_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("music_icon")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("scene_icon", scene_icon, sizeof(scene_icon) / sizeof(scene_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'scene_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("scene_icon")->SetIsEditorTexture(true);
 
 		return true;
 	}
@@ -390,8 +407,6 @@ namespace Feather {
 				m_IsRunning = false;
 				break;
 			case SDL_KEYDOWN:
-				if (m_Event.key.keysym.sym == SDLK_ESCAPE)
-					m_IsRunning = false;
 				keyboard.OnKeyPressed(m_Event.key.keysym.sym);
 				break;
 			case SDL_KEYUP:
@@ -517,12 +532,20 @@ namespace Feather {
 			return false;
 		}
 
+		auto assetDisplay = std::make_unique<AssetDisplay>();
+		if (!assetDisplay)
+		{
+			F_ERROR("Failed to create a Asset Display");
+			return false;
+		}
+
 		// Add other Displays here as needed
 
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
 		displayHolder->displays.push_back(std::move(tilesetDisplay));
 		displayHolder->displays.push_back(std::move(tilemapDisplay));
+		displayHolder->displays.push_back(std::move(assetDisplay));
 
 		return true;
 	}
@@ -600,6 +623,7 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
+			ImGui::DockBuilderDockWindow("Assets", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
 
 			ImGui::DockBuilderDockWindow("Tileset", logNodeId);
