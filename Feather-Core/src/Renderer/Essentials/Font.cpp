@@ -5,7 +5,7 @@
 namespace Feather {
 
 	Font::Font(GLuint fontAtlasID, int widht, int height, float fontSize, void* data)
-		: m_FontAtlasID{ fontAtlasID }, m_Width{ widht }, m_Height{ height }, m_FontSize{ fontSize }, m_Data{ data }
+		: m_FontAtlasID{ fontAtlasID }, m_Width{ widht }, m_Height{ height }, m_FontSize{ fontSize }, m_Data{ std::move(data) }
 	{}
 
 	Font::~Font()
@@ -14,7 +14,10 @@ namespace Feather {
 			glDeleteTextures(1, &m_FontAtlasID);
 
 		if (m_Data)
-			delete m_Data;
+		{
+			typedef stbtt_bakedchar(stbtt_bakedchar)[96];
+			delete[](stbtt_bakedchar*)m_Data;
+		}
 	}
 
 	FontGlyph Font::GetGlyph(char c, glm::vec2& pos)
