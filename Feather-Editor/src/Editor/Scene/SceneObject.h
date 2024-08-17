@@ -16,6 +16,7 @@ namespace Feather {
 		inline Canvas& GetCanvas() { return m_Canvas; }
 		inline const std::string& GetSceneName() { return m_SceneName; }
 		inline Registry& GetRegistry() { return m_Registry; }
+		inline Registry* GetRegistryPtr() { return &m_Registry; }
 		inline Registry& GetRuntimeRegistry() { return m_RuntimeRegistry; }
 
 	private:

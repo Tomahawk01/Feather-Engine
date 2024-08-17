@@ -10,6 +10,8 @@
 
 constexpr int MAX_CONTROLLERS = 4;
 
+#define INPUT_MANAGER() Feather::InputManager::GetInstance()
+
 namespace Feather {
 
 	class InputManager

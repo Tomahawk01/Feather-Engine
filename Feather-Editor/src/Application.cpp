@@ -540,9 +540,9 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
-			ImGui::DockBuilderDockWindow("Assets", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
 			ImGui::DockBuilderDockWindow("Tileset", logNodeId);
+			ImGui::DockBuilderDockWindow("Assets", logNodeId);
 
 			ImGui::DockBuilderFinish(dockSpaceId);
 		}
