@@ -10,13 +10,12 @@ namespace Feather {
 	class RenderUISystem
 	{
 	public:
-		RenderUISystem(Registry& registry);
+		RenderUISystem();
 		~RenderUISystem() = default;
 
-		void Update(entt::registry& registry);
+		void Update(Registry& registry);
 
 	private:
-		Registry& m_Registry;
 		std::unique_ptr<SpriteBatchRenderer> m_SpriteRenderer;
 		std::unique_ptr<TextBatchRenderer> m_TextRenderer;
 		std::unique_ptr<Camera2D> m_Camera2D;

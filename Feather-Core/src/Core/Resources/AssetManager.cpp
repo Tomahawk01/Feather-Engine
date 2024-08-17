@@ -42,9 +42,9 @@ namespace Feather {
             return false;
         }
 
-        m_mapTextures.emplace(textureName, std::move(texture));
+        auto [itr, isSuccess] = m_mapTextures.emplace(textureName, std::move(texture));
 
-        return true;
+        return isSuccess;
     }
 
     bool AssetManager::AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt, bool isTileset)
@@ -64,9 +64,9 @@ namespace Feather {
         }
 
         // Insert texture into the map
-        m_mapTextures.emplace(textureName, std::move(texture));
+        auto [itr, isSuccess] = m_mapTextures.emplace(textureName, std::move(texture));
 
-        return true;
+        return isSuccess;
     }
 
     std::shared_ptr<Texture> AssetManager::GetTexture(const std::string& textureName)
@@ -102,9 +102,9 @@ namespace Feather {
             return false;
         }
 
-        m_mapFonts.emplace(fontName, std::move(pFont));
+        auto [itr, isSuccess] = m_mapFonts.emplace(fontName, std::move(pFont));
 
-        return true;
+        return isSuccess;
     }
 
     bool AssetManager::AddFontFromMemory(const std::string& fontName, unsigned char* fontData, float fontSize)
@@ -123,9 +123,9 @@ namespace Feather {
             return false;
         }
 
-        m_mapFonts.emplace(fontName, std::move(pFont));
+        auto [itr, isSuccess] = m_mapFonts.emplace(fontName, std::move(pFont));
 
-        return true;
+        return isSuccess;
     }
 
     std::shared_ptr<Font> AssetManager::GetFont(const std::string& fontName)
@@ -142,7 +142,7 @@ namespace Feather {
 
     bool AssetManager::AddShader(const std::string& shaderName, const std::string& vertexPath, const std::string& fragmentPath)
     {
-        if (m_mapShaders.find(shaderName) != m_mapShaders.end())
+        if (m_mapShaders.contains(shaderName))
         {
             F_ERROR("Failed to add shader '{0}': Already exists!", shaderName);
             return false;
@@ -155,22 +155,23 @@ namespace Feather {
             return false;
         }
 
-        m_mapShaders.emplace(shaderName, std::move(shader));
-        return true;
+        auto [itr, isSuccess] = m_mapShaders.emplace(shaderName, std::move(shader));
+
+        return isSuccess;
     }
 
     bool AssetManager::AddShaderFromMemory(const std::string& shaderName, const char* vertexShader, const char* fragmentShader)
     {
-        if (m_mapShaders.find(shaderName) != m_mapShaders.end())
+        if (m_mapShaders.contains(shaderName))
         {
             F_ERROR("Failed to add shader - '{0}' -- Already exists!", shaderName);
             return false;
         }
 
         auto shader = std::move(ShaderLoader::CreateFromMemory(vertexShader, fragmentShader));
-        m_mapShaders.insert(std::make_pair(shaderName, std::move(shader)));
+        auto [itr, isSuccess] = m_mapShaders.insert(std::make_pair(shaderName, std::move(shader)));
 
-        return true;
+        return isSuccess;
     }
 
     std::shared_ptr<Shader> AssetManager::GetShader(const std::string& shaderName)
@@ -187,7 +188,7 @@ namespace Feather {
 
     bool AssetManager::AddMusic(const std::string& musicName, const std::string& filepath)
     {
-        if (m_mapMusic.find(musicName) != m_mapMusic.end())
+        if (m_mapMusic.contains(musicName))
         {
             F_ERROR("Failed to add music '{0}': Already exist!", musicName);
             return false;
@@ -211,9 +212,9 @@ namespace Feather {
             return false;
         }
 
-        m_mapMusic.emplace(musicName, std::move(musicPtr));
+        auto [itr, isSuccess] = m_mapMusic.emplace(musicName, std::move(musicPtr));
 
-        return true;
+        return isSuccess;
     }
 
     std::shared_ptr<Music> AssetManager::GetMusic(const std::string& musicName)
@@ -230,7 +231,7 @@ namespace Feather {
 
     bool AssetManager::AddSoundFx(const std::string& soundFxName, const std::string& filepath)
     {
-        if (m_mapSoundFX.find(soundFxName) != m_mapSoundFX.end())
+        if (m_mapSoundFX.contains(soundFxName))
         {
             F_ERROR("Failed to add sound effect '{0}': Already exist!", soundFxName);
             return false;
@@ -247,9 +248,9 @@ namespace Feather {
         SoundParams params{ .name = soundFxName, .filename = filepath, .duration = chunk->alen / 179.4 };
 
         auto pSoundFx = std::make_shared<SoundFX>(params, SoundFXPtr{ chunk });
-        m_mapSoundFX.emplace(soundFxName, std::move(pSoundFx));
+        auto [itr, isSuccess] = m_mapSoundFX.emplace(soundFxName, std::move(pSoundFx));
 
-        return true;
+        return isSuccess;
     }
 
     std::shared_ptr<SoundFX> AssetManager::GetSoundFx(const std::string& soundFxName)
@@ -314,6 +315,25 @@ namespace Feather {
             return m_mapSoundFX.contains(assetName);
         case AssetType::MUSIC:
             return m_mapMusic.contains(assetName);
+        default:
+            F_ASSERT(false && "Cannot get this type!");
+        }
+
+        return false;
+    }
+
+    bool AssetManager::DeleteAsset(const std::string& assetName, AssetType assetType)
+    {
+        switch (assetType)
+        {
+        case AssetType::TEXTURE:
+            return std::erase_if(m_mapTextures, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+        case AssetType::FONT:
+            return std::erase_if(m_mapFonts, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+        case AssetType::SOUNDFX:
+            return std::erase_if(m_mapSoundFX, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+        case AssetType::MUSIC:
+            return std::erase_if(m_mapMusic, [&](const auto& pair) { return pair.first == assetName; }) > 0;
         default:
             F_ASSERT(false && "Cannot get this type!");
         }

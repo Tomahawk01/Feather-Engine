@@ -1,12 +1,12 @@
 #pragma once
+#include <SDL.h>
 
-#include <glad/glad.h>
-
-#include <Windowing/Window/Window.h>
-#include <Core/ECS/Registry.h>
+#include <memory>
 
 namespace Feather {
 	
+	class Window;
+
 	class Application
 	{
 	public:
@@ -38,7 +38,6 @@ namespace Feather {
 
 	private:
 		std::unique_ptr<Feather::Window> m_Window;
-		std::unique_ptr<Feather::Registry> m_Registry;
 
 		SDL_Event m_Event;
 		bool m_IsRunning;

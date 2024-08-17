@@ -14,6 +14,12 @@ namespace Feather {
 		return m_Registry->ctx().get<TContext>();
 	}
 
+	template<typename TContext>
+	inline bool Registry::RemoveContext()
+	{
+		return m_Registry->ctx().erase<TContext>();
+	}
+
 	template <typename TComponent>
 	entt::runtime_view& add_component_to_view(Registry* registry, entt::runtime_view& view)
 	{

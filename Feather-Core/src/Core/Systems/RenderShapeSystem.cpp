@@ -9,17 +9,17 @@
 
 namespace Feather {
 
-	RenderShapeSystem::RenderShapeSystem(Registry& registry)
-		: m_Registry{ registry }, m_RectRenderer{ std::make_unique<RectBatchRenderer>() }, m_CircleRenderer{ std::make_unique<CircleBatchRenderer>() }
+	RenderShapeSystem::RenderShapeSystem()
+		: m_RectRenderer{ std::make_unique<RectBatchRenderer>() }, m_CircleRenderer{ std::make_unique<CircleBatchRenderer>() }
 	{}
 
-	void RenderShapeSystem::Update()
+	void RenderShapeSystem::Update(Registry& registry)
 	{
 		if (!CoreEngineData::GetInstance().RenderCollidersEnabled())
 			return;
 
-		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
-		auto& assetManager = m_Registry.GetContext<std::shared_ptr<AssetManager>>();
+		auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
+		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
 
 		// Box
 		auto colorShader = assetManager->GetShader("color");
@@ -29,7 +29,7 @@ namespace Feather {
 		colorShader->SetUniformMat4("uProjection", cam_mat);
 		m_RectRenderer->Begin();
 
-		auto boxView = m_Registry.GetRegistry().view<TransformComponent, BoxColliderComponent>();
+		auto boxView = registry.GetRegistry().view<TransformComponent, BoxColliderComponent>();
 		for (auto entity : boxView)
 		{
 			const auto& transform = boxView.get<TransformComponent>(entity);
@@ -42,9 +42,9 @@ namespace Feather {
 
 			auto color = Color{ 255, 0, 0, 100 };
 
-			if (m_Registry.GetRegistry().all_of<PhysicsComponent>(entity))
+			if (registry.GetRegistry().all_of<PhysicsComponent>(entity))
 			{
-				auto& physics = m_Registry.GetRegistry().get<PhysicsComponent>(entity);
+				auto& physics = registry.GetRegistry().get<PhysicsComponent>(entity);
 				if (physics.IsTrigger())
 					color = Color{ 0, 255, 0, 100 };
 			}
@@ -69,7 +69,7 @@ namespace Feather {
 		circleShader->SetUniformMat4("uProjection", cam_mat);
 		m_CircleRenderer->Begin();
 
-		auto circleView = m_Registry.GetRegistry().view<TransformComponent, CircleColliderComponent>();
+		auto circleView = registry.GetRegistry().view<TransformComponent, CircleColliderComponent>();
 		for (auto entity : circleView)
 		{
 			const auto& transform = circleView.get<TransformComponent>(entity);

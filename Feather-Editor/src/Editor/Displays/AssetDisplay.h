@@ -22,6 +22,7 @@ namespace Feather {
 		unsigned int GetTextureID(const std::string& assetName);
 		bool DoRenameAsset(const std::string& oldName, const std::string& newName);
 		void CheckRename(const std::string& checkName);
+		void OpenAssetContext(const std::string& assetName);
 
 	private:
 		const std::vector<std::string> m_SelectableTypes{ "Textures", "Fonts", "Music", "SoundFX", "Scenes" };

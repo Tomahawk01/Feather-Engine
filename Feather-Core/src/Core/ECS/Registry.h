@@ -13,12 +13,16 @@ namespace Feather {
 
 		inline entt::registry& GetRegistry() { return *m_Registry; }
 		inline entt::entity CreateEntity() { return m_Registry->create(); }
+		inline void ClearRegistry() { m_Registry->clear(); }
 
 		template <typename TContext>
 		TContext AddToContext(TContext context);
 
 		template <typename TContext>
 		TContext& GetContext();
+
+		template <typename TContext>
+		bool RemoveContext();
 
 		static void CreateLuaRegistryBind(sol::state& lua, Registry& registry);
 

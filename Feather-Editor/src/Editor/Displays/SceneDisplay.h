@@ -8,7 +8,7 @@ namespace Feather {
 	class SceneDisplay : public IDisplay
 	{
 	public:
-		SceneDisplay(Registry& registry);
+		SceneDisplay();
 		~SceneDisplay() = default;
 
 		virtual void Draw() override;
@@ -21,7 +21,6 @@ namespace Feather {
 		void RenderScene();
 
 	private:
-		Registry& m_Registry;
 		bool m_PlayScene;
 		bool m_SceneLoaded;
 	};

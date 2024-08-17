@@ -2,20 +2,11 @@
 
 #include <Logger/Logger.h>
 
-#include <Renderer/Essentials/ShaderLoader.h>
-#include <Renderer/Essentials/TextureLoader.h>
-#include <Renderer/Essentials/Vertex.h>
-#include <Renderer/Core/Camera2D.h>
 #include <Renderer/Core/Renderer.h>
-#include <Renderer/Buffers/Framebuffer.h>
 
-#include <Core/ECS/Entity.h>
-#include <Core/ECS/Components/Identification.h>
 #include <Core/ECS/MainRegistry.h>
-
-#include <Core/CoreUtils/CoreUtilities.h>
-
 #include <Core/Resources/AssetManager.h>
+#include <Core/CoreUtils/CoreUtilities.h>
 #include <Core/CoreUtils/CoreEngineData.h>
 
 #include <Core/Systems/ScriptingSystem.h>
@@ -26,10 +17,7 @@
 #include <Core/Systems/PhysicsSystem.h>
 
 #include <Core/Scripting/InputManager.h>
-
-#include <Sounds/MusicPlayer/MusicPlayer.h>
-#include <Sounds/SoundPlayer/SoundFXPlayer.h>
-
+#include <Windowing/Window/Window.h>
 #include <Physics/ContactListener.h>
 
 // IMGUI testing
@@ -47,8 +35,8 @@
 
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/editor_textures.h"
-
 #include "Editor/Systems/GridSystem.h"
+#include "Editor/Scene/SceneManager.h"
 
 namespace Feather {
 
@@ -160,35 +148,7 @@ namespace Feather {
 			return false;
 		}
 
-		m_Registry = std::make_unique<Registry>();
-
-		// Create Lua state
-		auto lua = std::make_shared<sol::state>();
-		if (!lua)
-		{
-			F_FATAL("Failed to create Lua state!");
-			return false;
-		}
-
-		if (!m_Registry->AddToContext<std::shared_ptr<sol::state>>(lua))
-		{
-			F_FATAL("Failed to add the sol::state to the registry context!");
-			return false;
-		}
-
-		auto scriptSystem = std::make_shared<ScriptingSystem>(*m_Registry);
-		if (!scriptSystem)
-		{
-			F_FATAL("Failed to create script system!");
-			return false;
-		}
-		if (!m_Registry->AddToContext<std::shared_ptr<ScriptingSystem>>(scriptSystem))
-		{
-			F_FATAL("Failed to add the script system to the registry context!");
-			return false;
-		}
-
-		auto renderSystem = std::make_shared<RenderSystem>(*m_Registry);
+		auto renderSystem = std::make_shared<RenderSystem>();
 		if (!renderSystem)
 		{
 			F_FATAL("Failed to create render system!");
@@ -200,7 +160,7 @@ namespace Feather {
 			return false;
 		}
 
-		auto renderUISystem = std::make_shared<RenderUISystem>(*m_Registry);
+		auto renderUISystem = std::make_shared<RenderUISystem>();
 		if (!renderUISystem)
 		{
 			F_FATAL("Failed to create render UI system!");
@@ -212,7 +172,7 @@ namespace Feather {
 			return false;
 		}
 
-		auto renderShapeSystem = std::make_shared<RenderShapeSystem>(*m_Registry);
+		auto renderShapeSystem = std::make_shared<RenderShapeSystem>();
 		if (!renderShapeSystem)
 		{
 			F_FATAL("Failed to create render shape system!");
@@ -223,51 +183,6 @@ namespace Feather {
 			F_FATAL("Failed to add the render shape system to the registry context!");
 			return false;
 		}
-
-		auto animationSystem = std::make_shared<AnimationSystem>(*m_Registry);
-		if (!animationSystem)
-		{
-			F_FATAL("Failed to create animation system!");
-			return false;
-		}
-		if (!m_Registry->AddToContext<std::shared_ptr<AnimationSystem>>(animationSystem))
-		{
-			F_FATAL("Failed to add the animation system to the registry context!");
-			return false;
-		}
-
-		// Camera creation
-		auto camera = std::make_shared<Camera2D>();
-
-		if (!m_Registry->AddToContext<std::shared_ptr<Camera2D>>(camera))
-		{
-			F_FATAL("Failed to add camera to the registry context!");
-			return false;
-		}
-
-		// Create Physics World
-		PhysicsWorld physicsWorld = std::make_shared<b2World>(b2Vec2{ 0.0f, 9.8f });
-		if (!m_Registry->AddToContext<PhysicsWorld>(physicsWorld))
-		{
-			F_FATAL("Failed to add physics world to the registry context!");
-			return false;
-		}
-
-		auto physicsSystem = std::make_shared<PhysicsSystem>(*m_Registry);
-		if (!m_Registry->AddToContext<std::shared_ptr<PhysicsSystem>>(physicsSystem))
-		{
-			F_FATAL("Failed to add physics system to the registry context!");
-			return false;
-		}
-
-		auto contactListener = std::make_shared<ContactListener>();
-		if (!m_Registry->AddToContext<std::shared_ptr<ContactListener>>(contactListener))
-		{
-			F_FATAL("Failed to add contact listener to the registry context!");
-			return false;
-		}
-
-		physicsWorld->SetContactListener(contactListener.get());
 
 		if (!InitImGui())
 		{
@@ -321,6 +236,10 @@ namespace Feather {
 			F_FATAL("Failed to add grid system to registry context");
 			return false;
 		}
+
+		// TODO: Remove these test scenes
+		SCENE_MANAGER().AddScene("DefaultScene");
+		SCENE_MANAGER().AddScene("TestScene");
 
 		return true;
     }
@@ -504,7 +423,7 @@ namespace Feather {
 			return false;
 		}
 
-		auto sceneDisplay = std::make_unique<SceneDisplay>(*m_Registry);
+		auto sceneDisplay = std::make_unique<SceneDisplay>();
 		if (!sceneDisplay)
 		{
 			F_ERROR("Failed to create a Scene Display");
@@ -538,8 +457,6 @@ namespace Feather {
 			F_ERROR("Failed to create a Asset Display");
 			return false;
 		}
-
-		// Add other Displays here as needed
 
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
@@ -625,7 +542,6 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow("Assets", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
-
 			ImGui::DockBuilderDockWindow("Tileset", logNodeId);
 
 			ImGui::DockBuilderFinish(dockSpaceId);
@@ -641,7 +557,7 @@ namespace Feather {
 	}
 
     Application::Application()
-        : m_Window{ nullptr }, m_Registry{ nullptr }, m_Event{}, m_IsRunning{ true }
+        : m_Window{ nullptr }, m_Event{}, m_IsRunning{ true }
     {}
 
 }

@@ -7,6 +7,8 @@
 
 #include "../Systems/GridSystem.h"
 #include "../Utilities/EditorFramebuffers.h"
+#include "../Utilities/EditorUtilities.h"
+#include "../Scene/SceneManager.h"
 
 #include "imgui.h"
 
@@ -42,6 +44,20 @@ namespace Feather {
 			ImGui::SetCursorPos(ImVec2{ x,y });
 
 			ImGui::Image((ImTextureID)fb->GetTextureID(), imageSize, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f });
+
+			// Accept scene drop target
+			if (ImGui::BeginDragDropTarget())
+			{
+				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_SCENE_SRC);
+				if (payload)
+				{
+					F_TRACE("Before: {}", SCENE_MANAGER().GetCurrentSceneName());
+					SCENE_MANAGER().SetCurrentScene(std::string{ (const char*)payload->Data });
+					F_TRACE("After: {}", SCENE_MANAGER().GetCurrentSceneName());
+				}
+
+				ImGui::EndDragDropTarget();
+			}
 
 			ImGui::EndChild();
 		}

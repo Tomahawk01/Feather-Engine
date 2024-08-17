@@ -6,6 +6,7 @@
 #include "Logger/Logger.h"
 
 #include "../Utilities/EditorUtilities.h"
+#include "../Scene/SceneManager.h"
 
 #include <imgui.h>
 
@@ -129,7 +130,7 @@ namespace Feather {
 
 		if (m_eSelectedType == AssetType::SCENE)
 		{
-			// TODO: Continue after Scene Manager is done
+			assetNames = SCENE_MANAGER().GetSceneNames();
 		}
 		else
 		{
@@ -185,14 +186,7 @@ namespace Feather {
 
 					if (IsSelectedAsset && ImGui::BeginPopupContextItem())
 					{
-						if (ImGui::Selectable("rename"))
-						{
-							m_Rename = true;
-						}
-						if (ImGui::Selectable("delete"))
-						{
-							F_TRACE("TEST DELETING FOR '{}'", *assetItr);
-						}
+						OpenAssetContext(*assetItr);
 						ImGui::EndPopup();
 					}
 
@@ -329,6 +323,29 @@ namespace Feather {
 
 		if (hasAsset)
 			ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, std::format("Asset name '{}' already exists!", checkName).c_str());
+	}
+
+	void AssetDisplay::OpenAssetContext(const std::string& assetName)
+	{
+		if (ImGui::Selectable("rename"))
+		{
+			m_Rename = true;
+		}
+		if (ImGui::Selectable("delete"))
+		{
+			if (m_eSelectedType == AssetType::SCENE)
+			{
+				// TODO: Check if scene name already exists
+			}
+			else
+			{
+				auto& assetManager = MAIN_REGISTRY().GetAssetManager();
+				if (!assetManager.DeleteAsset(assetName, m_eSelectedType))
+				{
+					F_ERROR("Failed to delete asset '{}'", assetName);
+				}
+			}
+		}
 	}
 
 }

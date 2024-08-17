@@ -14,8 +14,12 @@
 #include "Sounds/MusicPlayer/MusicPlayer.h"
 #include "Sounds/SoundPlayer/SoundFXPlayer.h"
 #include "Physics/Box2DWrappers.h"
-#include "../Utilities/EditorFramebuffers.h"
+#include "Physics/ContactListener.h"
 #include "Logger/Logger.h"
+
+#include "../Utilities/EditorFramebuffers.h"
+#include "../Scene/SceneManager.h"
+#include "../Scene/SceneObject.h"
 
 #include <imgui.h>
 
@@ -23,8 +27,8 @@ constexpr float one_over_sixty = 1.0f / 60.0f;
 
 namespace Feather {
 
-	SceneDisplay::SceneDisplay(Registry& registry)
-		: m_Registry{ registry }, m_PlayScene{ false }, m_SceneLoaded{ false }
+	SceneDisplay::SceneDisplay()
+		: m_PlayScene{ false }, m_SceneLoaded{ false }
 	{}
 
 	void SceneDisplay::Draw()
@@ -111,10 +115,15 @@ namespace Feather {
 		if (!m_PlayScene)
 			return;
 
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		if (!currentScene)
+			return;
+
+		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& coreGlobals = CORE_GLOBALS();
 
-		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
+		auto& camera = runtimeRegistry.GetContext<std::shared_ptr<Camera2D>>();
 		if (!camera)
 		{
 			F_FATAL("Failed to get the camera from the registry context!");
@@ -122,27 +131,44 @@ namespace Feather {
 		}
 		camera->Update();
 
-		auto& scriptSystem = m_Registry.GetContext<std::shared_ptr<ScriptingSystem>>();
+		auto& scriptSystem = runtimeRegistry.GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Update();
 
 		if (coreGlobals.IsPhysicsEnabled())
 		{
-			auto& physicsWorld = m_Registry.GetContext<PhysicsWorld>();
+			auto& physicsWorld = runtimeRegistry.GetContext<PhysicsWorld>();
 			physicsWorld->Step(one_over_sixty, coreGlobals.GetVelocityIterations(), coreGlobals.GetPositionIterations());
 			physicsWorld->ClearForces();
 		}
 
-		auto& physicsSystem = m_Registry.GetContext<std::shared_ptr<PhysicsSystem>>();
-		physicsSystem->Update(m_Registry.GetRegistry());
+		auto& physicsSystem = runtimeRegistry.GetContext<std::shared_ptr<PhysicsSystem>>();
+		physicsSystem->Update(runtimeRegistry.GetRegistry());
 
-		auto& animationSystem = m_Registry.GetContext<std::shared_ptr<AnimationSystem>>();
+		auto& animationSystem = runtimeRegistry.GetContext<std::shared_ptr<AnimationSystem>>();
 		animationSystem->Update();
 	}
 
 	void SceneDisplay::LoadScene()
 	{
-		auto& scriptSystem = m_Registry.GetContext<std::shared_ptr<ScriptingSystem>>();
-		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		if (!currentScene)
+			return;
+		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
+
+		const auto& canvas = currentScene->GetCanvas();
+		runtimeRegistry.AddToContext<std::shared_ptr<Camera2D>>(std::make_shared<Camera2D>(canvas.width, canvas.height));
+
+		auto physicsWorld = runtimeRegistry.AddToContext<PhysicsWorld>(std::make_shared<b2World>(b2Vec2{ 0.0f, 9.8f }));
+		auto contactListener = runtimeRegistry.AddToContext<std::shared_ptr<ContactListener>>(std::make_shared<ContactListener>());
+		physicsWorld->SetContactListener(contactListener.get());
+
+		// Add necessary systems
+		auto scriptSystem = runtimeRegistry.AddToContext<std::shared_ptr<ScriptingSystem>>(std::make_shared<ScriptingSystem>(runtimeRegistry));
+
+		runtimeRegistry.AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>(runtimeRegistry));
+		runtimeRegistry.AddToContext<std::shared_ptr<PhysicsSystem>>(std::make_shared<PhysicsSystem>(runtimeRegistry));
+
+		auto lua = runtimeRegistry.AddToContext<std::shared_ptr<sol::state>>(std::make_shared<sol::state>());
 
 		if (!lua)
 			lua = std::make_shared<sol::state>();
@@ -155,8 +181,8 @@ namespace Feather {
 							sol::lib::string,
 							sol::lib::package);
 
-		ScriptingSystem::RegisterLuaBindings(*lua, m_Registry);
-		ScriptingSystem::RegisterLuaFunctions(*lua, m_Registry);
+		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
+		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
 
 		if (!scriptSystem->LoadMainScript(*lua))
 		{
@@ -172,10 +198,16 @@ namespace Feather {
 	{
 		m_PlayScene = false;
 		m_SceneLoaded = false;
-		m_Registry.GetRegistry().clear();
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 
-		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
-		lua.reset();
+		runtimeRegistry.ClearRegistry();
+		runtimeRegistry.RemoveContext<std::shared_ptr<Camera2D>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<sol::state>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<PhysicsWorld>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<ContactListener>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<AnimationSystem>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<PhysicsSystem>>();
 
 		auto& mainRegistry = MAIN_REGISTRY();
 		mainRegistry.GetMusicPlayer().Stop();
@@ -199,9 +231,15 @@ namespace Feather {
 		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		renderer->ClearBuffers(true, true, false);
 
-		renderSystem->Update();
-		renderShapeSystem->Update();
-		renderUISystem->Update(m_Registry.GetRegistry());
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+
+		if (currentScene && m_PlayScene)
+		{
+			auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
+			renderSystem->Update(runtimeRegistry);
+			renderShapeSystem->Update(runtimeRegistry);
+			renderUISystem->Update(runtimeRegistry);
+		}
 		fb->Unbind();
 		fb->CheckResize();
 	}

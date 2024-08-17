@@ -9,9 +9,8 @@
 
 namespace Feather {
 
-	RenderUISystem::RenderUISystem(Registry& registry)
-		: m_Registry{ registry },
-		m_SpriteRenderer{ std::make_unique<SpriteBatchRenderer>() },
+	RenderUISystem::RenderUISystem()
+		: m_SpriteRenderer{ std::make_unique<SpriteBatchRenderer>() },
 		m_TextRenderer{ std::make_unique<TextBatchRenderer>() },
 		m_Camera2D{ nullptr }
 	{
@@ -24,12 +23,12 @@ namespace Feather {
 		m_Camera2D->Update();
 	}
 
-	void RenderUISystem::Update(entt::registry& registry)
+	void RenderUISystem::Update(Registry& registry)
 	{
 		auto& mainRegistry = MAIN_REGISTRY();
 
 		// If there are no entities in the view, leave
-		auto textView = registry.view<TextComponent, TransformComponent>();
+		auto textView = registry.GetRegistry().view<TextComponent, TransformComponent>();
 		if (textView.size_hint() < 1)
 			return;
 

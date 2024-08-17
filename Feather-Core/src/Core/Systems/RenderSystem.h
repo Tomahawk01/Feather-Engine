@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Core/ECS/Registry.h"
 #include "Renderer/Core/BatchRenderer.h"
 
@@ -8,13 +7,12 @@ namespace Feather {
 	class RenderSystem
 	{
 	public:
-		RenderSystem(Feather::Registry& registry);
+		RenderSystem();
 		~RenderSystem() = default;
 
-		void Update();
+		void Update(Feather::Registry& registry);
 
 	private:
-		Feather::Registry& m_Registry;
 		std::unique_ptr<Feather::SpriteBatchRenderer> m_BatchRenderer;
 	};
 

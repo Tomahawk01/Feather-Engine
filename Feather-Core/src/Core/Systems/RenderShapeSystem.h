@@ -9,13 +9,12 @@ namespace Feather {
 	class RenderShapeSystem
 	{
 	public:
-		RenderShapeSystem(Feather::Registry& registry);
+		RenderShapeSystem();
 		~RenderShapeSystem() = default;
 
-		void Update();
+		void Update(Registry& registry);
 
 	private:
-		Feather::Registry& m_Registry;
 		std::unique_ptr<Feather::RectBatchRenderer> m_RectRenderer;
 		std::unique_ptr<Feather::CircleBatchRenderer> m_CircleRenderer;
 	};
