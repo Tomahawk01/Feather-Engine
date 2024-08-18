@@ -1,5 +1,6 @@
 #pragma once
-
+#include "Core/ECS/Components/AllComponents.h"
+#include "Physics/UserData.h"
 
 namespace Feather {
 
@@ -13,6 +14,20 @@ namespace Feather {
 	{
 		int width{ 640 }, height{ 480 };
 		int tileWidth{ 16 }, tileHeight{ 16 };
+	};
+
+	struct Tile
+	{
+		uint32_t id{ entt::null };
+		TransformComponent transform{};
+		SpriteComponent sprite{};
+		AnimationComponent animation{};
+		BoxColliderComponent boxCollider{};
+		CircleColliderComponent circleCollider{};
+		PhysicsComponent physics{};
+		ObjectData objectData{};
+
+		bool isCollider{ false }, hasAnimation{ false }, hasPhysics{ false }, isCircle{ false };
 	};
 
 }
