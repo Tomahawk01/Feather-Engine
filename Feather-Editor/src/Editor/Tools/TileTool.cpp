@@ -47,9 +47,6 @@ namespace Feather {
 
 	const std::string& TileTool::GetSpriteTexture() const
 	{
-		if (!m_MouseTile)
-			return std::string{ "" };
-
 		return m_MouseTile->sprite.texture_name;
 	}
 

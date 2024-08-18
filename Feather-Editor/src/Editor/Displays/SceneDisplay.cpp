@@ -46,20 +46,28 @@ namespace Feather {
 		auto playTexture = assetManager.GetTexture("play_button");
 		auto stopTexture = assetManager.GetTexture("stop_button");
 
+		static int numStyleColors = 0;
+
 		// Play button
 		if (m_PlayScene)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
+
+			numStyleColors += 3;
 		}
 
 		if (ImGui::ImageButton((ImTextureID)playTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && !m_SceneLoaded)
 		{
 			LoadScene();
 		}
-		if (ImGui::GetColorStackSize() > 0)
-			ImGui::PopStyleColor(ImGui::GetColorStackSize());
+
+		if (numStyleColors > 0)
+		{
+			ImGui::PopStyleColor(numStyleColors);
+			numStyleColors = 0;
+		}
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
 			ImGui::SetTooltip("Play Scene");
 
@@ -71,6 +79,8 @@ namespace Feather {
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
+
+			numStyleColors += 3;
 		}
 
 		RenderScene();
@@ -79,8 +89,12 @@ namespace Feather {
 		{
 			UnloadScene();
 		}
-		if (ImGui::GetColorStackSize() > 0)
-			ImGui::PopStyleColor(ImGui::GetColorStackSize());
+
+		if (numStyleColors > 0)
+		{
+			ImGui::PopStyleColor(numStyleColors);
+			numStyleColors = 0;
+		}
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
 			ImGui::SetTooltip("Stop Scene");
 
@@ -214,7 +228,7 @@ namespace Feather {
 		mainRegistry.GetSoundPlayer().Stop(-1);
 	}
 
-	void SceneDisplay::RenderScene()
+	void SceneDisplay::RenderScene() const
 	{
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();

@@ -18,7 +18,7 @@ namespace Feather {
 		void LoadScene();
 		void UnloadScene();
 
-		void RenderScene();
+		void RenderScene() const;
 
 	private:
 		bool m_PlayScene;
