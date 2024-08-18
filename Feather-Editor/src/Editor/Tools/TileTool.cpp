@@ -12,7 +12,7 @@ namespace Feather {
 
 	TileTool::TileTool()
 		: AbstractTool(),
-		m_MouseRect{ 16.0f }, m_GridCoords{ 0.0f }, m_GridSnap{ true },
+		m_MouseRect{ 32.0f }, m_GridCoords{ 0.0f }, m_GridSnap{ true },
 		m_BatchRenderer{ std::make_shared<SpriteBatchRenderer>() },
 		m_MouseTile{ std::make_shared<Tile>() }
 	{}

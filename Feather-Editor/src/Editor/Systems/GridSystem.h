@@ -12,7 +12,7 @@ namespace Feather {
 		GridSystem();
 		~GridSystem() = default;
 
-		void Update(/*class SceneObject& currentScene, */ Camera2D& camera);
+		void Update(class SceneObject& currentScene, Camera2D& camera);
 
 	private:
 		std::unique_ptr<RectBatchRenderer> m_BatchRenderer;

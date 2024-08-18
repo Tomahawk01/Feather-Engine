@@ -18,6 +18,7 @@ namespace Feather {
 
 	private:
 		void RenderTilemap();
+		void LoadNewScene();
 	private:
 		std::unique_ptr<Camera2D> m_TilemapCam;
 	};

@@ -6,15 +6,18 @@
 #include "Renderer/Essentials/Primitives.h"
 #include "Renderer/Essentials/Vertex.h"
 
+#include "../Scene/SceneObject.h"
+
 namespace Feather {
 
 	GridSystem::GridSystem()
 		: m_BatchRenderer{ std::make_unique<RectBatchRenderer>() }
 	{}
 
-	void GridSystem::Update(Camera2D& camera)
+	void GridSystem::Update(SceneObject& currentScene, Camera2D& camera)
 	{
 		auto& assetManager = MAIN_REGISTRY().GetAssetManager();
+		const auto& canvas = currentScene.GetCanvas();
 		auto camMat = camera.GetCameraMatrix();
 		auto colorShader = assetManager.GetShader("color");
 		colorShader->Enable();
@@ -22,8 +25,8 @@ namespace Feather {
 
 		m_BatchRenderer->Begin();
 
-		int tileWidth{ 32 }, tileHeight{ 32 };
-		int canvasWidth{ 640 }, canvasHeight{ 480 };
+		int tileWidth{ canvas.tileWidth }, tileHeight{ canvas.tileHeight };
+		int canvasWidth{ canvas.width }, canvasHeight{ canvas.height };
 
 		int cols = canvasWidth / tileWidth;
 		int rows = canvasHeight / tileHeight;

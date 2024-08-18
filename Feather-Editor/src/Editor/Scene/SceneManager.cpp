@@ -2,6 +2,8 @@
 #include "SceneObject.h"
 #include "Utils/FeatherUtilities.h"
 #include "Logger/Logger.h"
+#include "../Tools/ToolManager.h"
+#include "../Tools/TileTool.h"
 
 namespace Feather {
 
@@ -54,6 +56,26 @@ namespace Feather {
 	std::vector<std::string> SceneManager::GetSceneNames() const
 	{
 		return GetKeys(m_mapScenes);
+	}
+
+	ToolManager& SceneManager::GetToolManager()
+	{
+		if (!m_ToolManager)
+			m_ToolManager = std::make_unique<ToolManager>();
+
+		F_ASSERT(m_ToolManager && "Tool manager must be valid!");
+		return *m_ToolManager;
+	}
+
+	void SceneManager::SetTileset(const std::string& tileset)
+	{
+		m_CurrentTileset = tileset;
+		if (!m_ToolManager)
+			return;
+
+		auto activeTool = m_ToolManager->GetActiveTool();
+		if (activeTool)
+			activeTool->LoadSpriteTextureData(m_CurrentTileset);
 	}
 
 }

@@ -4,6 +4,10 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Utils/FeatherUtilities.h"
 
+#include "../Scene/SceneManager.h"
+#include "../Tools/ToolManager.h"
+#include "../Tools/TileTool.h"
+
 #include <imgui.h>
 
 namespace Feather {
@@ -27,7 +31,10 @@ namespace Feather {
 			{
 				bool IsSelected = m_Tileset == tileset;
 				if (ImGui::Selectable(tileset.c_str(), IsSelected))
+				{
 					m_Tileset = tileset;
+					SCENE_MANAGER().SetTileset(tileset);
+				}
 
 				if (IsSelected)
 					ImGui::SetItemDefaultFocus();
@@ -84,7 +91,9 @@ namespace Feather {
 					if (ImGui::ImageButton((ImTextureID)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
 					{
 						m_Selected = id;
-						F_INFO("StartX: {}, StartY: {}", j, i);
+						auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
+						if (activeTool)
+							activeTool->SetSpriteUVs(j, i);
 					}
 
 					ImGui::PopID();
