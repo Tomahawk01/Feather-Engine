@@ -11,7 +11,7 @@ namespace Feather {
 		: m_MouseScreenCoords{ 0.0f }, m_MouseWorldCoords{ 0.0f },
 		m_GUICursorCoords{ 0.0f }, m_GUIRelativeCoords{ 0.0f },
 		m_WindowPos{ 0.0f }, m_WindowSize{ 0.0f },
-		m_Activated{ false }, m_OutOfBounds{ false }
+		m_Activated{ false }, m_OutOfBounds{ false }, m_OverTileMapWindow{ false }
 	{}
 
 	void AbstractTool::Update(Canvas& canvas)
@@ -53,11 +53,7 @@ namespace Feather {
 		auto boundsWidth{ canvas.width - canvas.tileWidth * 0.5f };
 		auto boundsHeight{ canvas.height - canvas.tileHeight * 0.5f };
 
-		if (m_WindowPos.x <= m_GUICursorCoords.x && m_WindowPos.x + m_WindowSize.x >= m_GUICursorCoords.x &&
-			m_WindowPos.y <= m_GUICursorCoords.y && m_WindowPos.y + m_WindowSize.y >= m_GUICursorCoords.y &&
-			m_MouseScreenCoords.x > 0.0f && m_MouseScreenCoords.y > 0.0f &&
-			m_MouseScreenCoords.x < m_WindowSize.x && m_MouseScreenCoords.y < m_WindowSize.y &&
-			m_MouseWorldCoords.x <= boundsWidth && m_MouseWorldCoords.y <= boundsHeight &&
+		if (m_MouseWorldCoords.x <= boundsWidth && m_MouseWorldCoords.y <= boundsHeight &&
 			m_MouseWorldCoords.x >= 0.0f && m_MouseWorldCoords.y >= 0.0f)
 		{
 			m_OutOfBounds = false;

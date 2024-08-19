@@ -71,7 +71,13 @@ namespace Feather {
 
 	void CreateTileTool::RemoveTile()
 	{
+		const auto& mouseWorldCoords = GetMouseWorldCoords();
 
+		if (auto id = CheckForTile(mouseWorldCoords); id != entt::null)
+		{
+			Entity tileToRemove{ CreateEntity(id) };
+			tileToRemove.Kill();
+		}
 	}
 
 }
