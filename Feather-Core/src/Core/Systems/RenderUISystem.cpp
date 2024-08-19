@@ -6,6 +6,9 @@
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Resources/AssetManager.h"
 #include "Renderer/Essentials/Font.h"
+#include "Renderer/Core/BatchRenderer.h"
+#include "Renderer/Core/TextBatchRenderer.h"
+#include "Renderer/Core/Camera2D.h"
 
 namespace Feather {
 
@@ -22,6 +25,9 @@ namespace Feather {
 		);
 		m_Camera2D->Update();
 	}
+
+	RenderUISystem::~RenderUISystem()
+	{}
 
 	void RenderUISystem::Update(Registry& registry)
 	{

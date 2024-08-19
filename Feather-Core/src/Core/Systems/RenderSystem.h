@@ -1,8 +1,10 @@
 #pragma once
 #include "Core/ECS/Registry.h"
-#include "Renderer/Core/BatchRenderer.h"
 
 namespace Feather {
+
+	class Camera2D;
+	class SpriteBatchRenderer;
 
 	class RenderSystem
 	{
@@ -10,7 +12,7 @@ namespace Feather {
 		RenderSystem();
 		~RenderSystem() = default;
 
-		void Update(Feather::Registry& registry);
+		void Update(Feather::Registry& registry, Camera2D& camera);
 
 	private:
 		std::unique_ptr<Feather::SpriteBatchRenderer> m_BatchRenderer;

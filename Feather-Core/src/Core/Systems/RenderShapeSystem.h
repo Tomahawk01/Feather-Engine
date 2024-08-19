@@ -1,10 +1,11 @@
 #pragma once
-
 #include "Core/ECS/Registry.h"
-#include "Renderer/Core/RectBatchRenderer.h"
-#include "Renderer/Core/CircleBatchRenderer.h"
 
 namespace Feather {
+
+	class Camera2D;
+	class RectBatchRenderer;
+	class CircleBatchRenderer;
 
 	class RenderShapeSystem
 	{
@@ -12,7 +13,7 @@ namespace Feather {
 		RenderShapeSystem();
 		~RenderShapeSystem() = default;
 
-		void Update(Registry& registry);
+		void Update(Registry& registry, Camera2D& camera);
 
 	private:
 		std::unique_ptr<Feather::RectBatchRenderer> m_RectRenderer;

@@ -5,6 +5,7 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Renderer/Core/Camera2D.h"
+#include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Essentials/Shader.h"
 
 namespace Feather {
@@ -13,7 +14,7 @@ namespace Feather {
 		: m_BatchRenderer{ std::make_unique<SpriteBatchRenderer>() }
 	{}
 
-	void RenderSystem::Update(Registry& registry)
+	void RenderSystem::Update(Registry& registry, Camera2D& camera)
 	{
 		auto view = registry.GetRegistry().view<SpriteComponent, TransformComponent>();
 		if (view.size_hint() < 1)
@@ -22,10 +23,8 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& assetManager = mainRegistry.GetAssetManager();
 
-		auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
-
 		const auto& spriteShader = assetManager.GetShader("basic");
-		auto cam_mat = camera->GetCameraMatrix();
+		auto cam_mat = camera.GetCameraMatrix();
 
 		if (spriteShader->ShaderProgramID() == 0)
 		{
@@ -44,7 +43,7 @@ namespace Feather {
 			const auto& transform = view.get<TransformComponent>(entity);
 			const auto& sprite = view.get<SpriteComponent>(entity);
 
-			if (!EntityInView(transform, sprite.width, sprite.height, *camera))
+			if (!EntityInView(transform, sprite.width, sprite.height, camera))
 				continue;
 
 			if (sprite.texture_name.empty() || sprite.isHidden)

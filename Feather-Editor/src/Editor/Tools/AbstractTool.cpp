@@ -16,8 +16,8 @@ namespace Feather {
 
 	void AbstractTool::Update(Canvas& canvas)
 	{
-		CheckOutOfBounds(canvas);
 		UpdateMouseWorldCoords();
+		CheckOutOfBounds(canvas);
 	}
 
 	bool AbstractTool::SetupTool(Registry* registry, Camera2D* camera)
@@ -48,9 +48,24 @@ namespace Feather {
 		m_MouseWorldCoords = m_Camera->ScreenCoordsToWorld(m_MouseScreenCoords);
 	}
 
-	void AbstractTool::CheckOutOfBounds(Canvas& canvas)
+	void AbstractTool::CheckOutOfBounds(const Canvas& canvas)
 	{
-		// TODO: Ensure mouse cursor is within desired location
+		auto boundsWidth{ canvas.width - canvas.tileWidth * 0.5f };
+		auto boundsHeight{ canvas.height - canvas.tileHeight * 0.5f };
+
+		if (m_WindowPos.x <= m_GUICursorCoords.x && m_WindowPos.x + m_WindowSize.x >= m_GUICursorCoords.x &&
+			m_WindowPos.y <= m_GUICursorCoords.y && m_WindowPos.y + m_WindowSize.y >= m_GUICursorCoords.y &&
+			m_MouseScreenCoords.x > 0.0f && m_MouseScreenCoords.y > 0.0f &&
+			m_MouseScreenCoords.x < m_WindowSize.x && m_MouseScreenCoords.y < m_WindowSize.y &&
+			m_MouseWorldCoords.x <= boundsWidth && m_MouseWorldCoords.y <= boundsHeight &&
+			m_MouseWorldCoords.x >= 0.0f && m_MouseWorldCoords.y >= 0.0f)
+		{
+			m_OutOfBounds = false;
+		}
+		else
+		{
+			m_OutOfBounds = true;
+		}
 	}
 
 	bool AbstractTool::MouseButtonJustPressed(MouseButton button)

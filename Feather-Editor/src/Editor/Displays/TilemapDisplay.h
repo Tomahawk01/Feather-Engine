@@ -1,6 +1,8 @@
 #pragma once
 #include "IDisplay.h"
 
+#include "glm/glm.hpp"
+
 #include <string>
 
 namespace Feather {
@@ -19,6 +21,7 @@ namespace Feather {
 	private:
 		void RenderTilemap();
 		void LoadNewScene();
+		void PanZoomCamera(const glm::vec2& mousePos);
 	private:
 		std::unique_ptr<Camera2D> m_TilemapCam;
 	};

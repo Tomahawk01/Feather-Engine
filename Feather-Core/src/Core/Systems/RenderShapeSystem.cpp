@@ -5,6 +5,8 @@
 #include "Core/CoreUtils/CoreUtilities.h"
 
 #include "Renderer/Core/Camera2D.h"
+#include "Renderer/Core/RectBatchRenderer.h"
+#include "Renderer/Core/CircleBatchRenderer.h"
 #include "Renderer/Essentials/Primitives.h"
 
 namespace Feather {
@@ -13,17 +15,16 @@ namespace Feather {
 		: m_RectRenderer{ std::make_unique<RectBatchRenderer>() }, m_CircleRenderer{ std::make_unique<CircleBatchRenderer>() }
 	{}
 
-	void RenderShapeSystem::Update(Registry& registry)
+	void RenderShapeSystem::Update(Registry& registry, Camera2D& camera)
 	{
 		if (!CoreEngineData::GetInstance().RenderCollidersEnabled())
 			return;
 
-		auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
 		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
 
 		// Box
 		auto colorShader = assetManager->GetShader("color");
-		auto cam_mat = camera->GetCameraMatrix();
+		auto cam_mat = camera.GetCameraMatrix();
 
 		colorShader->Enable();
 		colorShader->SetUniformMat4("uProjection", cam_mat);
@@ -35,7 +36,7 @@ namespace Feather {
 			const auto& transform = boxView.get<TransformComponent>(entity);
 			const auto& boxCollider = boxView.get<BoxColliderComponent>(entity);
 
-			if (!EntityInView(transform, static_cast<float>(boxCollider.width), static_cast<float>(boxCollider.height), *camera))
+			if (!EntityInView(transform, static_cast<float>(boxCollider.width), static_cast<float>(boxCollider.height), camera))
 				continue;
 
 			glm::mat4 model = TRSModel(transform, boxCollider.width, boxCollider.height);

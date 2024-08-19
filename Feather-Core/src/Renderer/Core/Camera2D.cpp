@@ -9,8 +9,7 @@ namespace Feather {
 	Feather::Camera2D::Camera2D(int width, int height)
 		: m_Width{ width }, m_Height{ height }, m_Scale{ 1.0f }, m_Position{ 0.0f }, m_ScreenOffset{ 0.0f }, m_CameraMatrix{ 1.0f }, m_OrthoProjection{ 1.0f }, m_NeedUpdate{ true }
 	{
-		m_OrthoProjection = glm::ortho(0.0f, static_cast<float>(m_Width), static_cast<float>(m_Height), 0.0f, 0.0f, 1.0f);
-		Update();
+		Initialize();
 	}
 
 	void Camera2D::Update()
@@ -19,7 +18,7 @@ namespace Feather {
 			return;
 
 		// Translate
-		glm::vec3 translate{ -m_Position.x, -m_Position.y, 0.0f };
+		glm::vec3 translate{ -m_Position.x + m_ScreenOffset.x, -m_Position.y + m_ScreenOffset.y, 0.0f };
 		m_CameraMatrix = glm::translate(m_OrthoProjection, translate);
 
 		// Scale
@@ -29,7 +28,23 @@ namespace Feather {
 		m_NeedUpdate = false;
 	}
 
-	glm::vec2 Camera2D::ScreenCoordsToWorld(const glm::vec2& screenCoords)
+	void Camera2D::Reset()
+	{
+		m_Scale = 1.0f;
+		m_Position = glm::vec2{ 0.0f };
+		m_ScreenOffset = glm::vec2{ 0.0f };
+		m_NeedUpdate = true;
+	}
+
+	void Camera2D::Resize(int width, int height)
+	{
+		m_Width = width;
+		m_Height = height;
+
+		Initialize();
+	}
+
+	glm::vec2 Camera2D::ScreenCoordsToWorld(const glm::vec2& screenCoords) const
 	{
 		glm::vec2 worldCoords{ screenCoords };
 
@@ -41,7 +56,7 @@ namespace Feather {
 		return worldCoords;
 	}
 
-	glm::vec2 Camera2D::WorldCoordsToScreen(const glm::vec2& worldCoords)
+	glm::vec2 Camera2D::WorldCoordsToScreen(const glm::vec2& worldCoords) const
 	{
 		glm::vec2 screenCoords{ worldCoords };
 
@@ -50,6 +65,14 @@ namespace Feather {
 		screenCoords -= m_Position;
 
 		return screenCoords;
+	}
+
+	void Camera2D::Initialize()
+	{
+		float width = static_cast<float>(m_Width);
+		float height = static_cast<float>(m_Height);
+		m_OrthoProjection = glm::ortho(0.0f, width, height, 0.0f, 0.0f, 1.0f);
+		Update();
 	}
 
 }

@@ -4,8 +4,10 @@
 #include "Core/Systems/RenderSystem.h"
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
+#include "Core/Scripting/InputManager.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
+#include "Windowing/Input/Mouse.h"
 #include "Logger/Logger.h"
 
 #include "../Systems/GridSystem.h"
@@ -59,6 +61,8 @@ namespace Feather {
 				activeTool->SetCursorCoords(glm::vec2{ io.MousePos.x, io.MousePos.y });
 				activeTool->SetWindowPos(glm::vec2{ windowPos.x, windowPos.y });
 				activeTool->SetWindowSize(glm::vec2{ windowSize.x, windowSize.y });
+
+				activeTool->SetOverTilemapWindow(ImGui::IsWindowHovered());
 			}
 
 			ImGui::Image((ImTextureID)fb->GetTextureID(), imageSize, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f });
@@ -71,9 +75,17 @@ namespace Feather {
 				{
 					SCENE_MANAGER().SetCurrentScene(std::string{ (const char*)payload->Data });
 					LoadNewScene();
+					m_TilemapCam->Reset();
 				}
 
 				ImGui::EndDragDropTarget();
+			}
+
+			// Check for resize based on window size
+			if (fb->GetWidth() != static_cast<int>(windowSize.x) || fb->GetHeight() != static_cast<int>(windowSize.y))
+			{
+				fb->Resize(static_cast<int>(windowSize.x), static_cast<int>(windowSize.y));
+				m_TilemapCam->Resize(static_cast<int>(windowSize.x), static_cast<int>(windowSize.y));
 			}
 
 			ImGui::EndChild();
@@ -89,8 +101,9 @@ namespace Feather {
 			return;
 
 		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
-		if (activeTool && !ImGui::GetDragDropPayload())
+		if (activeTool && activeTool->IsOverTilemapWindow() && !ImGui::GetDragDropPayload())
 		{
+			PanZoomCamera(activeTool->GetMouseScreenCoords());
 			activeTool->Update(currentScene->GetCanvas());
 			activeTool->Create();
 		}
@@ -125,8 +138,8 @@ namespace Feather {
 		auto& gridSystem = mainRegistry.GetContext<std::shared_ptr<GridSystem>>();
 		gridSystem->Update(*currentScene, *m_TilemapCam);
 
-		renderSystem->Update(currentScene->GetRegistry());
-		renderShapeSystem->Update(currentScene->GetRegistry());
+		renderSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
+		renderShapeSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
 		renderUISystem->Update(currentScene->GetRegistry());
 
 		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
@@ -157,6 +170,58 @@ namespace Feather {
 			if (!SCENE_MANAGER().GetCurrentTileset().empty())
 				activeTool->LoadSpriteTextureData(SCENE_MANAGER().GetCurrentTileset());
 		}
+	}
+
+	void TilemapDisplay::PanZoomCamera(const glm::vec2& mousePos)
+	{
+		if (!m_TilemapCam)
+			return;
+
+		auto& mouse = INPUT_MANAGER().GetMouse();
+		if (!mouse.IsButtonJustPressed(F_MOUSE_MIDDLE) && !mouse.IsButtonPressed(F_MOUSE_MIDDLE) && mouse.GetMouseWheelY() == 0)
+			return;
+
+		static glm::vec2 startPosition{ 0.0f };
+		auto screenOffset = m_TilemapCam->GetScreenOffset();
+		bool isOffsetChanged{ false }, isScaleChanged{ false };
+
+		if (mouse.IsButtonJustPressed(F_MOUSE_MIDDLE))
+			startPosition = mousePos;
+
+		if (mouse.IsButtonPressed(F_MOUSE_MIDDLE))
+		{
+			screenOffset += (mousePos - startPosition);
+			isOffsetChanged = true;
+		}
+
+		glm::vec2 currentWorldPos = m_TilemapCam->ScreenCoordsToWorld(mousePos);
+		float scale = m_TilemapCam->GetScale();
+
+		if (mouse.GetMouseWheelY() == 1)
+		{
+			scale += 0.2f;
+			isScaleChanged = true;
+			isOffsetChanged = true;
+		}
+		else if (mouse.GetMouseWheelY() == -1)
+		{
+			scale -= 0.2f;
+			isScaleChanged = true;
+			isOffsetChanged = true;
+		}
+
+		scale = std::clamp(scale, 1.0f, 10.0f);
+
+		if (isScaleChanged)
+			m_TilemapCam->SetScale(scale);
+
+		glm::vec2 afterMovePos = m_TilemapCam->ScreenCoordsToWorld(mousePos);
+
+		screenOffset += (afterMovePos - currentWorldPos);
+		if (isOffsetChanged)
+			m_TilemapCam->SetScreenOffset(screenOffset);
+
+		startPosition = mousePos;
 	}
 
 }

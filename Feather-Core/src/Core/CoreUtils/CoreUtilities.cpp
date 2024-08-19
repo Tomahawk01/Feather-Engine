@@ -5,7 +5,7 @@ namespace Feather {
 
     bool EntityInView(const TransformComponent& transform, float width, float height, const Camera2D& camera)
     {
-		const auto& cameraPos = camera.GetPosition();
+		const auto& cameraPos = camera.GetPosition() - camera.GetScreenOffset();
 		const auto& cameraWidth = camera.GetWidth();
 		const auto& cameraHeight = camera.GetHeight();
 		const auto& cameraScale = camera.GetScale();

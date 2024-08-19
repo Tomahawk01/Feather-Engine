@@ -200,17 +200,19 @@ namespace Feather {
 
 		if (m_GridSnap)
 		{
-			glm::vec2 mouseGrid{ 0.0f };
-			if (mouseWorldPos.x >= 0.0f)
-				mouseGrid.x = static_cast<int>((mouseWorldPos.x / (m_MouseRect.x * transform.scale.x) * cameraScale));
-			if (mouseWorldPos.y >= 0.0f)
-				mouseGrid.y = static_cast<int>((mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) * cameraScale));
+			glm::vec2 mouseGrid{
+				mouseWorldPos.x / (m_MouseRect.x * transform.scale.x) * cameraScale,
+				mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) * cameraScale
+			};
 
-			transform.position.x = std::floor(mouseGrid.x / cameraScale) * m_MouseRect.x * transform.scale.x;
-			transform.position.y = std::floor(mouseGrid.y / cameraScale) * m_MouseRect.y * transform.scale.y;
+			float scaledGridToCamX = std::floor(mouseGrid.x / cameraScale);
+			float scaledGridToCamY = std::floor(mouseGrid.y / cameraScale);
 
-			m_GridCoords.x = mouseGrid.x / cameraScale;
-			m_GridCoords.y = mouseGrid.y / cameraScale;
+			transform.position.x = scaledGridToCamX * m_MouseRect.x * transform.scale.x;
+			transform.position.y = scaledGridToCamY * m_MouseRect.y * transform.scale.y;
+
+			m_GridCoords.x = scaledGridToCamX;
+			m_GridCoords.y = scaledGridToCamY;
 
 			SetMouseWorldCoords(transform.position);
 		}

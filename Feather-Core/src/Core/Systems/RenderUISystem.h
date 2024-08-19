@@ -1,17 +1,17 @@
 #pragma once
-
-#include "Renderer/Core/BatchRenderer.h"
-#include "Renderer/Core/TextBatchRenderer.h"
-#include "Renderer/Core/Camera2D.h"
 #include "Core/ECS/Registry.h"
 
 namespace Feather {
 	
+	class Camera2D;
+	class SpriteBatchRenderer;
+	class TextBatchRenderer;
+
 	class RenderUISystem
 	{
 	public:
 		RenderUISystem();
-		~RenderUISystem() = default;
+		~RenderUISystem();
 
 		void Update(Registry& registry);
 

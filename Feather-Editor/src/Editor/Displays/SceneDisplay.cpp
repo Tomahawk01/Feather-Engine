@@ -250,8 +250,9 @@ namespace Feather {
 		if (currentScene && m_PlayScene)
 		{
 			auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
-			renderSystem->Update(runtimeRegistry);
-			renderShapeSystem->Update(runtimeRegistry);
+			auto& camera = runtimeRegistry.GetContext<std::shared_ptr<Camera2D>>();
+			renderSystem->Update(runtimeRegistry, *camera);
+			renderShapeSystem->Update(runtimeRegistry, *camera);
 			renderUISystem->Update(runtimeRegistry);
 		}
 		fb->Unbind();

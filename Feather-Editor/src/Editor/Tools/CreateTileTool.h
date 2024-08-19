@@ -11,6 +11,10 @@ namespace Feather {
 
 		virtual void Create() override;
 		virtual void Draw() override;
+
+	private:
+		void CreateNewTile();
+		void RemoveTile();
 	};
 
 }

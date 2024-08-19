@@ -15,9 +15,21 @@ namespace Feather {
 	}
 
 	template<typename TContext>
+	inline TContext* Registry::TryGetContext()
+	{
+		return m_Registry->ctx().find<TContext>();
+	}
+
+	template<typename TContext>
 	inline bool Registry::RemoveContext()
 	{
 		return m_Registry->ctx().erase<TContext>();
+	}
+
+	template<typename TContext>
+	inline bool Registry::HasContext()
+	{
+		return m_Registry->ctx().contains<TContext>();
 	}
 
 	template <typename TComponent>

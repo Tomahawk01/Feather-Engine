@@ -28,19 +28,22 @@ namespace Feather {
 
 		inline void Activate() { m_Activated = true; }
 		inline void Deactivate() { m_Activated = false; }
+		inline void SetOverTilemapWindow(bool isOverWindow) { m_OverTileMapWindow = isOverWindow; }
+
 		inline const bool IsActivated() const { return m_Activated; }
 		inline const bool OutOfBounds() const { return m_OutOfBounds; }
+		inline const bool IsOverTilemapWindow() const { return m_OverTileMapWindow; }
 
 	private:
 		void UpdateMouseWorldCoords();
-		void CheckOutOfBounds(Canvas& canvas);
+		void CheckOutOfBounds(const Canvas& canvas);
 
 	private:
 		glm::vec2 m_MouseScreenCoords, m_MouseWorldCoords;
 		glm::vec2 m_GUICursorCoords, m_GUIRelativeCoords;
 		glm::vec2 m_WindowPos, m_WindowSize;
 
-		bool m_Activated, m_OutOfBounds;
+		bool m_Activated, m_OutOfBounds, m_OverTileMapWindow;
 
 	protected:
 		enum class MouseButton
