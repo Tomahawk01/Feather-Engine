@@ -10,6 +10,7 @@ namespace Feather {
 	public:
 		Camera2D();
 		Camera2D(int width, int height);
+		~Camera2D();
 
 		void Update();
 		void Reset();

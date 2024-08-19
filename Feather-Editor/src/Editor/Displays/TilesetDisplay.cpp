@@ -12,6 +12,9 @@
 
 namespace Feather {
 
+	TilesetDisplay::~TilesetDisplay()
+	{}
+
 	void TilesetDisplay::Draw()
 	{
 		if (!ImGui::Begin("Tileset"))
@@ -88,7 +91,7 @@ namespace Feather {
 					// Create unique id for the buttons
 					ImGui::PushID(k++);
 
-					if (ImGui::ImageButton((ImTextureID)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
+					if (ImGui::ImageButton((ImTextureID)(intptr_t)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
 					{
 						m_Selected = id;
 						auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();

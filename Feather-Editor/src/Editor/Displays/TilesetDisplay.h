@@ -9,7 +9,7 @@ namespace Feather {
 	{
 	public:
 		TilesetDisplay() = default;
-		~TilesetDisplay() = default;
+		virtual ~TilesetDisplay();
 
 		virtual void Draw() override;
 

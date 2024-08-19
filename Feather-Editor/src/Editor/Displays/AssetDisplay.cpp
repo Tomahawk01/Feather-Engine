@@ -177,7 +177,7 @@ namespace Feather {
 					if (textureID == 0)
 						break;
 
-					ImGui::ImageButton((ImTextureID)textureID, ImVec2{ m_AssetSize, m_AssetSize });
+					ImGui::ImageButton((ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
 
 					if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0) && !m_Rename)
 						m_SelectedID = id;
@@ -193,7 +193,7 @@ namespace Feather {
 					if (ImGui::BeginDragDropSource())
 					{
 						ImGui::SetDragDropPayload(m_DragSource.c_str(), assetName, (strlen(assetName) + 1) * sizeof(char), ImGuiCond_Once);
-						ImGui::Image((ImTextureID)textureID, DRAG_ASSET_SIZE);
+						ImGui::Image((ImTextureID)(intptr_t)textureID, DRAG_ASSET_SIZE);
 						ImGui::EndDragDropSource();
 					}
 

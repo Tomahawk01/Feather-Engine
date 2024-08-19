@@ -58,7 +58,7 @@ namespace Feather {
 			numStyleColors += 3;
 		}
 
-		if (ImGui::ImageButton((ImTextureID)playTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && !m_SceneLoaded)
+		if (ImGui::ImageButton((ImTextureID)(intptr_t)playTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && !m_SceneLoaded)
 		{
 			LoadScene();
 		}
@@ -85,7 +85,7 @@ namespace Feather {
 
 		RenderScene();
 
-		if (ImGui::ImageButton((ImTextureID)stopTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && m_SceneLoaded)
+		if (ImGui::ImageButton((ImTextureID)(intptr_t)stopTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && m_SceneLoaded)
 		{
 			UnloadScene();
 		}
@@ -106,7 +106,7 @@ namespace Feather {
 			ImGui::SetCursorPos(ImVec2{ 0.0f, 0.0f });
 
 			ImGui::Image(
-				(ImTextureID)fb->GetTextureID(),
+				(ImTextureID)(intptr_t)fb->GetTextureID(),
 				ImVec2{
 					 static_cast<float>(fb->GetWidth()),
 					 static_cast<float>(fb->GetHeight())

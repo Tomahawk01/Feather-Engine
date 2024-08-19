@@ -12,6 +12,9 @@ namespace Feather {
 		Initialize();
 	}
 
+	Camera2D::~Camera2D()
+	{}
+
 	void Camera2D::Update()
 	{
 		if (!m_NeedUpdate)

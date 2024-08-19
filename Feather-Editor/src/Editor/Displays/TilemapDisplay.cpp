@@ -65,7 +65,7 @@ namespace Feather {
 				activeTool->SetOverTilemapWindow(ImGui::IsWindowHovered());
 			}
 
-			ImGui::Image((ImTextureID)fb->GetTextureID(), imageSize, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f });
+			ImGui::Image((ImTextureID)(intptr_t)fb->GetTextureID(), imageSize, ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f });
 
 			// Accept scene drop target
 			if (ImGui::BeginDragDropTarget())
