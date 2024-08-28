@@ -9,13 +9,13 @@ namespace Feather {
 
 	struct Color
 	{
-		GLubyte r, g, b, a;
+		GLubyte r{ 255 }, g{ 255 }, b{ 255 }, a{ 255 };
 	};
 
 	struct Vertex
 	{
 		glm::vec2 position{ 0.0f }, uvs{ 0.0f };
-		Color color{ .r = 255, .g = 255,.b = 255, .a = 255 };
+		Color color{ .r = 255, .g = 255, .b = 255, .a = 255 };
 
 		void set_color(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
 		{

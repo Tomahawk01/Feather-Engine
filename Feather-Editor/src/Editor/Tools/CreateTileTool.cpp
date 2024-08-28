@@ -37,7 +37,7 @@ namespace Feather {
 
 		shader->Enable();
 		auto camMat = m_Camera->GetCameraMatrix();
-		shader->SetUniformMat4("u_Projection", camMat);
+		shader->SetUniformMat4("uProjection", camMat);
 		DrawMouseSprite();
 		shader->Disable();
 	}

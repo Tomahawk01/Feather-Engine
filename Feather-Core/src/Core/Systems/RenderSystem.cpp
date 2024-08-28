@@ -34,7 +34,7 @@ namespace Feather {
 
 		// Enable shader
 		spriteShader->Enable();
-		spriteShader->SetUniformMat4("u_Projection", cam_mat);
+		spriteShader->SetUniformMat4("uProjection", cam_mat);
 
 		m_BatchRenderer->Begin();
 

@@ -6,11 +6,11 @@ layout (location = 2) in vec4 in_Color;
 
 out vec2 FragUVs;
 out vec4 FragColor;
-uniform mat4 u_Projection;
+uniform mat4 uProjection;
 
 void main()
 {
-	gl_Position = u_Projection * vec4(in_Position, 1.0);
+	gl_Position = uProjection * vec4(in_Position, 1.0);
 	FragUVs = in_TexCoords;
 	FragColor = in_Color;
 }

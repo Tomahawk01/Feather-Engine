@@ -35,6 +35,7 @@ namespace Feather {
 		void SetPhysics(bool hasPhysics);
 
 		const bool SpriteValid() const;
+		const bool CanDrawOrCreate() const;
 
 		inline void EnableGridSnap() { m_GridSnap = true; }
 		inline void DisableGridSnap() { m_GridSnap = false; }

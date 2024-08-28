@@ -124,6 +124,11 @@ namespace Feather {
 		return !m_MouseTile->sprite.texture_name.empty();
 	}
 
+	const bool TileTool::CanDrawOrCreate() const
+	{
+		return IsActivated() && !OutOfBounds() && IsOverTilemapWindow() && SpriteValid();
+	}
+
 	uint32_t TileTool::CheckForTile(const glm::vec2& position)
 	{
 		if (!m_Registry)
