@@ -29,14 +29,16 @@ project "Feather-Core"
         "%{wks.location}/vendor/entt/include",
         "%{wks.location}/vendor/lua_53/include",
         "%{wks.location}/vendor/sol3",
-        "%{wks.location}/vendor/box2d/include"
+        "%{wks.location}/vendor/box2d/include",
+        "%{wks.location}/vendor/tinyfiledialogs/include"
     }
 
     libdirs
     {
         "%{wks.location}/vendor/SDL/lib",
         "%{wks.location}/vendor/lua_53/lib",
-        "%{wks.location}/vendor/box2d/lib"
+        "%{wks.location}/vendor/box2d/lib",
+        "%{wks.location}/vendor/tinyfiledialogs/lib"
     }
 
     links
@@ -45,6 +47,7 @@ project "Feather-Core"
         "SDL2.lib",
         "SDL2_mixer.lib",
         "lua53.lib",
+        "tinyfiledialogs64.lib",
         "Box2D",
         "SOIL"
     }

@@ -26,7 +26,7 @@ If you are using Visual Studio 2022 press `F5` key.
 * [Glad](https://glad.dav1d.de/) as OpenGL loader
 * [glm](https://github.com/g-truc/glm) math library
 * [soil](https://github.com/littlstar/soil) for editor embedded textures loading
-* [stb_image.h](https://github.com/nothings/stb/blob/master/stb_image.h) for image loading
+* [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h) for image loading
 * [stb_truetype](https://github.com/nothings/stb/blob/master/stb_truetype.h) for characters rasterisation
 * [entt](https://github.com/skypjack/entt) for Entity Component System
 * [Box2D](https://github.com/erincatto/box2d) for a physics system
@@ -34,6 +34,7 @@ If you are using Visual Studio 2022 press `F5` key.
 * [Premake](https://premake.github.io/) for project building automatization
 * [Sol](https://github.com/ThePhD/sol2) to bind Lua functions, user types, etc. 
 * [ImGui](https://github.com/ocornut/imgui) for editor GUI
+* [tinyfiledialogs](https://sourceforge.net/projects/tinyfiledialogs) for file dialogs
 
 ## Games made using Feather Engine
 To play any available game created by the developer of this engine check [Releases](https://github.com/Tomahawk01/Feather-Engine/releases) tab.
@@ -46,12 +47,12 @@ The main goal was to test capabilities of the engine at that point of time.
 ### *Images*
 
 ### *Contorls*
-
-`W S` - Move forward, backward <br>
-`A D` - Rotate left, right <br>
-`Space` or `LMB` - Shoot <br>
-`Shift` - Speed up <br>
-
-`Enter` - Restart after Game Over <br>
+| **Key** | **Function** |
+| ------- | ------------ |
+| `W S`   | Move forward, backward |
+| `A D`   | Rotate left, right |
+| `Space` or `LMB` | Shoot |
+| `Shift` | Speed up |
+| `Enter` | Restart after Game Over |
 
 this is WIP

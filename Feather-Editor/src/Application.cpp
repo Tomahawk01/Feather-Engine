@@ -27,6 +27,7 @@
 #include <SDL_opengl.h>
 
 // Displays
+#include "Editor/Displays/MenuDisplay.h"
 #include "Editor/Displays/SceneDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
 #include "Editor/Displays/TilesetDisplay.h"
@@ -423,6 +424,13 @@ namespace Feather {
 			return false;
 		}
 
+		auto menuDisplay = std::make_unique<MenuDisplay>();
+		if (!menuDisplay)
+		{
+			F_ERROR("Failed to create a Menu Display");
+			return false;
+		}
+
 		auto sceneDisplay = std::make_unique<SceneDisplay>();
 		if (!sceneDisplay)
 		{
@@ -458,6 +466,7 @@ namespace Feather {
 			return false;
 		}
 
+		displayHolder->displays.push_back(std::move(menuDisplay));
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
 		displayHolder->displays.push_back(std::move(tilesetDisplay));

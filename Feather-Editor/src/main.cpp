@@ -10,11 +10,11 @@ int main()
 {
 #ifdef DEBUG
 #ifdef _WIN32
-	ShowWindow(GetConsoleWindow(), SW_SHOW);
+	ShowWindow(GetConsoleWindow(), 1);
 #endif
 #else
 #ifdef _WIN32
-	ShowWindow(GetConsoleWindow(), SW_HIDE);
+	ShowWindow(GetConsoleWindow(), 0);
 #endif
 #endif
 
