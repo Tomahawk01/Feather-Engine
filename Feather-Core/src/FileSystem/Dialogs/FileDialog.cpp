@@ -4,7 +4,7 @@
 
 namespace Feather {
 
-	std::string FileDialog::OpenFileDialog(const std::string& title, const std::string& defaultPath, const std::vector<const char*> filters, const std::string& filterDesc)
+	std::string FileDialog::OpenFileDialog(const std::string& title, const std::string& defaultPath, const std::vector<const char*>& filters, const std::string& filterDesc)
 	{
 		const char* file = tinyfd_openFileDialog(title.c_str(), defaultPath.c_str(), filters.size(), filters.data(), filterDesc.c_str(), 1);
 		if (!file)
@@ -13,7 +13,7 @@ namespace Feather {
 		return std::string{ file };
 	}
 
-	std::string FileDialog::SaveFileDialog(const std::string& title, const std::string& defaultPath, const std::vector<const char*> filters, const std::string& filterDesc)
+	std::string FileDialog::SaveFileDialog(const std::string& title, const std::string& defaultPath, const std::vector<const char*>& filters, const std::string& filterDesc)
 	{
 		const char* file = tinyfd_saveFileDialog(title.c_str(), defaultPath.c_str(), filters.size(), filters.data(), filterDesc.c_str());
 		if (!file)
