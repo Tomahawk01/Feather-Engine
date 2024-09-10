@@ -155,29 +155,48 @@ namespace Feather {
 		);
 	}
 
+	void CreateQuaternionLuaBind(sol::state& lua)
+	{
+		lua.new_usertype<glm::quat>(
+			"quat",
+			sol::call_constructor,
+			sol::constructors<glm::quat(float, float, float, float)>(),
+			"x",
+			&glm::quat::x,
+			"y",
+			&glm::quat::y,
+			"z",
+			&glm::quat::z,
+			"w",
+			&glm::quat::w,
+			"normalize",
+			[](const glm::quat& q) { return glm::normalize(q); },
+			"conjugate",
+			[](const glm::quat& q) { return glm::conjugate(q); },
+			"cross",
+			[](const glm::quat& q, const glm::quat& q2) { return glm::cross(q, q2); },
+			"dot",
+			[](const glm::quat& q, const glm::quat& q2) { return glm::dot(q, q2); });
+	}
+
 	// Helper math functions
 	void MathFreeFunctions(sol::state& lua)
 	{
-		lua.set_function("distance", sol::overload(
+		lua.set_function("F_distance", sol::overload(
 			[](glm::vec2& a, glm::vec2& b) { return glm::distance(a, b); },
 			[](glm::vec3& a, glm::vec3& b) { return glm::distance(a, b); },
 			[](glm::vec4& a, glm::vec4& b) { return glm::distance(a, b); }
 		));
 
-		lua.set_function("lerp", [](float a, float b, float t) { return std::lerp(a, b, t); });
-		lua.set_function("clamp", sol::overload(
+		lua.set_function("F_lerp", [](float a, float b, float t) { return std::lerp(a, b, t); });
+
+		lua.set_function("F_clamp", sol::overload(
 			[](float value, float min, float max) { return std::clamp(value, min, max); },
 			[](double value, double min, double max) { return std::clamp(value, min, max); },
 			[](int value, int min, int max) { return std::clamp(value, min, max); }
 		));
 
-		lua.set_function("distance", sol::overload(
-			[](glm::vec2& a, glm::vec2& b) { return glm::distance(a, b); },
-			[](glm::vec3& a, glm::vec3& b) { return glm::distance(a, b); },
-			[](glm::vec4& a, glm::vec4& b) { return glm::distance(a, b); }
-		));
-
-		lua.set_function("nearly_zero", sol::overload(
+		lua.set_function("F_nearly_zero", sol::overload(
 			[](const glm::vec2& v) {
 				return glm::epsilonEqual(v.x, 0.f, 0.001f) && glm::epsilonEqual(v.y, 0.f, 0.001f);
 			},
@@ -185,6 +204,25 @@ namespace Feather {
 				return glm::epsilonEqual(v.x, 0.f, 0.001f) && glm::epsilonEqual(v.y, 0.f, 0.001f) && glm::epsilonEqual(v.z, 0.f, 0.001f);
 			}
 		));
+
+		lua.set_function("F_dot_product", sol::overload(
+			[](const glm::vec2& v1, const glm::vec2& v2) {
+				return glm::dot(v1, v2);
+			},
+			[](const glm::vec3& v1, const glm::vec3& v2) {
+				return glm::dot(v1, v2);
+			},
+			[](const glm::vec4& v1, const glm::vec4& v2) {
+				return glm::dot(v1, v2);
+			}));
+
+		lua.set_function("F_cross_product", sol::overload(
+			[](const glm::vec2& v1, const glm::vec2& v2) { 
+				return v1.x * v2.y - v2.x * v1.y;
+			},
+			[](const glm::vec3& v1, const glm::vec3& v2) {
+				return glm::cross(v1, v2);
+			}));
 	}
 
 	void MathConstants(sol::state& lua)

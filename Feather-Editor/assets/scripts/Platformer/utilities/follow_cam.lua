@@ -32,13 +32,13 @@ function FollowCam:Update(entity_id)
     new_cam_pos.x = (transform.position.x - cam_width / (2 * self.m_Scale)) * self.m_Scale
     new_cam_pos.y = (transform.position.y - cam_height / (2 * self.m_Scale)) * self.m_Scale
 
-    new_cam_pos.x = clamp(new_cam_pos.x, self.m_MinX, self.m_MaxX)
-    new_cam_pos.y = clamp(new_cam_pos.y, self.m_MinY, self.m_MaxY)
+    new_cam_pos.x = F_clamp(new_cam_pos.x, self.m_MinX, self.m_MaxX)
+    new_cam_pos.y = F_clamp(new_cam_pos.y, self.m_MinY, self.m_MaxY)
 
     self.m_Cam.set_position(
         vec2(
-            lerp(cam_pos.x, new_cam_pos.x, self.m_Springback),
-            lerp(cam_pos.y, new_cam_pos.y, self.m_Springback)
+            F_lerp(cam_pos.x, new_cam_pos.x, self.m_Springback),
+            F_lerp(cam_pos.y, new_cam_pos.y, self.m_Springback)
         )
     )
 end
