@@ -35,6 +35,7 @@ If you are using Visual Studio 2022 press `F5` key.
 * [Sol](https://github.com/ThePhD/sol2) to bind Lua functions, user types, etc. 
 * [ImGui](https://github.com/ocornut/imgui) for editor GUI
 * [tinyfiledialogs](https://sourceforge.net/projects/tinyfiledialogs) for file dialogs
+* [rapidjson](https://github.com/Tencent/rapidjson) for json parsing
 
 ## Games made using Feather Engine
 To play any available game created by the developer of this engine check [Releases](https://github.com/Tomahawk01/Feather-Engine/releases) tab.

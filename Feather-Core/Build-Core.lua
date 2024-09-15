@@ -30,7 +30,8 @@ project "Feather-Core"
         "%{wks.location}/vendor/lua_53/include",
         "%{wks.location}/vendor/sol3",
         "%{wks.location}/vendor/box2d/include",
-        "%{wks.location}/vendor/tinyfiledialogs/include"
+        "%{wks.location}/vendor/tinyfiledialogs/include",
+        "%{wks.location}/vendor/rapidjson/include"
     }
 
     libdirs
