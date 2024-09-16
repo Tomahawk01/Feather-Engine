@@ -30,7 +30,12 @@ namespace Feather {
 
 				if (ImGui::MenuItem("Save", "Ctrl + S"))
 				{
-					F_TRACE("Save pressed");
+					FileDialog fd{};
+					auto file = fd.SaveFileDialog("Save Tilemap Test", SDL_GetBasePath(), { "*.json" });
+					if (!file.empty())
+					{
+						// TODO: Save Tilemap
+					}
 				}
 
 				if (ImGui::MenuItem("Exit"))
