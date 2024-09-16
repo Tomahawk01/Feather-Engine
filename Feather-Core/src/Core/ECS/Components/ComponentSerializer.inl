@@ -9,6 +9,12 @@ namespace Feather {
 	}
 
 	template<typename TComponent, typename TTable>
+	inline void ComponentSerializer::Deserialize(const TTable& table, TComponent& component)
+	{
+		DeserializeComponent(table, component);
+	}
+
+	template<typename TComponent, typename TTable>
 	inline auto ComponentSerializer::Deserialize(const TTable& table)
 	{
 		if constexpr (std::is_same_v<TComponent, TransformComponent>)

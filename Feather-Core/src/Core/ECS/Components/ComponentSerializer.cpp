@@ -67,6 +67,62 @@ namespace Feather {
 	{
 	}
 
+	// ======================= Deserialization =======================
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, TransformComponent& transform)
+	{
+		transform.position = glm::vec2{
+				jsonValue["position"]["x"].GetFloat(),
+				jsonValue["position"]["y"].GetFloat()
+		};
+		transform.scale = glm::vec2{
+				jsonValue["scale"]["x"].GetFloat(),
+				jsonValue["scale"]["y"].GetFloat()
+		};
+		transform.rotation = jsonValue["rotation"].GetFloat();
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, SpriteComponent& sprite)
+	{
+		sprite.width = jsonValue["width"].GetFloat();
+		sprite.height = jsonValue["height"].GetFloat();
+		sprite.uvs = UVs{
+			.u = jsonValue["uvs"]["u"].GetFloat(),
+			.v = jsonValue["uvs"]["v"].GetFloat(),
+			.uv_width = jsonValue["uvs"]["uv_width"].GetFloat(),
+			.uv_height = jsonValue["uvs"]["uv_height"].GetFloat()
+		};
+		sprite.start_x = jsonValue["startX"].GetInt();
+		sprite.start_y = jsonValue["startY"].GetInt();
+		sprite.layer = jsonValue["layer"].GetInt();
+		sprite.isHidden = jsonValue["isHidden"].GetBool();
+		sprite.texture_name = jsonValue["sTexture"].GetString();
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, AnimationComponent& animation)
+	{
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, BoxColliderComponent& boxCollider)
+	{
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, CircleColliderComponent& circleCollider)
+	{
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, TextComponent& text)
+	{
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, PhysicsComponent& physics)
+	{
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, RigidBodyComponent& rigidBody)
+	{
+	}
+
 	TransformComponent ComponentSerializer::DeserializeTransform(const rapidjson::Value& jsonValue)
 	{
 		return TransformComponent{
