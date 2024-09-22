@@ -45,7 +45,10 @@ To play any available game created by the developer of this engine check [Releas
 ### *Description*
 As a title says this is a remake of Asteroids game from 1979.
 The main goal was to test capabilities of the engine at that point of time.
+
 ### *Images*
+![Asteroids gameplay](images/asteroids_game/gameplay.png)
+![Asteroids gameover](images/asteroids_game/game-over.png)
 
 ### *Contorls*
 | **Key** | **Function** |
