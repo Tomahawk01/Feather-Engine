@@ -4,7 +4,7 @@
 #include "rapidjson/document.h"
 
 #define SERIALIZE_COMPONENT(serializer, component) Feather::ComponentSerializer::Serialize(serializer, component)
-#define DESERIALIZE_COMPONENT(serializer, compref) Feather::ComponentSerializer::Deserialize(serializer, compref)
+#define DESERIALIZE_COMPONENT(table, compref) Feather::ComponentSerializer::Deserialize(table, compref)
 #define DESERIALIZE_COMPONENT_DEPRICATED(COMP, serailizer) Feather::ComponentSerializer::Deserialize<COMP>(serializer)
 
 namespace Feather {

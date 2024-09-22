@@ -1,6 +1,9 @@
 #include "MenuDisplay.h"
 #include "Logger/Logger.h"
 #include "FileSystem/Dialogs/FileDialog.h"
+#include "Core/Loaders/TilemapLoader.h"
+#include "../Scene/SceneManager.h"
+#include "../Scene/SceneObject.h"
 
 #include <imgui.h>
 #include <SDL.h>
@@ -21,10 +24,20 @@ namespace Feather {
 				if (ImGui::MenuItem("Open", "Ctrl + O"))
 				{
 					FileDialog fd{};
-					auto file = fd.OpenFileDialog("Open tests", SDL_GetBasePath(), { "*.png", "*.jpg" });
+					auto file = fd.OpenFileDialog("Open tilemap test", SDL_GetBasePath(), { "*.json" });
 					if (!file.empty())
 					{
-						F_TRACE("File opened: {}", file);
+						auto currentScene = SCENE_MANAGER().GetCurrentScene();
+						if (currentScene)
+						{
+							TilemapLoader tl{};
+							if (!tl.LoadTilemap(currentScene->GetRegistry(), file, true))
+								F_ERROR("Failed to load tilemap");
+						}
+						else
+						{
+							F_ERROR("Failed to load tilemap. No active scene");
+						}
 					}
 				}
 
@@ -34,7 +47,17 @@ namespace Feather {
 					auto file = fd.SaveFileDialog("Save Tilemap Test", SDL_GetBasePath(), { "*.json" });
 					if (!file.empty())
 					{
-						// TODO: Save Tilemap
+						auto currentScene = SCENE_MANAGER().GetCurrentScene();
+						if (currentScene)
+						{
+							TilemapLoader tl{};
+							if (!tl.SaveTilemap(currentScene->GetRegistry(), file, true))
+								F_ERROR("Failed to save tilemap");
+						}
+						else
+						{
+							F_ERROR("Failed to save tilemap. No active scene");
+						}
 					}
 				}
 

@@ -9,4 +9,7 @@ namespace Feather {
 	// Transform, Rotation, Scale
 	glm::mat4 TRSModel(const TransformComponent& transform, float width, float height);
 
+	std::string GetRigidBodyTypeString(RigidBodyType rigidType);
+	RigidBodyType GetRigidBodyTypeByString(const std::string rigidType);
+
 }

@@ -42,6 +42,7 @@ namespace Feather {
 		UserData* GetUserData() { return m_UserData.get(); }
 
 		const bool IsTrigger() const;
+		const PhysicsAttributes& GetAttributes() const { return m_InitialAttributes; }
 		static void CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry);
 
 	private:
