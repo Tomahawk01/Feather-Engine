@@ -12,4 +12,6 @@ namespace Feather {
 	std::string GetRigidBodyTypeString(RigidBodyType rigidType);
 	RigidBodyType GetRigidBodyTypeByString(const std::string rigidType);
 
+	void GenerateUVs(SpriteComponent& sprite, int textureWidth, int textureHeight);
+
 }

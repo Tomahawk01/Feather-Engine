@@ -10,6 +10,4 @@ namespace Feather {
 		int32_t entity_id{ -1 };
 	};
 
-
-
 }
