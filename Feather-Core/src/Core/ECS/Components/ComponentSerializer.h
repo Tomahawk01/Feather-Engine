@@ -5,7 +5,6 @@
 
 #define SERIALIZE_COMPONENT(serializer, component) Feather::ComponentSerializer::Serialize(serializer, component)
 #define DESERIALIZE_COMPONENT(table, compref) Feather::ComponentSerializer::Deserialize(table, compref)
-#define DESERIALIZE_COMPONENT_DEPRICATED(COMP, serailizer) Feather::ComponentSerializer::Deserialize<COMP>(serializer)
 
 namespace Feather {
 
@@ -21,10 +20,6 @@ namespace Feather {
 
 		template <typename TComponent, typename TTable>
 		static void Deserialize(const TTable& table, TComponent& component);
-
-		template <typename TComponent, typename TTable>
-		[[deprecated("Deprecated because this uses a lot of constexpr checks for component types")]]
-		static auto Deserialize(const TTable& table);
 
 	private:
 		static void SerializeComponent(JSONSerializer& serializer, const TransformComponent& transform);
