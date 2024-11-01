@@ -117,7 +117,7 @@ namespace Feather {
 					int nNext = n + (ImGui::GetMouseDragDelta(0).y < 0.0f ? 1 : -1);
 					if (nNext >= 0 && nNext < reverseView.size())
 					{
-						std::swap(reverseView[n], reverseView[nNext]);
+						std::swap(spriteLayers[n], spriteLayers[nNext]);
 
 						auto spriteView = currentScene->GetRegistry().GetRegistry().view<SpriteComponent, TileComponent>();
 
