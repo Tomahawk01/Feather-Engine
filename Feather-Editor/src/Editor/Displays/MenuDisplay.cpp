@@ -2,8 +2,11 @@
 #include "Logger/Logger.h"
 #include "FileSystem/Dialogs/FileDialog.h"
 #include "Core/Loaders/TilemapLoader.h"
+#include "Core/CoreUtils/CoreEngineData.h"
+
 #include "../Scene/SceneManager.h"
 #include "../Scene/SceneObject.h"
+#include "../Tools/ToolManager.h"
 
 #include <imgui.h>
 #include <SDL.h>
@@ -71,6 +74,21 @@ namespace Feather {
 
 			if (ImGui::BeginMenu("Edit"))
 			{
+				auto& coreGlobals = CORE_GLOBALS();
+
+				static bool gridSnap{ true };
+				if (ImGui::Checkbox("Enable Gridsnap", &gridSnap))
+					SCENE_MANAGER().GetToolManager().EnableGridSnap(gridSnap);
+
+				static bool showCollision{ false };
+				if (ImGui::Checkbox("Show Collision", &showCollision))
+				{
+					if (showCollision)
+						coreGlobals.EnableColliderRender();
+					else
+						coreGlobals.DisableColliderRender();
+				}
+
 				ImGui::EndMenu();
 			}
 

@@ -28,6 +28,8 @@ namespace Feather {
 		*/
 		TileTool* GetActiveTool();
 
+		void EnableGridSnap(bool enable);
+
 	private:
 		std::map<ToolType, std::unique_ptr<TileTool>> m_mapTools;
 	};

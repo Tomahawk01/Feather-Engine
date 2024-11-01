@@ -1,22 +1,16 @@
 #include "AnimationSystem.h"
+#include "Core/ECS/Registry.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 
 #include <SDL.h>
 
-#include "Core/CoreUtils/CoreUtilities.h"
-
 namespace Feather {
 
-	AnimationSystem::AnimationSystem(Registry& registry)
-		: m_Registry{registry}
-	{}
-
-	void AnimationSystem::Update()
+	void AnimationSystem::Update(Registry& registry, Camera2D& camera)
 	{
-		auto view = m_Registry.GetRegistry().view<AnimationComponent, SpriteComponent, TransformComponent>();
+		auto view = registry.GetRegistry().view<AnimationComponent, SpriteComponent, TransformComponent>();
 		if (view.size_hint() < 1)
 			return;
-
-		auto& camera = m_Registry.GetContext<std::shared_ptr<Camera2D>>();
 
 		for (auto entity : view)
 		{
@@ -24,7 +18,7 @@ namespace Feather {
 			auto& sprite = view.get<SpriteComponent>(entity);
 			auto& animation = view.get<AnimationComponent>(entity);
 
-			if (!EntityInView(transform, sprite.width, sprite.height, *camera))
+			if (!EntityInView(transform, sprite.width, sprite.height, camera))
 				continue;
 
 			if (animation.numFrames <= 0)

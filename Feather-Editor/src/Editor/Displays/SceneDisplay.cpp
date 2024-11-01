@@ -159,7 +159,7 @@ namespace Feather {
 		physicsSystem->Update(runtimeRegistry.GetRegistry());
 
 		auto& animationSystem = runtimeRegistry.GetContext<std::shared_ptr<AnimationSystem>>();
-		animationSystem->Update();
+		animationSystem->Update(runtimeRegistry, *camera);
 	}
 
 	void SceneDisplay::LoadScene()
@@ -179,7 +179,7 @@ namespace Feather {
 		// Add necessary systems
 		auto scriptSystem = runtimeRegistry.AddToContext<std::shared_ptr<ScriptingSystem>>(std::make_shared<ScriptingSystem>(runtimeRegistry));
 
-		runtimeRegistry.AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>(runtimeRegistry));
+		runtimeRegistry.AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>());
 		runtimeRegistry.AddToContext<std::shared_ptr<PhysicsSystem>>(std::make_shared<PhysicsSystem>(runtimeRegistry));
 
 		auto lua = runtimeRegistry.AddToContext<std::shared_ptr<sol::state>>(std::make_shared<sol::state>());
@@ -252,7 +252,8 @@ namespace Feather {
 			auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 			auto& camera = runtimeRegistry.GetContext<std::shared_ptr<Camera2D>>();
 			renderSystem->Update(runtimeRegistry, *camera);
-			renderShapeSystem->Update(runtimeRegistry, *camera);
+			if (CORE_GLOBALS().RenderCollidersEnabled())
+				renderShapeSystem->Update(runtimeRegistry, *camera);
 			renderUISystem->Update(runtimeRegistry);
 		}
 		fb->Unbind();

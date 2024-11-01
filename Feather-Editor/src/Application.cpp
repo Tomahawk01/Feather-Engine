@@ -188,6 +188,8 @@ namespace Feather {
 			return false;
 		}
 
+		mainRegistry.AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>());
+
 		if (!InitImGui())
 		{
 			F_FATAL("Failed to initialize ImGui!");

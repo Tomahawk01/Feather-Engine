@@ -3,6 +3,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/ECS/MainRegistry.h"
 
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/RectBatchRenderer.h"
@@ -17,13 +18,10 @@ namespace Feather {
 
 	void RenderShapeSystem::Update(Registry& registry, Camera2D& camera)
 	{
-		if (!CoreEngineData::GetInstance().RenderCollidersEnabled())
-			return;
-
-		auto& assetManager = registry.GetContext<std::shared_ptr<AssetManager>>();
+		auto& assetManager = MAIN_REGISTRY().GetAssetManager();
 
 		// Box
-		auto colorShader = assetManager->GetShader("color");
+		auto colorShader = assetManager.GetShader("color");
 		auto cam_mat = camera.GetCameraMatrix();
 
 		colorShader->Enable();
@@ -64,7 +62,7 @@ namespace Feather {
 		colorShader->Disable();
 
 		// Circle
-		auto circleShader = assetManager->GetShader("circle");
+		auto circleShader = assetManager.GetShader("circle");
 
 		circleShader->Enable();
 		circleShader->SetUniformMat4("uProjection", cam_mat);

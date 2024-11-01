@@ -137,15 +137,19 @@ namespace Feather {
 
 				if (m_MouseTile->isCollider)
 				{
-					// TODO: Add collider component
+					tile.AddComponent<BoxColliderComponent>(m_MouseTile->boxCollider);
+				}
+				if (m_MouseTile->isCircle)
+				{
+					tile.AddComponent<CircleColliderComponent>(m_MouseTile->circleCollider);
 				}
 				if (m_MouseTile->hasAnimation)
 				{
-					// TODO: Add animation component
+					tile.AddComponent<AnimationComponent>(m_MouseTile->animation);
 				}
 				if (m_MouseTile->hasPhysics)
 				{
-					// TODO: Add physics component
+					tile.AddComponent<PhysicsComponent>(m_MouseTile->physics);
 				}
 
 				tile.AddComponent<TileComponent>(static_cast<uint32_t>(tile.GetEntity()));

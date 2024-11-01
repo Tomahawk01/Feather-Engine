@@ -1,19 +1,17 @@
 #pragma once
 
-#include "Core/ECS/Registry.h"
-
 namespace Feather {
+
+	class Registry;
+	class Camera2D;
 
 	class AnimationSystem
 	{
 	public:
-		AnimationSystem(Registry& registry);
+		AnimationSystem() = default;
 		~AnimationSystem() = default;
 
-		void Update();
-
-	private:
-		Registry& m_Registry;
+		void Update(Registry& registry, Camera2D& camera);
 	};
 
 }

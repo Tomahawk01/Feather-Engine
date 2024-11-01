@@ -42,4 +42,15 @@ namespace Feather {
 		return nullptr;
 	}
 
+	void ToolManager::EnableGridSnap(bool enable)
+	{
+		for (auto& tool : m_mapTools)
+		{
+			if (enable)
+				tool.second->EnableGridSnap();
+			else
+				tool.second->DisableGridSnap();
+		}
+	}
+
 }

@@ -4,7 +4,9 @@
 #include "Core/Systems/RenderSystem.h"
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
+#include "Core/Systems/AnimationSystem.h"
 #include "Core/Scripting/InputManager.h"
+#include "Core/CoreUtils/CoreEngineData.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
 #include "Windowing/Input/Mouse.h"
@@ -108,6 +110,10 @@ namespace Feather {
 			activeTool->Create();
 		}
 
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& animationSystem = mainRegistry.GetContext<std::shared_ptr<AnimationSystem>>();
+		animationSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
+
 		m_TilemapCam->Update();
 	}
 
@@ -139,7 +145,8 @@ namespace Feather {
 		gridSystem->Update(*currentScene, *m_TilemapCam);
 
 		renderSystem->Update(currentScene->GetRegistry(), *m_TilemapCam, currentScene->GetLayerParams());
-		renderShapeSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
+		if (CORE_GLOBALS().RenderCollidersEnabled())
+			renderShapeSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
 		renderUISystem->Update(currentScene->GetRegistry());
 
 		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
