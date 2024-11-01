@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/ECS/Entity.h"
+#include "Utils/HelperUtilities.h"
 #include "../Utilities/EditorUtilities.h"
 
 namespace Feather {
@@ -13,6 +14,9 @@ namespace Feather {
 		void CopySceneToRuntime();
 		void ClearRuntimeScene();
 
+		void AddNewLayer();
+		inline std::vector<SpriteLayerParams>& GetLayerParams() { return m_LayerParams; }
+
 		inline Canvas& GetCanvas() { return m_Canvas; }
 		inline const std::string& GetSceneName() { return m_SceneName; }
 		inline Registry& GetRegistry() { return m_Registry; }
@@ -23,6 +27,7 @@ namespace Feather {
 		Registry m_Registry, m_RuntimeRegistry;
 		std::string m_SceneName;
 		Canvas m_Canvas;
+		std::vector<SpriteLayerParams> m_LayerParams;
 	};
 
 }

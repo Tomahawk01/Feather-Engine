@@ -157,30 +157,188 @@ namespace Feather {
 
 	void DrawComponentsUtil::DrawImGuiComponent(AnimationComponent& animation)
 	{
+		ImGui::SeparatorText("Animation Component");
+		ImGui::PushID(entt::type_hash<AnimationComponent>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel("num frames");
+			if (ImGui::InputInt("##1", &animation.numFrames, 1, 1))
+				animation.numFrames = std::clamp(animation.numFrames, 1, 15);
+
+			ImGui::InlineLabel("frame rate");
+			if (ImGui::InputInt("##frame_rate", &animation.frameRate, 1, 1))
+				animation.frameRate = std::clamp(animation.frameRate, 1, 25);
+
+			ImGui::InlineLabel("frame offset");
+			if (ImGui::InputInt("##frame_offset", &animation.frameOffset, 1, 1))
+				animation.frameOffset = std::clamp(animation.frameOffset, 0, 15);
+
+			ImGui::InlineLabel("vertical");
+			ImGui::Checkbox("##vertical", &animation.isVertical);
+			ImGui::InlineLabel("looped");
+			ImGui::Checkbox("##looped", &animation.isLooped);
+			ImGui::TreePop();
+			ImGui::PopItemWidth();
+		}
+		ImGui::PopID();
 	}
 
 	void DrawComponentsUtil::DrawImGuiComponent(BoxColliderComponent& boxCollider)
 	{
+		ImGui::SeparatorText("Box Collider Component");
+		ImGui::PushID(entt::type_hash<BoxColliderComponent>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel("width");
+			if (ImGui::InputInt("##width", &boxCollider.width, 4, 4))
+				boxCollider.width = std::clamp(boxCollider.width, 4, 2000);
+
+			ImGui::InlineLabel("height");
+			if (ImGui::InputInt("##height", &boxCollider.height, 4, 4))
+				boxCollider.height = std::clamp(boxCollider.height, 4, 2000);
+
+			ImGui::InlineLabel("offset");
+			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::SameLine();
+			if (ImGui::InputFloat("##offset_x", &boxCollider.offset.x, 4.0f, 4.0f))
+				boxCollider.offset.x = std::clamp(boxCollider.offset.x, 0.0f, 128.0f);
+			ImGui::SameLine();
+			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::SameLine();
+			if (ImGui::InputFloat("##offset_y", &boxCollider.offset.y, 4.0f, 4.0f))
+				boxCollider.offset.y = std::clamp(boxCollider.offset.y, 0.0f, 128.0f);
+			ImGui::TreePop();
+			ImGui::PopItemWidth();
+		}
+		ImGui::PopID();
 	}
 
-	void DrawComponentsUtil::DrawImGuiComponent(CircleColliderComponent& cirlceCollider)
+	void DrawComponentsUtil::DrawImGuiComponent(CircleColliderComponent& circleCollider)
 	{
+		ImGui::SeparatorText("Circle Collider Component");
+		ImGui::PushID(entt::type_hash<CircleColliderComponent>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel("radius");
+			if (ImGui::InputFloat("##radius", &circleCollider.radius, 4, 4))
+				circleCollider.radius = std::clamp(circleCollider.radius, 4.0f, 2000.0f);
+
+			ImGui::InlineLabel("offset");
+			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::SameLine();
+			if (ImGui::InputFloat("##offset_x", &circleCollider.offset.x, 4.0f, 4.0f))
+				circleCollider.offset.x = std::clamp(circleCollider.offset.x, 0.0f, 128.0f);
+			ImGui::SameLine();
+			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::SameLine();
+			if (ImGui::InputFloat("##offset_y", &circleCollider.offset.y, 4.0f, 4.0f))
+				circleCollider.offset.y = std::clamp(circleCollider.offset.y, 0.0f, 128.0f);
+			ImGui::TreePop();
+			ImGui::PopItemWidth();
+		}
+		ImGui::PopID();
 	}
 
 	void DrawComponentsUtil::DrawImGuiComponent(PhysicsComponent& physics)
 	{
+		ImGui::SeparatorText("Physics Component");
+		ImGui::PushID(entt::type_hash<PhysicsComponent>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// TODO: Add thing
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
 	}
 
 	void DrawComponentsUtil::DrawImGuiComponent(RigidBodyComponent& rigidBody)
 	{
+		ImGui::SeparatorText("Rigidbody Component");
+		ImGui::PushID(entt::type_hash<RigidBodyComponent>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// TODO: Add thing
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
 	}
 
 	void DrawComponentsUtil::DrawImGuiComponent(TextComponent& text)
 	{
+		ImGui::SeparatorText("Text Component");
+		ImGui::PushID(entt::type_hash<TextComponent>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			std::string sTextBuffer{ text.textStr };
+			ImGui::InlineLabel("text");
+			if (ImGui::InputText("##_textStr", sTextBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				text.textStr = std::string{ sTextBuffer.data() };
+			}
+
+			std::string fontName{ text.fontName };
+			ImGui::PushItemWidth(164.0f);
+			ImGui::InlineLabel("font");
+			if (ImGui::BeginCombo("##fontName", fontName.c_str()))
+			{
+				auto& assetManager = MAIN_REGISTRY().GetAssetManager();
+				for (const auto& font : assetManager.GetAssetKeyNames(AssetType::FONT))
+				{
+					if (ImGui::Selectable(font.c_str(), font == fontName))
+					{
+						fontName = font;
+						text.fontName = fontName;
+					}
+				}
+				ImGui::EndCombo();
+			}
+
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel("padding");
+			if (ImGui::InputInt("##padding", &text.padding, 0, 0))
+			{
+				// TODO: Add padding
+			}
+
+			ImGui::InlineLabel("wrap");
+			if (ImGui::InputFloat("##textWrap", &text.wrap, 0.0f, 0.0f))
+			{
+				// TODO: Add textWrap
+			}
+
+			ImGui::PopItemWidth();
+			ImGui::PopItemWidth();
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
 	}
 
 	void DrawComponentsUtil::DrawImGuiComponent(Identification& identification)
 	{
+		ImGui::SeparatorText("Identificaton");
+		ImGui::PushID(entt::type_hash<Identification>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			std::string sNameBuffer{ identification.name };
+			ImGui::InlineLabel("name");
+			if (ImGui::InputText("##_name", sNameBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				identification.name = std::string{ sNameBuffer.data() };
+			}
+
+			std::string sGroupBuffer{ identification.group };
+			ImGui::InlineLabel("group");
+			if (ImGui::InputText("##_group", sGroupBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				identification.group = std::string{ sGroupBuffer.data() };
+			}
+
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
 	}
 
 }

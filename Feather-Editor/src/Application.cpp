@@ -20,6 +20,8 @@
 #include <Windowing/Window/Window.h>
 #include <Physics/ContactListener.h>
 
+#include <Utils/HelperUtilities.h>
+
 // IMGUI testing
 #include <imgui_internal.h>
 #include <backends/imgui_impl_sdl2.h>
@@ -29,10 +31,11 @@
 // Displays
 #include "Editor/Displays/MenuDisplay.h"
 #include "Editor/Displays/SceneDisplay.h"
+#include "Editor/Displays/AssetDisplay.h"
+#include "Editor/Displays/TileDetailsDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
 #include "Editor/Displays/TilesetDisplay.h"
 #include "Editor/Displays/TilemapDisplay.h"
-#include "Editor/Displays/AssetDisplay.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/editor_textures.h"
@@ -459,6 +462,13 @@ namespace Feather {
 			return false;
 		}
 
+		auto tileDetailsDisplay = std::make_unique<TileDetailsDisplay>();
+		if (!tileDetailsDisplay)
+		{
+			F_ERROR("Failed to create a Tile details Display");
+			return false;
+		}
+
 		auto assetDisplay = std::make_unique<AssetDisplay>();
 		if (!assetDisplay)
 		{
@@ -470,6 +480,7 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
 		displayHolder->displays.push_back(std::move(tilesetDisplay));
+		displayHolder->displays.push_back(std::move(tileDetailsDisplay));
 		displayHolder->displays.push_back(std::move(tilemapDisplay));
 		displayHolder->displays.push_back(std::move(assetDisplay));
 
@@ -548,6 +559,7 @@ namespace Feather {
 			const auto logNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Down, 0.25f, nullptr, &centerNodeId);
 
 			ImGui::DockBuilderDockWindow("Tileset", rightNodeId);
+			ImGui::DockBuilderDockWindow("Tile Details", rightNodeId);
 			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);

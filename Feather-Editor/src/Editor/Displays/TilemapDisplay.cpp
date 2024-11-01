@@ -138,7 +138,7 @@ namespace Feather {
 		auto& gridSystem = mainRegistry.GetContext<std::shared_ptr<GridSystem>>();
 		gridSystem->Update(*currentScene, *m_TilemapCam);
 
-		renderSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
+		renderSystem->Update(currentScene->GetRegistry(), *m_TilemapCam, currentScene->GetLayerParams());
 		renderShapeSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
 		renderUISystem->Update(currentScene->GetRegistry());
 

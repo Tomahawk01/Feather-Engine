@@ -7,6 +7,9 @@
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Essentials/Shader.h"
+#include "Utils/HelperUtilities.h"
+
+#include <ranges>
 
 namespace Feather {
 
@@ -14,12 +17,8 @@ namespace Feather {
 		: m_BatchRenderer{ std::make_unique<SpriteBatchRenderer>() }
 	{}
 
-	void RenderSystem::Update(Registry& registry, Camera2D& camera)
+	void RenderSystem::Update(Registry& registry, Camera2D& camera, const std::vector<SpriteLayerParams>& layerFilters)
 	{
-		auto view = registry.GetRegistry().view<SpriteComponent, TransformComponent>();
-		if (view.size_hint() < 1)
-			return;
-
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& assetManager = mainRegistry.GetAssetManager();
 
@@ -38,10 +37,33 @@ namespace Feather {
 
 		m_BatchRenderer->Begin();
 
-		for (const auto& entity : view)
+		auto spriteView = registry.GetRegistry().view<SpriteComponent, TransformComponent>();
+		std::function<bool(entt::entity)> filterFunc;
+
+		// Check if layers are visible, if not filter them out
+		if (layerFilters.empty())
 		{
-			const auto& transform = view.get<TransformComponent>(entity);
-			const auto& sprite = view.get<SpriteComponent>(entity);
+			filterFunc = [](entt::entity) { return true; };
+		}
+		else
+		{
+			filterFunc = [&](entt::entity entity) {
+				// Only filter tiles
+				if (!registry.GetRegistry().all_of<TileComponent>(entity))
+					return true;
+
+				const auto& sprite = spriteView.get<SpriteComponent>(entity);
+				if (sprite.layer >= 0 && sprite.layer < layerFilters.size())
+					return layerFilters[sprite.layer].isVisible;
+
+				return false;
+			};
+		}
+
+		for (const auto& entity : std::views::filter(spriteView, filterFunc))
+		{
+			const auto& transform = spriteView.get<TransformComponent>(entity);
+			const auto& sprite = spriteView.get<SpriteComponent>(entity);
 
 			if (!EntityInView(transform, sprite.width, sprite.height, camera))
 				continue;

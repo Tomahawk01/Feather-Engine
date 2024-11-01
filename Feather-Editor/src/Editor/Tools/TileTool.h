@@ -4,6 +4,7 @@
 
 namespace Feather {
 
+	struct Tile;
 	class SpriteBatchRenderer;
 
 	class TileTool : public AbstractTool
@@ -40,6 +41,8 @@ namespace Feather {
 		inline void EnableGridSnap() { m_GridSnap = true; }
 		inline void DisableGridSnap() { m_GridSnap = false; }
 
+		inline Tile& GetTileData() { return *m_MouseTile; }
+
 	private:
 		glm::vec2 m_MouseRect;
 		glm::vec2 m_GridCoords;
@@ -57,7 +60,7 @@ namespace Feather {
 		virtual void ExamineMousePosition() override;
 	protected:
 		std::shared_ptr<SpriteBatchRenderer> m_BatchRenderer; // TODO: Overkill for one sprite. Remade it
-		std::shared_ptr<struct Tile> m_MouseTile;
+		std::shared_ptr<Tile> m_MouseTile;
 	};
 
 }

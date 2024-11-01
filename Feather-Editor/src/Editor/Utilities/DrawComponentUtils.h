@@ -24,7 +24,7 @@ namespace Feather {
 		static void DrawImGuiComponent(SpriteComponent& sprite);
 		static void DrawImGuiComponent(AnimationComponent& animation);
 		static void DrawImGuiComponent(BoxColliderComponent& boxCollider);
-		static void DrawImGuiComponent(CircleColliderComponent& cirlceCollider);
+		static void DrawImGuiComponent(CircleColliderComponent& circleCollider);
 		static void DrawImGuiComponent(PhysicsComponent& physics);
 		static void DrawImGuiComponent(RigidBodyComponent& rigidBody);
 		static void DrawImGuiComponent(TextComponent& text);
