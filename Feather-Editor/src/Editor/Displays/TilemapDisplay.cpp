@@ -161,7 +161,7 @@ namespace Feather {
 		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
 		if (activeTool)
 		{
-			if (!activeTool->SetupTool(currentScene->GetRegistryPtr(), m_TilemapCam.get()))
+			if (!activeTool->SetupTool(currentScene.get(), m_TilemapCam.get()))
 			{
 				F_ASSERT(false && "This should work!?");
 				__debugbreak();

@@ -15,6 +15,9 @@ namespace Feather {
 		void ClearRuntimeScene();
 
 		void AddNewLayer();
+		bool CheckLayerName(const std::string& layerName);
+
+		bool HasTileLayers() const { return !m_LayerParams.empty(); }
 		inline std::vector<SpriteLayerParams>& GetLayerParams() { return m_LayerParams; }
 
 		inline Canvas& GetCanvas() { return m_Canvas; }
@@ -28,6 +31,7 @@ namespace Feather {
 		std::string m_SceneName;
 		Canvas m_Canvas;
 		std::vector<SpriteLayerParams> m_LayerParams;
+		int m_CurrentLayer;
 	};
 
 }

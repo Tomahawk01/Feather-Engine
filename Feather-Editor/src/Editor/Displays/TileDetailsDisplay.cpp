@@ -91,6 +91,7 @@ namespace Feather {
 			ImGui::SeparatorText("Tile Layers");
 
 			auto& spriteLayers = currentScene->GetLayerParams();
+			std::string checkName{ m_RenameLayerBuff.data() };
 
 			if (ImGui::Button("Add"))
 				currentScene->AddNewLayer();
@@ -152,15 +153,32 @@ namespace Feather {
 					m_RenameLayerBuff = spriteLayer.layerName;
 				}
 
+				bool checkPassed{ currentScene->CheckLayerName(checkName) };
+
 				if (m_Renaming && isSelected)
 				{
-					// TODO: Renaming
+					ImGui::SetKeyboardFocusHere();
+					if (ImGui::InputText("##rename", m_RenameLayerBuff.data(), 255, ImGuiInputTextFlags_EnterReturnsTrue) && checkPassed)
+					{
+						spriteLayer.layerName = checkName;
+						m_RenameLayerBuff.clear();
+						m_Renaming = false;
+					}
+					else if (m_Renaming && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+					{
+						m_RenameLayerBuff.clear();
+						m_Renaming = false;
+					}
 				}
 
 				ImGui::SameLine();
 
 				// Layer visibility
 				ImGui::Checkbox(std::format("##visible_{}", spriteLayer.layerName).c_str(), &spriteLayer.isVisible);
+
+				// Display an error if the name already exists
+				if (!checkPassed && isSelected)
+					ImGui::TextColored(ImVec4{ 1.f, 0.f, 0.f, 1.f }, std::format("{} - Already exists", checkName).c_str());
 			}
 
 			ImGui::EndChild();
@@ -184,6 +202,7 @@ namespace Feather {
 
 			std::string layer{ "" };
 
+			// Set layer description
 			if (sprite.layer >= 0 && sprite.layer < scene->GetLayerParams().size())
 				layer = scene->GetLayerParams()[sprite.layer].layerName;
 
@@ -227,14 +246,19 @@ namespace Feather {
 
 		if (IsChanged)
 		{
-			auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
-			if (!texture)
+			auto tileTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
+			if (tileTool)
 			{
-				F_ERROR("Texture is not valid");
-				return;
+				tileTool->SetSpriteRect(glm::vec2{ sprite.width, sprite.height });
 			}
+			else
+			{
+				auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+				if (!texture)
+					return;
 
-			GenerateUVs(sprite, texture->GetWidth(), texture->GetHeight());
+				GenerateUVs(sprite, texture->GetWidth(), texture->GetHeight());
+			}
 		}
 	}
 

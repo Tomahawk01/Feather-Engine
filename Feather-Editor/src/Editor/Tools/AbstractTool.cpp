@@ -3,7 +3,9 @@
 #include "Core/Scripting/InputManager.h"
 #include "Core/ECS/Registry.h"
 #include "Renderer/Core/Camera2D.h"
+
 #include "../Utilities/EditorUtilities.h"
+#include "../Scene/SceneObject.h"
 
 namespace Feather {
 
@@ -20,21 +22,29 @@ namespace Feather {
 		CheckOutOfBounds(canvas);
 	}
 
-	bool AbstractTool::SetupTool(Registry* registry, Camera2D* camera)
+	bool AbstractTool::SetupTool(SceneObject* sceneObject, Camera2D* camera)
 	{
-		if (!registry)
+		if (!sceneObject)
+		{
+			F_ERROR("Failed to setup tool: SceneObject was nullptr");
+			return false;
+		}
+
+		if (!sceneObject->GetRegistryPtr())
 		{
 			F_ERROR("Failed to setup tool: Registry was nullptr");
 			return false;
 		}
+
 		if (!camera)
 		{
 			F_ERROR("Failed to setup tool: Camera was nullptr");
 			return false;
 		}
 
+		m_CurrentScene = sceneObject;
 		m_Camera = camera;
-		m_Registry = registry;
+		m_Registry = sceneObject->GetRegistryPtr();
 
 		return true;
 	}

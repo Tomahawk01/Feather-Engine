@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <ranges>
+#include <functional>
 
 namespace Feather {
 
@@ -42,6 +43,13 @@ namespace Feather {
 		node.key() = change;
 		const auto [itr, isSuccess, nType] = map.insert(std::move(node));
 		return isSuccess;
+	}
+
+	template <typename TCont, typename TFunc>
+	bool CheckContainsValue(TCont& cont, TFunc func)
+	{
+		auto itr = std::ranges::find_if(cont, func);
+		return itr == cont.end();
 	}
 
 }

@@ -2,9 +2,12 @@
 #include "Logger/Logger.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Core/Camera2D.h"
+
 #include "../Utilities/EditorUtilities.h"
+#include "../Scene/SceneObject.h"
 
 constexpr int MOUSE_SPRITE_LAYER = 10;
 
@@ -30,19 +33,22 @@ namespace Feather {
 
 	void TileTool::LoadSpriteTextureData(const std::string& textureName)
 	{
+		// We need to get the current sprite layer to ensure that if we change tilesets, the layer we are drawing on does not reset
+		int currentLayer = m_MouseTile->sprite.layer;
+
 		m_MouseTile->sprite = SpriteComponent{
 			.width = m_MouseRect.x,
 			.height = m_MouseRect.y,
 			.color = Color{255, 255, 255, 255},
 			.start_x = 0,
 			.start_y = 0,
-			.layer = 0,
+			.layer = currentLayer,
 			.texture_name = textureName
 		};
 
 		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(textureName);
 		F_ASSERT(texture && "Texture must exist");
-		m_MouseTile->sprite.generate_uvs(texture->GetWidth(), texture->GetHeight());
+		GenerateUVs(m_MouseTile->sprite, texture->GetWidth(), texture->GetHeight());
 	}
 
 	const std::string& TileTool::GetSpriteTexture() const
@@ -96,7 +102,7 @@ namespace Feather {
 
 		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
 		F_ASSERT(texture && "Texture must exist");
-		sprite.generate_uvs(texture->GetWidth(), texture->GetHeight());
+		GenerateUVs(sprite, texture->GetWidth(), texture->GetHeight());
 	}
 
 	void TileTool::SetCollider(bool isCollider)
@@ -126,7 +132,7 @@ namespace Feather {
 
 	const bool TileTool::CanDrawOrCreate() const
 	{
-		return IsActivated() && !OutOfBounds() && IsOverTilemapWindow() && SpriteValid();
+		return IsActivated() && !OutOfBounds() && IsOverTilemapWindow() && SpriteValid() && m_CurrentScene && m_CurrentScene->HasTileLayers();
 	}
 
 	uint32_t TileTool::CheckForTile(const glm::vec2& position)

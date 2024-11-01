@@ -3,10 +3,10 @@
 
 namespace Feather {
 
+	struct Canvas;
 	class Camera2D;
 	class Registry;
-
-	struct Canvas;
+	class SceneObject;
 
 	class AbstractTool
 	{
@@ -16,7 +16,7 @@ namespace Feather {
 
 		// NOTE: If overrided, ensure to call the parent update. This will make sure the mouse world coords are updated accordingly.
 		virtual void Update(Canvas& canvas);
-		bool SetupTool(Registry* registry, Camera2D* camera);
+		bool SetupTool(SceneObject* sceneObject, Camera2D* camera);
 
 		inline void SetRelativeCoords(const glm::vec2& relativeCoords) { m_GUIRelativeCoords = relativeCoords; }
 		inline void SetCursorCoords(const glm::vec2& cursorCoords) { m_GUICursorCoords = cursorCoords; }
@@ -71,6 +71,7 @@ namespace Feather {
 	protected:
 		Registry* m_Registry{ nullptr };
 		Camera2D* m_Camera{ nullptr };
+		SceneObject* m_CurrentScene{ nullptr };
 	};
 
 }
