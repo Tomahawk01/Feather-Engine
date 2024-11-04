@@ -4,6 +4,7 @@
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/ECS/MainRegistry.h"
+#include "Core/ECS/Registry.h"
 
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/RectBatchRenderer.h"

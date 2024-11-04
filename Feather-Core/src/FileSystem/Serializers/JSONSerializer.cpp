@@ -125,4 +125,12 @@ namespace Feather {
 		return *this;
 	}
 
+	JSONSerializer& JSONSerializer::AddKeyValuePair(const std::string& key, const bool& value)
+	{
+		m_Writer->Key(key.c_str());
+		m_Writer->Bool(value);
+
+		return *this;
+	}
+
 }

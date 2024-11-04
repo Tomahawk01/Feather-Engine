@@ -21,10 +21,10 @@ namespace Feather {
 		JSONSerializer& StartNewArray(const std::string& key);
 		JSONSerializer& EndArray();
 
+		JSONSerializer& AddKeyValuePair(const std::string& key, const bool& value);
+
 		template <typename TValue>
 		JSONSerializer& AddKeyValuePair(const std::string& key, const TValue& value);
-		template <>
-		JSONSerializer& AddKeyValuePair(const std::string& key, const bool& value);
 
 	private:
 		std::fstream m_FileStream;

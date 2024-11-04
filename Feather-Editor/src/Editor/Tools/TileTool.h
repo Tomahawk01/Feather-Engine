@@ -27,7 +27,7 @@ namespace Feather {
 		void SetScale(const glm::vec2& scale);
 		void SetAnimation(int numFrames, int frameRate, bool isVertical, bool isLooped, int frameOffset);
 		void SetSpriteUVs(int startX, int startY);
-		// TODO: Set physics props
+
 		void SetSpriteRect(const glm::vec2& spriteRect);
 
 		void SetCollider(bool isCollider);

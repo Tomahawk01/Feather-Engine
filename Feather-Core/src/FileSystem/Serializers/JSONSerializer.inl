@@ -16,16 +16,7 @@ namespace Feather {
 		else if constexpr (std::is_floating_point_v<TValue>)
 			m_Writer->Double(value);
 		else
-			static_assert(false, "Type is not supported!");
-
-		return *this;
-	}
-
-	template<>
-	inline JSONSerializer& JSONSerializer::AddKeyValuePair(const std::string& key, const bool& value)
-	{
-		m_Writer->Key(key.c_str());
-		m_Writer->Bool(value);
+			assert(false && "Type not supported!");
 
 		return *this;
 	}

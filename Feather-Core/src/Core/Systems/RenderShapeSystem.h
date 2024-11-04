@@ -1,11 +1,12 @@
 #pragma once
-#include "Core/ECS/Registry.h"
+#include <memory>
 
 namespace Feather {
 
 	class Camera2D;
 	class RectBatchRenderer;
 	class CircleBatchRenderer;
+	class Registry;
 
 	class RenderShapeSystem
 	{
