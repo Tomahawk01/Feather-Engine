@@ -31,6 +31,7 @@
 // Displays
 #include "Editor/Displays/MenuDisplay.h"
 #include "Editor/Displays/SceneDisplay.h"
+#include "Editor/Displays/SceneHierarchyDisplay.h"
 #include "Editor/Displays/AssetDisplay.h"
 #include "Editor/Displays/TileDetailsDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
@@ -38,6 +39,7 @@
 #include "Editor/Displays/TilemapDisplay.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
+#include "Editor/Utilities/DrawComponentUtils.h"
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Systems/GridSystem.h"
 #include "Editor/Scene/SceneManager.h"
@@ -243,6 +245,16 @@ namespace Feather {
 			return false;
 		}
 
+		DrawComponentsUtil::RegisterUIComponent<Identification>();
+		DrawComponentsUtil::RegisterUIComponent<TransformComponent>();
+		DrawComponentsUtil::RegisterUIComponent<SpriteComponent>();
+		DrawComponentsUtil::RegisterUIComponent<AnimationComponent>();
+		DrawComponentsUtil::RegisterUIComponent<PhysicsComponent>();
+		DrawComponentsUtil::RegisterUIComponent<RigidBodyComponent>();
+		DrawComponentsUtil::RegisterUIComponent<BoxColliderComponent>();
+		DrawComponentsUtil::RegisterUIComponent<CircleColliderComponent>();
+		DrawComponentsUtil::RegisterUIComponent<TextComponent>();
+
 		// TODO: Remove these test scenes
 		SCENE_MANAGER().AddScene("DefaultScene");
 		SCENE_MANAGER().AddScene("TestScene");
@@ -443,6 +455,13 @@ namespace Feather {
 			return false;
 		}
 
+		auto sceneHierarchyDisplay = std::make_unique<SceneHierarchyDisplay>();
+		if (!sceneHierarchyDisplay)
+		{
+			F_ERROR("Failed to create a Scene Hierarchy Display");
+			return false;
+		}
+
 		auto logDisplay = std::make_unique<LogDisplay>();
 		if (!logDisplay)
 		{
@@ -480,6 +499,7 @@ namespace Feather {
 
 		displayHolder->displays.push_back(std::move(menuDisplay));
 		displayHolder->displays.push_back(std::move(sceneDisplay));
+		displayHolder->displays.push_back(std::move(sceneHierarchyDisplay));
 		displayHolder->displays.push_back(std::move(logDisplay));
 		displayHolder->displays.push_back(std::move(tilesetDisplay));
 		displayHolder->displays.push_back(std::move(tileDetailsDisplay));
@@ -560,9 +580,10 @@ namespace Feather {
 			const auto rightNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Right, 0.3f, nullptr, &centerNodeId);
 			const auto logNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Down, 0.25f, nullptr, &centerNodeId);
 
+			ImGui::DockBuilderDockWindow("Object Details", rightNodeId);
 			ImGui::DockBuilderDockWindow("Tileset", rightNodeId);
 			ImGui::DockBuilderDockWindow("Tile Details", rightNodeId);
-			ImGui::DockBuilderDockWindow("Dear ImGui Demo", leftNodeId);
+			ImGui::DockBuilderDockWindow("Scene Hierarchy", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
@@ -576,8 +597,6 @@ namespace Feather {
 
 		for (const auto& display : displayHolder->displays)
 			display->Draw();
-
-		ImGui::ShowDemoWindow();
 	}
 
     Application::Application()

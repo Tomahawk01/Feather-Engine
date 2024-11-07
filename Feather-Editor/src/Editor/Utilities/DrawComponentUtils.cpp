@@ -128,6 +128,7 @@ namespace Feather {
 				sprite.start_x = glm::clamp(sprite.start_x, 0, 32); // TODO: Get texure and divide by width to get maxvalue
 				IsChanged = true;
 			}
+			ImGui::SameLine();
 			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputInt("##start_y", &sprite.start_y, 1, 1))

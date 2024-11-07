@@ -59,6 +59,9 @@ namespace Feather {
 	auto add_component(Entity& entity, const sol::table& comp, sol::this_state s);
 
 	template <typename TComponent>
+	auto add_component_default(Entity& entity);
+
+	template <typename TComponent>
 	bool has_component(Entity& entity);
 
 	template <typename TComponent>
