@@ -3,6 +3,10 @@
 
 namespace Feather {
 
+	Window::Window()
+		: Window("default_window", 640, 480, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, 0)
+	{}
+
 	Window::Window(const std::string title, int width, int height, int x_pos, int y_pos, bool v_sync, Uint32 flags)
 		: m_pWindow{ nullptr }, m_GLContext{}, m_Title{ title }, m_Width{ width }, m_Height{ height }, m_XPos{ x_pos }, m_YPos{ y_pos }, m_WindowFlags{ flags }
 	{

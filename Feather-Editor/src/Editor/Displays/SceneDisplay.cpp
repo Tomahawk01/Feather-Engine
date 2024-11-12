@@ -98,7 +98,7 @@ namespace Feather {
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
 			ImGui::SetTooltip("Stop Scene");
 
-		if (ImGui::BeginChild("##SceneChild", ImVec2{ 0.0f, 0.0f }, NULL, ImGuiWindowFlags_NoScrollWithMouse))
+		if (ImGui::BeginChild("##SceneChild", ImVec2{ 0.0f, 0.0f }, ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollWithMouse))
 		{
 			auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
 			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];

@@ -15,7 +15,7 @@ using namespace entt::literals;
 
 namespace Feather {
 
-	auto create_entity = [&](SceneObject& currentScene) {
+	auto create_entity = [](SceneObject& currentScene) {
 		Entity newEntity{ currentScene.GetRegistry(), "GameObject", "" };
 		newEntity.AddComponent<TransformComponent>();
 	};

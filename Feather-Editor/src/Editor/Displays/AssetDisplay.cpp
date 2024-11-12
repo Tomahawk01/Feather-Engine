@@ -65,7 +65,7 @@ namespace Feather {
 			ImGui::EndCombo();
 		}
 
-		if (ImGui::BeginChild("##AssetTable", ImVec2{ 0.0f, 0.0f }, NULL, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_ChildWindow))
+		if (ImGui::BeginChild("##AssetTable", ImVec2{ 0.0f, 0.0f }, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_ChildWindow))
 		{
 			m_WindowHovered = ImGui::IsWindowHovered();
 			m_WindowSelected = ImGui::IsWindowFocused();
