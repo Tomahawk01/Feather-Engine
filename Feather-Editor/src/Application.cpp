@@ -245,6 +245,7 @@ namespace Feather {
 			return false;
 		}
 
+		// Register meta fuctions
 		DrawComponentsUtil::RegisterUIComponent<Identification>();
 		DrawComponentsUtil::RegisterUIComponent<TransformComponent>();
 		DrawComponentsUtil::RegisterUIComponent<SpriteComponent>();
@@ -254,6 +255,8 @@ namespace Feather {
 		DrawComponentsUtil::RegisterUIComponent<BoxColliderComponent>();
 		DrawComponentsUtil::RegisterUIComponent<CircleColliderComponent>();
 		DrawComponentsUtil::RegisterUIComponent<TextComponent>();
+
+		CoreEngineData::RegisterMetaFunctions();
 
 		// TODO: Remove these test scenes
 		SCENE_MANAGER().AddScene("DefaultScene");

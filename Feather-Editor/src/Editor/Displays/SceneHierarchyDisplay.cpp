@@ -139,7 +139,7 @@ namespace Feather {
 					std::format("Game Object already has '{}'. Please make another selection", componentStr).c_str());
 			}
 
-			if (ImGui::Button("Ok"))
+			if (ImGui::Button("Ok") && !error)
 			{
 				if (!componentStr.empty())
 				{
@@ -159,12 +159,7 @@ namespace Feather {
 					}
 				}
 
-				if (error)
-				{
-					*addComponent = false;
-					ImGui::CloseCurrentPopup();
-				}
-				else
+				if (!error)
 				{
 					auto&& storage = registry.storage(id_type);
 					if (!storage)
@@ -177,6 +172,7 @@ namespace Feather {
 						}
 						else
 						{
+							// This should probably fail
 							F_ASSERT(addComponent && "Failed to add component");
 							*addComponent = false;
 							error = true;

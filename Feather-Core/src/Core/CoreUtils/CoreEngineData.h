@@ -38,6 +38,8 @@ namespace Feather {
 		inline const bool IsPhysicsEnabled() const { return m_PhysicsEnabled; }
 		inline const bool IsPhysicsPaused() const { return m_PhysicsPaused; }
 
+		static void RegisterMetaFunctions();
+
 	private:
 		CoreEngineData();
 		~CoreEngineData() = default;

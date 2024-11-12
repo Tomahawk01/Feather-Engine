@@ -305,27 +305,6 @@ namespace Feather {
 		PhysicsComponent::CreatePhysicsLuaBind(lua, registry.GetRegistry());
 		RigidBodyComponent::CreateRigidBodyLuaBind(lua);
 		TextComponent::CreateLuaTextBindings(lua);
-
-		Entity::RegisterMetaComponent<TransformComponent>();
-		Entity::RegisterMetaComponent<SpriteComponent>();
-		Entity::RegisterMetaComponent<AnimationComponent>();
-		Entity::RegisterMetaComponent<BoxColliderComponent>();
-		Entity::RegisterMetaComponent<CircleColliderComponent>();
-		Entity::RegisterMetaComponent<PhysicsComponent>();
-		Entity::RegisterMetaComponent<RigidBodyComponent>();
-		Entity::RegisterMetaComponent<TextComponent>();
-
-		Registry::RegisterMetaComponent<TransformComponent>();
-		Registry::RegisterMetaComponent<SpriteComponent>();
-		Registry::RegisterMetaComponent<AnimationComponent>();
-		Registry::RegisterMetaComponent<BoxColliderComponent>();
-		Registry::RegisterMetaComponent<CircleColliderComponent>();
-		Registry::RegisterMetaComponent<PhysicsComponent>();
-		Registry::RegisterMetaComponent<RigidBodyComponent>();
-		Registry::RegisterMetaComponent<TextComponent>();
-
-		// Register user data types
-		UserDataBinder::register_user_meta_data<ObjectData>();
 	}
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)

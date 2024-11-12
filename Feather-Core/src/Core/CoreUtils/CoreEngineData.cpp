@@ -1,9 +1,37 @@
 #include "CoreEngineData.h"
+#include "Core/ECS/Entity.h"
+#include "Core/ECS/Registry.h"
+#include "Core/ECS/Components/AllComponents.h"
+#include "Core/Scripting/UserDataBindings.h"
 
 namespace Feather {
 
 	constexpr float METERS_TO_PIXELS = 12.0f;
 	constexpr float PIXELS_TO_METERS = 1.0f / METERS_TO_PIXELS;
+
+	void CoreEngineData::RegisterMetaFunctions()
+	{
+		Entity::RegisterMetaComponent<TransformComponent>();
+		Entity::RegisterMetaComponent<SpriteComponent>();
+		Entity::RegisterMetaComponent<AnimationComponent>();
+		Entity::RegisterMetaComponent<BoxColliderComponent>();
+		Entity::RegisterMetaComponent<CircleColliderComponent>();
+		Entity::RegisterMetaComponent<PhysicsComponent>();
+		Entity::RegisterMetaComponent<RigidBodyComponent>();
+		Entity::RegisterMetaComponent<TextComponent>();
+
+		Registry::RegisterMetaComponent<TransformComponent>();
+		Registry::RegisterMetaComponent<SpriteComponent>();
+		Registry::RegisterMetaComponent<AnimationComponent>();
+		Registry::RegisterMetaComponent<BoxColliderComponent>();
+		Registry::RegisterMetaComponent<CircleColliderComponent>();
+		Registry::RegisterMetaComponent<PhysicsComponent>();
+		Registry::RegisterMetaComponent<RigidBodyComponent>();
+		Registry::RegisterMetaComponent<TextComponent>();
+
+		// Register user data types
+		UserDataBinder::register_user_meta_data<ObjectData>();
+	}
 
 	CoreEngineData::CoreEngineData()
 		: m_DeltaTime{ 0.0f }, m_ScaledWidth{ 0.0f }, m_ScaledHeight{ 0.0f },
