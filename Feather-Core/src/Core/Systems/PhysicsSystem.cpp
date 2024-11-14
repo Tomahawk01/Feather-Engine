@@ -5,18 +5,17 @@
 #include "Core/ECS/Components/CircleColliderComponent.h"
 #include "Core/ECS/Components/TransformComponent.h"
 #include "Core/ECS/Components/PhysicsComponent.h"
-
+#include "Core/ECS/Registry.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 
 namespace Feather {
 
-	PhysicsSystem::PhysicsSystem(Registry& registry)
-		: m_Registry{ registry }
+	PhysicsSystem::PhysicsSystem()
 	{}
 
-	void PhysicsSystem::Update(entt::registry& registry)
+	void PhysicsSystem::Update(Registry& registry)
 	{
-		auto boxView = registry.view<PhysicsComponent, TransformComponent, BoxColliderComponent>();
+		auto boxView = registry.GetRegistry().view<PhysicsComponent, TransformComponent, BoxColliderComponent>();
 		auto& coreEngine = CoreEngineData::GetInstance();
 
 		float scaledWidth = coreEngine.ScaledWidth() * 0.5f;
@@ -46,7 +45,7 @@ namespace Feather {
 				transform.rotation = glm::degrees(RigidBody->GetAngle());
 		}
 
-		auto circleView = registry.view<PhysicsComponent, TransformComponent, CircleColliderComponent>();
+		auto circleView = registry.GetRegistry().view<PhysicsComponent, TransformComponent, CircleColliderComponent>();
 		for (auto entity : circleView)
 		{
 			auto& physics = circleView.get<PhysicsComponent>(entity);

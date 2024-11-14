@@ -11,11 +11,17 @@ namespace Feather {
 	class MusicPlayer;
 	class SoundFXPlayer;
 
+	class RenderSystem;
+	class RenderUISystem;
+	class RenderShapeSystem;
+	class AnimationSystem;
+	class PhysicsSystem;
+
 	class MainRegistry
 	{
 	public:
 		static MainRegistry& GetInstance();
-		void Initialize();
+		bool Initialize();
 
 		AssetManager& GetAssetManager();
 		MusicPlayer& GetMusicPlayer();
@@ -33,6 +39,12 @@ namespace Feather {
 			return m_MainRegistry->GetContext<TContext>();
 		}
 
+		RenderSystem& GetRenderSystem();
+		RenderUISystem& GetRenderUISystem();
+		RenderShapeSystem& GetRenderShapeSystem();
+		AnimationSystem& GetAnimationSystem();
+		PhysicsSystem& GetPhysicsSystem();
+
 	private:
 		std::unique_ptr<Registry> m_MainRegistry{ nullptr };
 		bool m_Initialized{ false };
@@ -41,6 +53,8 @@ namespace Feather {
 		~MainRegistry() = default;
 		MainRegistry(const MainRegistry&) = delete;
 		MainRegistry& operator=(const MainRegistry&) = delete;
+
+		bool RegisterMainSystems();
 	};
 
 }

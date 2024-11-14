@@ -111,8 +111,8 @@ namespace Feather {
 		}
 
 		auto& mainRegistry = MAIN_REGISTRY();
-		auto& animationSystem = mainRegistry.GetContext<std::shared_ptr<AnimationSystem>>();
-		animationSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
+		auto& animationSystem = mainRegistry.GetAnimationSystem();
+		animationSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
 
 		m_TilemapCam->Update();
 	}
@@ -124,9 +124,9 @@ namespace Feather {
 		auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
 		auto& renderer = mainRegistry.GetContext<std::shared_ptr<Renderer>>();
 
-		auto& renderSystem = mainRegistry.GetContext<std::shared_ptr<RenderSystem>>();
-		auto& renderUISystem = mainRegistry.GetContext<std::shared_ptr<RenderUISystem>>();
-		auto& renderShapeSystem = mainRegistry.GetContext<std::shared_ptr<RenderShapeSystem>>();
+		auto& renderSystem = mainRegistry.GetRenderSystem();
+		auto& renderUISystem = mainRegistry.GetRenderUISystem();
+		auto& renderShapeSystem = mainRegistry.GetRenderShapeSystem();
 
 		const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::TILEMAP];
 
@@ -144,10 +144,10 @@ namespace Feather {
 		auto& gridSystem = mainRegistry.GetContext<std::shared_ptr<GridSystem>>();
 		gridSystem->Update(*currentScene, *m_TilemapCam);
 
-		renderSystem->Update(currentScene->GetRegistry(), *m_TilemapCam, currentScene->GetLayerParams());
+		renderSystem.Update(currentScene->GetRegistry(), *m_TilemapCam, currentScene->GetLayerParams());
 		if (CORE_GLOBALS().RenderCollidersEnabled())
-			renderShapeSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
-		renderUISystem->Update(currentScene->GetRegistry());
+			renderShapeSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
+		renderUISystem.Update(currentScene->GetRegistry());
 
 		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
 		if (activeTool)

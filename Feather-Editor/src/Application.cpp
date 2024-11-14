@@ -9,18 +9,9 @@
 #include <Core/CoreUtils/CoreUtilities.h>
 #include <Core/CoreUtils/CoreEngineData.h>
 
-#include <Core/Systems/ScriptingSystem.h>
-#include <Core/Systems/RenderSystem.h>
-#include <Core/Systems/RenderUISystem.h>
-#include <Core/Systems/RenderShapeSystem.h>
-#include <Core/Systems/AnimationSystem.h>
-#include <Core/Systems/PhysicsSystem.h>
-
 #include <Core/Scripting/InputManager.h>
 #include <Windowing/Window/Window.h>
 #include <Physics/ContactListener.h>
-
-#include <Utils/HelperUtilities.h>
 
 // IMGUI testing
 #include <imgui_internal.h>
@@ -136,61 +127,12 @@ namespace Feather {
 			return false;
 		}
 
-		auto renderer = std::make_shared<Renderer>();
-
-		// Enable alpha blending
-		renderer->SetCapability(Renderer::GLCapability::BLEND, true);
-		renderer->SetBlendCapability(
-			Renderer::BlendingFactors::SRC_ALPHA,
-			Renderer::BlendingFactors::ONE_MINUS_SRC_ALPHA
-		);
-
 		auto& mainRegistry = MAIN_REGISTRY();
-		mainRegistry.Initialize();
-
-		if (!mainRegistry.AddToContext<std::shared_ptr<Renderer>>(renderer))
+		if (!mainRegistry.Initialize())
 		{
-			F_FATAL("Failed to add the Renderer to the registry context!");
+			F_FATAL("Failed to initialize the main registry!");
 			return false;
 		}
-
-		auto renderSystem = std::make_shared<RenderSystem>();
-		if (!renderSystem)
-		{
-			F_FATAL("Failed to create render system!");
-			return false;
-		}
-		if (!mainRegistry.AddToContext<std::shared_ptr<RenderSystem>>(renderSystem))
-		{
-			F_FATAL("Failed to add the render system to the registry context!");
-			return false;
-		}
-
-		auto renderUISystem = std::make_shared<RenderUISystem>();
-		if (!renderUISystem)
-		{
-			F_FATAL("Failed to create render UI system!");
-			return false;
-		}
-		if (!mainRegistry.AddToContext<std::shared_ptr<RenderUISystem>>(renderUISystem))
-		{
-			F_FATAL("Failed to add the render UI system to the registry context!");
-			return false;
-		}
-
-		auto renderShapeSystem = std::make_shared<RenderShapeSystem>();
-		if (!renderShapeSystem)
-		{
-			F_FATAL("Failed to create render shape system!");
-			return false;
-		}
-		if (!mainRegistry.AddToContext<std::shared_ptr<RenderShapeSystem>>(renderShapeSystem))
-		{
-			F_FATAL("Failed to add the render shape system to the registry context!");
-			return false;
-		}
-
-		mainRegistry.AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>());
 
 		if (!InitImGui())
 		{
@@ -215,8 +157,6 @@ namespace Feather {
 			F_FATAL("Failed to create displays!");
 			return false;
 		}
-
-		renderer->SetLineWidth(4.0f);
 
 		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
 		{
@@ -246,16 +186,7 @@ namespace Feather {
 		}
 
 		// Register meta fuctions
-		DrawComponentsUtil::RegisterUIComponent<Identification>();
-		DrawComponentsUtil::RegisterUIComponent<TransformComponent>();
-		DrawComponentsUtil::RegisterUIComponent<SpriteComponent>();
-		DrawComponentsUtil::RegisterUIComponent<AnimationComponent>();
-		DrawComponentsUtil::RegisterUIComponent<PhysicsComponent>();
-		DrawComponentsUtil::RegisterUIComponent<RigidBodyComponent>();
-		DrawComponentsUtil::RegisterUIComponent<BoxColliderComponent>();
-		DrawComponentsUtil::RegisterUIComponent<CircleColliderComponent>();
-		DrawComponentsUtil::RegisterUIComponent<TextComponent>();
-
+		RegistryEditorMetaFunctions();
 		CoreEngineData::RegisterMetaFunctions();
 
 		// TODO: Remove these test scenes
@@ -600,6 +531,19 @@ namespace Feather {
 
 		for (const auto& display : displayHolder->displays)
 			display->Draw();
+	}
+
+	void Application::RegistryEditorMetaFunctions()
+	{
+		DrawComponentsUtil::RegisterUIComponent<Identification>();
+		DrawComponentsUtil::RegisterUIComponent<TransformComponent>();
+		DrawComponentsUtil::RegisterUIComponent<SpriteComponent>();
+		DrawComponentsUtil::RegisterUIComponent<AnimationComponent>();
+		DrawComponentsUtil::RegisterUIComponent<PhysicsComponent>();
+		DrawComponentsUtil::RegisterUIComponent<RigidBodyComponent>();
+		DrawComponentsUtil::RegisterUIComponent<BoxColliderComponent>();
+		DrawComponentsUtil::RegisterUIComponent<CircleColliderComponent>();
+		DrawComponentsUtil::RegisterUIComponent<TextComponent>();
 	}
 
     Application::Application()

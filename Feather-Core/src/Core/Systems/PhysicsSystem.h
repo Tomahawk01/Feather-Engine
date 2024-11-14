@@ -1,19 +1,16 @@
 #pragma once
 
-#include "Core/ECS/Registry.h"
-
 namespace Feather {
+
+	class Registry;
 
 	class PhysicsSystem
 	{
 	public:
-		PhysicsSystem(Registry& registry);
+		PhysicsSystem();
 		~PhysicsSystem() = default;
 
-		void Update(entt::registry& registry);
-
-	private:
-		Registry& m_Registry;
+		void Update(Registry& registry);
 	};
 
 }
