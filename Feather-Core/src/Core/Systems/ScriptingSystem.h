@@ -2,26 +2,25 @@
 
 #include <sol/sol.hpp>
 
-#include "Core/ECS/Registry.h"
-
 namespace Feather {
+
+	class Registry;
 
 	class ScriptingSystem
 	{
 	public:
-		ScriptingSystem(Registry& registry);
+		ScriptingSystem();
 		~ScriptingSystem() = default;
 
-		bool LoadMainScript(sol::state& lua);
-		void Update();
-		void Render();
+		bool LoadMainScript(Registry& registry, sol::state& lua);
+		void Update(Registry& registry);
+		void Render(Registry& registry);
 
 		static void RegisterLuaBindings(sol::state& lua, Registry& registry);
 
 		static void RegisterLuaFunctions(sol::state& lua, Registry& registry);
 
 	private:
-		Registry& m_Registry;
 		bool m_MainLoaded;
 	};
 

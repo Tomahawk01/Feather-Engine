@@ -70,6 +70,9 @@ namespace Feather {
 	template <typename TComponent>
 	auto remove_component(Entity& entity);
 
+	template <typename TComponent>
+	auto copy_component(Entity& entityToCopy, Entity& entityThatCopies);
+
 }
 
 #include "Entity.inl"

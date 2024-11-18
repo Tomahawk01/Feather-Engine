@@ -1,7 +1,10 @@
 #include "SceneObject.h"
 #include "Utils/FeatherUtilities.h"
+#include "Core/ECS/MetaUtilities.h"
 
 #include <format>
+
+using namespace entt::literals;
 
 namespace Feather {
 
@@ -11,10 +14,26 @@ namespace Feather {
 
 	void SceneObject::CopySceneToRuntime()
 	{
+		auto& registryToCopy = m_Registry.GetRegistry();
+
+		for (auto entityToCopy : registryToCopy.view<entt::entity>(entt::exclude<ScriptComponent>))
+		{
+			entt::entity newEntity = m_RuntimeRegistry.CreateEntity();
+
+			// Copy components of the entity to the new entity
+			for (auto&& [id, storage] : registryToCopy.storage())
+			{
+				if (!storage.contains(entityToCopy))
+					continue;
+
+				InvokeMetaFunction(id, "copy_component"_hs, Entity{ m_Registry, entityToCopy }, Entity{ m_RuntimeRegistry, newEntity });
+			}
+		}
 	}
 
 	void SceneObject::ClearRuntimeScene()
 	{
+		m_RuntimeRegistry.ClearRegistry();
 	}
 
 	void SceneObject::AddNewLayer()

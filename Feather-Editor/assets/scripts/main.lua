@@ -1,5 +1,5 @@
 -- Main Lua Script!
-
+--[[
 F_run_script("assets/scripts/Platformer/script_list.lua")
 F_load_script_table(ScriptList)
 
@@ -16,11 +16,12 @@ gStateStack = StateStack()
 
 local title = TitleState:Create(gStateStack)
 gStateStack:change_state(title)
+--]]
 
 main = {
 	[1] = {
 		update = function()
-			gStateStack:update(0.016)
+			--gStateStack:update(0.016)
 		end
 	},
 	[2] = {

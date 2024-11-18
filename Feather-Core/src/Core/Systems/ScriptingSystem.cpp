@@ -25,11 +25,11 @@
 
 namespace Feather {
 
-	ScriptingSystem::ScriptingSystem(Feather::Registry& registry)
-		: m_Registry(registry), m_MainLoaded{ false }
+	ScriptingSystem::ScriptingSystem()
+		: m_MainLoaded{ false }
 	{}
 
-	bool ScriptingSystem::LoadMainScript(sol::state& lua)
+	bool ScriptingSystem::LoadMainScript(Registry& registry, sol::state& lua)
 	{
 		try
 		{
@@ -61,7 +61,7 @@ namespace Feather {
 		sol::table render_script = main_lua[2];
 		sol::function render = render_script["render"];
 
-		Entity mainLuaScript{ m_Registry, "main_script", "" };
+		Entity mainLuaScript{ registry, "main_script", "" };
 		mainLuaScript.AddComponent<ScriptComponent>(ScriptComponent{
 					.update = update,
 					.render = render });
@@ -71,7 +71,7 @@ namespace Feather {
 		return true;
 	}
 
-	void ScriptingSystem::Update()
+	void ScriptingSystem::Update(Registry& registry)
 	{
 		if (!m_MainLoaded)
 		{
@@ -79,10 +79,10 @@ namespace Feather {
 			return;
 		}
 
-		auto view = m_Registry.GetRegistry().view<ScriptComponent>();
+		auto view = registry.GetRegistry().view<ScriptComponent>();
 		for (const auto& entity : view)
 		{
-			Entity ent{ m_Registry, entity };
+			Entity ent{ registry, entity };
 			if (ent.GetName() != "main_script")
 				continue;
 			
@@ -95,11 +95,11 @@ namespace Feather {
 			}
 		}
 
-		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
+		auto& lua = registry.GetContext<std::shared_ptr<sol::state>>();
 		if (lua) lua->collect_garbage();
 	}
 
-	void ScriptingSystem::Render()
+	void ScriptingSystem::Render(Registry& registry)
 	{
 		if (!m_MainLoaded)
 		{
@@ -107,10 +107,10 @@ namespace Feather {
 			return;
 		}
 
-		auto view = m_Registry.GetRegistry().view<ScriptComponent>();
+		auto view = registry.GetRegistry().view<ScriptComponent>();
 		for (const auto& entity : view)
 		{
-			Entity ent{ m_Registry, entity };
+			Entity ent{ registry, entity };
 			if (ent.GetName() != "main_script")
 				continue;
 
@@ -123,7 +123,7 @@ namespace Feather {
 			}
 		}
 
-		auto& lua = m_Registry.GetContext<std::shared_ptr<sol::state>>();
+		auto& lua = registry.GetContext<std::shared_ptr<sol::state>>();
 		if (lua) lua->collect_garbage();
 	}
 

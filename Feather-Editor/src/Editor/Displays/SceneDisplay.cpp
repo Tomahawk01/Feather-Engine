@@ -133,6 +133,8 @@ namespace Feather {
 		if (!currentScene)
 			return;
 
+		currentScene->CopySceneToRuntime();
+
 		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& coreGlobals = CORE_GLOBALS();
@@ -146,7 +148,7 @@ namespace Feather {
 		camera->Update();
 
 		auto& scriptSystem = runtimeRegistry.GetContext<std::shared_ptr<ScriptingSystem>>();
-		scriptSystem->Update();
+		scriptSystem->Update(runtimeRegistry);
 
 		if (coreGlobals.IsPhysicsEnabled())
 		{
@@ -177,7 +179,7 @@ namespace Feather {
 		physicsWorld->SetContactListener(contactListener.get());
 
 		// Add necessary systems
-		auto scriptSystem = runtimeRegistry.AddToContext<std::shared_ptr<ScriptingSystem>>(std::make_shared<ScriptingSystem>(runtimeRegistry));
+		auto scriptSystem = runtimeRegistry.AddToContext<std::shared_ptr<ScriptingSystem>>(std::make_shared<ScriptingSystem>());
 
 		auto lua = runtimeRegistry.AddToContext<std::shared_ptr<sol::state>>(std::make_shared<sol::state>());
 
@@ -195,7 +197,7 @@ namespace Feather {
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
 
-		if (!scriptSystem->LoadMainScript(*lua))
+		if (!scriptSystem->LoadMainScript(runtimeRegistry, *lua))
 		{
 			F_FATAL("Failed to load main lua script");
 			return;
@@ -217,6 +219,7 @@ namespace Feather {
 		runtimeRegistry.RemoveContext<std::shared_ptr<sol::state>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<PhysicsWorld>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<ContactListener>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<ScriptingSystem>>();
 
 		auto& mainRegistry = MAIN_REGISTRY();
 		mainRegistry.GetMusicPlayer().Stop();

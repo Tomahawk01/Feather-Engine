@@ -20,6 +20,7 @@ namespace Feather {
 		Entity::RegisterMetaComponent<PhysicsComponent>();
 		Entity::RegisterMetaComponent<RigidBodyComponent>();
 		Entity::RegisterMetaComponent<TextComponent>();
+		Entity::RegisterMetaComponent<TileComponent>();
 
 		Registry::RegisterMetaComponent<Identification>();
 		Registry::RegisterMetaComponent<TransformComponent>();
@@ -30,6 +31,7 @@ namespace Feather {
 		Registry::RegisterMetaComponent<PhysicsComponent>();
 		Registry::RegisterMetaComponent<RigidBodyComponent>();
 		Registry::RegisterMetaComponent<TextComponent>();
+		Registry::RegisterMetaComponent<TileComponent>();
 
 		// Register user data types
 		UserDataBinder::register_user_meta_data<ObjectData>();
