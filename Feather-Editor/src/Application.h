@@ -31,7 +31,7 @@ namespace Feather {
 		void EndImGui();
 		void RenderImGui();
 
-		void RegistryEditorMetaFunctions();
+		void RegisterEditorMetaFunctions();
 
 		Application();
 		~Application() = default;

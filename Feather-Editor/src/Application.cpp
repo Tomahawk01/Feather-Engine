@@ -186,7 +186,7 @@ namespace Feather {
 		}
 
 		// Register meta fuctions
-		RegistryEditorMetaFunctions();
+		RegisterEditorMetaFunctions();
 		CoreEngineData::RegisterMetaFunctions();
 
 		// TODO: Remove these test scenes
@@ -533,7 +533,7 @@ namespace Feather {
 			display->Draw();
 	}
 
-	void Application::RegistryEditorMetaFunctions()
+	void Application::RegisterEditorMetaFunctions()
 	{
 		DrawComponentsUtil::RegisterUIComponent<Identification>();
 		DrawComponentsUtil::RegisterUIComponent<TransformComponent>();

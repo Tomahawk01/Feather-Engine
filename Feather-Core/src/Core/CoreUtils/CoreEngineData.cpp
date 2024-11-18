@@ -11,6 +11,7 @@ namespace Feather {
 
 	void CoreEngineData::RegisterMetaFunctions()
 	{
+		Entity::RegisterMetaComponent<Identification>();
 		Entity::RegisterMetaComponent<TransformComponent>();
 		Entity::RegisterMetaComponent<SpriteComponent>();
 		Entity::RegisterMetaComponent<AnimationComponent>();
@@ -20,6 +21,7 @@ namespace Feather {
 		Entity::RegisterMetaComponent<RigidBodyComponent>();
 		Entity::RegisterMetaComponent<TextComponent>();
 
+		Registry::RegisterMetaComponent<Identification>();
 		Registry::RegisterMetaComponent<TransformComponent>();
 		Registry::RegisterMetaComponent<SpriteComponent>();
 		Registry::RegisterMetaComponent<AnimationComponent>();
