@@ -73,6 +73,7 @@ namespace Feather {
 			// Color picker
 			ImVec4 color = { sprite.color.r / 255.0f, sprite.color.g / 255.0f, sprite.color.b / 255.0f, sprite.color.a / 255.0f };
 			ImGui::InlineLabel("color");
+			ImGui::ItemToolTip("Sprite color override");
 			if (ImGui::ColorEdit4("##color", &color.x, IMGUI_COLOR_PICKER_FLAGS))
 			{
 				sprite.color.r = static_cast<GLubyte>(color.x * 255.0f);
@@ -84,6 +85,7 @@ namespace Feather {
 			auto& assetManager = MAIN_REGISTRY().GetAssetManager();
 			std::string selectedTexture{ sprite.texture_name };
 			ImGui::InlineLabel("texture");
+			ImGui::ItemToolTip("The current active texture of the sprite to be drawn");
 			if (ImGui::BeginCombo("##texture", selectedTexture.c_str()))
 			{
 				for (const std::string& textureName : assetManager.GetAssetKeyNames(AssetType::TEXTURE))
@@ -102,12 +104,14 @@ namespace Feather {
 
 			ImGui::PushItemWidth(120.0f);
 			ImGui::InlineLabel("width");
+			ImGui::ItemToolTip("The width of the sprite");
 			if (ImGui::InputFloat("##width", &sprite.width, 1.0f, 8.0f))
 			{
 				sprite.width = glm::clamp(sprite.width, 8.0f, 2000.0f);
 				IsChanged = true;
 			}
 			ImGui::InlineLabel("height");
+			ImGui::ItemToolTip("The height of the sprite");
 			if (ImGui::InputFloat("##height", &sprite.height, 1.0f, 8.0f))
 			{
 				sprite.height = glm::clamp(sprite.height, 8.0f, 2000.0f);
@@ -115,12 +119,14 @@ namespace Feather {
 			}
 
 			ImGui::InlineLabel("layer");
+			ImGui::ItemToolTip("Z-Index in which to draw the sprite");
 			if (ImGui::InputInt("##layer", &sprite.layer, 1.0f, 1.0f))
 			{
 				sprite.layer = glm::clamp(sprite.layer, 0, 99);
 			}
 
-			ImGui::InlineLabel("Sprite Sheet Position");
+			ImGui::InlineLabel("start pos");
+			ImGui::ItemToolTip("The index positions where we want to start our UV calculations");
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputInt("##start_x", &sprite.start_x, 1, 1))
@@ -176,8 +182,10 @@ namespace Feather {
 				animation.frameOffset = std::clamp(animation.frameOffset, 0, 15);
 
 			ImGui::InlineLabel("vertical");
+			ImGui::ItemToolTip("Does the sprite animations scroll vertically");
 			ImGui::Checkbox("##vertical", &animation.isVertical);
 			ImGui::InlineLabel("looped");
+			ImGui::ItemToolTip("Are the sprite animatons to be looped");
 			ImGui::Checkbox("##looped", &animation.isLooped);
 			ImGui::TreePop();
 			ImGui::PopItemWidth();
@@ -201,6 +209,7 @@ namespace Feather {
 				boxCollider.height = std::clamp(boxCollider.height, 4, 2000);
 
 			ImGui::InlineLabel("offset");
+			ImGui::ItemToolTip("The offset of the box collider from the origin. Origin is the Top Left corner");
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##offset_x", &boxCollider.offset.x, 4.0f, 4.0f))
@@ -228,6 +237,7 @@ namespace Feather {
 				circleCollider.radius = std::clamp(circleCollider.radius, 4.0f, 2000.0f);
 
 			ImGui::InlineLabel("offset");
+			ImGui::ItemToolTip("The offset of the circle collider from the origin. Origin is the Top Left corner");
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##offset_x", &circleCollider.offset.x, 4.0f, 4.0f))
@@ -261,7 +271,16 @@ namespace Feather {
 		ImGui::PushID(entt::type_hash<RigidBodyComponent>::value());
 		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// TODO: Add thing
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel("max velocity");
+			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::SameLine();
+			ImGui::InputFloat("##maxVelocity_x", &rigidBody.maxVelocity.x, 1.0f, 10.0f, "%.2f");
+			ImGui::SameLine();
+			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::SameLine();
+			ImGui::InputFloat("##maxVelocity_y", &rigidBody.maxVelocity.y, 1.0f, 10.0f, "%.2f");
+
 			ImGui::TreePop();
 		}
 		ImGui::PopID();

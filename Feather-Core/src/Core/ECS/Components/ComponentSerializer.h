@@ -39,23 +39,6 @@ namespace Feather {
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, TextComponent& text);
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, PhysicsComponent& physics);
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, RigidBodyComponent& rigidBody);
-
-		[[deprecated]]
-		static TransformComponent DeserializeTransform(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static SpriteComponent DeserializeSprite(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static AnimationComponent DeserializeAnimation(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static BoxColliderComponent DeserializeBoxCollider(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static CircleColliderComponent DeserializeCircleCollider(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static TextComponent DeserializeText(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static PhysicsComponent DeserializePhysics(const rapidjson::Value& jsonValue);
-		[[deprecated]]
-		static RigidBodyComponent DeserializeRigidBody(const rapidjson::Value& jsonValue);
 	};
 
 }

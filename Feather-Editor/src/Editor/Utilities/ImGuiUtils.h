@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <format>
 
 #include <imgui.h>
 
@@ -18,5 +19,22 @@ namespace ImGui {
 	void OffsetTextX(const std::string& label, float position);
 	void AddSpaces(int numSpaces);
 	void InlineLabel(const std::string& label, float spaceSize = 128.0f);
+
+	template <typename... Args>
+	void ItemToolTip(const std::string_view tipMsg, Args&&... args)
+	{
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::TextUnformatted(std::vformat(tipMsg, std::make_format_args(args...)).c_str());
+			ImGui::EndTooltip();
+		}
+	}
+	template <typename... Args>
+	void TextFormatted(const std::string_view text, Args&&... args)
+	{
+		ImGui::TextUnformatted(std::vformat(text, std::make_format_args(args...)).c_str());
+		ImGui::EndTooltip();
+	}
 
 }

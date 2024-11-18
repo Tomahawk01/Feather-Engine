@@ -4,11 +4,11 @@
 
 namespace Feather {
 	
-	std::string RigidBodyComponent::to_string()
+	std::string RigidBodyComponent::to_string() const
 	{
 		std::stringstream ss;
 		ss << "==== RigidBody Component ==== \n" <<
-			  "Velocity: x = " << velocity.x << ", y = " << velocity.y << "\n";
+			  "Max velocity: x = " << maxVelocity.x << ", y = " << maxVelocity.y << "\n";
 
 		return ss.str();
 	}
@@ -20,9 +20,10 @@ namespace Feather {
 			"type_id", entt::type_hash<RigidBodyComponent>::value,
 			sol::call_constructor,
 			sol::factories(
-				[](const glm::vec2& velocity) { return RigidBodyComponent{ .velocity = velocity }; }
+				[](const glm::vec2& velocity) { return RigidBodyComponent{ .maxVelocity = velocity }; }
 			),
-			"velocity", &RigidBodyComponent::velocity,
+			"currentVelocity", &RigidBodyComponent::currentVelocity,
+			"maxVelocity", &RigidBodyComponent::maxVelocity,
 			"to_string", &RigidBodyComponent::to_string
 		);
 	}
