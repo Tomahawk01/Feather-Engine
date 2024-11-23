@@ -134,8 +134,6 @@ namespace Feather {
 		if (!currentScene)
 			return;
 
-		currentScene->CopySceneToRuntime();
-
 		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& coreGlobals = CORE_GLOBALS();
@@ -170,6 +168,8 @@ namespace Feather {
 		auto currentScene = SCENE_MANAGER().GetCurrentScene();
 		if (!currentScene)
 			return;
+
+		currentScene->CopySceneToRuntime();
 		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 
 		const auto& canvas = currentScene->GetCanvas();
@@ -197,8 +197,6 @@ namespace Feather {
 
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
-
-		// LEFTOFF: Need to fix a bug when playing scene and physics won't apply to objects
 
 		// Initialize all of the physics entities
 		auto physicsEntities = runtimeRegistry.GetRegistry().view<PhysicsComponent>();
