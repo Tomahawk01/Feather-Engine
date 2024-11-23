@@ -4,18 +4,32 @@
 
 namespace Feather {
 
-	class RandomGenerator
+	class RandomIntGenerator
 	{
 	public:
-		RandomGenerator();
-		RandomGenerator(uint32_t min, uint32_t max);
+		RandomIntGenerator();
+		RandomIntGenerator(uint32_t min, uint32_t max);
 
-		float GetFloat();
-		uint32_t GetInt();
+		int GetValue();
 
 	private:
 		std::mt19937 m_MTEngine;
-		std::uniform_int_distribution<std::mt19937::result_type> m_Distribution;
+		std::uniform_int_distribution<std::mt19937::result_type> m_IntDistribution;
+
+		void Initialize();
+	};
+
+	class RandomFloatGenerator
+	{
+	public:
+		RandomFloatGenerator();
+		RandomFloatGenerator(float min, float max);
+
+		float GetValue();
+
+	private:
+		std::mt19937 m_MTEngine;
+		std::uniform_real_distribution<> m_FloatDistribution;
 
 		void Initialize();
 	};

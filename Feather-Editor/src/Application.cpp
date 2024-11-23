@@ -26,13 +26,18 @@
 #include "Editor/Displays/AssetDisplay.h"
 #include "Editor/Displays/TileDetailsDisplay.h"
 #include "Editor/Displays/LogDisplay.h"
+#include "Editor/Displays/EditorStyleToolDisplay.h"
 #include "Editor/Displays/TilesetDisplay.h"
 #include "Editor/Displays/TilemapDisplay.h"
 
-#include "Editor/Utilities/EditorFramebuffers.h"
-#include "Editor/Utilities/DrawComponentUtils.h"
 #include "Editor/Utilities/editor_textures.h"
+#include "Editor/Utilities/EditorFramebuffers.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/DrawComponentUtils.h"
+
 #include "Editor/Systems/GridSystem.h"
+
+// TODO: This needs to be removed. Scenes are added by default for testing
 #include "Editor/Scene/SceneManager.h"
 
 namespace Feather {
@@ -431,6 +436,13 @@ namespace Feather {
 			return false;
 		}
 
+		/*auto editorStylesDisplay = std::make_unique<EditorStyleToolDisplay>();
+		if (!editorStylesDisplay)
+		{
+			F_ERROR("Failed to create Editor Styles Display");
+			return false;
+		}*/
+
 		displayHolder->displays.push_back(std::move(menuDisplay));
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(sceneHierarchyDisplay));
@@ -439,6 +451,7 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(tileDetailsDisplay));
 		displayHolder->displays.push_back(std::move(tilemapDisplay));
 		displayHolder->displays.push_back(std::move(assetDisplay));
+		// displayHolder->displays.push_back(std::move(editorStylesDisplay));
 
 		return true;
 	}
@@ -472,6 +485,8 @@ namespace Feather {
 			F_FATAL("Failed to initialize ImGui OpenGL3!");
 			return false;
 		}
+
+		ImGui::InitDefaultStyles();
 
 		return true;
 	}
@@ -511,12 +526,14 @@ namespace Feather {
 
 			auto centerNodeId = dockSpaceId;
 			const auto leftNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Left, 0.2f, nullptr, &centerNodeId);
-			const auto rightNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Right, 0.3f, nullptr, &centerNodeId);
+			auto rightNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Right, 0.3f, nullptr, &centerNodeId);
 			const auto logNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Down, 0.25f, nullptr, &centerNodeId);
+			auto tileLayerId = ImGui::DockBuilderSplitNode(rightNodeId, ImGuiDir_Down, 0.4f, nullptr, &rightNodeId);
 
 			ImGui::DockBuilderDockWindow("Object Details", rightNodeId);
 			ImGui::DockBuilderDockWindow("Tileset", rightNodeId);
 			ImGui::DockBuilderDockWindow("Tile Details", rightNodeId);
+			ImGui::DockBuilderDockWindow("Tile Layers", tileLayerId);
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);

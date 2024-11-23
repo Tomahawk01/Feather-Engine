@@ -25,7 +25,7 @@ namespace Feather {
 		}
 	}
 
-	void SoundFXPlayer::SetVolume(int channel, int volume)
+	void SoundFXPlayer::SetVolume(int volume, int channel)
 	{
 		if (volume < 0 || volume > 100)
 		{

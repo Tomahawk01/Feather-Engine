@@ -1,18 +1,6 @@
 #include "CoreUtilities.h"
 #include "Core/ECS/Components/AllComponents.h"
 
-static const std::unordered_map<std::string, Feather::RigidBodyType> StringToRigidBodyType{
-	{ "static", Feather::RigidBodyType::STATIC },
-	{ "kinematic", Feather::RigidBodyType::KINEMATIC },
-	{ "dynamic", Feather::RigidBodyType::DYNAMIC }
-};
-
-static const std::unordered_map<Feather::RigidBodyType, std::string> RigidBodyTypeToString{
-	{ Feather::RigidBodyType::STATIC, "static" },
-	{ Feather::RigidBodyType::KINEMATIC, "kinematic" },
-	{ Feather::RigidBodyType::DYNAMIC, "dynamic" }
-};
-
 namespace Feather {
 
     bool EntityInView(const TransformComponent& transform, float width, float height, const Camera2D& camera)
@@ -52,22 +40,6 @@ namespace Feather {
 
 		return model;
     }
-
-	std::string GetRigidBodyTypeString(RigidBodyType rigidType)
-	{
-		auto rigidItr = RigidBodyTypeToString.find(rigidType);
-		if (rigidItr == RigidBodyTypeToString.end())
-			return {};
-		return rigidItr->second;
-	}
-
-	RigidBodyType GetRigidBodyTypeByString(const std::string rigidType)
-	{
-		auto rigidItr = StringToRigidBodyType.find(rigidType);
-		if (rigidItr == StringToRigidBodyType.end())
-			return RigidBodyType::STATIC;
-		return rigidItr->second;
-	}
 
 	void GenerateUVs(SpriteComponent& sprite, int textureWidth, int textureHeight)
 	{

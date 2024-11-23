@@ -15,6 +15,8 @@ constexpr ImGuiTableFlags IMGUI_NORMAL_TABLE_FLAGS = ImGuiTableFlags_SizingFixed
 
 namespace ImGui {
 
+	void InitDefaultStyles();
+
 	void ColoredLabel(const std::string& label, const ImVec2& size = ImVec2{ 32.0f, 32.0f }, const ImVec4& color = ImVec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 	void OffsetTextX(const std::string& label, float position);
 	void AddSpaces(int numSpaces);
@@ -34,7 +36,6 @@ namespace ImGui {
 	void TextFormatted(const std::string_view text, Args&&... args)
 	{
 		ImGui::TextUnformatted(std::vformat(text, std::make_format_args(args...)).c_str());
-		ImGui::EndTooltip();
 	}
 
 }

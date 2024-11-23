@@ -51,7 +51,7 @@ function Rain:Update(dt)
 	local transform = self.m_Entity:get_component(Transform)
 	local rigid_body = self.m_Entity:get_component(RigidBody)
 
-	transform.position = transform.position + (rigid_body.velocity * dt)
+	transform.position = transform.position + (rigid_body.maxVelocity * dt)
 end
 
 function Rain:Finish()
@@ -63,7 +63,7 @@ function Rain:Finish()
 	local animation = self.m_Entity:get_component(Animation)
 
 	if not self.m_StartFinish then
-		rigid_body.velocity = vec2(0, 0) -- stop moving
+		rigid_body.maxVelocity = vec2(0, 0) -- stop moving
 		animation.num_frames = self.m_NumFrames
 		self.m_StartFinish = true
 	else 
@@ -77,11 +77,11 @@ function Rain:Finish()
 			transform.position = self.m_InitialPosition 
 
 			-- Change velocity to a random value between the min and max
-			local rain_velocity = Random(self.m_MinVelocity, self.m_MaxVelocity):get_float()
-			rigid_body.velocity = vec2(rain_velocity, rain_velocity)
+			local rain_velocity = RandomFloat(self.m_MinVelocity, self.m_MaxVelocity):get_value()
+			rigid_body.maxVelocity = vec2(rain_velocity, rain_velocity)
 
 			-- Adjust lifetime to a random value between the min and max
-			self.m_LifeTime = Random(self.m_MinLifeTime, self.m_MaxLifeTime):get_float()
+			self.m_LifeTime = RandomFloat(self.m_MinLifeTime, self.m_MaxLifeTime):get_value()
 
 			-- Reset the Lifetime timer
 			self.m_LifeTimer:stop()
@@ -135,8 +135,8 @@ end
 
 function RainGenerator:ReGenerate()
 	if #self.m_RainTable == 0 then
-		local maxWidth = WindowWidth()
-		local maxHeight = WindowHeight()
+		local maxWidth = F_WindowWidth()
+		local maxHeight = F_WindowHeight()
 
 		local rows = maxHeight / self.m_yOffset
 		local cols = maxWidth / self.m_xOffset
@@ -146,12 +146,12 @@ function RainGenerator:ReGenerate()
 			for j = 0, cols do
 				local start_x = F_clamp(self.m_xOffset * j, 0, maxWidth)
 				local start_y = F_clamp(self.m_yOffset * i, 0, maxHeight)
-				local rain_velocity = Random(self.m_RainVelMin, self.m_RainVelMax):get_float()
+				local rain_velocity = RandomFloat(self.m_RainVelMin, self.m_RainVelMax):get_value()
 				local rain = Rain:Create(
 					{
 						position = vec2(start_x, start_y),
 						velocity = vec2(rain_velocity, rain_velocity),
-						life_time = Random(self.m_RainLifeMin, self.m_RainLifeMax):get_float(),
+						life_time = RandomFloat(self.m_RainLifeMin, self.m_RainLifeMax):get_value(),
 						scale = self.m_Scale,
 						num_frames = 1
 					}

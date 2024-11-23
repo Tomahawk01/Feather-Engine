@@ -2,10 +2,24 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Physics/PhysicsUtilities.h"
 #include "Utils/FeatherUtilities.h"
 #include "Logger/Logger.h"
 
 #include "ImGuiUtils.h"
+
+#include <map>
+
+static constexpr std::string GetPhysicsBodyDescription(Feather::RigidBodyType type)
+{
+	switch (type)
+	{
+	case Feather::RigidBodyType::STATIC: return "Zero mass, zero velocity, may be manually moved";
+	case Feather::RigidBodyType::KINEMATIC: return "Zero mass, velocity set by user, moved by solver";
+	case Feather::RigidBodyType::DYNAMIC: return "Positive mass, velocity determined by forces, moved by solver";
+	default: return "";
+	}
+}
 
 namespace Feather {
 
@@ -212,12 +226,12 @@ namespace Feather {
 			ImGui::ItemToolTip("The offset of the box collider from the origin. Origin is the Top Left corner");
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##offset_x", &boxCollider.offset.x, 4.0f, 4.0f))
+			if (ImGui::InputFloat("##offset_x", &boxCollider.offset.x, 1.0f, 4.0f))
 				boxCollider.offset.x = std::clamp(boxCollider.offset.x, 0.0f, 128.0f);
 			ImGui::SameLine();
 			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##offset_y", &boxCollider.offset.y, 4.0f, 4.0f))
+			if (ImGui::InputFloat("##offset_y", &boxCollider.offset.y, 1.0f, 4.0f))
 				boxCollider.offset.y = std::clamp(boxCollider.offset.y, 0.0f, 128.0f);
 			ImGui::TreePop();
 			ImGui::PopItemWidth();
@@ -233,6 +247,7 @@ namespace Feather {
 		{
 			ImGui::PushItemWidth(120.0f);
 			ImGui::InlineLabel("radius");
+			ImGui::ItemToolTip("The radius of the circle component. Clamped to [4 - 2000]");
 			if (ImGui::InputFloat("##radius", &circleCollider.radius, 4, 4))
 				circleCollider.radius = std::clamp(circleCollider.radius, 4.0f, 2000.0f);
 
@@ -240,12 +255,12 @@ namespace Feather {
 			ImGui::ItemToolTip("The offset of the circle collider from the origin. Origin is the Top Left corner");
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##offset_x", &circleCollider.offset.x, 4.0f, 4.0f))
+			if (ImGui::InputFloat("##offset_x", &circleCollider.offset.x, 1.0f, 4.0f))
 				circleCollider.offset.x = std::clamp(circleCollider.offset.x, 0.0f, 128.0f);
 			ImGui::SameLine();
 			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##offset_y", &circleCollider.offset.y, 4.0f, 4.0f))
+			if (ImGui::InputFloat("##offset_y", &circleCollider.offset.y, 1.0f, 4.0f))
 				circleCollider.offset.y = std::clamp(circleCollider.offset.y, 0.0f, 128.0f);
 			ImGui::TreePop();
 			ImGui::PopItemWidth();
@@ -259,7 +274,200 @@ namespace Feather {
 		ImGui::PushID(entt::type_hash<PhysicsComponent>::value());
 		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// TODO: Add thing
+			ImGui::AddSpaces(2);
+
+			PhysicsAttributes& physicsAttributes = physics.GetChangableAttributes();
+			static std::string selectedBodyType{ "" };
+			ImGui::InlineLabel("body type");
+			ImGui::ItemToolTip("The body type: static, kinematic, or dynamic");
+			if (ImGui::BeginCombo("##body_type", selectedBodyType.c_str()))
+			{
+				for (const auto& [bodyType, bodyStr] : GetRigidBodyStringMap())
+				{
+					if (ImGui::Selectable(bodyStr.c_str(), bodyStr == selectedBodyType))
+					{
+						selectedBodyType = bodyStr;
+						physicsAttributes.eType = bodyType;
+					}
+
+					ImGui::ItemToolTip("{}", GetPhysicsBodyDescription(bodyType));
+				}
+
+				ImGui::EndCombo();
+			}
+
+			static std::string selectedCategoryType{ "" };
+			ImGui::InlineLabel("category type");
+			ImGui::ItemToolTip("The collision category bits. Bodies will usually only use one category type");
+			if (ImGui::BeginCombo("##category_type", selectedCategoryType.c_str()))
+			{
+				for (const auto& [categoryType, categoryStr] : GetFilterCategoryToStringMap())
+				{
+					if (ImGui::Selectable(categoryStr.c_str(), categoryStr == selectedCategoryType))
+					{
+						selectedCategoryType = categoryStr;
+						physicsAttributes.filterCategory = static_cast<uint16_t>(categoryType);
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			ImGui::Separator();
+			ImGui::AddSpaces(2);
+
+			static std::string selectedMaskBit{ "" };
+			static FilterCategory maskCategory{ FilterCategory::NO_CATEGORY };
+			ImGui::InlineLabel("masks");
+			ImGui::ItemToolTip("The collision mask bits. This states the categories that this shape would accept for collision");
+			if (ImGui::BeginCombo("##mask_bits", selectedMaskBit.c_str()))
+			{
+				for (const auto& [categoryType, categoryStr] : GetFilterCategoryToStringMap())
+				{
+					if (ImGui::Selectable(categoryStr.c_str(), categoryStr == selectedMaskBit))
+					{
+						selectedMaskBit = categoryStr;
+						maskCategory = categoryType;
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+
+			if (!selectedMaskBit.empty() && maskCategory != FilterCategory::NO_CATEGORY)
+			{
+				ImGui::SetCursorPosX(128.0f);
+				if (ImGui::Button("apply mask"))
+				{
+					uint16_t filterCat = static_cast<uint16_t>(maskCategory);
+					if (!(IsBitSet(physicsAttributes.filterMask, filterCat)))
+					{
+						physicsAttributes.filterMask += filterCat;
+						maskCategory = FilterCategory::NO_CATEGORY;
+						selectedMaskBit.clear();
+					}
+					else
+					{
+						F_ERROR("Masks already contain '{}'", selectedMaskBit);
+					}
+				}
+			}
+
+			if (physicsAttributes.filterMask > 0)
+			{
+				ImGui::InlineLabel("applied masks");
+				if (ImGui::BeginListBox("##applied_masks", ImVec2{ 0.0f, 32.0f }))
+				{
+					auto setMaskBits{ GetAllSetBits(physicsAttributes.filterMask) };
+					for (auto mask : setMaskBits)
+					{
+						ImGui::Selectable(GetFilterCategoryString(static_cast<FilterCategory>(Bit(mask))).c_str());
+					}
+
+					ImGui::EndListBox();
+				}
+
+				ImGui::SetCursorPosX(128.0f);
+				if (ImGui::Button("clear masks"))
+				{
+					physicsAttributes.filterMask = 0;
+					maskCategory = FilterCategory::NO_CATEGORY;
+					selectedMaskBit.clear();
+				}
+			}
+
+			ImGui::AddSpaces(2);
+			ImGui::Separator();
+			ImGui::AddSpaces(2);
+
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel("density");
+			ImGui::ItemToolTip("The density, usually in kg/m^2");
+			ImGui::InputFloat("##density", &physicsAttributes.density, 1.0f, 1.0f, "%.1f");
+
+			ImGui::InlineLabel("friction");
+			ImGui::ItemToolTip("The Coulomb friction coefficient, usually in the range [0,1]");
+			if (ImGui::InputFloat("##friction", &physicsAttributes.friction, 0.1f, 0.1f, "%.1f"))
+				physicsAttributes.friction = std::clamp(physicsAttributes.friction, 0.0f, 1.0f);
+
+			ImGui::InlineLabel("restitution");
+			ImGui::ItemToolTip("The restitution (bounce) usually in the range [0,1]");
+			if (ImGui::InputFloat("##restitution", &physicsAttributes.restitution, 0.1f, 0.1f, "%.1f"))
+				physicsAttributes.restitution = std::clamp(physicsAttributes.restitution, 0.0f, 1.0f);
+
+			ImGui::InlineLabel("gravityScale");
+			ImGui::ItemToolTip("Scale of gravity applied to this body");
+			ImGui::InputFloat("##gravityScale", &physicsAttributes.gravityScale, 1.0f, 1.0f, "%.1f");
+
+			ImGui::AddSpaces(2);
+			ImGui::Separator();
+			ImGui::AddSpaces(2);
+
+			ImGui::InlineLabel("is a box?");
+			ImGui::ItemToolTip("If the entity is a box, the box collider is used in construction for the size");
+			if (ImGui::Checkbox("##boxShape", &physicsAttributes.isBoxShape))
+			{
+				if (physicsAttributes.isCircle)
+					physicsAttributes.isCircle = false;
+			}
+
+			if (physicsAttributes.isBoxShape && !physicsAttributes.isCircle)
+			{
+				ImGui::SameLine(0, 32.0f);
+				ImGui::TextColored(ImVec4{ 1.0f, 1.0f, 0.0f, 1.0f }, "Must have a Box Collider Component");
+			}
+
+			ImGui::InlineLabel("is a circle?");
+			ImGui::ItemToolTip("If the entity is a circle, the circle collider is used in construction for the size");
+			if (ImGui::Checkbox("##circle", &physicsAttributes.isCircle))
+			{
+				if (physicsAttributes.isBoxShape)
+					physicsAttributes.isBoxShape = false;
+			}
+
+			if (!physicsAttributes.isBoxShape && physicsAttributes.isCircle)
+			{
+				ImGui::SameLine(0, 32.0f);
+				ImGui::TextColored(ImVec4{ 1.0f, 1.0f, 0.0f, 1.0f }, "Must have a Circle Collider Component");
+			}
+
+			ImGui::AddSpaces(2);
+			ImGui::Separator();
+
+			ImGui::InlineLabel("fixed rotation");
+			ImGui::ItemToolTip("Should the body be prevented from rotating?");
+			ImGui::Checkbox("##fixedRotation", &physicsAttributes.isFixedRotation);
+
+			ImGui::InlineLabel("sensor");
+			ImGui::ItemToolTip("A sensor shape generates overlap events but never generates a collision response.\n"
+				"Sensors do not collide with other sensors and do not have continuous collision");
+			ImGui::Checkbox("##sensor", &physicsAttributes.isTrigger);
+
+			ImGui::SeparatorText("Physics Object Data");
+			ImGui::AddSpaces(2);
+
+			ImGui::PopItemWidth();
+			auto& objectData = physicsAttributes.objectData;
+
+			std::string tagBuffer{ objectData.tag };
+			ImGui::InlineLabel("tag");
+			if (ImGui::InputText("##_tag", tagBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+				objectData.tag = std::string{ tagBuffer.data() };
+
+			std::string groupBuffer{ objectData.group };
+			ImGui::InlineLabel("group");
+			if (ImGui::InputText("##_group", groupBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+				objectData.group = std::string{ groupBuffer.data() };
+
+			ImGui::InlineLabel("is collider?");
+			ImGui::Checkbox("##objectDataCollider", &objectData.isCollider);
+
+			ImGui::InlineLabel("is trigger?");
+			ImGui::Checkbox("##objectDataTrigger", &objectData.isTrigger);
+
+			ImGui::InlineLabel("is friendly?");
+			ImGui::Checkbox("##objectDataFriendly", &objectData.isFriendly);
+
 			ImGui::TreePop();
 		}
 		ImGui::PopID();

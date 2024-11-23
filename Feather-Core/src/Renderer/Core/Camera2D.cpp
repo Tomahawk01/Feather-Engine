@@ -39,10 +39,10 @@ namespace Feather {
 		m_NeedUpdate = true;
 	}
 
-	void Camera2D::Resize(int width, int height)
+	void Camera2D::Resize(int newWidth, int newHeight)
 	{
-		m_Width = width;
-		m_Height = height;
+		m_Width = newWidth;
+		m_Height = newHeight;
 
 		Initialize();
 	}
@@ -72,9 +72,7 @@ namespace Feather {
 
 	void Camera2D::Initialize()
 	{
-		float width = static_cast<float>(m_Width);
-		float height = static_cast<float>(m_Height);
-		m_OrthoProjection = glm::ortho(0.0f, width, height, 0.0f, 0.0f, 1.0f);
+		m_OrthoProjection = glm::ortho(0.0f, static_cast<float>(m_Width), static_cast<float>(m_Height), 0.0f, 0.0f, 1.0f);
 		Update();
 	}
 

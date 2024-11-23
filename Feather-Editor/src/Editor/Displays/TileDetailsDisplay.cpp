@@ -54,7 +54,8 @@ namespace Feather {
 		ImGui::Separator();
 		ImGui::AddSpaces(2);
 
-		ImGui::Checkbox("Box Collider", &tileData.isCollider);
+		ImGui::InlineLabel("Box Collider");
+		ImGui::Checkbox("##Box_Collider", &tileData.isCollider);
 		if (tileData.isCollider)
 			DrawComponentsUtil::DrawComponentInfo(tileData.boxCollider);
 
@@ -62,7 +63,8 @@ namespace Feather {
 		ImGui::Separator();
 		ImGui::AddSpaces(2);
 
-		ImGui::Checkbox("Circle Collider", &tileData.isCircle);
+		ImGui::InlineLabel("Circle Collider");
+		ImGui::Checkbox("##Cicle_Collider", &tileData.isCircle);
 		if (tileData.isCircle)
 			DrawComponentsUtil::DrawComponentInfo(tileData.circleCollider);
 
@@ -70,7 +72,8 @@ namespace Feather {
 		ImGui::Separator();
 		ImGui::AddSpaces(2);
 
-		ImGui::Checkbox("Animation", &tileData.hasAnimation);
+		ImGui::InlineLabel("Animation");
+		ImGui::Checkbox("##Animation", &tileData.hasAnimation);
 		if (tileData.hasAnimation)
 			DrawComponentsUtil::DrawComponentInfo(tileData.animation);
 
@@ -78,7 +81,8 @@ namespace Feather {
 		ImGui::Separator();
 		ImGui::AddSpaces(2);
 
-		ImGui::Checkbox("Physics", &tileData.hasPhysics);
+		ImGui::InlineLabel("Physics");
+		ImGui::Checkbox("##Physics", &tileData.hasPhysics);
 		if (tileData.hasPhysics)
 			DrawComponentsUtil::DrawComponentInfo(tileData.physics);
 
@@ -86,7 +90,9 @@ namespace Feather {
 		ImGui::Separator();
 		ImGui::AddSpaces(2);
 
-		if (ImGui::BeginChild("Tile Layers"))
+		ImGui::End();
+
+		if (ImGui::Begin("Tile Layers"))
 		{
 			ImGui::SeparatorText("Tile Layers");
 
@@ -181,10 +187,8 @@ namespace Feather {
 					ImGui::TextColored(ImVec4{ 1.f, 0.f, 0.f, 1.f }, std::format("{} - Already exists", checkName).c_str());
 			}
 
-			ImGui::EndChild();
+			ImGui::End();
 		}
-
-		ImGui::End();
 	}
 
 	void TileDetailsDisplay::DrawSpriteComponent(SpriteComponent& sprite, SceneObject* scene)

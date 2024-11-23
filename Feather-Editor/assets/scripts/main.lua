@@ -1,7 +1,7 @@
 -- Main Lua Script!
---[[
-F_run_script("assets/scripts/Platformer/script_list.lua")
-F_load_script_table(ScriptList)
+-- [[
+F_RunScript("assets/scripts/Platformer/script_list.lua")
+F_LoadScriptTable(ScriptList)
 
 LoadAssets(AssetDefs)
 
@@ -21,12 +21,16 @@ gStateStack:change_state(title)
 main = {
 	[1] = {
 		update = function()
-			--gStateStack:update(0.016)
+			if gStateStack then
+				gStateStack:update(0.016)
+			end
 		end
 	},
 	[2] = {
 		render = function()
-			--gStateStack:render()
+			if gStateStack then
+				gStateStack:render()
+			end
 		end
 	}
 }

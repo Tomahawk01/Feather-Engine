@@ -7,7 +7,7 @@ namespace Feather {
 
 	struct CircleColliderComponent
 	{
-		float radius{ 0.0f };
+		float radius{ 4.0f };
 		glm::vec2 offset{ glm::vec2{0} };
 		bool colliding{ false };
 

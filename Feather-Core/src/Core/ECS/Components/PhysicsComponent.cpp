@@ -380,6 +380,12 @@ namespace Feather {
 				}
 
 				return body->IsBullet();
+			},
+			"set_filter_category",
+			[](PhysicsComponent& pc) {
+				auto body = pc.GetBody();
+				if (!body)
+					return;
 			}
 		);
 	}

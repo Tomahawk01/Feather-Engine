@@ -3,6 +3,7 @@
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
 #include "Core/ECS/MainRegistry.h"
+#include "Core/ECS/Components/AllComponents.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Systems/PhysicsSystem.h"
 #include "Core/Systems/ScriptingSystem.h"
@@ -196,6 +197,50 @@ namespace Feather {
 
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
+
+		// LEFTOFF: Need to fix a bug when playing scene and physics won't apply to objects
+
+		// Initialize all of the physics entities
+		auto physicsEntities = runtimeRegistry.GetRegistry().view<PhysicsComponent>();
+
+		for (auto entity : physicsEntities)
+		{
+			Entity ent{ runtimeRegistry, entity };
+
+			bool boxCollider{ ent.HasComponent<BoxColliderComponent>() };
+			bool circleCollider{ ent.HasComponent<CircleColliderComponent>() };
+
+			if (!boxCollider && !circleCollider)
+			{
+				F_ERROR("Entity must have a box or circle collider component to initialize physics on it");
+				continue;
+			}
+
+			auto& physics = ent.GetComponent<PhysicsComponent>();
+			auto& physicsAttributes = physics.GetChangableAttributes();
+
+			if (boxCollider)
+			{
+				const auto& boxCollider = ent.GetComponent<BoxColliderComponent>();
+				physicsAttributes.boxSize = glm::vec2{ boxCollider.width, boxCollider.height };
+				physicsAttributes.offset = boxCollider.offset;
+			}
+			else if (circleCollider)
+			{
+				const auto& circleCollider = ent.GetComponent<CircleColliderComponent>();
+				physicsAttributes.radius = circleCollider.radius;
+				physicsAttributes.offset = circleCollider.offset;
+			}
+
+			const auto& transform = ent.GetComponent<TransformComponent>();
+			physicsAttributes.position = transform.position;
+			physicsAttributes.scale = transform.scale;
+			physicsAttributes.objectData.entityID = static_cast<int32_t>(entity);
+
+			// TODO: Set Filters/Masks/Group Index
+
+			physics.Init(physicsWorld, 640, 480);
+		}
 
 		if (!scriptSystem->LoadMainScript(runtimeRegistry, *lua))
 		{

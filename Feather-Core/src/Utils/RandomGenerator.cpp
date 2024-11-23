@@ -2,27 +2,46 @@
 
 namespace Feather {
 
-    RandomGenerator::RandomGenerator()
-        : RandomGenerator(0, std::numeric_limits<uint32_t>::max())
+    // ============= Int =============
+
+    RandomIntGenerator::RandomIntGenerator()
+        : RandomIntGenerator(0, std::numeric_limits<uint32_t>::max())
     {}
 
-    RandomGenerator::RandomGenerator(uint32_t min, uint32_t max)
-        : m_MTEngine{}, m_Distribution{ min, max }
+    RandomIntGenerator::RandomIntGenerator(uint32_t min, uint32_t max)
+        : m_MTEngine{}, m_IntDistribution{ min, max }
     {
         Initialize();
     }
 
-    float RandomGenerator::GetFloat()
+    int RandomIntGenerator::GetValue()
     {
-        return (float)m_Distribution(m_MTEngine);
+        return static_cast<int>(m_IntDistribution(m_MTEngine));
     }
 
-    uint32_t RandomGenerator::GetInt()
+    void RandomIntGenerator::Initialize()
     {
-        return m_Distribution(m_MTEngine);
+        m_MTEngine.seed(std::random_device()());
     }
 
-    void RandomGenerator::Initialize()
+    // ============= Float =============
+
+    RandomFloatGenerator::RandomFloatGenerator()
+        : RandomFloatGenerator(0.0f, std::numeric_limits<float>::max())
+    {}
+
+    RandomFloatGenerator::RandomFloatGenerator(float min, float max)
+        : m_MTEngine{}, m_FloatDistribution{ min, max }
+    {
+        Initialize();
+    }
+
+    float RandomFloatGenerator::GetValue()
+    {
+        return m_FloatDistribution(m_MTEngine);
+    }
+
+    void RandomFloatGenerator::Initialize()
     {
         m_MTEngine.seed(std::random_device()());
     }

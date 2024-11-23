@@ -253,7 +253,7 @@ function LoadMap(mapDef)
                         )
                     )
 
-                    if IsPhysicsEnabled() then
+                    if F_IsPhysicsEnabled() then
                         local physicsAttribs = PhysicsAttributes()
 
                         physicsAttribs.type = BodyType.Static
@@ -332,10 +332,10 @@ end
 
 function Debug()
     if Keyboard.just_pressed(KEY_F1) then
-        if IsRenderCollidersEnabled() then
-            DisableRenderColliders()
+        if F_CollisionRenderingEnabled() then
+            F_DisableCollisionRendering()
         else
-            EnableRenderColliders()
+            F_EnableCollisionRendering()
         end
     end
 end

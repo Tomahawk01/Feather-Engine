@@ -2,19 +2,13 @@
 
 #include "Physics/Box2DWrappers.h"
 #include "Physics/UserData.h"
+#include "Physics/PhysicsUtilities.h"
 
 #include <sol/sol.hpp>
 #include <glm/glm.hpp>
 #include <entt.hpp>
 
 namespace Feather {
-
-	enum class RigidBodyType
-	{
-		STATIC = 0,
-		KINEMATIC,
-		DYNAMIC
-	};
 
 	struct PhysicsAttributes
 	{
@@ -23,10 +17,16 @@ namespace Feather {
 		float restitutionThreshold{ 1.0f }, radius{ 0.0f }, gravityScale{ 1.0f };
 
 		glm::vec2 position{ 0.0f }, scale{ 1.0f }, boxSize{ 0.0f }, offset{ 0.0f };
-		bool isCircle{ false }, isBoxShape{ true }, isFixedRotation{ false }, isTrigger{ false };
+		bool isCircle{ false }, isBoxShape{ true }, isFixedRotation{ true }, isTrigger{ false };
 
-		uint16_t filterCategory{ 0 }, filterMask{ 0 };
+		bool isBullet{ false };
+
+		// Used to filter collisions on shapes
+		uint16_t filterCategory{ 0 };
+		uint16_t filterMask{ 0 };
 		int16_t groupIndex{ 0 };
+
+		// User specified data for each body
 		ObjectData objectData{};
 	};
 
@@ -43,6 +43,7 @@ namespace Feather {
 
 		const bool IsTrigger() const;
 		const PhysicsAttributes& GetAttributes() const { return m_InitialAttributes; }
+		PhysicsAttributes& GetChangableAttributes() { return m_InitialAttributes; }
 		static void CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry);
 
 	private:

@@ -7,7 +7,8 @@ project "Feather-Editor"
     files
     {
         "**.h",
-        "**.cpp"
+        "**.cpp",
+        "**.inl"
     }
 
     includedirs

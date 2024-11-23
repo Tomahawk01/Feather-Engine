@@ -96,7 +96,8 @@ namespace Feather {
 		}
 
 		auto& lua = registry.GetContext<std::shared_ptr<sol::state>>();
-		if (lua) lua->collect_garbage();
+		if (lua)
+			lua->collect_garbage();
 	}
 
 	void ScriptingSystem::Render(Registry& registry)
@@ -124,7 +125,8 @@ namespace Feather {
 		}
 
 		auto& lua = registry.GetContext<std::shared_ptr<sol::state>>();
-		if (lua) lua->collect_garbage();
+		if (lua)
+			lua->collect_garbage();
 	}
 
 	auto create_timer = [](sol::state& lua){
@@ -312,7 +314,7 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 
 		lua.set_function(
-			"F_run_script", [&](const std::string& path)
+			"F_RunScript", [&](const std::string& path)
 			{
 				try
 				{
@@ -328,7 +330,7 @@ namespace Feather {
 			}
 		);
 
-		lua.set_function("F_load_script_table", [&](const sol::table& scriptList) {
+		lua.set_function("F_LoadScriptTable", [&](const sol::table& scriptList) {
 			if (!scriptList.valid())
 			{
 				F_ERROR("Failed to load script list: Table is invalid");
@@ -354,11 +356,11 @@ namespace Feather {
 			}
 		});
 
-		lua.set_function("F_get_ticks", [] { return SDL_GetTicks(); });
+		lua.set_function("F_GetTicks", [] { return SDL_GetTicks(); });
 
 		auto& assetManager = mainRegistry.GetAssetManager();
 		lua.set_function(
-			"F_measure_text", [&](const std::string& text, const std::string& fontName) {
+			"F_MeasureText", [&](const std::string& text, const std::string& fontName) {
 				const auto& pFont = assetManager.GetFont(fontName);
 				if (!pFont)
 				{
@@ -375,26 +377,32 @@ namespace Feather {
 		);
 
 		auto& engine = CoreEngineData::GetInstance();
-		lua.set_function("GetDeltaTime", [&] { return engine.GetDeltaTime(); });
-		lua.set_function("WindowWidth", [&] { return engine.WindowWidth(); });
-		lua.set_function("WindowHeight", [&] { return engine.WindowHeight(); });
+		lua.set_function("F_DeltaTime", [&] { return engine.GetDeltaTime(); });
+		lua.set_function("F_WindowWidth", [&] { return engine.WindowWidth(); });
+		lua.set_function("F_WindowHeight", [&] { return engine.WindowHeight(); });
 
 		// Physics Enable functions
-		lua.set_function("DisablePhysics", [&] { engine.DisablePhysics(); });
-		lua.set_function("EnablePhysics", [&] { engine.EnablePhysics(); });
-		lua.set_function("IsPhysicsEnabled", [&] { return engine.IsPhysicsEnabled(); });
+		lua.set_function("F_DisablePhysics", [&] { engine.DisablePhysics(); });
+		lua.set_function("F_EnablePhysics", [&] { engine.EnablePhysics(); });
+		lua.set_function("F_IsPhysicsEnabled", [&] { return engine.IsPhysicsEnabled(); });
 
 		// Render Colliders Enable functions
-		lua.set_function("DisableRenderColliders", [&] { engine.DisableColliderRender(); });
-		lua.set_function("EnableRenderColliders", [&] { engine.EnableColliderRender(); });
-		lua.set_function("IsRenderCollidersEnabled", [&] { return engine.RenderCollidersEnabled(); });
+		lua.set_function("F_DisableCollisionRendering", [&] { engine.DisableColliderRender(); });
+		lua.set_function("F_EnableCollisionRendering", [&] { engine.EnableColliderRender(); });
+		lua.set_function("F_CollisionRenderingEnabled", [&] { return engine.RenderCollidersEnabled(); });
 
-		lua.new_usertype<RandomGenerator>(
-			"Random",
+		lua.new_usertype<RandomIntGenerator>(
+			"RandomInt",
 			sol::call_constructor,
-			sol::constructors<RandomGenerator(uint32_t, uint32_t), RandomGenerator()>(),
-			"get_float", &RandomGenerator::GetFloat,
-			"get_int", &RandomGenerator::GetInt
+			sol::constructors<RandomIntGenerator(uint32_t, uint32_t), RandomIntGenerator()>(),
+			"get_value", &RandomIntGenerator::GetValue
+		);
+
+		lua.new_usertype<RandomFloatGenerator>(
+			"RandomFloat",
+			sol::call_constructor,
+			sol::constructors<RandomFloatGenerator(float, float), RandomFloatGenerator()>(),
+			"get_value", &RandomFloatGenerator::GetValue
 		);
 
 		lua.set_function(

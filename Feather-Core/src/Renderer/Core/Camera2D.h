@@ -14,7 +14,7 @@ namespace Feather {
 
 		void Update();
 		void Reset();
-		void Resize(int width, int height);
+		void Resize(int newWidth, int newHeight);
 
 		glm::vec2 ScreenCoordsToWorld(const glm::vec2& screenCoords) const;
 		glm::vec2 WorldCoordsToScreen(const glm::vec2& worldCoords) const;
