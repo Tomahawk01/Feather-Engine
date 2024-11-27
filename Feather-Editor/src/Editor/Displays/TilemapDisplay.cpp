@@ -1,4 +1,5 @@
 #include "TilemapDisplay.h"
+
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/Systems/RenderSystem.h"
@@ -12,13 +13,14 @@
 #include "Windowing/Input/Mouse.h"
 #include "Logger/Logger.h"
 
-#include "../Systems/GridSystem.h"
-#include "../Utilities/EditorFramebuffers.h"
-#include "../Utilities/EditorUtilities.h"
-#include "../Scene/SceneManager.h"
-#include "../Scene/SceneObject.h"
-#include "../Tools/ToolManager.h"
-#include "../Tools/CreateTileTool.h"
+#include "Editor/Systems/GridSystem.h"
+#include "Editor/Utilities/EditorFramebuffers.h"
+#include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
+#include "Editor/Tools/ToolManager.h"
+#include "Editor/Tools/CreateTileTool.h"
+#include "Editor/Commands/CommandManager.h"
 
 #include "imgui.h"
 
@@ -115,6 +117,16 @@ namespace Feather {
 		animationSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
 
 		m_TilemapCam->Update();
+
+		auto& keyboard = INPUT_MANAGER().GetKeyboard();
+		if (keyboard.IsKeyPressed(F_KEY_LCTRL) &&
+			keyboard.IsKeyJustPressed(F_KEY_Z))
+		{
+			if (keyboard.IsKeyPressed(F_KEY_LSHIFT))
+				COMMAND_MANAGER().Redo();
+			else
+				COMMAND_MANAGER().Undo();
+		}
 	}
 
 	void TilemapDisplay::RenderTilemap()

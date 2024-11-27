@@ -4,9 +4,9 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Utils/FeatherUtilities.h"
 
-#include "../Scene/SceneManager.h"
-#include "../Tools/ToolManager.h"
-#include "../Tools/TileTool.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Tools/ToolManager.h"
+#include "Editor/Tools/TileTool.h"
 
 #include <imgui.h>
 

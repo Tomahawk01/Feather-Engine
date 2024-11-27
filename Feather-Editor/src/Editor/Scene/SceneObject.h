@@ -1,7 +1,8 @@
 #pragma once
 #include "Core/ECS/Entity.h"
 #include "Utils/HelperUtilities.h"
-#include "../Utilities/EditorUtilities.h"
+
+#include "Editor/Utilities/EditorUtilities.h"
 
 namespace Feather {
 

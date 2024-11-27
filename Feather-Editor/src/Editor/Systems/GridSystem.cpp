@@ -6,7 +6,7 @@
 #include "Renderer/Essentials/Primitives.h"
 #include "Renderer/Essentials/Vertex.h"
 
-#include "../Scene/SceneObject.h"
+#include "Editor/Scene/SceneObject.h"
 
 namespace Feather {
 

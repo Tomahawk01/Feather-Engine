@@ -1,11 +1,12 @@
 #include "AbstractTool.h"
+
 #include "Logger/Logger.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/ECS/Registry.h"
 #include "Renderer/Core/Camera2D.h"
 
-#include "../Utilities/EditorUtilities.h"
-#include "../Scene/SceneObject.h"
+#include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Scene/SceneObject.h"
 
 namespace Feather {
 

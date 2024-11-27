@@ -5,8 +5,8 @@
 #include "Core/Resources/AssetManager.h"
 #include "Logger/Logger.h"
 
-#include "../Utilities/EditorUtilities.h"
-#include "../Scene/SceneManager.h"
+#include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Scene/SceneManager.h"
 
 #include <imgui.h>
 

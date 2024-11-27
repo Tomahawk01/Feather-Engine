@@ -2,8 +2,10 @@
 #include "SceneObject.h"
 #include "Utils/FeatherUtilities.h"
 #include "Logger/Logger.h"
-#include "../Tools/ToolManager.h"
-#include "../Tools/TileTool.h"
+
+#include "Editor/Tools/ToolManager.h"
+#include "Editor/Tools/TileTool.h"
+#include "Editor/Commands/CommandManager.h"
 
 namespace Feather {
 
@@ -65,6 +67,15 @@ namespace Feather {
 
 		F_ASSERT(m_ToolManager && "Tool manager must be valid!");
 		return *m_ToolManager;
+	}
+
+	CommandManager& SceneManager::GetCommandManager()
+	{
+		if (!m_CommandManager)
+			m_CommandManager = std::make_unique<CommandManager>();
+
+		F_ASSERT(m_CommandManager && "Command manager must be valid!");
+		return *m_CommandManager;
 	}
 
 	void SceneManager::SetTileset(const std::string& tileset)

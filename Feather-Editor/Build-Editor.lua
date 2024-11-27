@@ -13,6 +13,7 @@ project "Feather-Editor"
 
     includedirs
     {
+        "src",
         "%{wks.location}/Feather-Core/src",
         "%{wks.location}/vendor/SDL/include",
         "%{wks.location}/vendor/soil/include",

@@ -4,9 +4,9 @@
 #include "Core/Loaders/TilemapLoader.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 
-#include "../Scene/SceneManager.h"
-#include "../Scene/SceneObject.h"
-#include "../Tools/ToolManager.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
+#include "Editor/Tools/ToolManager.h"
 
 #include <imgui.h>
 #include <SDL.h>

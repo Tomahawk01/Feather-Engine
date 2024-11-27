@@ -18,9 +18,9 @@
 #include "Physics/ContactListener.h"
 #include "Logger/Logger.h"
 
-#include "../Utilities/EditorFramebuffers.h"
-#include "../Scene/SceneManager.h"
-#include "../Scene/SceneObject.h"
+#include "Editor/Utilities/EditorFramebuffers.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
 
 #include <imgui.h>
 

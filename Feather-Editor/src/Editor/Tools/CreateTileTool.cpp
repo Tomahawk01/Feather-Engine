@@ -1,9 +1,14 @@
 #include "CreateTileTool.h"
+
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Logger/Logger.h"
-#include "../Utilities/EditorUtilities.h"
+
+#include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Commands/CommandManager.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
 
 namespace Feather {
 
@@ -71,6 +76,17 @@ namespace Feather {
 		}
 
 		tile.AddComponent<TileComponent>(static_cast<uint32_t>(tile.GetEntity()));
+
+		auto createToolAddCmd = UndoableCommands
+		{
+			CreateTileToolAddCmd
+			{
+				.registry = SCENE_MANAGER().GetCurrentScene()->GetRegistryPtr(),
+				.tile = std::make_shared<Tile>(*m_MouseTile)
+			}
+		};
+
+		COMMAND_MANAGER().Execute(createToolAddCmd);
 	}
 
 	void CreateTileTool::RemoveTile()

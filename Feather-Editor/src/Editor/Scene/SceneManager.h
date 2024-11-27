@@ -5,11 +5,13 @@
 #include <vector>
 
 #define SCENE_MANAGER() Feather::SceneManager::GetInstance()
+#define COMMAND_MANAGER() SCENE_MANAGER().GetCommandManager()
 
 namespace Feather {
 
 	class ToolManager;
 	class SceneObject;
+	class CommandManager;
 
 	class SceneManager
 	{
@@ -21,6 +23,8 @@ namespace Feather {
 		std::shared_ptr<SceneObject> GetCurrentScene();
 		std::vector<std::string> GetSceneNames() const;
 		ToolManager& GetToolManager();
+		CommandManager& GetCommandManager();
+
 		void SetTileset(const std::string& tileset);
 
 		inline void SetCurrentScene(const std::string& sceneName) { m_CurrentScene = sceneName; }
@@ -38,6 +42,7 @@ namespace Feather {
 		std::string m_CurrentScene{ "" }, m_CurrentTileset{ "" };
 
 		std::unique_ptr<ToolManager> m_ToolManager{ nullptr };
+		std::unique_ptr<CommandManager> m_CommandManager{ nullptr };
 	};
 
 }

@@ -1,11 +1,11 @@
 #include "TileDetailsDisplay.h"
 
-#include "../Utilities/ImGuiUtils.h"
-#include "../Utilities/DrawComponentUtils.h"
-#include "../Scene/SceneManager.h"
-#include "../Scene/SceneObject.h"
-#include "../Tools/ToolManager.h"
-#include "../Tools/TileTool.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/DrawComponentUtils.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
+#include "Editor/Tools/ToolManager.h"
+#include "Editor/Tools/TileTool.h"
 
 #include "Core/ECS/MainRegistry.h"
 #include "Core/ECS/Components/AllComponents.h"

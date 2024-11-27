@@ -1,4 +1,5 @@
 #include "RectFillTool.h"
+
 #include "Renderer/Core/RectBatchRenderer.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Core/Camera2D.h"
@@ -7,7 +8,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Logger/Logger.h"
 
-#include "../Utilities/EditorUtilities.h"
+#include "Editor/Utilities/EditorUtilities.h"
 
 constexpr int PREVIEW_LAYER = 10;
 

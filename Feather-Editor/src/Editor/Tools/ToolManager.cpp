@@ -12,7 +12,7 @@ namespace Feather {
 
 		// TODO: Add other tools as needed
 
-		SetToolActive(ToolType::RECT_FILL_TILE);
+		SetToolActive(ToolType::CREATE_TILE);
 	}
 
 	void ToolManager::Update(Canvas& canvas)

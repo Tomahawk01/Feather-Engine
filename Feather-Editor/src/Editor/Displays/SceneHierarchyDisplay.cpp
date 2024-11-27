@@ -4,8 +4,8 @@
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/ECS/MetaUtilities.h"
 
-#include "../Scene/SceneManager.h"
-#include "../Scene/SceneObject.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
 
 #include <imgui.h>
 

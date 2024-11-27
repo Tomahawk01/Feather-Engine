@@ -1,4 +1,5 @@
 #include "TileTool.h"
+
 #include "Logger/Logger.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
@@ -6,8 +7,8 @@
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Core/Camera2D.h"
 
-#include "../Utilities/EditorUtilities.h"
-#include "../Scene/SceneObject.h"
+#include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Scene/SceneObject.h"
 
 constexpr int MOUSE_SPRITE_LAYER = 10;
 
