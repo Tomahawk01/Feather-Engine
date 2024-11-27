@@ -51,8 +51,8 @@ namespace Feather {
 
 			Rect rect{
 				.position = glm::vec2{ transform.position.x + boxCollider.offset.x, transform.position.y + boxCollider.offset.y },
-				.width = boxCollider.width * transform.scale.x,
-				.height = boxCollider.height * transform.scale.y,
+				.width = static_cast<float>(boxCollider.width),
+				.height = static_cast<float>(boxCollider.height),
 				.color = color
 			};
 			m_RectRenderer->AddRect(rect, model);
