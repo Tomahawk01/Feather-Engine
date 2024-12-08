@@ -9,6 +9,9 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
+#include "Editor/Commands/CommandManager.h"
 
 constexpr int PREVIEW_LAYER = 10;
 
@@ -122,6 +125,8 @@ namespace Feather {
 		auto spriteWidth = static_cast<int>(sprite.width * transform.scale.x * (dx > 0 ? 1.0f : -1.0f));
 		auto spriteHeight = static_cast<int>(sprite.height * transform.scale.y * (dy > 0 ? 1.0f : -1.0f));
 
+		std::vector<Tile> createdTiles;
+
 		for (int y = 0; (dy > 0 ? y < dy : y > dy); y += spriteHeight)
 		{
 			for (int x = 0; (dx > 0 ? x < dx : x > dx); x += spriteWidth)
@@ -132,30 +137,55 @@ namespace Feather {
 					continue;
 
 				Entity tile{ CreateEntity() };
+				Tile createdTile{};
 				auto& newTransform = tile.AddComponent<TransformComponent>(transform);
 				newTransform.position = newTilePosition;
+				createdTile.transform = newTransform;
+
 				tile.AddComponent<SpriteComponent>(sprite);
+
+				createdTile.sprite = sprite;
 
 				if (m_MouseTile->isCollider)
 				{
 					tile.AddComponent<BoxColliderComponent>(m_MouseTile->boxCollider);
+					createdTile.boxCollider = m_MouseTile->boxCollider;
+					createdTile.isCollider = true;
 				}
 				if (m_MouseTile->isCircle)
 				{
 					tile.AddComponent<CircleColliderComponent>(m_MouseTile->circleCollider);
+					createdTile.circleCollider = m_MouseTile->circleCollider;
+					createdTile.isCircle = true;
 				}
 				if (m_MouseTile->hasAnimation)
 				{
 					tile.AddComponent<AnimationComponent>(m_MouseTile->animation);
+					createdTile.animation = m_MouseTile->animation;
+					createdTile.hasAnimation = true;
 				}
 				if (m_MouseTile->hasPhysics)
 				{
 					tile.AddComponent<PhysicsComponent>(m_MouseTile->physics);
+					createdTile.physics = m_MouseTile->physics;
+					createdTile.hasPhysics = true;
 				}
 
 				tile.AddComponent<TileComponent>(static_cast<uint32_t>(tile.GetEntity()));
+				createdTiles.push_back(createdTile);
 			}
 		}
+
+		auto rectToolAddCmd = UndoableCommands
+		{
+			RectToolAddTilesCmd
+			{
+				.registry = SCENE_MANAGER().GetCurrentScene()->GetRegistryPtr(),
+				.tiles = createdTiles
+			}
+		};
+
+		COMMAND_MANAGER().Execute(rectToolAddCmd);
 	}
 
 	void RectFillTool::RemoveTiles()
@@ -179,11 +209,51 @@ namespace Feather {
 			}
 		}
 
+		std::vector<Tile> removedTiles{};
+
 		for (auto id : entitiesToRemove)
 		{
-			Entity removedTile{ CreateEntity(id) };
-			removedTile.Kill();
+			Entity tileToRemove{ CreateEntity(id) };
+			Tile removedTile{};
+
+			removedTile.transform = tileToRemove.GetComponent<TransformComponent>();
+			removedTile.sprite = tileToRemove.GetComponent<SpriteComponent>();
+
+			if (tileToRemove.HasComponent<BoxColliderComponent>())
+			{
+				removedTile.boxCollider = tileToRemove.GetComponent<BoxColliderComponent>();
+				removedTile.isCollider = true;
+			}
+			if (tileToRemove.HasComponent<CircleColliderComponent>())
+			{
+				removedTile.circleCollider = tileToRemove.GetComponent<CircleColliderComponent>();
+				removedTile.isCircle = true;
+			}
+			if (tileToRemove.HasComponent<AnimationComponent>())
+			{
+				removedTile.animation = tileToRemove.GetComponent<AnimationComponent>();
+				removedTile.hasAnimation = true;
+			}
+			if (tileToRemove.HasComponent<PhysicsComponent>())
+			{
+				removedTile.physics = tileToRemove.GetComponent<PhysicsComponent>();
+				removedTile.hasPhysics = true;
+			}
+
+			tileToRemove.Kill();
+			removedTiles.push_back(removedTile);
 		}
+
+		auto rectToolRemovedCmd = UndoableCommands
+		{
+			RectToolRemoveTilesCmd
+			{
+				.registry = SCENE_MANAGER().GetCurrentScene()->GetRegistryPtr(),
+				.tiles = removedTiles
+			}
+		};
+
+		COMMAND_MANAGER().Execute(rectToolRemovedCmd);
 	}
 
 	void RectFillTool::DrawPreview(int dx, int dy)

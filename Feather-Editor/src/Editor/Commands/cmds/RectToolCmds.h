@@ -1,24 +1,25 @@
 #pragma once
-#include <memory>
+
+#include <vector>
 
 namespace Feather {
 
-	class Registry;
 	struct Tile;
+	class Registry;
 
-	struct CreateTileToolAddCmd
+	struct RectToolAddTilesCmd
 	{
 		Registry* registry{ nullptr };
-		std::shared_ptr<Tile> tile{ nullptr };
+		std::vector<Tile> tiles{};
 
 		void undo();
 		void redo();
 	};
 
-	struct CreateTileToolRemoveCmd
+	struct RectToolRemoveTilesCmd
 	{
 		Registry* registry{ nullptr };
-		std::shared_ptr<Tile> tile{ nullptr };
+		std::vector<Tile> tiles{};
 
 		void undo();
 		void redo();

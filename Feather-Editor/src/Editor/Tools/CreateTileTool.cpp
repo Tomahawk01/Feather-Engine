@@ -96,7 +96,44 @@ namespace Feather {
 		if (auto id = CheckForTile(mouseWorldCoords); id != entt::null)
 		{
 			Entity tileToRemove{ CreateEntity(id) };
+			Tile removedTile{};
+
+			removedTile.transform = tileToRemove.GetComponent<TransformComponent>();
+			removedTile.sprite= tileToRemove.GetComponent<SpriteComponent>();
+
+			if (tileToRemove.HasComponent<BoxColliderComponent>())
+			{
+				removedTile.isCollider = true;
+				removedTile.boxCollider = tileToRemove.GetComponent<BoxColliderComponent>();
+			}
+			if (tileToRemove.HasComponent<CircleColliderComponent>())
+			{
+				removedTile.isCircle = true;
+				removedTile.circleCollider = tileToRemove.GetComponent<CircleColliderComponent>();
+			}
+			if (tileToRemove.HasComponent<AnimationComponent>())
+			{
+				removedTile.hasAnimation = true;
+				removedTile.animation = tileToRemove.GetComponent<AnimationComponent>();
+			}
+			if (tileToRemove.HasComponent<PhysicsComponent>())
+			{
+				removedTile.hasPhysics = true;
+				removedTile.physics = tileToRemove.GetComponent<PhysicsComponent>();
+			}
+
 			tileToRemove.Kill();
+
+			auto createToolRemoveCmd = UndoableCommands
+			{
+				CreateTileToolRemoveCmd
+				{
+					.registry = SCENE_MANAGER().GetCurrentScene()->GetRegistryPtr(),
+					.tile = std::make_shared<Tile>(removedTile)
+				}
+			};
+
+			COMMAND_MANAGER().Execute(createToolRemoveCmd);
 		}
 	}
 
