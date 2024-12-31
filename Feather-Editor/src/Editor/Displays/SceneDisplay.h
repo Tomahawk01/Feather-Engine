@@ -20,6 +20,9 @@ namespace Feather {
 
 		void RenderScene() const;
 
+	protected:
+		virtual void DrawToolbar() override;
+
 	private:
 		bool m_PlayScene;
 		bool m_SceneLoaded;

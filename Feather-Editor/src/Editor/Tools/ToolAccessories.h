@@ -10,4 +10,13 @@ namespace Feather {
 		NO_TOOL
 	};
 
+	enum class GizmoType
+	{
+		TRANSLATE = 0,
+		SCALE,
+		ROTATE,
+
+		NO_GIZMO
+	};
+
 }

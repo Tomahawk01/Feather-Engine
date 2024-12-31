@@ -502,7 +502,7 @@ namespace Feather {
 		{
 			std::string sTextBuffer{ text.textStr };
 			ImGui::InlineLabel("text");
-			if (ImGui::InputText("##_textStr", sTextBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+			if (ImGui::InputText("##_textStr", sTextBuffer.data(), sizeof(char) * 1024, 0/*ImGuiInputTextFlags_EnterReturnsTrue*/))
 			{
 				text.textStr = std::string{ sTextBuffer.data() };
 			}

@@ -34,6 +34,7 @@
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/ImGuiUtils.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include "Editor/Systems/GridSystem.h"
 
@@ -473,6 +474,19 @@ namespace Feather {
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+		io.Fonts->AddFontDefault();
+		float baseFontSize = 16.0f;
+		float iconFontSize = baseFontSize * 2.0f / 3.0f;
+
+		// merge in icons from Font Awesome
+		static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+		ImFontConfig icons_config;
+		icons_config.MergeMode = true;
+		icons_config.PixelSnapH = true;
+		icons_config.GlyphMinAdvanceX = iconFontSize;
+		icons_config.GlyphOffset = ImVec2{ 0.0f, 2.0f };
+		io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, baseFontSize, &icons_config, icons_ranges);
 
 		if (!ImGui_ImplSDL2_InitForOpenGL(m_Window->GetWindow().get(), m_Window->GetGLContext()))
 		{

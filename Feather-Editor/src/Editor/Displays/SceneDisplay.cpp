@@ -19,6 +19,7 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
+#include "Editor/Utilities/ImGuiUtils.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 
@@ -41,67 +42,12 @@ namespace Feather {
 			return;
 		}
 
-		auto& mainRegistry = MAIN_REGISTRY();
-		auto& assetManager = mainRegistry.GetAssetManager();
-
-		auto playTexture = assetManager.GetTexture("play_button");
-		auto stopTexture = assetManager.GetTexture("stop_button");
-
-		static int numStyleColors = 0;
-
-		// Play button
-		if (m_PlayScene)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
-
-			numStyleColors += 3;
-		}
-
-		if (ImGui::ImageButton((ImTextureID)(intptr_t)playTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && !m_SceneLoaded)
-		{
-			LoadScene();
-		}
-
-		if (numStyleColors > 0)
-		{
-			ImGui::PopStyleColor(numStyleColors);
-			numStyleColors = 0;
-		}
-		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
-			ImGui::SetTooltip("Play Scene");
-
-		ImGui::SameLine();
-
-		// Stop button
-		if (!m_PlayScene)
-		{
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f });
-
-			numStyleColors += 3;
-		}
-
+		DrawToolbar();
 		RenderScene();
-
-		if (ImGui::ImageButton((ImTextureID)(intptr_t)stopTexture->GetID(), ImVec2{ (float)playTexture->GetWidth() * 0.5f, (float)playTexture->GetHeight() * 0.5f }) && m_SceneLoaded)
-		{
-			UnloadScene();
-		}
-
-		if (numStyleColors > 0)
-		{
-			ImGui::PopStyleColor(numStyleColors);
-			numStyleColors = 0;
-		}
-		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
-			ImGui::SetTooltip("Stop Scene");
 
 		if (ImGui::BeginChild("##SceneChild", ImVec2{ 0.0f, 0.0f }, ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollWithMouse))
 		{
-			auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
+			auto& editorFramebuffers = MAIN_REGISTRY().GetContext<std::shared_ptr<EditorFramebuffers>>();
 			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
 
 			ImGui::SetCursorPos(ImVec2{ 0.0f, 0.0f });
@@ -300,4 +246,58 @@ namespace Feather {
 		fb->Unbind();
 		fb->CheckResize();
 	}
+
+	void SceneDisplay::DrawToolbar()
+	{
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& assetManager = mainRegistry.GetAssetManager();
+
+		auto playTexture = assetManager.GetTexture("play_button");
+		auto stopTexture = assetManager.GetTexture("stop_button");
+
+		F_ASSERT(playTexture && stopTexture);
+
+		ImGui::Separator();
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, 0.0f });
+
+		// Play button
+		auto playTextureID = (ImTextureID)(intptr_t)playTexture->GetID();
+		if (m_PlayScene && m_SceneLoaded)
+		{
+			ImGui::ActiveImageButton(playTextureID);
+		}
+		else
+		{
+			if (ImGui::ImageButton(playTextureID, TOOL_BUTTON_SIZE))
+			{
+				LoadScene();
+			}
+		}
+
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+			ImGui::SetTooltip("Play Scene");
+
+		ImGui::SameLine();
+
+		// Stop button
+		auto stopTextureID = (ImTextureID)(intptr_t)stopTexture->GetID();
+		if (!m_PlayScene && !m_SceneLoaded)
+		{
+			ImGui::ActiveImageButton(stopTextureID);
+		}
+		else
+		{
+			if (ImGui::ImageButton(stopTextureID, TOOL_BUTTON_SIZE))
+			{
+				UnloadScene();
+			}
+		}
+
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+			ImGui::SetTooltip("Stop Scene");
+
+		ImGui::Separator();
+		ImGui::PopStyleVar(1);
+	}
+
 }

@@ -16,9 +16,12 @@
 #include "Editor/Systems/GridSystem.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
+#include "Editor/Tools/ToolAccessories.h"
 #include "Editor/Tools/CreateTileTool.h"
 #include "Editor/Commands/CommandManager.h"
 
@@ -38,6 +41,7 @@ namespace Feather {
 			return;
 		}
 
+		DrawToolbar();
 		RenderTilemap();
 
 		auto& mainRegistry = MAIN_REGISTRY();
@@ -177,15 +181,17 @@ namespace Feather {
 		if (!currentScene)
 			return;
 
-		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
+		auto& toolManager = TOOL_MANAGER();
+
+		if (!toolManager.SetupTools(currentScene.get(), m_TilemapCam.get()))
+		{
+			F_ASSERT(false && "This should work!?");
+			__debugbreak();
+		}
+
+		auto activeTool = toolManager.GetActiveTool();
 		if (activeTool)
 		{
-			if (!activeTool->SetupTool(currentScene.get(), m_TilemapCam.get()))
-			{
-				F_ASSERT(false && "This should work!?");
-				__debugbreak();
-			}
-
 			if (!SCENE_MANAGER().GetCurrentTileset().empty())
 				activeTool->LoadSpriteTextureData(SCENE_MANAGER().GetCurrentTileset());
 		}
@@ -241,6 +247,120 @@ namespace Feather {
 			m_TilemapCam->SetScreenOffset(screenOffset);
 
 		startPosition = mousePos;
+	}
+
+	void TilemapDisplay::DrawToolbar()
+	{
+		ImGui::Separator();
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 0.0f, 0.0f });
+
+		auto& commandManager = COMMAND_MANAGER();
+		if (commandManager.UndoEmpty())
+		{
+			ImGui::DisabledButton(ICON_FA_UNDO, TOOL_BUTTON_SIZE, "Undo [CTRL + Z] - Nothing to undo");
+		}
+		else
+		{
+			if (ImGui::Button(ICON_FA_UNDO, TOOL_BUTTON_SIZE))
+				commandManager.Undo();
+		}
+		ImGui::ItemToolTip("Undo [CTRL + Z]");
+		ImGui::SameLine();
+
+		if (commandManager.RedoEmpty())
+		{
+			ImGui::DisabledButton(ICON_FA_REDO, TOOL_BUTTON_SIZE, "Redo [CTRL + SHIFT + Z] - Nothing to redo");
+		}
+		else
+		{
+			if (ImGui::Button(ICON_FA_REDO, TOOL_BUTTON_SIZE))
+				commandManager.Redo();
+		}
+		ImGui::ItemToolTip("Redo [CTRL + SHIFT + Z]");
+		ImGui::SameLine(0.0f, 32.0f);
+
+		auto& toolManager = TOOL_MANAGER();
+		const ToolType activeToolType = toolManager.GetActiveToolType();
+		const GizmoType activeGizmoType = toolManager.GetActiveGizmoType();
+
+		ImGui::DisabledButton(ICON_FA_TOOLS, TOOL_BUTTON_SIZE);
+
+		ImGui::SameLine();
+
+		if (activeGizmoType == GizmoType::TRANSLATE)
+		{
+			ImGui::ActiveButton(ICON_FA_ARROWS_ALT, TOOL_BUTTON_SIZE);
+		}
+		else
+		{
+			if (ImGui::Button(ICON_FA_ARROWS_ALT, TOOL_BUTTON_SIZE))
+				toolManager.SetGizmoActive(GizmoType::TRANSLATE);
+		}
+		ImGui::ItemToolTip("Translate [W] - move game objects");
+
+		ImGui::SameLine();
+
+		if (activeGizmoType == GizmoType::SCALE)
+		{
+			ImGui::ActiveButton(ICON_FA_EXPAND, TOOL_BUTTON_SIZE);
+		}
+		else
+		{
+			if (ImGui::Button(ICON_FA_EXPAND, TOOL_BUTTON_SIZE))
+				toolManager.SetGizmoActive(GizmoType::SCALE);
+		}
+		ImGui::ItemToolTip("Scale [E] - scale game objects");
+
+		ImGui::SameLine();
+
+		if (activeGizmoType == GizmoType::ROTATE)
+		{
+			//ImGui::ActiveButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE);
+			ImGui::DisabledButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE, "Rotate [R] - rotate game objects. Currently Unavailable");
+		}
+		else
+		{
+			/*if (ImGui::Button(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE))
+				toolManager.SetGizmoActive(GizmoType::ROTATE);*/
+			ImGui::DisabledButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE, "Rotate [R] - rotate game objects. Currently Unavailable");
+		}
+		//ImGui::ItemToolTip("Rotate [R] - rotate game objects. Currently Unavailable");
+
+		ImGui::SameLine();
+
+		if (activeToolType == ToolType::CREATE_TILE)
+		{
+			ImGui::ActiveButton(ICON_FA_STAMP, TOOL_BUTTON_SIZE);
+		}
+		else
+		{
+			if (ImGui::Button(ICON_FA_STAMP, TOOL_BUTTON_SIZE))
+				toolManager.SetToolActive(ToolType::CREATE_TILE);
+		}
+		ImGui::ItemToolTip("Create Tile [T] - creates a single tile");
+
+		ImGui::SameLine();
+
+		if (activeToolType == ToolType::RECT_FILL_TILE)
+		{
+			ImGui::ActiveButton(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE);
+		}
+		else
+		{
+			if (ImGui::Button(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE))
+				toolManager.SetToolActive(ToolType::RECT_FILL_TILE);
+		}
+		ImGui::ItemToolTip("Rect Fill tool [Y] - creates tiles inside of rectangle");
+
+		ImGui::SameLine();
+
+		ImGui::DisabledButton(ICON_FA_TOOLS, TOOL_BUTTON_SIZE);
+
+		ImGui::PopStyleVar(2);
+		ImGui::Separator();
+		ImGui::AddSpaces(1);
 	}
 
 }

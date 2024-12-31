@@ -4,11 +4,15 @@
 
 namespace Feather {
 
-	struct IDisplay
+	class IDisplay
 	{
+	public:
 		virtual ~IDisplay() = default;
 		virtual void Draw() = 0;
 		virtual void Update() {}
+
+	protected:
+		virtual void DrawToolbar() {}
 	};
 
 	struct DisplayHolder

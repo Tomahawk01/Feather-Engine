@@ -6,6 +6,7 @@
 
 #define SCENE_MANAGER() Feather::SceneManager::GetInstance()
 #define COMMAND_MANAGER() SCENE_MANAGER().GetCommandManager()
+#define TOOL_MANAGER() SCENE_MANAGER().GetToolManager()
 
 namespace Feather {
 

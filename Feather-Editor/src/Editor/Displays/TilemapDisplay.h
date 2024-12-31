@@ -22,6 +22,10 @@ namespace Feather {
 		void RenderTilemap();
 		void LoadNewScene();
 		void PanZoomCamera(const glm::vec2& mousePos);
+
+	protected:
+		virtual void DrawToolbar() override;
+
 	private:
 		std::unique_ptr<Camera2D> m_TilemapCam;
 	};
