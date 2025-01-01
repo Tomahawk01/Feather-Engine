@@ -100,7 +100,7 @@ namespace Feather {
 			auto& spriteLayers = currentScene->GetLayerParams();
 			std::string checkName{ m_RenameLayerBuff.data() };
 
-			if (ImGui::Button(ICON_FA_PLUS_CIRCLE "Add Layer"))
+			if (ImGui::Button(ICON_FA_PLUS_CIRCLE " Add Layer"))
 				currentScene->AddNewLayer();
 
 			ImGui::ItemToolTip("Add Layer");

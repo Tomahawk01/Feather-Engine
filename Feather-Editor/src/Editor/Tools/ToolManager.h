@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <memory>
+#include <string>
 
 namespace Feather {
 
@@ -24,6 +25,13 @@ namespace Feather {
 		* @param Tool type to set active.
 		*/
 		void SetToolActive(ToolType toolType);
+
+		/*
+		* @brief Sets the passed in tileset for all tools
+		*/
+		void SetToolsCurrentTileset(const std::string& tileset);
+
+		void SetTileToolStartCoords(int x, int y);
 
 		/*
 		* @brief Activates the gizmo based on the passed in gizmo type. This will also deactivate all other tools and gizmos

@@ -189,12 +189,8 @@ namespace Feather {
 			__debugbreak();
 		}
 
-		auto activeTool = toolManager.GetActiveTool();
-		if (activeTool)
-		{
-			if (!SCENE_MANAGER().GetCurrentTileset().empty())
-				activeTool->LoadSpriteTextureData(SCENE_MANAGER().GetCurrentTileset());
-		}
+		if (!SCENE_MANAGER().GetCurrentTileset().empty())
+			toolManager.SetToolsCurrentTileset(SCENE_MANAGER().GetCurrentTileset());
 	}
 
 	void TilemapDisplay::PanZoomCamera(const glm::vec2& mousePos)

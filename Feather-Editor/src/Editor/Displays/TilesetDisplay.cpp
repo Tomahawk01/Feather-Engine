@@ -75,9 +75,7 @@ namespace Feather {
 					if (ImGui::ImageButton((ImTextureID)(intptr_t)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
 					{
 						m_Selected = id;
-						auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
-						if (activeTool)
-							activeTool->SetSpriteUVs(j, i);
+						TOOL_MANAGER().SetTileToolStartCoords(j, i);
 					}
 
 					ImGui::PopID();

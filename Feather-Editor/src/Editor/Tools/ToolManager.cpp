@@ -41,6 +41,22 @@ namespace Feather {
 		m_ActiveToolType = toolType;
 	}
 
+	void ToolManager::SetToolsCurrentTileset(const std::string& tileset)
+	{
+		for (auto& [eType, pTool] : m_mapTools)
+		{
+			pTool->LoadSpriteTextureData(tileset);
+		}
+	}
+
+	void ToolManager::SetTileToolStartCoords(int x, int y)
+	{
+		for (auto& [eType, pTool] : m_mapTools)
+		{
+			pTool->SetSpriteUVs(x, y);
+		}
+	}
+
 	void ToolManager::SetGizmoActive(GizmoType gizmoType)
 	{
 		// Deactivate all tools

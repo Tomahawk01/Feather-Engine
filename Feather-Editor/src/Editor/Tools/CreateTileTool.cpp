@@ -18,7 +18,7 @@ namespace Feather {
 
 	void CreateTileTool::Create()
 	{
-		if (OutOfBounds() || !IsActivated() || !SpriteValid() || !m_Registry)
+		if (!CanDrawOrCreate())
 			return;
 
 		if (MouseButtonJustPressed(MouseButton::LEFT) || MouseButtonPressed(MouseButton::LEFT))
@@ -33,7 +33,7 @@ namespace Feather {
 
 	void CreateTileTool::Draw()
 	{
-		if (OutOfBounds() || !IsActivated() || !SpriteValid() || !m_Camera)
+		if (!CanDrawOrCreate())
 			return;
 
 		auto shader = MAIN_REGISTRY().GetAssetManager().GetShader("basic");

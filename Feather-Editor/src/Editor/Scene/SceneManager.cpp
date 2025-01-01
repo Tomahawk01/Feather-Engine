@@ -84,9 +84,7 @@ namespace Feather {
 		if (!m_ToolManager)
 			return;
 
-		auto activeTool = m_ToolManager->GetActiveTool();
-		if (activeTool)
-			activeTool->LoadSpriteTextureData(m_CurrentTileset);
+		m_ToolManager->SetToolsCurrentTileset(tileset);
 	}
 
 }
