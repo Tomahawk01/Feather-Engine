@@ -7,6 +7,8 @@
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <imgui.h>
 #include <SDL.h>
@@ -17,13 +19,15 @@ namespace Feather {
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMenu("File"))
+			if (ImGui::BeginMenu(ICON_FA_FILE "File"))
 			{
+				ImGui::InlineLabel(ICON_FA_FILE_ALT, 32.0f);
 				if (ImGui::MenuItem("New", "Ctrl + N"))
 				{
 					F_TRACE("New pressed");
 				}
 
+				ImGui::InlineLabel(ICON_FA_FOLDER_OPEN, 32.0f);
 				if (ImGui::MenuItem("Open", "Ctrl + O"))
 				{
 					FileDialog fd{};
@@ -44,6 +48,7 @@ namespace Feather {
 					}
 				}
 
+				ImGui::InlineLabel(ICON_FA_SAVE, 32.0f);
 				if (ImGui::MenuItem("Save", "Ctrl + S"))
 				{
 					FileDialog fd{};
@@ -64,6 +69,7 @@ namespace Feather {
 					}
 				}
 
+				ImGui::InlineLabel(ICON_FA_WINDOW_CLOSE, 32.0f);
 				if (ImGui::MenuItem("Exit"))
 				{
 					F_TRACE("Exit pressed");
@@ -72,7 +78,7 @@ namespace Feather {
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Edit"))
+			if (ImGui::BeginMenu(ICON_FA_EDIT "Edit"))
 			{
 				auto& coreGlobals = CORE_GLOBALS();
 
@@ -92,17 +98,17 @@ namespace Feather {
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Tools"))
+			if (ImGui::BeginMenu(ICON_FA_TOOLS "Tools"))
 			{
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Settings"))
+			if (ImGui::BeginMenu(ICON_FA_COG "Settings"))
 			{
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Help"))
+			if (ImGui::BeginMenu(ICON_FA_QUESTION_CIRCLE "Help"))
 			{
 				ImGui::EndMenu();
 			}

@@ -24,6 +24,9 @@ namespace Feather {
 		void CheckRename(const std::string& checkName);
 		void OpenAssetContext(const std::string& assetName);
 
+	protected:
+		virtual void DrawToolbar() override;
+
 	private:
 		const std::vector<std::string> m_SelectableTypes{ "Textures", "Fonts", "Music", "SoundFX", "Scenes" };
 		bool m_ItemHovered, m_AssetTypeChanged, m_Rename;

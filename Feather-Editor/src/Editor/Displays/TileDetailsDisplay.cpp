@@ -1,6 +1,7 @@
 #include "TileDetailsDisplay.h"
 
 #include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
@@ -99,14 +100,16 @@ namespace Feather {
 			auto& spriteLayers = currentScene->GetLayerParams();
 			std::string checkName{ m_RenameLayerBuff.data() };
 
-			if (ImGui::Button("Add"))
+			if (ImGui::Button(ICON_FA_PLUS_CIRCLE "Add Layer"))
 				currentScene->AddNewLayer();
+
+			ImGui::ItemToolTip("Add Layer");
 
 			ImGui::AddSpaces(2);
 			ImGui::Separator();
 			ImGui::AddSpaces(2);
 
-			float itemWidth{ ImGui::GetWindowWidth() - 32.0f };
+			float itemWidth{ ImGui::GetWindowWidth() - 64.0f };
 			auto reverseView = spriteLayers | std::ranges::views::reverse;
 
 			for (auto rit = reverseView.begin(); rit < reverseView.end(); rit++)
@@ -161,6 +164,14 @@ namespace Feather {
 
 				bool checkPassed{ currentScene->CheckLayerName(checkName) };
 
+				ImGui::SameLine();
+				ImGui::PushID(n);
+				ImGui::PushStyleColor(ImGuiCol_Button, BLACK_TRANSPARENT);
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, BLACK_TRANSPARENT);
+				if (ImGui::Button(spriteLayer.isVisible ? ICON_FA_EYE : ICON_FA_EYE_SLASH, { 24.0f, 24.0f }))
+					spriteLayer.isVisible= !spriteLayer.isVisible;
+				ImGui::PopStyleColor(2);
+
 				if (m_Renaming && isSelected)
 				{
 					ImGui::SetKeyboardFocusHere();
@@ -177,14 +188,11 @@ namespace Feather {
 					}
 				}
 
-				ImGui::SameLine();
-
-				// Layer visibility
-				ImGui::Checkbox(std::format("##visible_{}", spriteLayer.layerName).c_str(), &spriteLayer.isVisible);
-
 				// Display an error if the name already exists
 				if (!checkPassed && isSelected)
 					ImGui::TextColored(ImVec4{ 1.f, 0.f, 0.f, 1.f }, std::format("{} - Already exists", checkName).c_str());
+
+				ImGui::PopID();
 			}
 
 			ImGui::End();

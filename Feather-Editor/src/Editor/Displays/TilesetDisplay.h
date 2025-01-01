@@ -16,6 +16,9 @@ namespace Feather {
 		inline void SetTileset(const std::string& tileset) { m_Tileset = tileset; }
 		inline const std::string& GetTilesetName() const { return m_Tileset; }
 
+	protected:
+		virtual void DrawToolbar() override;
+
 	private:
 		std::string m_Tileset{ "" };
 		int m_Selected{ -1 };

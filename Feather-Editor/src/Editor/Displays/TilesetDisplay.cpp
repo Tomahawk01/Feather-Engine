@@ -7,6 +7,8 @@
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <imgui.h>
 
@@ -23,28 +25,7 @@ namespace Feather {
 			return;
 		}
 
-		auto& mainRegistry = MAIN_REGISTRY();
-		auto& assetManager = mainRegistry.GetAssetManager();
-
-		auto tilesets = GetKeys(assetManager.GetAllTextures(), [](const auto& pair) { return pair.second->IsTileset(); });
-
-		if (ImGui::BeginCombo("Choose Tileset", m_Tileset.c_str()))
-		{
-			for (const auto& tileset : assetManager.GetTilesetNames())
-			{
-				bool IsSelected = m_Tileset == tileset;
-				if (ImGui::Selectable(tileset.c_str(), IsSelected))
-				{
-					m_Tileset = tileset;
-					SCENE_MANAGER().SetTileset(tileset);
-				}
-
-				if (IsSelected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
+		DrawToolbar();
 
 		if (m_Tileset.empty())
 		{
@@ -52,7 +33,7 @@ namespace Feather {
 			return;
 		}
 
-		auto texture = assetManager.GetTexture(m_Tileset);
+		auto texture = ASSET_MANAGER().GetTexture(m_Tileset);
 		if (!texture)
 		{
 			ImGui::End();
@@ -117,6 +98,45 @@ namespace Feather {
 		}
 
 		ImGui::End();
+	}
+
+	void TilesetDisplay::DrawToolbar()
+	{
+		auto& assetManager = ASSET_MANAGER();
+
+		ImGui::Separator();
+		if (ImGui::Button(ICON_FA_PLUS_CIRCLE))
+		{
+			// TODO: Add new tileset functionality
+		}
+		ImGui::ItemToolTip("Add Tileset");
+		ImGui::SameLine();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, BLACK_TRANSPARENT);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BLACK_TRANSPARENT);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, BLACK_TRANSPARENT);
+		ImGui::Button("Choose Tileset");
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		if (ImGui::BeginCombo("##Choose_Tileset", m_Tileset.c_str()))
+		{
+			for (const auto& sTileset : assetManager.GetTilesetNames())
+			{
+				bool bIsSelected = m_Tileset == sTileset;
+				if (ImGui::Selectable(sTileset.c_str(), bIsSelected))
+				{
+					m_Tileset = sTileset;
+					SCENE_MANAGER().SetTileset(sTileset);
+				}
+
+				if (bIsSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+		ImGui::Separator();
 	}
 
 }

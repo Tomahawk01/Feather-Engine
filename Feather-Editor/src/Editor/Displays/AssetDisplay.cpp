@@ -6,11 +6,13 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
 
 #include <imgui.h>
 
-constexpr float DEFAULT_ASSET_SIZE = 128.0f;
+constexpr float DEFAULT_ASSET_SIZE = 64.0f;
 constexpr ImVec2 DRAG_ASSET_SIZE = ImVec2{ 32.0f, 32.0f };
 
 namespace Feather {
@@ -40,32 +42,9 @@ namespace Feather {
 			return;
 		}
 
-		auto& mainRegistry = MAIN_REGISTRY();
-		auto& assetManager = mainRegistry.GetAssetManager();
+		DrawToolbar();
 
-		ImGui::Text("Asset Type");
-		ImGui::SameLine(0.0f, 10.0f);
-		if (ImGui::BeginCombo("##AssetType", m_SelectedType.c_str()))
-		{
-			for (const auto& assetType : m_SelectableTypes)
-			{
-				bool IsSelected = m_SelectedType == assetType;
-				if (ImGui::Selectable(assetType.c_str(), IsSelected))
-				{
-					m_AssetTypeChanged = true;
-					m_SelectedType = assetType;
-					m_SelectedID = -1;
-					SetAssetType();
-				}
-
-				if (IsSelected)
-					ImGui::SetItemDefaultFocus();
-			}
-
-			ImGui::EndCombo();
-		}
-
-		if (ImGui::BeginChild("##AssetTable", ImVec2{ 0.0f, 0.0f }, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_ChildWindow))
+		if (ImGui::BeginChild("##AssetTable", ImVec2{ 0.f, 0.f }, ImGuiChildFlags_None, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_ChildWindow))
 		{
 			m_WindowHovered = ImGui::IsWindowHovered();
 			m_WindowSelected = ImGui::IsWindowFocused();
@@ -346,6 +325,42 @@ namespace Feather {
 				}
 			}
 		}
+	}
+
+	void AssetDisplay::DrawToolbar()
+	{
+		auto& mainRegistry = MAIN_REGISTRY();
+		auto& assetManager = mainRegistry.GetAssetManager();
+
+		ImGui::Separator();
+		ImGui::PushStyleColor(ImGuiCol_Button, BLACK_TRANSPARENT);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BLACK_TRANSPARENT);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, BLACK_TRANSPARENT);
+		ImGui::Button("Asset Type");
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine(0.0f, 10.0f);
+		if (ImGui::BeginCombo("##AssetType", m_SelectedType.c_str()))
+		{
+			for (const auto& assetType : m_SelectableTypes)
+			{
+				bool IsSelected = m_SelectedType == assetType;
+				if (ImGui::Selectable(assetType.c_str(), IsSelected))
+				{
+					m_AssetTypeChanged = true;
+					m_SelectedType = assetType;
+					m_SelectedID = -1;
+					SetAssetType();
+				}
+
+				if (IsSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		ImGui::Separator();
 	}
 
 }

@@ -159,7 +159,7 @@ namespace Feather {
 					}
 				}
 
-				if (!error)
+				if (!error && id_type != 0)
 				{
 					auto&& storage = registry.storage(id_type);
 					if (!storage)
