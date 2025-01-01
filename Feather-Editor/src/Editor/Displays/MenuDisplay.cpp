@@ -19,7 +19,7 @@ namespace Feather {
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMenu(ICON_FA_FILE "File"))
+			if (ImGui::BeginMenu(ICON_FA_FILE " File"))
 			{
 				ImGui::InlineLabel(ICON_FA_FILE_ALT, 32.0f);
 				if (ImGui::MenuItem("New", "Ctrl + N"))
@@ -78,7 +78,7 @@ namespace Feather {
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu(ICON_FA_EDIT "Edit"))
+			if (ImGui::BeginMenu(ICON_FA_EDIT " Edit"))
 			{
 				auto& coreGlobals = CORE_GLOBALS();
 
@@ -98,17 +98,17 @@ namespace Feather {
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu(ICON_FA_TOOLS "Tools"))
+			if (ImGui::BeginMenu(ICON_FA_TOOLS " Tools"))
 			{
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu(ICON_FA_COG "Settings"))
+			if (ImGui::BeginMenu(ICON_FA_COG " Settings"))
 			{
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu(ICON_FA_QUESTION_CIRCLE "Help"))
+			if (ImGui::BeginMenu(ICON_FA_QUESTION_CIRCLE " Help"))
 			{
 				ImGui::EndMenu();
 			}
