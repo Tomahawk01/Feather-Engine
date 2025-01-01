@@ -57,32 +57,6 @@ namespace Feather {
 		return m_MouseTile->sprite.texture_name;
 	}
 
-	void TileTool::SetBoxCollider(int width, int height, const glm::vec2& offset)
-	{
-		m_MouseTile->boxCollider.width = width;
-		m_MouseTile->boxCollider.height = height;
-		m_MouseTile->boxCollider.offset = offset;
-	}
-
-	void TileTool::SetSpriteLayer(int layer)
-	{
-		m_MouseTile->sprite.layer = layer;
-	}
-
-	void TileTool::SetScale(const glm::vec2& scale)
-	{
-		m_MouseTile->transform.scale = scale;
-	}
-
-	void TileTool::SetAnimation(int numFrames, int frameRate, bool isVertical, bool isLooped, int frameOffset)
-	{
-		m_MouseTile->animation.numFrames = numFrames;
-		m_MouseTile->animation.frameRate = frameRate;
-		m_MouseTile->animation.isVertical = isVertical;
-		m_MouseTile->animation.isLooped = isLooped;
-		m_MouseTile->animation.frameOffset = frameOffset;
-	}
-
 	void TileTool::SetSpriteUVs(int startX, int startY)
 	{
 		m_MouseTile->sprite.start_x = startX;
@@ -104,26 +78,6 @@ namespace Feather {
 		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
 		F_ASSERT(texture && "Texture must exist");
 		GenerateUVs(sprite, texture->GetWidth(), texture->GetHeight());
-	}
-
-	void TileTool::SetCollider(bool isCollider)
-	{
-		m_MouseTile->isCollider = isCollider;
-	}
-
-	void TileTool::SetCircle(bool isCircle)
-	{
-		m_MouseTile->isCircle = isCircle;
-	}
-
-	void TileTool::SetAnimation(bool hasAnimation)
-	{
-		m_MouseTile->hasAnimation = hasAnimation;
-	}
-
-	void TileTool::SetPhysics(bool hasPhysics)
-	{
-		m_MouseTile->hasPhysics = hasPhysics;
 	}
 
 	const bool TileTool::SpriteValid() const

@@ -22,18 +22,8 @@ namespace Feather {
 		void LoadSpriteTextureData(const std::string& textureName);
 		const std::string& GetSpriteTexture() const;
 
-		void SetBoxCollider(int width, int height, const glm::vec2& offset);
-		void SetSpriteLayer(int layer);
-		void SetScale(const glm::vec2& scale);
-		void SetAnimation(int numFrames, int frameRate, bool isVertical, bool isLooped, int frameOffset);
 		void SetSpriteUVs(int startX, int startY);
-
 		void SetSpriteRect(const glm::vec2& spriteRect);
-
-		void SetCollider(bool isCollider);
-		void SetCircle(bool isCircle);
-		void SetAnimation(bool hasAnimation);
-		void SetPhysics(bool hasPhysics);
 
 		const bool SpriteValid() const;
 		const bool CanDrawOrCreate() const;
