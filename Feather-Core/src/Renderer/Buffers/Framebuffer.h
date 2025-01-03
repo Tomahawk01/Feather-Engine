@@ -30,9 +30,12 @@ namespace Feather {
 		void CleanUp();
 
 	private:
-		GLuint m_FboID, m_RboID;
+		GLuint m_FboID;
+		GLuint m_RboID;
 		std::shared_ptr<Texture> m_Texture;
-		int m_Width, m_Height;
-		bool m_ShouldResize, m_UseRbo;
+		int m_Width;
+		int m_Height;
+		bool m_ShouldResize;
+		bool m_UseRbo;
 	};
 }

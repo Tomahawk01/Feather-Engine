@@ -35,11 +35,15 @@ namespace Feather {
 		void Initialize();
 
 	private:
-		int m_Width, m_Height;
+		int m_Width;
+		int m_Height;
 		float m_Scale;
 
-		glm::vec2 m_Position, m_ScreenOffset;
-		glm::mat4 m_CameraMatrix, m_OrthoProjection;
+		glm::vec2 m_Position;
+		glm::vec2 m_ScreenOffset;
+
+		glm::mat4 m_CameraMatrix;
+		glm::mat4 m_OrthoProjection;
 
 		bool m_NeedUpdate;
 	};

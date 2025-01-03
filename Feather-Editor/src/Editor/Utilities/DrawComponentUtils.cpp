@@ -443,6 +443,11 @@ namespace Feather {
 				"Sensors do not collide with other sensors and do not have continuous collision");
 			ImGui::Checkbox("##sensor", &physicsAttributes.isTrigger);
 
+			ImGui::InlineLabel("bullet");
+			ImGui::ItemToolTip("Treat this body as high speed object that performs continuous collision detection against dynamic and kinematic bodies, but not other bullet bodies.\n"
+				"Warning - Bullets should be used sparingly. They are not a solution for general dynamic-versus-dynamic continuous collision. They may interfere with joint constraints");
+			ImGui::Checkbox("##bullet", &physicsAttributes.isBullet);
+
 			ImGui::SeparatorText("Physics Object Data");
 			ImGui::AddSpaces(2);
 

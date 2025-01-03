@@ -9,7 +9,8 @@ namespace Feather {
 
 	struct FontGlyph
 	{
-		Vertex min, max;
+		Vertex min;
+		Vertex max;
 	};
 
 	class Font
@@ -25,7 +26,8 @@ namespace Feather {
 
 	private:
 		GLuint m_FontAtlasID;
-		int m_Width, m_Height;
+		int m_Width;
+		int m_Height;
 		float m_FontSize;
 		void* m_Data;
 	};

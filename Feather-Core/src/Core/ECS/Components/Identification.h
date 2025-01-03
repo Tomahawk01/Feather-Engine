@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entt.hpp>
+
 #include <string>
 
 namespace Feather {
@@ -8,7 +10,7 @@ namespace Feather {
 	{
 		std::string name{ "GameObject" };
 		std::string group{ "" };
-		int32_t entity_id{ -1 };
+		uint32_t entity_id{ entt::null };
 	};
 
 }

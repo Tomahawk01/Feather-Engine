@@ -35,12 +35,14 @@ namespace Feather {
 		inline const GLuint ShaderProgramID() const { return m_ShaderProgramID; }
 
 	private:
+		GLuint GetUniformLocation(const std::string& uniformName);
+
+	private:
 		GLuint m_ShaderProgramID;
-		std::string m_VertexPath, m_FragmentPath;
+		std::string m_VertexPath;
+		std::string m_FragmentPath;
 
 		std::unordered_map<std::string, GLuint> m_UniformLocationMap;
-	private:
-		GLuint GetUniformLocation(const std::string& uniformName);
 	};
 
 }

@@ -30,7 +30,7 @@ namespace Feather {
 
 			if (animation.isVertical)
 			{
-				sprite.uvs.v = animation.currentFrame * sprite.uvs.uv_width;
+				sprite.uvs.v = animation.currentFrame * sprite.uvs.uv_height;
 				sprite.uvs.u = animation.frameOffset * sprite.uvs.uv_width;
 			}
 			else
