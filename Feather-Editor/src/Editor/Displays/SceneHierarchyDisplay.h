@@ -1,6 +1,8 @@
 #pragma once
 #include "IDisplay.h"
 
+#include <imgui.h>
+
 namespace Feather {
 
 	class Entity;
@@ -22,6 +24,7 @@ namespace Feather {
 
 	private:
 		std::shared_ptr<Entity> m_SelectedEntity{ nullptr };
+		ImGuiTextFilter m_TextFilter;
 		bool m_AddComponent{ false };
 	};
 

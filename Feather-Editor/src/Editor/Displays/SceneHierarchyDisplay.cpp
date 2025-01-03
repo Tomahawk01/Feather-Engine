@@ -6,6 +6,8 @@
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
+#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <imgui.h>
 
@@ -47,12 +49,22 @@ namespace Feather {
 			ImGui::EndPopup();
 		}
 
+		ImGui::Separator();
+		ImGui::AddSpaces(1);
+		ImGui::InlineLabel(ICON_FA_SEARCH, 32.0f);
+		m_TextFilter.Draw("##search_filter");
+		ImGui::AddSpaces(1);
+		ImGui::Separator();
+
 		auto& registry = currentScene->GetRegistry();
 		auto sceneEntities = registry.GetRegistry().view<entt::entity>(entt::exclude<TileComponent, ScriptComponent>);
 
 		for (auto entity : sceneEntities)
 		{
 			Entity ent{ registry, entity };
+			if (!m_TextFilter.PassFilter(ent.GetName().c_str()))
+				continue;
+
 			if (OpenTreeNode(ent))
 				ImGui::TreePop();
 		}
