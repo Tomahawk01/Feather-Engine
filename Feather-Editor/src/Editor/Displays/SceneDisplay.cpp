@@ -121,7 +121,7 @@ namespace Feather {
 		const auto& canvas = currentScene->GetCanvas();
 		runtimeRegistry.AddToContext<std::shared_ptr<Camera2D>>(std::make_shared<Camera2D>(canvas.width, canvas.height));
 
-		auto physicsWorld = runtimeRegistry.AddToContext<PhysicsWorld>(std::make_shared<b2World>(b2Vec2{ 0.0f, 9.8f }));
+		auto physicsWorld = runtimeRegistry.AddToContext<PhysicsWorld>(std::make_shared<b2World>(b2Vec2{ 0.0f, CORE_GLOBALS().GetGravity() }));
 		auto contactListener = runtimeRegistry.AddToContext<std::shared_ptr<ContactListener>>(std::make_shared<ContactListener>());
 		physicsWorld->SetContactListener(contactListener.get());
 
@@ -206,7 +206,7 @@ namespace Feather {
 		runtimeRegistry.ClearRegistry();
 		runtimeRegistry.RemoveContext<std::shared_ptr<Camera2D>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<sol::state>>();
-		runtimeRegistry.RemoveContext<std::shared_ptr<PhysicsWorld>>();
+		runtimeRegistry.RemoveContext<PhysicsWorld>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<ContactListener>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<ScriptingSystem>>();
 

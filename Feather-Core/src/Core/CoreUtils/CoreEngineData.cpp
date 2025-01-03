@@ -38,7 +38,7 @@ namespace Feather {
 	}
 
 	CoreEngineData::CoreEngineData()
-		: m_DeltaTime{ 0.0f }, m_ScaledWidth{ 0.0f }, m_ScaledHeight{ 0.0f },
+		: m_DeltaTime{ 0.0f }, m_ScaledWidth{ 0.0f }, m_ScaledHeight{ 0.0f }, m_Gravity{ 9.8f },
 		m_WindowWidth{ 640 }, m_WindowHeight{ 480 },
 		m_VelocityIterations{ 10 }, m_PositionIterations{ 8 },
 		m_PhysicsEnabled{ true }, m_PhysicsPaused{ false }, m_RenderColliders{ false }

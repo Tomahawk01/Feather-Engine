@@ -17,19 +17,25 @@ namespace Feather {
 		const float MetersToPixels() const;
 		const float PixelsToMeters() const;
 
-		inline const float GetDeltaTime() const { return m_DeltaTime; }
-		inline const int WindowWidth() const { return m_WindowWidth; }
-		inline const int WindowHeight() const { return m_WindowHeight; }
+		inline float GetDeltaTime() const { return m_DeltaTime; }
+		inline int WindowWidth() const { return m_WindowWidth; }
+		inline int WindowHeight() const { return m_WindowHeight; }
 
 		inline void EnableColliderRender() { m_RenderColliders = true; }
 		inline void DisableColliderRender() { m_RenderColliders = false; }
-		inline const bool RenderCollidersEnabled() { return m_RenderColliders; }
+		inline bool RenderCollidersEnabled() const { return m_RenderColliders; }
 
-		inline const float ScaledWidth() const { return m_ScaledWidth; }
-		inline const float ScaledHeight() const { return m_ScaledHeight; }
+		inline float ScaledWidth() const { return m_ScaledWidth; }
+		inline float ScaledHeight() const { return m_ScaledHeight; }
 
-		inline const int32_t GetVelocityIterations() const { return m_VelocityIterations; }
-		inline const int32_t GetPositionIterations() const { return m_PositionIterations; }
+		inline int32_t GetVelocityIterations() const { return m_VelocityIterations; }
+		inline int32_t GetPositionIterations() const { return m_PositionIterations; }
+
+		inline void SetVelocityIterations(int32_t velocityIterations) { m_VelocityIterations = velocityIterations; }
+		inline void SetPositionIterations(int32_t positionIterations) { m_PositionIterations = positionIterations; }
+
+		inline float GetGravity() const { return m_Gravity; }
+		inline void SetGravity(float gravity) { m_Gravity = gravity; }
 
 		inline void EnablePhysics() { m_PhysicsEnabled = true; }
 		inline void DisablePhysics() { m_PhysicsEnabled = false; }
@@ -47,12 +53,19 @@ namespace Feather {
 		CoreEngineData& operator=(const CoreEngineData&) = delete;
 
 	private:
-		float m_DeltaTime, m_ScaledWidth, m_ScaledHeight;
+		float m_DeltaTime;
+		float m_ScaledWidth;
+		float m_ScaledHeight;
+		float m_Gravity;
 		std::chrono::steady_clock::time_point m_LastUpdate;
-		int m_WindowWidth, m_WindowHeight;
-		int32_t m_VelocityIterations, m_PositionIterations;
+		int m_WindowWidth;
+		int m_WindowHeight;
+		int32_t m_VelocityIterations;
+		int32_t m_PositionIterations;
 
-		bool m_PhysicsEnabled, m_PhysicsPaused, m_RenderColliders;
+		bool m_PhysicsEnabled;
+		bool m_PhysicsPaused;
+		bool m_RenderColliders;
 	};
 
 }
