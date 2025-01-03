@@ -36,7 +36,10 @@ namespace Feather {
 		WindowPtr m_pWindow;
 		SDL_GLContext m_GLContext;
 		std::string m_Title;
-		int m_Width, m_Height, m_XPos, m_YPos;
+		int m_Width;
+		int m_Height;
+		int m_XPos;
+		int m_YPos;
 		Uint32 m_WindowFlags;
 	private:
 		void CreateNewWindow(Uint32 flags);

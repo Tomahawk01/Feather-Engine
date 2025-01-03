@@ -15,8 +15,11 @@ namespace Feather {
 
 	struct ObjectData
 	{
-		std::string tag{ "" }, group{ "" };
-		bool isCollider{ false }, isTrigger{ false }, isFriendly{ false };
+		std::string tag{ "" };
+		std::string group{ "" };
+		bool isCollider{ false };
+		bool isTrigger{ false };
+		bool isFriendly{ false };
 		std::uint32_t entityID{};
 		std::vector<ObjectData> contactEntities;
 

@@ -5,15 +5,6 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 
-//void Feather::SpriteComponent::generate_uvs(int textureWidth, int textureHeight)
-//{
-//	uvs.uv_width = width / textureWidth;
-//	uvs.uv_height = height / textureHeight;
-//
-//	uvs.u = start_x * uvs.uv_width;
-//	uvs.v = start_y * uvs.uv_height;
-//}
-
 std::string Feather::SpriteComponent::to_string() const
 {
 	std::stringstream ss;

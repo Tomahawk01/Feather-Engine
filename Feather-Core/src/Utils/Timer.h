@@ -24,8 +24,10 @@ namespace Feather {
 		inline const bool IsPaused() const { return m_IsPaused; }
 
 	private:
-		time_point<steady_clock> m_StartPoint, m_PausedPoint;
-		bool m_IsRunning{ false }, m_IsPaused{ false };
+		time_point<steady_clock> m_StartPoint;
+		time_point<steady_clock> m_PausedPoint;
+		bool m_IsRunning{ false };
+		bool m_IsPaused{ false };
 	};
 
 }

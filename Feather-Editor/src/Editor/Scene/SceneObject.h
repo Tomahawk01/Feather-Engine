@@ -28,7 +28,8 @@ namespace Feather {
 		inline Registry& GetRuntimeRegistry() { return m_RuntimeRegistry; }
 
 	private:
-		Registry m_Registry, m_RuntimeRegistry;
+		Registry m_Registry;
+		Registry m_RuntimeRegistry;
 		std::string m_SceneName;
 		Canvas m_Canvas;
 		std::vector<SpriteLayerParams> m_LayerParams;

@@ -8,7 +8,10 @@ namespace Feather {
 
 	struct FollowCamParams
 	{
-		float minX{ 0.0f }, minY{ 0.0f }, scale{ 1.0f }, springback{ 1.0f };
+		float minX{ 0.0f };
+		float minY{ 0.0f };
+		float scale{ 1.0f };
+		float springback{ 1.0f };
 		float maxX{ static_cast<float>(CoreEngineData::GetInstance().WindowWidth()) };
 		float maxY{ static_cast<float>(CoreEngineData::GetInstance().WindowHeight()) };
 	};

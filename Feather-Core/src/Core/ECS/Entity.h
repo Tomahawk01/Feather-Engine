@@ -52,7 +52,8 @@ namespace Feather {
 	private:
 		Registry& m_Registry;
 		entt::entity m_Entity;
-		std::string m_Name, m_Group;
+		std::string m_Name;
+		std::string m_Group;
 	};
 
 	template <typename TComponent>

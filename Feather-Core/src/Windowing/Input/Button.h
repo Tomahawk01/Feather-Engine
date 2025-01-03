@@ -4,7 +4,9 @@ namespace Feather {
 
 	struct Button
 	{
-		bool IsPressed{ false }, JustPressed{ false }, JustReleased{ false };
+		bool IsPressed{ false };
+		bool JustPressed{ false };
+		bool JustReleased{ false };
 
 		void Update(bool pressed);
 		void Reset();

@@ -39,7 +39,10 @@ namespace Feather {
 			{F_MOUSE_RIGHT, Button{}}
 		};
 
-		int m_X{ 0 }, m_Y{ 0 }, m_WheelX{ 0 }, m_WheelY{ 0 };
+		int m_X{ 0 };
+		int m_Y{ 0 };
+		int m_WheelX{ 0 };
+		int m_WheelY{ 0 };
 		bool m_MouseMoving{ false };
 	};
 

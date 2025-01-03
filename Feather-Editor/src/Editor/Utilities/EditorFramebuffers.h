@@ -7,7 +7,10 @@ namespace Feather {
 
 	enum class FramebufferType
 	{
-		TILEMAP, SCENE, NO_TYPE
+		TILEMAP,
+		SCENE,
+
+		NO_TYPE
 	};
 
 	struct EditorFramebuffers

@@ -6,7 +6,9 @@ namespace Feather {
 
 	struct SoundParams
 	{
-		std::string name{ "" }, description{ "" }, filename{ "" };
+		std::string name{ "" };
+		std::string description{ "" };
+		std::string filename{ "" };
 		double duration{ 0.0 };
 	};
 

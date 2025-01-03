@@ -13,12 +13,22 @@ namespace Feather {
 	struct PhysicsAttributes
 	{
 		RigidBodyType eType{ RigidBodyType::STATIC };
-		float density{ 1.0f }, friction{ 0.2f }, restitution{ 0.2f };
-		float restitutionThreshold{ 1.0f }, radius{ 0.0f }, gravityScale{ 1.0f };
+		float density{ 1.0f };
+		float friction{ 0.2f };
+		float restitution{ 0.2f };
+		float restitutionThreshold{ 1.0f };
+		float radius{ 0.0f };
+		float gravityScale{ 1.0f };
 
-		glm::vec2 position{ 0.0f }, scale{ 1.0f }, boxSize{ 0.0f }, offset{ 0.0f };
-		bool isCircle{ false }, isBoxShape{ true }, isFixedRotation{ true }, isTrigger{ false };
+		glm::vec2 position{ 0.0f };
+		glm::vec2 scale{ 1.0f };
+		glm::vec2 boxSize{ 0.0f };
+		glm::vec2 offset{ 0.0f };
 
+		bool isCircle{ false };
+		bool isBoxShape{ true };
+		bool isFixedRotation{ true };
+		bool isTrigger{ false };
 		bool isBullet{ false };
 
 		// Used to filter collisions on shapes

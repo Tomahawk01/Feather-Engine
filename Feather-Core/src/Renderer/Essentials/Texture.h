@@ -14,6 +14,7 @@ namespace Feather {
 			PIXEL = 0,
 			BLENDED,
 			FRAMEBUFFER,
+
 			NONE
 		};
 
@@ -35,7 +36,8 @@ namespace Feather {
 
 	private:
 		GLuint m_TextureID;
-		int m_Width, m_Height;
+		int m_Width;
+		int m_Height;
 		std::string m_Path;
 		TextureType m_Type;
 		bool m_IsTileset;

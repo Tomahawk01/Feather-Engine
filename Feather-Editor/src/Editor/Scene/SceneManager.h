@@ -40,7 +40,8 @@ namespace Feather {
 
 	private:
 		std::map<std::string, std::shared_ptr<SceneObject>> m_mapScenes;
-		std::string m_CurrentScene{ "" }, m_CurrentTileset{ "" };
+		std::string m_CurrentScene{ "" };
+		std::string m_CurrentTileset{ "" };
 
 		std::unique_ptr<ToolManager> m_ToolManager{ nullptr };
 		std::unique_ptr<CommandManager> m_CommandManager{ nullptr };

@@ -43,7 +43,9 @@ namespace Feather {
 		glm::vec2 m_GUICursorCoords, m_GUIRelativeCoords;
 		glm::vec2 m_WindowPos, m_WindowSize;
 
-		bool m_Activated, m_OutOfBounds, m_OverTileMapWindow;
+		bool m_Activated;
+		bool m_OutOfBounds;
+		bool m_OverTileMapWindow;
 
 	protected:
 		enum class MouseButton

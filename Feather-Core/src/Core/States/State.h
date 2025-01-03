@@ -14,7 +14,8 @@ namespace Feather {
 		sol::protected_function handle_inputs{ sol::lua_nil };
 
 		sol::object variables{ sol::lua_nil };
-		bool killState{ false }, addState{ false };
+		bool killState{ false };
+		bool addState{ false };
 
 		static void CreateLuaStateBind(sol::state& lua);
 	};
