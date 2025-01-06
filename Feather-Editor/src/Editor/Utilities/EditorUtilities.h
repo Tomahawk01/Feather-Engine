@@ -30,4 +30,21 @@ namespace Feather {
 		bool isCollider{ false }, hasAnimation{ false }, hasPhysics{ false }, isCircle{ false };
 	};
 
+	constexpr Color XAXIS_GIZMO_COLOR = { 255, 0, 0, 175 };
+	constexpr Color XAXIS_HOVERED_GIZMO_COLOR = { 255, 255, 0, 175 };
+	constexpr Color YAXIS_GIZMO_COLOR = { 0, 255, 0, 175 };
+	constexpr Color YAXIS_HOVERED_GIZMO_COLOR = { 0, 255, 255, 175 };
+	constexpr Color GRAYED_OUT_GIZMO_COLOR = { 135, 135, 135, 175 };
+
+	struct GizmoAxisParams
+	{
+		TransformComponent transform{};
+		SpriteComponent sprite{};
+		glm::vec2 axisOffset;
+
+		Color axisColor;
+		Color axisHoveredColor;
+		Color axisDisabledColor;
+	};
+
 }

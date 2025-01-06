@@ -44,6 +44,9 @@ namespace Feather {
 		TComponent& GetComponent();
 
 		template <typename TComponent>
+		TComponent* TryGetComponent();
+
+		template <typename TComponent>
 		bool HasComponent();
 
 		template <typename TComponent>
