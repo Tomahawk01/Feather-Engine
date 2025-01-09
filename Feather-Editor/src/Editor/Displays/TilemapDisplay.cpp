@@ -328,16 +328,14 @@ namespace Feather {
 
 		if (activeGizmoType == GizmoType::ROTATE)
 		{
-			//ImGui::ActiveButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE);
-			ImGui::DisabledButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE, "Rotate [R] - rotate game objects. Currently Unavailable");
+			ImGui::ActiveButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE);
 		}
 		else
 		{
-			/*if (ImGui::Button(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE))
-				toolManager.SetGizmoActive(GizmoType::ROTATE);*/
-			ImGui::DisabledButton(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE, "Rotate [R] - rotate game objects. Currently Unavailable");
+			if (ImGui::Button(ICON_FA_CIRCLE_NOTCH, TOOL_BUTTON_SIZE))
+				toolManager.SetGizmoActive(GizmoType::ROTATE);
 		}
-		//ImGui::ItemToolTip("Rotate [R] - rotate game objects. Currently Unavailable");
+		ImGui::ItemToolTip("Rotate [R] - rotates game objects");
 
 		ImGui::SameLine();
 

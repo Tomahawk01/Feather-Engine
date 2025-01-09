@@ -7,6 +7,8 @@
 
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/Gizmos/TranslateGizmo.h"
+#include "Editor/Tools/Gizmos/ScaleGizmo.h"
+#include "Editor/Tools/Gizmos/RotateGizmo.h"
 
 namespace Feather {
 
@@ -16,6 +18,8 @@ namespace Feather {
 		m_mapTools.emplace(ToolType::RECT_FILL_TILE, std::make_unique<RectFillTool>());
 
 		m_mapGizmos.emplace(GizmoType::TRANSLATE, std::make_unique<TranslateGizmo>());
+		m_mapGizmos.emplace(GizmoType::SCALE, std::make_unique<ScaleGizmo>());
+		m_mapGizmos.emplace(GizmoType::ROTATE, std::make_unique<RotateGizmo>());
 
 		// TODO: Add other tools as needed
 
