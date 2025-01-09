@@ -23,6 +23,7 @@
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/ToolAccessories.h"
 #include "Editor/Tools/CreateTileTool.h"
+#include "Editor/Tools/Gizmos/Gizmo.h"
 #include "Editor/Commands/CommandManager.h"
 
 #include "imgui.h"
@@ -62,7 +63,7 @@ namespace Feather {
 			auto relativePos = ImGui::GetCursorScreenPos();
 			auto windowPos = ImGui::GetWindowPos();
 
-			auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
+			auto activeTool = TOOL_MANAGER().GetActiveToolFromAbstract();
 			if (activeTool)
 			{
 				activeTool->SetRelativeCoords(glm::vec2{ relativePos.x, relativePos.y });
@@ -108,12 +109,19 @@ namespace Feather {
 		if (!currentScene)
 			return;
 
-		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
+		auto activeTool = TOOL_MANAGER().GetActiveTool();
 		if (activeTool && activeTool->IsOverTilemapWindow() && !ImGui::GetDragDropPayload())
 		{
 			PanZoomCamera(activeTool->GetMouseScreenCoords());
 			activeTool->Update(currentScene->GetCanvas());
 			activeTool->Create();
+		}
+
+		auto activeGizmo = TOOL_MANAGER().GetActiveGizmo();
+		if (activeGizmo && activeGizmo->IsOverTilemapWindow() && !ImGui::GetDragDropPayload())
+		{
+			PanZoomCamera(activeGizmo->GetMouseScreenCoords());
+			activeGizmo->Update(currentScene->GetCanvas());
 		}
 
 		auto& mainRegistry = MAIN_REGISTRY();
@@ -144,9 +152,12 @@ namespace Feather {
 		auto& renderUISystem = mainRegistry.GetRenderUISystem();
 		auto& renderShapeSystem = mainRegistry.GetRenderShapeSystem();
 
+		auto activeGizmo = TOOL_MANAGER().GetActiveGizmo();
+
 		const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::TILEMAP];
 
 		fb->Bind();
+
 		renderer->SetViewport(0, 0, fb->GetWidth(), fb->GetHeight());
 		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		renderer->ClearBuffers(true, true, false);
@@ -165,9 +176,13 @@ namespace Feather {
 			renderShapeSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
 		renderUISystem.Update(currentScene->GetRegistry());
 
-		auto activeTool = SCENE_MANAGER().GetToolManager().GetActiveTool();
+		auto activeTool = TOOL_MANAGER().GetActiveTool();
 		if (activeTool)
 			activeTool->Draw();
+
+		if (activeGizmo)
+			activeGizmo->Draw();
+
 		fb->Unbind();
 		fb->CheckResize();
 

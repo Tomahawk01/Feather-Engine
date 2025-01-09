@@ -265,40 +265,40 @@ namespace Feather {
 		assetManager.GetTexture("scene_icon")->SetIsEditorTexture(true);
 
 		// ============= Gizmo Textures =============
-		if (!assetManager.AddTextureFromMemory("F_x_axis_translate", x_axis_arrow, x_axis_arrow_size))
+		if (!assetManager.AddTextureFromMemory("x_axis_translate", x_axis_arrow, x_axis_arrow_size))
 		{
-			F_ERROR("Failed to load texture 'F_x_axis_translate' from memory");
+			F_ERROR("Failed to load texture 'x_axis_translate' from memory");
 			return false;
 		}
-		assetManager.GetTexture("F_x_axis_translate")->SetIsEditorTexture(true);
+		assetManager.GetTexture("x_axis_translate")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("F_y_axis_translate", y_axis_arrow, y_axis_arrow_size))
+		if (!assetManager.AddTextureFromMemory("y_axis_translate", y_axis_arrow, y_axis_arrow_size))
 		{
-			F_ERROR("Failed to load texture [F_y_axis_translate] from memory");
+			F_ERROR("Failed to load texture [y_axis_translate] from memory");
 			return false;
 		}
-		assetManager.GetTexture("F_y_axis_translate")->SetIsEditorTexture(true);
+		assetManager.GetTexture("y_axis_translate")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("F_x_axis_scale", x_axis_scale, x_axis_scale_size))
+		if (!assetManager.AddTextureFromMemory("x_axis_scale", x_axis_scale, x_axis_scale_size))
 		{
-			F_ERROR("Failed to load texture [F_x_axis_scale] from memory");
+			F_ERROR("Failed to load texture [x_axis_scale] from memory");
 			return false;
 		}
-		assetManager.GetTexture("F_x_axis_scale")->SetIsEditorTexture(true);
+		assetManager.GetTexture("x_axis_scale")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("F_y_axis_scale", y_axis_scale, y_axis_scale_size))
+		if (!assetManager.AddTextureFromMemory("y_axis_scale", y_axis_scale, y_axis_scale_size))
 		{
-			F_ERROR("Failed to load texture [F_y_axis_scale] from memory");
+			F_ERROR("Failed to load texture [y_axis_scale] from memory");
 			return false;
 		}
-		assetManager.GetTexture("F_y_axis_scale")->SetIsEditorTexture(true);
+		assetManager.GetTexture("y_axis_scale")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("F_rotate_tool", rotate_tool, rotate_tool_size))
+		if (!assetManager.AddTextureFromMemory("rotate_tool", rotate_tool, rotate_tool_size))
 		{
-			F_ERROR("Failed to load texture [F_rotate_tool] from memory");
+			F_ERROR("Failed to load texture [rotate_tool] from memory");
 			return false;
 		}
-		assetManager.GetTexture("F_rotate_tool")->SetIsEditorTexture(true);
+		assetManager.GetTexture("rotate_tool")->SetIsEditorTexture(true);
 
 		return true;
 	}

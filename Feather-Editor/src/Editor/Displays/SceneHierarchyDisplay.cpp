@@ -6,6 +6,7 @@
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
+#include "Editor/Tools/ToolManager.h"
 #include "Editor/Utilities/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
@@ -92,6 +93,7 @@ namespace Feather {
 		if (ImGui::IsItemClicked())
 		{
 			m_SelectedEntity = std::make_shared<Entity>(SCENE_MANAGER().GetCurrentScene()->GetRegistry(), entity.GetEntity());
+			TOOL_MANAGER().SetSelectedEntity(entity.GetEntity());
 		}
 
 		ImGui::PopID();

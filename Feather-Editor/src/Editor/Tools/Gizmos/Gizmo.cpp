@@ -48,6 +48,9 @@ namespace Feather {
 		m_YAxisParams = std::make_unique<GizmoAxisParams>(yAxisParams);
 	}
 
+	Gizmo::~Gizmo()
+	{}
+
 	void Gizmo::Update(Canvas& canvas)
 	{
 		m_LastMousePos = GetMouseScreenCoords();
@@ -235,13 +238,13 @@ namespace Feather {
 				selectedTransform.position + m_XAxisParams->axisOffset +
 				glm::vec2{
 					spriteWidth * selectedTransform.scale.x * 0.5f,
-					(spriteHeight * selectedTransform.scale.y * 0.5f) - (m_XAxisParams->sprite.height * m_XAxisParams->transform.scale.y)
+					(spriteHeight * selectedTransform.scale.y * 0.5f) - (m_XAxisParams->sprite.height * m_XAxisParams->transform.scale.y * 0.5f)
 				};
 
 			m_YAxisParams->transform.position =
 				selectedTransform.position + m_YAxisParams->axisOffset +
 				glm::vec2{
-					(spriteWidth * selectedTransform.scale.x * 0.5f) - (m_YAxisParams->sprite.width * m_YAxisParams->transform.scale.x),
+					(spriteWidth * selectedTransform.scale.x * 0.5f) - (m_YAxisParams->sprite.width * m_YAxisParams->transform.scale.x * 0.5f),
 					(spriteHeight * selectedTransform.scale.y * 0.5f) - (m_YAxisParams->sprite.height * m_YAxisParams->transform.scale.y)
 				};
 		}
@@ -250,8 +253,8 @@ namespace Feather {
 			m_XAxisParams->transform.position =
 				selectedTransform.position + m_XAxisParams->axisOffset +
 				glm::vec2{
-					(spriteWidth * selectedTransform.scale.x * 0.5f) - (m_XAxisParams->sprite.width * m_XAxisParams->transform.scale.x),
-					(spriteHeight * selectedTransform.scale.y * 0.5f) - (m_XAxisParams->sprite.height * m_XAxisParams->transform.scale.y)
+					(spriteWidth * selectedTransform.scale.x * 0.5f) - (m_XAxisParams->sprite.width * m_XAxisParams->transform.scale.x * 0.5f),
+					(spriteHeight * selectedTransform.scale.y * 0.5f) - (m_XAxisParams->sprite.height * m_XAxisParams->transform.scale.y * 0.5f)
 				};
 		}
 	}

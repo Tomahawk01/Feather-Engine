@@ -3,10 +3,14 @@
 #include <memory>
 #include <string>
 
+#include <entt.hpp>
+
 namespace Feather {
 
 	enum class ToolType;
 	enum class GizmoType;
+	class AbstractTool;
+	class Gizmo;
 	class TileTool;
 	class SceneObject;
 	class Camera2D;
@@ -39,11 +43,25 @@ namespace Feather {
 		*/
 		void SetGizmoActive(GizmoType gizmoType);
 
+		void SetSelectedEntity(entt::entity entity);
+
 		/*
 		* @brief Gets the current activated tool
 		* @return Returns a pointer to a TileTool if activated, else returns nullptr
 		*/
 		TileTool* GetActiveTool();
+
+		/*
+		* @brief Gets the current activated gizmo
+		* @return Returns a pointer to a Gizmo if activated, else returns nullptr
+		*/
+		Gizmo* GetActiveGizmo();
+
+		/*
+		* @brief Gets the current activated abstract tool
+		* @return Returns a pointer to a Abstract tool if activated, else returns nullptr
+		*/
+		AbstractTool* GetActiveToolFromAbstract();
 
 		inline ToolType GetActiveToolType() const { return m_ActiveToolType; }
 		inline GizmoType GetActiveGizmoType() const { return m_ActiveGizmoType; }
@@ -54,6 +72,7 @@ namespace Feather {
 
 	private:
 		std::map<ToolType, std::unique_ptr<TileTool>> m_mapTools;
+		std::map<GizmoType, std::unique_ptr<Gizmo>> m_mapGizmos;
 
 		ToolType m_ActiveToolType;
 		GizmoType m_ActiveGizmoType;

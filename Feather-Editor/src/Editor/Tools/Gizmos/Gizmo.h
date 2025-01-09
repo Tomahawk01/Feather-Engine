@@ -16,6 +16,7 @@ namespace Feather {
 	public:
 		Gizmo();
 		Gizmo(const GizmoAxisParams& xAxisParams, const GizmoAxisParams& yAxisParams, bool oneAxis);
+		virtual ~Gizmo();
 
 		virtual void Update(Canvas& canvas) override;
 		virtual void Draw() = 0;

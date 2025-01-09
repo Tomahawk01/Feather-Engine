@@ -5,6 +5,7 @@
 
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"
+#include "Editor/Tools/Gizmos/Gizmo.h"
 #include "Editor/Commands/CommandManager.h"
 
 namespace Feather {
