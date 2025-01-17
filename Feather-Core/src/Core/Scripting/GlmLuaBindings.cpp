@@ -198,10 +198,10 @@ namespace Feather {
 
 		lua.set_function("F_nearly_zero", sol::overload(
 			[](const glm::vec2& v) {
-				return glm::epsilonEqual(v.x, 0.f, 0.001f) && glm::epsilonEqual(v.y, 0.f, 0.001f);
+				return glm::epsilonEqual(v.x, 0.0f, 0.001f) && glm::epsilonEqual(v.y, 0.0f, 0.001f);
 			},
 			[](const glm::vec3& v) {
-				return glm::epsilonEqual(v.x, 0.f, 0.001f) && glm::epsilonEqual(v.y, 0.f, 0.001f) && glm::epsilonEqual(v.z, 0.f, 0.001f);
+				return glm::epsilonEqual(v.x, 0.0f, 0.001f) && glm::epsilonEqual(v.y, 0.0f, 0.001f) && glm::epsilonEqual(v.z, 0.0f, 0.001f);
 			}
 		));
 

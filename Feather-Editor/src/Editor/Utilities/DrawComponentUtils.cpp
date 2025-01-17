@@ -444,8 +444,10 @@ namespace Feather {
 			ImGui::Checkbox("##sensor", &physicsAttributes.isTrigger);
 
 			ImGui::InlineLabel("bullet");
-			ImGui::ItemToolTip("Treat this body as high speed object that performs continuous collision detection against dynamic and kinematic bodies, but not other bullet bodies.\n"
-				"Warning - Bullets should be used sparingly. They are not a solution for general dynamic-versus-dynamic continuous collision. They may interfere with joint constraints");
+			ImGui::ItemToolTip("Treat this body as high speed object that performs continuous collision detection against "
+								"dynamic and kinematic bodies, but not other bullet bodies.\n"
+								"Warning - Bullets should be used sparingly. They are not a solution for general "
+								"dynamic-versus-dynamic continuous collision. They may interfere with joint constraints.");
 			ImGui::Checkbox("##bullet", &physicsAttributes.isBullet);
 
 			ImGui::SeparatorText("Physics Object Data");
@@ -572,6 +574,106 @@ namespace Feather {
 			ImGui::TreePop();
 		}
 		ImGui::PopID();
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, TransformComponent& transform)
+	{
+		ImGui::SeparatorText("Transform");
+		ImGui::PushID(entt::type_hash<TransformComponent>::value());
+		if (ImGui::TreeNodeEx("##TransformTree", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			const auto& relations = entity.GetComponent<Relationship>();
+			bool hasParent{ relations.parent != entt::null };
+			bool positionChanged{ false };
+
+			ImGui::PushItemWidth(120.0f);
+			ImGui::InlineLabel(hasParent ? "relative pos" : "position");
+			ImGui::ItemToolTip(hasParent ? "Game object has a parent. This is the relative position based on the parent's position"
+										 : "World or absolute position of the game object");
+
+			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::SameLine();
+			if (ImGui::InputFloat(
+				"##position_x", hasParent ? &transform.localPosition.x : &transform.position.x, 1.0f, 10.0f, "%.1f"))
+			{
+				positionChanged = true;
+			}
+
+			ImGui::SameLine();
+			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::SameLine();
+			if (ImGui::InputFloat(
+				"##position_y", hasParent ? &transform.localPosition.y : &transform.position.y, 1.0f, 10.0f, "%.1f"))
+			{
+				positionChanged = true;
+			}
+			if (positionChanged)
+			{
+				entity.UpdateTransform();
+			}
+
+			ImGui::InlineLabel("scale");
+			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::SameLine();
+			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 1.0f, 1.0f, "%.1f"))
+			{
+				transform.scale.x = std::clamp(transform.scale.x, 0.01f, 150.0f);
+			}
+			ImGui::SameLine();
+			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::SameLine();
+			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 1.0f, 1.0f, "%.1f"))
+			{
+				transform.scale.y = std::clamp(transform.scale.y, 0.01f, 150.0f);
+			}
+
+			ImGui::InlineLabel("rotation");
+			ImGui::InputFloat("##rotation", &transform.rotation, 1.0f, 1.0f, "%.1f");
+			ImGui::PopItemWidth();
+			ImGui::TreePop();
+		}
+
+		ImGui::PopID();
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, SpriteComponent& sprite)
+	{
+		DrawImGuiComponent(sprite);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, AnimationComponent& animation)
+	{
+		DrawImGuiComponent(animation);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, BoxColliderComponent& boxCollider)
+	{
+		DrawImGuiComponent(boxCollider);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, CircleColliderComponent& circleCollider)
+	{
+		DrawImGuiComponent(circleCollider);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, PhysicsComponent& physics)
+	{
+		DrawImGuiComponent(physics);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, RigidBodyComponent& rigidbody)
+	{
+		DrawImGuiComponent(rigidbody);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, TextComponent& textComponent)
+	{
+		DrawImGuiComponent(textComponent);
+	}
+
+	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, Identification& identification)
+	{
+		DrawImGuiComponent(identification);
 	}
 
 }

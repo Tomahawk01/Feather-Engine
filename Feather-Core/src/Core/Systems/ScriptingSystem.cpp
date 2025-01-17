@@ -365,10 +365,10 @@ namespace Feather {
 				if (!pFont)
 				{
 					F_ERROR("Failed to get font '{}': Does not exist in asset manager!", fontName);
-					return -1.f;
+					return -1.0f;
 				}
 
-				glm::vec2 position{ 0.f }, temp_pos{ position };
+				glm::vec2 position{ 0.0f }, temp_pos{ position };
 				for (const auto& character : text)
 					pFont->GetNextCharPos(character, temp_pos);
 

@@ -7,13 +7,19 @@ namespace Feather {
 	inline void DrawComponentsUtil::DrawEntityComponentInfo(Entity& entity)
 	{
 		auto& component = entity.GetComponent<TComponent>();
-		DrawImGuiComponent(component);
+		DrawImGuiComponent(entity, component);
 	}
 
 	template<typename TComponent>
 	inline void DrawComponentsUtil::DrawComponentInfo(TComponent& component)
 	{
 		DrawImGuiComponent(component);
+	}
+
+	template <typename TComponent>
+	inline void DrawComponentsUtil::DrawComponentInfo(Entity& entity, TComponent& component)
+	{
+		DrawImGuiComponent(entity, component);
 	}
 
 	template<typename TComponent>

@@ -82,7 +82,7 @@ namespace Feather {
 			return;
 		}
 
-		ImGui::PushItemWidth(250.f);
+		ImGui::PushItemWidth(250.0f);
 		ImVec4* colors = ImGui::GetStyle().Colors;
 		ImGui::Text("Style Colors");
 		ImGui::ColorEdit4("Text", &colors[ImGuiCol_Text].x);

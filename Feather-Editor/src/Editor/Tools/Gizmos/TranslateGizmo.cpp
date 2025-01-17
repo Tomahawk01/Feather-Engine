@@ -32,9 +32,27 @@ namespace Feather {
 
 		Entity selectedEntity{ *m_Registry, m_SelectedEntity };
 		auto& selectedTransform = selectedEntity.GetComponent<TransformComponent>();
+		float deltaX{ GetDeltaX() };
+		float deltaY{ GetDeltaY() };
 
-		selectedTransform.position.x += GetDeltaX();
-		selectedTransform.position.y += GetDeltaY();
+		bool bTransformChanged = (deltaX != 0.0f || deltaY != 0.0f);
+
+		if (auto* relations = m_Registry->GetRegistry().try_get<Relationship>(m_SelectedEntity);
+			relations->parent != entt::null)
+		{
+			selectedTransform.localPosition.x += deltaX;
+			selectedTransform.localPosition.y += deltaY;
+		}
+		else
+		{
+			selectedTransform.position.x += deltaX;
+			selectedTransform.position.y += deltaY;
+		}
+
+		if (bTransformChanged)
+		{
+			selectedEntity.UpdateTransform();
+		}
 
 		SetGizmoPosition(selectedEntity);
 

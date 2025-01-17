@@ -190,7 +190,7 @@ namespace Feather {
 
 				// Display an error if the name already exists
 				if (!checkPassed && isSelected)
-					ImGui::TextColored(ImVec4{ 1.f, 0.f, 0.f, 1.f }, std::format("{} - Already exists", checkName).c_str());
+					ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, std::format("{} - Already exists", checkName).c_str());
 
 				ImGui::PopID();
 			}

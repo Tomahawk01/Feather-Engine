@@ -67,7 +67,7 @@ namespace Feather {
 
 	void CircleBatchRenderer::AddCircle(const Circle& circle)
 	{
-		glm::mat4 model{ 1.f };
+		glm::mat4 model{ 1.0f };
 		auto newCircle = std::make_shared<CircleGlyph>(
 			CircleGlyph{
 				.topLeft = CircleVertex {

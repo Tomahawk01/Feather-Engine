@@ -23,11 +23,23 @@ namespace Feather {
 			return *this;
 		}
 
+		/*
+		* @brief Adds a new child to the entity.
+		* @param underlying entity of the child to add
+		*/
+		bool AddChild(entt::entity child);
+
+		/*
+		* @brief Updates the position of the entity. If the entity has children, it will update all the children as well.
+		*/
+		void UpdateTransform();
+
 		inline const std::string& GetName() const { return m_Name; }
 		inline const std::string& GetGroup() const { return m_Group; }
 		inline std::uint32_t Kill() { return m_Registry.GetRegistry().destroy(m_Entity); }
 		inline entt::entity& GetEntity() { return m_Entity; }
-		inline entt::registry& GetRegistry() { return m_Registry.GetRegistry(); }
+		inline entt::registry& GetEnttRegistry() { return m_Registry.GetRegistry(); }
+		inline Registry& GetRegistry() { return m_Registry; }
 
 		static void CreateLuaEntityBind(sol::state& lua, Registry& registry);
 

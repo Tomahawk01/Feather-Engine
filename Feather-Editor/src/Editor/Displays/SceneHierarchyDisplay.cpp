@@ -66,8 +66,13 @@ namespace Feather {
 			if (!m_TextFilter.PassFilter(ent.GetName().c_str()))
 				continue;
 
-			if (OpenTreeNode(ent))
-				ImGui::TreePop();
+			// Do not redraw the children
+			const auto& relations = ent.GetComponent<Relationship>();
+			if (relations.parent == entt::null)
+			{
+				if (OpenTreeNode(ent))
+					ImGui::TreePop();
+			}
 		}
 
 		ImGui::End();
@@ -84,19 +89,53 @@ namespace Feather {
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding |
 									   ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		if (m_SelectedEntity && m_SelectedEntity->GetEntity() == entity.GetEntity())
+		// Get a copy of the relationships of the current entity
+		auto relations = entity.GetComponent<Relationship>();
+		auto curr = relations.firstChild;
+
+		bool selected{ m_SelectedEntity && m_SelectedEntity->GetEntity() == entity.GetEntity() };
+		if (selected)
 			nodeFlags |= ImGuiTreeNodeFlags_Selected;
 
 		bool treeNodeOpen{ false };
 		treeNodeOpen = ImGui::TreeNodeEx(name.c_str(), nodeFlags);
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
 
 		if (ImGui::IsItemClicked())
 		{
-			m_SelectedEntity = std::make_shared<Entity>(SCENE_MANAGER().GetCurrentScene()->GetRegistry(), entity.GetEntity());
+			m_SelectedEntity = std::make_shared<Entity>(currentScene->GetRegistry(), entity.GetEntity());
 			TOOL_MANAGER().SetSelectedEntity(entity.GetEntity());
 		}
 
 		ImGui::PopID();
+
+		if (ImGui::BeginDragDropSource())
+		{
+			ImGui::SetDragDropPayload("SceneHierarchy", &(entity.GetEntity()), sizeof(entity.GetEntity()));
+			ImGui::Text(entity.GetName().c_str());
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneHierarchy");
+			if (payload)
+			{
+				F_ASSERT(payload->DataSize == sizeof(entity.GetEntity()));
+				entt::entity* ent = (entt::entity*)payload->Data;
+				auto entID = static_cast<int32_t>(*ent);
+				entity.AddChild(*ent);
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		while (curr != entt::null && treeNodeOpen)
+		{
+			Entity ent{ currentScene->GetRegistry(), curr };
+			if (OpenTreeNode(ent))
+				ImGui::TreePop();
+			curr = ent.GetComponent<Relationship>().nextSibling;
+		}
 
 		return treeNodeOpen;
 	}
@@ -111,7 +150,7 @@ namespace Feather {
 
 		if (ImGui::BeginPopupModal("Add Component"))
 		{
-			auto& registry = entity.GetRegistry();
+			auto& registry = entity.GetEnttRegistry();
 
 			// Get all of the reflected types from entt::meta
 			std::map<entt::id_type, std::string> componentMap;
@@ -244,14 +283,14 @@ namespace Feather {
 		if (!m_SelectedEntity)
 			return;
 
-		auto& registry = m_SelectedEntity->GetRegistry();
+		auto& registry = m_SelectedEntity->GetEnttRegistry();
 
 		for (const auto&& [id, storage] : registry.storage())
 		{
 			if (!storage.contains(m_SelectedEntity->GetEntity()))
 				continue;
 
-			if (id == entt::type_hash<TileComponent>::value())
+			if (id == entt::type_hash<TileComponent>::value() || id == entt::type_hash<Relationship>::value())
 				continue;
 
 			const auto drawInfo = InvokeMetaFunction(id, "DrawEntityComponentInfo"_hs, *m_SelectedEntity);

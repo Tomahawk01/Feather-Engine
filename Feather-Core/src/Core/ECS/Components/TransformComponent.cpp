@@ -34,6 +34,7 @@ void Feather::TransformComponent::CreateLuaTransformBind(sol::state& lua)
 			}
 		),
 		"position", &TransformComponent::position,
+		"localPosition", &TransformComponent::localPosition,
 		"scale", &TransformComponent::scale,
 		"rotation", &TransformComponent::rotation,
 		"to_string", &TransformComponent::to_string

@@ -11,3 +11,5 @@
 #include "Identification.h"
 #include "TextComponent.h"
 #include "TileComponent.h"
+#include "Identification.h"
+#include "Relationship.h"

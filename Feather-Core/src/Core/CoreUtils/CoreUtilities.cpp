@@ -24,18 +24,18 @@ namespace Feather {
 
     glm::mat4 TRSModel(const TransformComponent& transform, float width, float height)
     {
-		glm::mat4 model{ 1.f };
+		glm::mat4 model{ 1.0f };
 
-		if (transform.rotation > 0.f || transform.rotation < 0.f ||
-			transform.scale.x > 1.f  || transform.scale.x < 1.f  ||
-			transform.scale.y > 1.f  || transform.scale.y < 1.f)
+		if (transform.rotation > 0.0f || transform.rotation < 0.0f ||
+			transform.scale.x > 1.0f  || transform.scale.x < 1.0f  ||
+			transform.scale.y > 1.0f  || transform.scale.y < 1.0f)
 		{
-			model = glm::translate(model, glm::vec3{ transform.position, 0.f });
-			model = glm::translate(model, glm::vec3{ (width * transform.scale.x) * 0.5f, (height * transform.scale.y) * 0.5f, 0.f });
-			model = glm::rotate(model, glm::radians(transform.rotation), glm::vec3{ 0.f, 0.f, 1.f });
-			model = glm::translate(model, glm::vec3{ (width * transform.scale.x) * -0.5f, (height * transform.scale.y) * -0.5f, 0.f });
+			model = glm::translate(model, glm::vec3{ transform.position, 0.0f });
+			model = glm::translate(model, glm::vec3{ (width * transform.scale.x) * 0.5f, (height * transform.scale.y) * 0.5f, 0.0f });
+			model = glm::rotate(model, glm::radians(transform.rotation), glm::vec3{ 0.0f, 0.0f, 1.0f });
+			model = glm::translate(model, glm::vec3{ (width * transform.scale.x) * -0.5f, (height * transform.scale.y) * -0.5f, 0.0f });
 			model = glm::scale(model, glm::vec3{ transform.scale, 1.0f });
-			model = glm::translate(model, glm::vec3{ -transform.position, 0.f });
+			model = glm::translate(model, glm::vec3{ -transform.position, 0.0f });
 		}
 
 		return model;
