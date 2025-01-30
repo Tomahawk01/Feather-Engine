@@ -8,6 +8,7 @@
 #include <Core/Resources/AssetManager.h>
 #include <Core/CoreUtils/CoreUtilities.h>
 #include <Core/CoreUtils/CoreEngineData.h>
+#include <Core/Events/EventDispatcher.h>
 
 #include <Core/Scripting/InputManager.h>
 #include <Windowing/Window/Window.h>
@@ -29,6 +30,7 @@
 #include "Editor/Displays/EditorStyleToolDisplay.h"
 #include "Editor/Displays/TilesetDisplay.h"
 #include "Editor/Displays/TilemapDisplay.h"
+#include "Editor/Displays/ContentDisplay.h"
 
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
@@ -37,6 +39,8 @@
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include "Editor/Systems/GridSystem.h"
+
+#include "Editor/Events/EditorEventTypes.h"
 
 // TODO: This needs to be removed. Scenes are added by default for testing
 #include "Editor/Scene/SceneManager.h"
@@ -69,7 +73,11 @@ namespace Feather {
 
     bool Application::Initialize()
     {
+#if DEBUG
+		F_INIT_LOGS(true, true);
+#else
 		F_INIT_LOGS(false, true);
+#endif
 
 		// TODO: Load core engine data
 		// Init SDL
@@ -250,20 +258,6 @@ namespace Feather {
 		}
 		assetManager.GetTexture("stop_button")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("music_icon", music_icon, sizeof(music_icon) / sizeof(music_icon[0])))
-		{
-			F_ERROR("Failed to load texture 'music_icon' from memory");
-			return false;
-		}
-		assetManager.GetTexture("music_icon")->SetIsEditorTexture(true);
-
-		if (!assetManager.AddTextureFromMemory("scene_icon", scene_icon, sizeof(scene_icon) / sizeof(scene_icon[0])))
-		{
-			F_ERROR("Failed to load texture 'scene_icon' from memory");
-			return false;
-		}
-		assetManager.GetTexture("scene_icon")->SetIsEditorTexture(true);
-
 		// ============= Gizmo Textures =============
 		if (!assetManager.AddTextureFromMemory("x_axis_translate", x_axis_arrow, x_axis_arrow_size))
 		{
@@ -274,31 +268,67 @@ namespace Feather {
 
 		if (!assetManager.AddTextureFromMemory("y_axis_translate", y_axis_arrow, y_axis_arrow_size))
 		{
-			F_ERROR("Failed to load texture [y_axis_translate] from memory");
+			F_ERROR("Failed to load texture 'y_axis_translate' from memory");
 			return false;
 		}
 		assetManager.GetTexture("y_axis_translate")->SetIsEditorTexture(true);
 
 		if (!assetManager.AddTextureFromMemory("x_axis_scale", x_axis_scale, x_axis_scale_size))
 		{
-			F_ERROR("Failed to load texture [x_axis_scale] from memory");
+			F_ERROR("Failed to load texture 'x_axis_scale' from memory");
 			return false;
 		}
 		assetManager.GetTexture("x_axis_scale")->SetIsEditorTexture(true);
 
 		if (!assetManager.AddTextureFromMemory("y_axis_scale", y_axis_scale, y_axis_scale_size))
 		{
-			F_ERROR("Failed to load texture [y_axis_scale] from memory");
+			F_ERROR("Failed to load texture 'y_axis_scale' from memory");
 			return false;
 		}
 		assetManager.GetTexture("y_axis_scale")->SetIsEditorTexture(true);
 
 		if (!assetManager.AddTextureFromMemory("rotate_tool", rotate_tool, rotate_tool_size))
 		{
-			F_ERROR("Failed to load texture [rotate_tool] from memory");
+			F_ERROR("Failed to load texture 'rotate_tool' from memory");
 			return false;
 		}
 		assetManager.GetTexture("rotate_tool")->SetIsEditorTexture(true);
+
+		// ============= Content Display Textures =============
+		if (!assetManager.AddTextureFromMemory("file_icon", file_icon, sizeof(file_icon) / sizeof(file_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'file_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("file_icon")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("folder_icon", folder_icon, sizeof(folder_icon) / sizeof(folder_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'folder_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("folder_icon")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("music_icon", music_icon, sizeof(music_icon) / sizeof(music_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'music_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("music_icon")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("image_icon", image_icon, sizeof(image_icon) / sizeof(image_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'image_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("image_icon")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("scene_icon", scene_icon, sizeof(scene_icon) / sizeof(scene_icon[0])))
+		{
+			F_ERROR("Failed to load texture 'scene_icon' from memory");
+			return false;
+		}
+		assetManager.GetTexture("scene_icon")->SetIsEditorTexture(true);
 
 		return true;
 	}
@@ -366,6 +396,13 @@ namespace Feather {
 					break;
 				}
 				break;
+			case SDL_DROPFILE:
+			{
+				EVENT_DISPATCHER().EmitEvent(FileEvent{
+					.eAction = FileAction::FileDropped,
+					.sFilepath = std::string{m_Event.drop.file}
+					});
+			} break;
 			default:
 				break;
 			}
@@ -473,6 +510,13 @@ namespace Feather {
 			return false;
 		}
 
+		auto contentDisplay = std::make_unique<ContentDisplay>();
+		if (!contentDisplay)
+		{
+			F_ERROR("Failed to create a Content Display");
+			return false;
+		}
+
 		/*auto editorStylesDisplay = std::make_unique<EditorStyleToolDisplay>();
 		if (!editorStylesDisplay)
 		{
@@ -488,6 +532,7 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(tileDetailsDisplay));
 		displayHolder->displays.push_back(std::move(tilemapDisplay));
 		displayHolder->displays.push_back(std::move(assetDisplay));
+		displayHolder->displays.push_back(std::move(contentDisplay));
 		// displayHolder->displays.push_back(std::move(editorStylesDisplay));
 
 		return true;
@@ -589,6 +634,7 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
 			ImGui::DockBuilderDockWindow("Assets", logNodeId);
+			ImGui::DockBuilderDockWindow("Content Browser", logNodeId);
 
 			ImGui::DockBuilderFinish(dockSpaceId);
 		}

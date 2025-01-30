@@ -10,6 +10,7 @@
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Systems/PhysicsSystem.h"
+#include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/Renderer.h"
 #include "Utils/HelperUtilities.h"
 
@@ -96,6 +97,7 @@ namespace Feather {
 
         AddToContext<std::shared_ptr<PhysicsSystem>>(std::make_shared<PhysicsSystem>());
         AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>());
+        AddToContext<std::shared_ptr<EventDispatcher>>(std::make_shared<EventDispatcher>());
 
         return true;
     }
@@ -146,6 +148,12 @@ namespace Feather {
     {
         F_ASSERT(m_Initialized && "Main Registry must be initialized before use");
         return *m_MainRegistry->GetContext<std::shared_ptr<PhysicsSystem>>();
+    }
+
+    EventDispatcher& MainRegistry::GetEventDispatcher()
+    {
+        F_ASSERT(m_Initialized && "Main Registry must be initialized before use");
+        return *m_MainRegistry->GetContext<std::shared_ptr<EventDispatcher>>();
     }
 
 }

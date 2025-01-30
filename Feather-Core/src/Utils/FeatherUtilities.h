@@ -4,6 +4,8 @@
 #include <ranges>
 #include <functional>
 #include <concepts>
+#include <string>
+#include <string_view>
 #include <set>
 #include <map>
 #include <unordered_map>
@@ -121,4 +123,8 @@ namespace Feather {
 		return 0 != (x & y);
 	}
 
+	std::string_view GetSubstring(const std::string_view& str, const std::string& find);
+
 }
+
+#define GET_SUBSTRING(str, find) Feather::GetSubstring(str, find)

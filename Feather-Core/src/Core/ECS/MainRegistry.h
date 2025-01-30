@@ -5,6 +5,8 @@
 
 #define MAIN_REGISTRY() Feather::MainRegistry::GetInstance()
 #define ASSET_MANAGER() MAIN_REGISTRY().GetAssetManager()
+#define EVENT_DISPATCHER() MAIN_REGISTRY().GetEventDispatcher()
+#define ADD_EVENT_HANDLER(Event, Func, Handler) EVENT_DISPATCHER().AddHandler<Event, Func>(Handler);
 
 namespace Feather {
 
@@ -17,6 +19,8 @@ namespace Feather {
 	class RenderShapeSystem;
 	class AnimationSystem;
 	class PhysicsSystem;
+
+	class EventDispatcher;
 
 	class MainRegistry
 	{
@@ -45,6 +49,8 @@ namespace Feather {
 		RenderShapeSystem& GetRenderShapeSystem();
 		AnimationSystem& GetAnimationSystem();
 		PhysicsSystem& GetPhysicsSystem();
+
+		EventDispatcher& GetEventDispatcher();
 
 	private:
 		std::unique_ptr<Registry> m_MainRegistry{ nullptr };
