@@ -20,6 +20,8 @@ namespace Feather {
 		static SceneManager& GetInstance();
 
 		bool AddScene(const std::string& sceneName);
+		bool HasScene(const std::string& sceneName);
+
 		std::shared_ptr<SceneObject> GetScene(const std::string& sceneName);
 		std::shared_ptr<SceneObject> GetCurrentScene();
 		std::vector<std::string> GetSceneNames() const;

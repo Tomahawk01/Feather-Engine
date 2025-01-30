@@ -1,4 +1,6 @@
 #include "AssetDisplay.h"
+
+#include "AssetDisplayUtils.h"
 #include "Utils/FeatherUtilities.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Scripting/InputManager.h"
@@ -18,11 +20,11 @@ constexpr ImVec2 DRAG_ASSET_SIZE = ImVec2{ 32.0f, 32.0f };
 namespace Feather {
 
 	AssetDisplay::AssetDisplay()
-		: m_ItemHovered{ false },
-		m_AssetTypeChanged{ true },
+		: m_AssetTypeChanged{ true },
 		m_Rename{ false },
 		m_WindowSelected{ false },
 		m_WindowHovered{ false },
+		m_OpenAddAssetModal{ false },
 		m_SelectedAssetName{ "" },
 		m_SelectedType{ "Textures" },
 		m_DragSource{ "" },
@@ -50,6 +52,17 @@ namespace Feather {
 			m_WindowSelected = ImGui::IsWindowFocused();
 
 			DrawSelectedAssets();
+
+			if (m_SelectedID == -1 && ImGui::BeginPopupContextWindow("##AddAsset"))
+			{
+				if (ImGui::Selectable(AssetDisplayUtils::AddAssetBasedOnType(m_eSelectedType).c_str()))
+					m_OpenAddAssetModal = true;
+
+				ImGui::EndPopup();
+			}
+
+			if (m_OpenAddAssetModal)
+				AssetDisplayUtils::OpenAddAssetModalBasedOnType(m_eSelectedType, &m_OpenAddAssetModal);
 
 			ImGui::EndChild();
 		}

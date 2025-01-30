@@ -29,6 +29,11 @@ namespace Feather {
 		return isSuccess;
 	}
 
+	bool SceneManager::HasScene(const std::string& sceneName)
+	{
+		return m_mapScenes.contains(sceneName);
+	}
+
 	std::shared_ptr<SceneObject> SceneManager::GetScene(const std::string& sceneName)
 	{
 		auto sceneItr = m_mapScenes.find(sceneName);

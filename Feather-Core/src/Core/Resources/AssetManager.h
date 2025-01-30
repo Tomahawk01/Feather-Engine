@@ -24,7 +24,7 @@ namespace Feather {
 
 		bool CreateDefaultFonts();
 
-		bool AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt = true, bool isTileset = false);
+		bool AddTexture(const std::string& textureName, const std::string& texturePath, bool pixelArt = true, bool isTileset = false);
 		bool AddTextureFromMemory(const std::string& textureName, const unsigned char* imageData, size_t length, bool pixelArt = true, bool isTileset = false);
 		std::shared_ptr<Texture> GetTexture(const std::string& textureName);
 

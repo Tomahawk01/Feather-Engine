@@ -42,9 +42,6 @@
 
 #include "Editor/Events/EditorEventTypes.h"
 
-// TODO: This needs to be removed. Scenes are added by default for testing
-#include "Editor/Scene/SceneManager.h"
-
 namespace Feather {
 
     Application& Application::GetInstance()
@@ -202,10 +199,6 @@ namespace Feather {
 		// Register meta fuctions
 		RegisterEditorMetaFunctions();
 		CoreEngineData::RegisterMetaFunctions();
-
-		// TODO: Remove these test scenes
-		SCENE_MANAGER().AddScene("DefaultScene");
-		SCENE_MANAGER().AddScene("TestScene");
 
 		return true;
     }

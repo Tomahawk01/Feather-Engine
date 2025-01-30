@@ -25,7 +25,7 @@ namespace Feather {
         return true;
     }
 
-    bool AssetManager::AddTexure(const std::string& textureName, const std::string& texturePath, bool pixelArt, bool isTileset)
+    bool AssetManager::AddTexture(const std::string& textureName, const std::string& texturePath, bool pixelArt, bool isTileset)
     {
         if (m_mapTextures.find(textureName) != m_mapTextures.end())
         {
@@ -353,11 +353,11 @@ namespace Feather {
             sol::overload(
                 [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
                 {
-                    return asset_manager.AddTexure(assetName, filepath, pixel_art, false);
+                    return asset_manager.AddTexture(assetName, filepath, pixel_art, false);
                 },
                 [&](const std::string& assetName, const std::string& filepath, bool pixel_art, bool isTileset)
                 {
-                    return asset_manager.AddTexure(assetName, filepath, pixel_art, isTileset);
+                    return asset_manager.AddTexture(assetName, filepath, pixel_art, isTileset);
                 }
             ),
             "add_music",

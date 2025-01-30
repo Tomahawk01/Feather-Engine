@@ -29,9 +29,15 @@ namespace Feather {
 
 	private:
 		const std::vector<std::string> m_SelectableTypes{ "Textures", "Fonts", "Music", "SoundFX", "Scenes" };
-		bool m_ItemHovered, m_AssetTypeChanged, m_Rename;
-		bool m_WindowSelected, m_WindowHovered;
-		std::string m_SelectedAssetName, m_SelectedType, m_DragSource, m_RenameBuf;
+		bool m_AssetTypeChanged;
+		bool m_Rename;
+		bool m_WindowSelected;
+		bool m_WindowHovered;
+		bool m_OpenAddAssetModal;
+		std::string m_SelectedAssetName;
+		std::string m_SelectedType;
+		std::string m_DragSource;
+		std::string m_RenameBuf;
 		AssetType m_eSelectedType;
 		float m_AssetSize;
 		int m_SelectedID;
