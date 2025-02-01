@@ -4,6 +4,7 @@
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+*.aps
 
 # Binaries
 **/bin/

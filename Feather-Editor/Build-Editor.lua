@@ -25,7 +25,8 @@ project "Feather-Editor"
         "%{wks.location}/vendor/lua_53/include",
         "%{wks.location}/vendor/sol3",
         "%{wks.location}/vendor/box2d/include",
-        "%{wks.location}/vendor/ImGui/src"
+        "%{wks.location}/vendor/ImGui/src",
+        "%{wks.location}/vendor/rapidjson/include"
     }
 
     libdirs
@@ -53,6 +54,8 @@ project "Feather-Editor"
     filter "system:windows"
         systemversion "latest"
         defines { "WINDOWS" }
+        files { "%{wks.location}/resources/feather.rc", "**.ico" }
+        vpaths { ["resources/*"] = { "*.rc", "**.ico" } }
 
     filter "configurations:Debug"
         defines { "DEBUG" }
