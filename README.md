@@ -1,3 +1,5 @@
+![feather_logo](images/Feather_logo.png)
+
 # Feather-Engine
 Feather Engine is a 2D game engine written in C++ and OpenGL.
 
