@@ -29,6 +29,18 @@ namespace Feather {
 		return isSuccess;
 	}
 
+	bool SceneManager::AddScene(const std::string& sceneName, const std::string& sceneData)
+	{
+		if (m_mapScenes.contains(sceneName))
+		{
+			F_ERROR("Failed to add new scene object - '{}' already exists", sceneName);
+			return false;
+		}
+
+		auto [itr, success] = m_mapScenes.emplace(sceneName, std::move(std::make_shared<SceneObject>(sceneName, sceneData)));
+		return success;
+	}
+
 	bool SceneManager::HasScene(const std::string& sceneName)
 	{
 		return m_mapScenes.contains(sceneName);
@@ -61,6 +73,17 @@ namespace Feather {
 		return sceneItr->second;
 	}
 
+	void SceneManager::AddLayerToCurrentScene(const std::string& layerName, bool visible)
+	{
+		if (auto currentScene = GetCurrentScene())
+		{
+			currentScene->AddLayer(layerName, visible);
+			return;
+		}
+
+		F_ERROR("Failed to add layer. Current scene is nullptr");
+	}
+
 	std::vector<std::string> SceneManager::GetSceneNames() const
 	{
 		return GetKeys(m_mapScenes);
@@ -91,6 +114,37 @@ namespace Feather {
 			return;
 
 		m_ToolManager->SetToolsCurrentTileset(tileset);
+	}
+
+	bool SceneManager::LoadCurrentScene()
+	{
+		if (auto currentScene = GetCurrentScene())
+			return currentScene->LoadScene();
+
+		return false;
+	}
+
+	bool SceneManager::UnloadCurrentScene()
+	{
+		if (auto currentScene = GetCurrentScene())
+			return currentScene->UnloadScene();
+
+		return false;
+	}
+
+	bool SceneManager::SaveAllScenes()
+	{
+		bool success{ true };
+		for (const auto& [name, scene] : m_mapScenes)
+		{
+			if (!scene->SaveScene())
+			{
+				F_ERROR("Failed to save scene '{}'", name);
+				success = false;
+			}
+		}
+
+		return success;
 	}
 
 }

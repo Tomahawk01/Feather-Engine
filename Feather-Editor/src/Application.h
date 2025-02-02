@@ -5,6 +5,7 @@
 
 namespace Feather {
 	
+	struct CloseEditorEvent;
 	class Window;
 
 	class Application
@@ -16,6 +17,7 @@ namespace Feather {
 
 	private:
 		bool Initialize();
+		bool InitApp();
 		bool LoadShaders();
 		bool LoadEditorTextures();
 
@@ -26,12 +28,12 @@ namespace Feather {
 		void CleanUp();
 
 		bool CreateDisplays();
-		bool InitImGui();
-		void BeginImGui();
-		void EndImGui();
-		void RenderImGui();
+		void InitDisplays();
+		void RenderDisplays();
 
 		void RegisterEditorMetaFunctions();
+
+		void OnCloseEditor(CloseEditorEvent& close);
 
 		Application();
 		~Application() = default;
@@ -40,6 +42,7 @@ namespace Feather {
 
 	private:
 		std::unique_ptr<Feather::Window> m_Window;
+		std::unique_ptr<class Hub> m_Hub;
 
 		SDL_Event m_Event;
 		bool m_IsRunning;

@@ -20,16 +20,27 @@ namespace Feather {
 		static SceneManager& GetInstance();
 
 		bool AddScene(const std::string& sceneName);
+		bool AddScene(const std::string& sceneName, const std::string& sceneData);
 		bool HasScene(const std::string& sceneName);
 
 		std::shared_ptr<SceneObject> GetScene(const std::string& sceneName);
 		std::shared_ptr<SceneObject> GetCurrentScene();
+
+		// TODO: May not be necessary
+		void AddLayerToCurrentScene(const std::string& layerName, bool visible);
+
 		std::vector<std::string> GetSceneNames() const;
 		ToolManager& GetToolManager();
 		CommandManager& GetCommandManager();
 
 		void SetTileset(const std::string& tileset);
 
+		bool LoadCurrentScene();
+		bool UnloadCurrentScene();
+
+		bool SaveAllScenes();
+
+		inline const std::map<std::string, std::shared_ptr<SceneObject>>& GetAllScenes() const { return m_mapScenes; }
 		inline void SetCurrentScene(const std::string& sceneName) { m_CurrentScene = sceneName; }
 		inline const std::string& GetCurrentSceneName() const { return m_CurrentScene; }
 		inline const std::string& GetCurrentTileset() const { return m_CurrentTileset; }

@@ -19,11 +19,16 @@ namespace Feather {
 	}
 #ifdef _WIN32
 	constexpr char PATH_SEPARATOR = '\\';
-#define DEFAULT_PROJECT_PATH BASE_PATH + "assets"
+#define DEFAULT_PROJECT_PATH BASE_PATH + "FeatherProjects"
 #else
 	constexpr char PATH_SEPARATOR = '/';
 #define DEFAULT_PROJECT_PATH BASE_PATH + PATH_SEPARATOR + "FeatherProjects"
 #endif
+
+#define SCRIPTS "scripts"
+#define ASSETS "assets" 
+
+	constexpr const char* FEATHER_PRJ_FILE_EXT = ".fprj";
 
 	struct Canvas
 	{

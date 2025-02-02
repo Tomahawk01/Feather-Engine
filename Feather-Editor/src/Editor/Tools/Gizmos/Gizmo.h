@@ -35,6 +35,7 @@ namespace Feather {
 		float GetDeltaY();
 
 		void SetGizmoPosition(Entity& selectedEntity);
+		virtual void ResetSelectedEntity() override { m_SelectedEntity = entt::null; }
 
 	protected:
 		std::unique_ptr<GizmoAxisParams> m_XAxisParams;

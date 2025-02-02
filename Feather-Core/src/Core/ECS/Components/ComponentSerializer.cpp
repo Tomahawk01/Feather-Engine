@@ -151,6 +151,14 @@ namespace Feather {
 			.EndObject();
 	}
 
+	void ComponentSerializer::SerializeComponent(JSONSerializer& serializer, const Identification& id)
+	{
+		serializer.StartNewObject("id")
+			.AddKeyValuePair("name", id.name)
+			.AddKeyValuePair("group", id.group)
+			.EndObject();
+	}
+
 	// ======================= Deserialization =======================
 
 	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, TransformComponent& transform)
@@ -228,6 +236,12 @@ namespace Feather {
 	{
 		rigidBody.maxVelocity.x = jsonValue["maxVelocity"]["x"].GetFloat();
 		rigidBody.maxVelocity.y = jsonValue["maxVelocity"]["y"].GetFloat();
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, Identification& id)
+	{
+		id.name = jsonValue["name"].GetString();
+		id.group = jsonValue["group"].GetString();
 	}
 
 }

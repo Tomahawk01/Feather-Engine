@@ -27,7 +27,9 @@ namespace Feather {
 		inline const GLuint GetID() const { return m_TextureID; }
 
 		inline const bool IsTileset() const { return m_IsTileset; }
+		inline TextureType GetType() const { return m_Type; }
 		inline void SetIsTileset(bool isTileset) { m_IsTileset = isTileset; }
+		inline const std::string& GetPath() const { return m_Path; }
 		inline const bool IsEditorTexture() const { return m_IsEditorTexture; }
 		inline void SetIsEditorTexture(bool isEditorTexture) { m_IsEditorTexture = isEditorTexture; }
 

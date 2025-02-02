@@ -3,12 +3,17 @@
 #include "FileSystem/Dialogs/FileDialog.h"
 #include "Core/Loaders/TilemapLoader.h"
 #include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/ECS/MainRegistry.h"
+#include "Core/Events/EventDispatcher.h"
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Utilities/SaveProject.h"
+#include "Editor/Loaders/ProjectLoader.h"
+#include "Editor/Events/EditorEventTypes.h"
 
 #include <imgui.h>
 #include <SDL.h>
@@ -30,49 +35,26 @@ namespace Feather {
 				ImGui::InlineLabel(ICON_FA_FOLDER_OPEN, 32.0f);
 				if (ImGui::MenuItem("Open", "Ctrl + O"))
 				{
-					FileDialog fd{};
-					auto file = fd.OpenFileDialog("Open tilemap test", SDL_GetBasePath(), { "*.json" });
-					if (!file.empty())
-					{
-						auto currentScene = SCENE_MANAGER().GetCurrentScene();
-						if (currentScene)
-						{
-							TilemapLoader tl{};
-							if (!tl.LoadTilemap(currentScene->GetRegistry(), file, true))
-								F_ERROR("Failed to load tilemap");
-						}
-						else
-						{
-							F_ERROR("Failed to load tilemap. No active scene");
-						}
-					}
+					F_TRACE("OPEN PRESSED");
 				}
 
 				ImGui::InlineLabel(ICON_FA_SAVE, 32.0f);
 				if (ImGui::MenuItem("Save", "Ctrl + S"))
 				{
-					FileDialog fd{};
-					auto file = fd.SaveFileDialog("Save Tilemap Test", SDL_GetBasePath(), { "*.json" });
-					if (!file.empty())
+					auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
+					F_ASSERT(saveProject && "Save Project must exist!");
+					// Save entire project
+					ProjectLoader pl{};
+					if (!pl.SaveLoadedProject(*saveProject))
 					{
-						auto currentScene = SCENE_MANAGER().GetCurrentScene();
-						if (currentScene)
-						{
-							TilemapLoader tl{};
-							if (!tl.SaveTilemap(currentScene->GetRegistry(), file, true))
-								F_ERROR("Failed to save tilemap");
-						}
-						else
-						{
-							F_ERROR("Failed to save tilemap. No active scene");
-						}
+						F_ERROR("Failed to save project '{}' at file '{}'", saveProject->projectName, saveProject->projectFilePath);
 					}
 				}
 
 				ImGui::InlineLabel(ICON_FA_WINDOW_CLOSE, 32.0f);
 				if (ImGui::MenuItem("Exit"))
 				{
-					F_TRACE("Exit pressed");
+					EVENT_DISPATCHER().EmitEvent(CloseEditorEvent{});
 				}
 
 				ImGui::EndMenu();

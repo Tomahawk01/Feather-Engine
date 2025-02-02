@@ -45,6 +45,10 @@ namespace Feather {
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
 
 		inline const std::map<std::string, std::shared_ptr<Texture>>& GetAllTextures() const { return m_mapTextures; }
+		inline const std::map<std::string, std::shared_ptr<SoundFX>>& GetAllSoundFx() const { return m_mapSoundFX; }
+		inline const std::map<std::string, std::shared_ptr<Shader>>& GetAllShaders() const { return m_mapShaders; }
+		inline const std::map<std::string, std::shared_ptr<Font>>& GetAllFonts() const { return m_mapFonts; }
+		inline const std::map<std::string, std::shared_ptr<Music>>& GetAllMusic() const { return m_mapMusic; }
 
 		std::vector<std::string> GetAssetKeyNames(AssetType assetType) const;
 

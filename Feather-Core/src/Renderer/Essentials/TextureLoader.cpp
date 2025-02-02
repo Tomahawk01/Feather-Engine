@@ -14,13 +14,14 @@ namespace Feather {
 		glGenTextures(1, &id);
 		glBindTexture(GL_TEXTURE_2D, id);
 
+		bool loadSuccessful{ false };
 		switch (type)
 		{
 		case Feather::Texture::TextureType::PIXEL:
-			LoadTexture(texturePath, id, width, height, false);
+			loadSuccessful = LoadTexture(texturePath, id, width, height, false);
 			break;
 		case Feather::Texture::TextureType::BLENDED:
-			LoadTexture(texturePath, id, width, height, true);
+			loadSuccessful = LoadTexture(texturePath, id, width, height, true);
 			break;
 		// TODO: Add other texture types as needed
 		default:
@@ -28,7 +29,7 @@ namespace Feather {
 			return nullptr;
 		}
 
-		return std::make_shared<Texture>(id, width, height, type, texturePath, isTileset);
+		return loadSuccessful ? std::make_shared<Texture>(id, width, height, type, texturePath, isTileset) : nullptr;
     }
 
 	std::shared_ptr<Texture> TextureLoader::Create(Texture::TextureType type, int width, int height, bool isTileset)
@@ -43,9 +44,12 @@ namespace Feather {
 
 		GLuint id;
 		glGenTextures(1, &id);
-		LoadFBTexture(id, width, height);
+		if (LoadFBTexture(id, width, height))
+		{
+			return std::make_shared<Texture>(id, width, height, type, "", isTileset);
+		}
 
-		return std::make_shared<Texture>(id, width, height, type, "", isTileset);
+		return nullptr;
 	}
 
 	std::shared_ptr<Texture> TextureLoader::CreateFromMemory(const unsigned char* imageData, size_t length, bool blended, bool isTileset)
@@ -53,9 +57,12 @@ namespace Feather {
 		GLuint id;
 		int width, height;
 
-		LoadTextureFromMemory(imageData, length, id, width, height, blended);
+		if (LoadTextureFromMemory(imageData, length, id, width, height, blended))
+		{
+			return std::make_shared<Texture>(id, width, height, blended ? Texture::TextureType::BLENDED : Texture::TextureType::PIXEL, "", isTileset);
+		}
 
-		return std::make_shared<Texture>(id, width, height, blended ? Texture::TextureType::BLENDED : Texture::TextureType::PIXEL, "", isTileset);
+		return nullptr;
 	}
 
     bool TextureLoader::LoadTexture(const std::string& filepath, GLuint& id, int& width, int& height, bool blended)

@@ -8,9 +8,10 @@
 #include "FileSystem/Dialogs/FileDialog.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/fonts/IconsFontAwesome5.h"
 #include "Editor/Events/EditorEventTypes.h"
+#include "Editor/Utilities/SaveProject.h"
 
 #include <imgui.h>
 
@@ -18,7 +19,7 @@ namespace Feather {
 
 	ContentDisplay::ContentDisplay()
 		: m_FileDispatcher{ std::make_unique<EventDispatcher>() }
-		, m_CurrentDir{ DEFAULT_PROJECT_PATH }
+		, m_CurrentDir{ MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath + "content" }
 		, m_FilepathToAction{ "" }
 		, m_Selected{ -1 }
 		, m_FileAction{ FileAction::NoAction }
@@ -90,10 +91,11 @@ namespace Feather {
 					const auto* icon = GetIconTexture(path.string());
 					static bool itemPop{ false };
 
+					std::string contentBtn = "##content_" + std::to_string(id);
 					if (itr->is_directory())
 					{
 						// Change to the next Directory
-						ImGui::ImageButton((ImTextureID)icon->GetID(), ImVec2{ 80.0f, 80.0f });
+						ImGui::ImageButton(contentBtn.c_str(), (ImTextureID)(intptr_t)icon->GetID(), ImVec2{ 80.0f, 80.0f });
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 						{
 							m_CurrentDir /= path.filename();
@@ -111,7 +113,7 @@ namespace Feather {
 					else
 					{
 						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, 0.0f });
-						ImGui::ImageButton((ImTextureID)icon->GetID(), ImVec2{ 80.0f, 80.0f });
+						ImGui::ImageButton(contentBtn.c_str(), (ImTextureID)(intptr_t)icon->GetID(), ImVec2{ 80.0f, 80.0f });
 						ImGui::PopStyleVar(1);
 
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
@@ -207,9 +209,10 @@ namespace Feather {
 		ImGui::ItemToolTip("Create Folder");
 		ImGui::SameLine(0.0f, 16.0f);
 
+		const auto& savedPath = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath;
 		std::string pathStr{ m_CurrentDir.string() };
-		std::string pathToSplit = pathStr.substr(pathStr.find(BASE_PATH) + BASE_PATH.size());
-		auto dir = SplitStr(pathToSplit, '\\');
+		std::string pathToSplit = pathStr.substr(pathStr.find(savedPath) + savedPath.size());
+		auto dir = SplitStr(pathToSplit, PATH_SEPARATOR);
 		for (size_t i = 0; i < dir.size(); i++)
 		{
 			if (ImGui::Button(dir[i].c_str()))

@@ -19,7 +19,8 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
+#include "Editor/Utilities/SaveProject.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 
@@ -186,7 +187,9 @@ namespace Feather {
 			physics.Init(physicsWorld, 640, 480);
 		}
 
-		if (!scriptSystem->LoadMainScript(runtimeRegistry, *lua))
+		// Get the main script path
+		auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
+		if (!scriptSystem->LoadMainScript(saveProject->mainLuaScript, runtimeRegistry, *lua))
 		{
 			F_FATAL("Failed to load main lua script");
 			return;
@@ -264,11 +267,11 @@ namespace Feather {
 		auto playTextureID = (ImTextureID)(intptr_t)playTexture->GetID();
 		if (m_PlayScene && m_SceneLoaded)
 		{
-			ImGui::ActiveImageButton(playTextureID);
+			ImGui::ActiveImageButton("##playButton", playTextureID);
 		}
 		else
 		{
-			if (ImGui::ImageButton(playTextureID, TOOL_BUTTON_SIZE))
+			if (ImGui::ImageButton("##playButton", playTextureID, TOOL_BUTTON_SIZE))
 			{
 				LoadScene();
 			}
@@ -283,11 +286,11 @@ namespace Feather {
 		auto stopTextureID = (ImTextureID)(intptr_t)stopTexture->GetID();
 		if (!m_PlayScene && !m_SceneLoaded)
 		{
-			ImGui::ActiveImageButton(stopTextureID);
+			ImGui::ActiveImageButton("##playButton", stopTextureID);
 		}
 		else
 		{
-			if (ImGui::ImageButton(stopTextureID, TOOL_BUTTON_SIZE))
+			if (ImGui::ImageButton("##playButton", stopTextureID, TOOL_BUTTON_SIZE))
 			{
 				UnloadScene();
 			}

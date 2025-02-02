@@ -47,6 +47,8 @@ namespace Feather {
 		m_Camera = camera;
 		m_Registry = sceneObject->GetRegistryPtr();
 
+		ResetSelectedEntity();
+
 		return true;
 	}
 

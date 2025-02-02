@@ -16,7 +16,7 @@
 #include "Editor/Systems/GridSystem.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/EditorUtilities.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
@@ -82,7 +82,9 @@ namespace Feather {
 				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_SCENE_SRC);
 				if (payload)
 				{
+					SCENE_MANAGER().UnloadCurrentScene();
 					SCENE_MANAGER().SetCurrentScene(std::string{ (const char*)payload->Data });
+					SCENE_MANAGER().LoadCurrentScene();
 					LoadNewScene();
 					m_TilemapCam->Reset();
 				}

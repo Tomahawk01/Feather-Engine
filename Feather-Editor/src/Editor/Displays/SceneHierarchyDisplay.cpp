@@ -7,7 +7,7 @@
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <imgui.h>

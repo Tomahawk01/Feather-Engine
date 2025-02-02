@@ -8,7 +8,7 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
 
@@ -169,7 +169,8 @@ namespace Feather {
 					if (textureID == 0)
 						break;
 
-					ImGui::ImageButton((ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
+					std::string assetBtn = "##asset" + std::to_string(id);
+					ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
 
 					if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0) && !m_Rename)
 						m_SelectedID = id;
@@ -203,7 +204,7 @@ namespace Feather {
 							m_RenameBuf.clear();
 							m_Rename = false;
 						}
-						else if (m_Rename && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+						else if (m_Rename && ImGui::IsKeyPressed(ImGuiKey_Escape))
 						{
 							m_RenameBuf.clear();
 							m_Rename = false;

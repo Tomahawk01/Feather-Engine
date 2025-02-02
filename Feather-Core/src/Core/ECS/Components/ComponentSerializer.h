@@ -30,6 +30,7 @@ namespace Feather {
 		static void SerializeComponent(JSONSerializer& serializer, const TextComponent& text);
 		static void SerializeComponent(JSONSerializer& serializer, const PhysicsComponent& physics);
 		static void SerializeComponent(JSONSerializer& serializer, const RigidBodyComponent& rigidBody);
+		static void SerializeComponent(JSONSerializer& serializer, const Identification& id);
 
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, TransformComponent& transform);
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, SpriteComponent& sprite);
@@ -39,6 +40,7 @@ namespace Feather {
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, TextComponent& text);
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, PhysicsComponent& physics);
 		static void DeserializeComponent(const rapidjson::Value& jsonValue, RigidBodyComponent& rigidBody);
+		static void DeserializeComponent(const rapidjson::Value& jsonValue, Identification& id);
 	};
 
 }

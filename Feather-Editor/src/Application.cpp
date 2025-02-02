@@ -1,24 +1,18 @@
 #include "Application.h"
 
 #include <Logger/Logger.h>
-
 #include <Renderer/Core/Renderer.h>
 
 #include <Core/ECS/MainRegistry.h>
 #include <Core/Resources/AssetManager.h>
 #include <Core/CoreUtils/CoreUtilities.h>
 #include <Core/CoreUtils/CoreEngineData.h>
+#include <Core/CoreUtils/EngineShaders.h>
 #include <Core/Events/EventDispatcher.h>
-
 #include <Core/Scripting/InputManager.h>
+
 #include <Windowing/Window/Window.h>
 #include <Physics/ContactListener.h>
-
-// IMGUI testing
-#include <imgui_internal.h>
-#include <backends/imgui_impl_sdl2.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <SDL_opengl.h>
 
 // Displays
 #include "Editor/Displays/MenuDisplay.h"
@@ -34,13 +28,19 @@
 
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
-#include "Editor/Utilities/ImGuiUtils.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
-#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Utilities/SaveProject.h"
 
 #include "Editor/Systems/GridSystem.h"
-
 #include "Editor/Events/EditorEventTypes.h"
+#include "Editor/Hub/Hub.h"
+
+// IMGUI
+#include <Editor/Utilities/GUI/Gui.h>
+#include <imgui_internal.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <SDL_opengl.h>
 
 namespace Feather {
 
@@ -57,6 +57,11 @@ namespace Feather {
 			F_FATAL("Initialization failed!");
 			return;
 		}
+
+		if (!m_Hub || !m_Hub->Run())
+			return;
+
+		InitApp();
 
 		while (m_IsRunning)
 		{
@@ -75,8 +80,6 @@ namespace Feather {
 #else
 		F_INIT_LOGS(false, true);
 #endif
-
-		// TODO: Load core engine data
 		// Init SDL
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
@@ -107,11 +110,14 @@ namespace Feather {
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
-		SDL_DisplayMode displayMode;
-		SDL_GetCurrentDisplayMode(0, &displayMode);
-
 		// Create the Window
-		m_Window = std::make_unique<Window>("Feather Engine", displayMode.w, displayMode.h, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MOUSE_CAPTURE | SDL_WINDOW_MAXIMIZED);
+		m_Window = std::make_unique<Window>("Feather Engine", 800, 600, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, true, SDL_WINDOW_OPENGL);
+		/*
+		 * SDL Hack - If we create the window as borderless, we lose the icon in the title bar.
+		 * If we create the window with a border, then hide the border.
+		 * When we show the border later on, the icon will be there
+		 */
+		SDL_SetWindowBordered(m_Window->GetWindow().get(), SDL_FALSE);
 
 		if (!m_Window->GetWindow())
 		{
@@ -145,15 +151,9 @@ namespace Feather {
 			return false;
 		}
 
-		if (!InitImGui())
+		if (!Gui::InitImGui(m_Window.get()))
 		{
 			F_FATAL("Failed to initialize ImGui!");
-			return false;
-		}
-
-		if (!LoadShaders())
-		{
-			F_FATAL("Failed to load shaders!");
 			return false;
 		}
 
@@ -163,13 +163,27 @@ namespace Feather {
 			return false;
 		}
 
+		mainRegistry.AddToContext<std::shared_ptr<SaveProject>>(std::make_shared<SaveProject>());
+		m_Hub = std::make_unique<Hub>(*m_Window);
+
+		return true;
+	}
+
+	bool Application::InitApp()
+	{
+		if (!LoadShaders())
+		{
+			F_FATAL("Failed to load shaders!");
+			return false;
+		}
+
 		if (!CreateDisplays())
 		{
 			F_FATAL("Failed to create displays!");
 			return false;
 		}
 
-		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
+		if (!ASSET_MANAGER().CreateDefaultFonts())
 		{
 			F_FATAL("Failed to create default fonts!");
 			return false;
@@ -181,7 +195,7 @@ namespace Feather {
 			F_FATAL("Failed to create editor framebuffers to context");
 			return false;
 		}
-		if (!mainRegistry.AddToContext<std::shared_ptr<EditorFramebuffers>>(editorFramebuffers))
+		if (!MAIN_REGISTRY().AddToContext<std::shared_ptr<EditorFramebuffers>>(editorFramebuffers))
 		{
 			F_FATAL("Failed to add editor framebuffers to registry context");
 			return false;
@@ -190,11 +204,13 @@ namespace Feather {
 		editorFramebuffers->mapFramebuffers.emplace(FramebufferType::SCENE, std::make_shared<Framebuffer>(640, 480, false));
 		editorFramebuffers->mapFramebuffers.emplace(FramebufferType::TILEMAP, std::make_shared<Framebuffer>(640, 480, false));
 
-		if (!mainRegistry.AddToContext<std::shared_ptr<GridSystem>>(std::make_shared<GridSystem>()))
+		if (!MAIN_REGISTRY().AddToContext<std::shared_ptr<GridSystem>>(std::make_shared<GridSystem>()))
 		{
 			F_FATAL("Failed to add grid system to registry context");
 			return false;
 		}
+
+		ADD_EVENT_HANDLER(CloseEditorEvent, &Application::OnCloseEditor, *this);
 
 		// Register meta fuctions
 		RegisterEditorMetaFunctions();
@@ -208,22 +224,22 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& assetManager = mainRegistry.GetAssetManager();
 
-		if (!assetManager.AddShader("basic", "assets/shaders/basicShader.vert", "assets/shaders/basicShader.frag"))
+		if (!assetManager.AddShaderFromMemory("basic", basicShaderVert, basicShaderFrag))
 		{
 			F_FATAL("Failed to add basicShader to the asset manager!");
 			return false;
 		}
-		if (!assetManager.AddShader("color", "assets/shaders/colorShader.vert", "assets/shaders/colorShader.frag"))
+		if (!assetManager.AddShaderFromMemory("color", colorShaderVert, colorShaderFrag))
 		{
 			F_FATAL("Failed to add colorShader to the asset manager!");
 			return false;
 		}
-		if (!assetManager.AddShader("circle", "assets/shaders/circleShader.vert", "assets/shaders/circleShader.frag"))
+		if (!assetManager.AddShaderFromMemory("circle", circleShaderVert, circleShaderFrag))
 		{
 			F_FATAL("Failed to add the color shader to the asset manager");
 			return false;
 		}
-		if (!assetManager.AddShader("font", "assets/shaders/fontShader.vert", "assets/shaders/fontShader.frag"))
+		if (!assetManager.AddShaderFromMemory("font", fontShaderVert, fontShaderFrag))
 		{
 			F_FATAL("Failed to add the font shader to the asset manager");
 			return false;
@@ -322,6 +338,13 @@ namespace Feather {
 			return false;
 		}
 		assetManager.GetTexture("scene_icon")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("feather_logo", feather_logo, feather_logo_size))
+		{
+			F_ERROR("Failed to load texture 'feather_logo' from memory");
+			return false;
+		}
+		assetManager.GetTexture("feather_logo")->SetIsEditorTexture(true);
 
 		return true;
 	}
@@ -424,9 +447,9 @@ namespace Feather {
 
     void Application::Render()
     {
-		BeginImGui();
-		RenderImGui();
-		EndImGui();
+		Gui::BeginImGui();
+		RenderDisplays();
+		Gui::EndImGui(m_Window.get());
 
 		SDL_GL_SwapWindow(m_Window->GetWindow().get());
     }
@@ -510,13 +533,6 @@ namespace Feather {
 			return false;
 		}
 
-		/*auto editorStylesDisplay = std::make_unique<EditorStyleToolDisplay>();
-		if (!editorStylesDisplay)
-		{
-			F_ERROR("Failed to create Editor Styles Display");
-			return false;
-		}*/
-
 		displayHolder->displays.push_back(std::move(menuDisplay));
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(sceneHierarchyDisplay));
@@ -526,85 +542,14 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(tilemapDisplay));
 		displayHolder->displays.push_back(std::move(assetDisplay));
 		displayHolder->displays.push_back(std::move(contentDisplay));
-		// displayHolder->displays.push_back(std::move(editorStylesDisplay));
 
 		return true;
 	}
 
-	bool Application::InitImGui()
-	{
-		const char* glslVersion = "#version 450 core";
-		IMGUI_CHECKVERSION();
-
-		if (!ImGui::CreateContext())
-		{
-			F_FATAL("Failed to create ImGui context!");
-			return false;
-		}
-
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-		io.ConfigWindowsMoveFromTitleBarOnly = true;
-
-		io.Fonts->AddFontDefault();
-		float baseFontSize = 16.0f;
-		float iconFontSize = baseFontSize * 2.0f / 3.0f;
-
-		// merge in icons from Font Awesome
-		static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
-		ImFontConfig icons_config;
-		icons_config.MergeMode = true;
-		icons_config.PixelSnapH = true;
-		icons_config.GlyphMinAdvanceX = iconFontSize;
-		icons_config.GlyphOffset = ImVec2{ 0.0f, 2.0f };
-		io.Fonts->AddFontFromFileTTF(FONT_ICON_FILE_NAME_FAS, baseFontSize, &icons_config, icons_ranges);
-
-		if (!ImGui_ImplSDL2_InitForOpenGL(m_Window->GetWindow().get(), m_Window->GetGLContext()))
-		{
-			F_FATAL("Failed to initialize ImGui SDL2 for OpenGL!");
-			return false;
-		}
-
-		if (!ImGui_ImplOpenGL3_Init(glslVersion))
-		{
-			F_FATAL("Failed to initialize ImGui OpenGL3!");
-			return false;
-		}
-
-		ImGui::InitDefaultStyles();
-
-		return true;
-	}
-
-	void Application::BeginImGui()
-	{
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-	}
-
-	void Application::EndImGui()
-	{
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-
-			SDL_GL_MakeCurrent(m_Window->GetWindow().get(), backupContext);
-		}
-	}
-
-	void Application::RenderImGui()
+	void Application::InitDisplays()
 	{
 		const auto dockSpaceId = ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
 		if (static auto firstTime = true; firstTime) [[unlikely]]
 		{
 			firstTime = false;
@@ -631,6 +576,11 @@ namespace Feather {
 
 			ImGui::DockBuilderFinish(dockSpaceId);
 		}
+	}
+
+	void Application::RenderDisplays()
+	{
+		InitDisplays();
 
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& displayHolder = mainRegistry.GetContext<std::shared_ptr<DisplayHolder>>();
@@ -650,6 +600,12 @@ namespace Feather {
 		DrawComponentsUtil::RegisterUIComponent<BoxColliderComponent>();
 		DrawComponentsUtil::RegisterUIComponent<CircleColliderComponent>();
 		DrawComponentsUtil::RegisterUIComponent<TextComponent>();
+	}
+
+	void Application::OnCloseEditor(CloseEditorEvent& close)
+	{
+		// TODO: Maybe add a check for save?
+		m_IsRunning = false;
 	}
 
     Application::Application()

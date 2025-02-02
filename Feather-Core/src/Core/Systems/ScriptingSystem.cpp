@@ -23,21 +23,30 @@
 #include "Core/States/StateStack.h"
 #include "Core/States/StateMachine.h"
 
+#include <filesystem>
+
 namespace Feather {
 
 	ScriptingSystem::ScriptingSystem()
 		: m_MainLoaded{ false }
 	{}
 
-	bool ScriptingSystem::LoadMainScript(Registry& registry, sol::state& lua)
+	bool ScriptingSystem::LoadMainScript(const std::string& mainLuaFile, Registry& registry, sol::state& lua)
 	{
+		std::error_code ec;
+		if (!std::filesystem::exists(mainLuaFile, ec))
+		{
+			F_ERROR("Error loading the main lua script: {}", ec.message());
+			return false;
+		}
+
 		try
 		{
-			auto result = lua.safe_script_file("assets/scripts/main.lua");
+			auto result = lua.safe_script_file(mainLuaFile);
 		}
 		catch (const sol::error& e)
 		{
-			F_ERROR("Error loading the Main lua script: {0}", e.what());
+			F_ERROR("Error loading the Main lua script: {}", e.what());
 			return false;
 		}
 

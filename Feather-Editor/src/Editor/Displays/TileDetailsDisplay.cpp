@@ -1,6 +1,6 @@
 #include "TileDetailsDisplay.h"
 
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
 #include "Editor/Scene/SceneManager.h"
@@ -181,7 +181,7 @@ namespace Feather {
 						m_RenameLayerBuff.clear();
 						m_Renaming = false;
 					}
-					else if (m_Renaming && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+					else if (m_Renaming && ImGui::IsKeyPressed(ImGuiKey_Escape))
 					{
 						m_RenameLayerBuff.clear();
 						m_Renaming = false;

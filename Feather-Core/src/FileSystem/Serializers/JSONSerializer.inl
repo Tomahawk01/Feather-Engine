@@ -9,6 +9,10 @@ namespace Feather {
 
 		if constexpr (std::is_same_v<TValue, std::string>)
 			m_Writer->String(value.c_str());
+		else if constexpr (std::is_same_v<TValue, const char*>)
+			m_Writer->String(value);
+		else if constexpr (std::is_same_v<TValue, const char>)
+			m_Writer->String(value);
 		else if constexpr (std::is_integral_v<TValue>)
 			m_Writer->Int64(value);
 		else if constexpr (std::is_unsigned_v<TValue>)

@@ -12,13 +12,13 @@ namespace Feather {
 		template <typename TEventType, auto Func, typename THandlerType>
 		void AddHandler(THandlerType& handler)
 		{
-			m_Dispatcher.sink<TEventType>().connect<Func>(handler);
+			m_Dispatcher.sink<TEventType>().template connect<Func>(handler);
 		}
 
 		template <typename TEventType, auto Func, typename THandlerType>
 		void RemoveHandler(THandlerType& handler)
 		{
-			m_Dispatcher.sink<TEventType>().disconnect<Func>(handler);
+			m_Dispatcher.sink<TEventType>().template disconnect<Func>(handler);
 		}
 
 		template <typename TEventType>
@@ -30,7 +30,7 @@ namespace Feather {
 		template <typename TEventType, auto Func>
 		void AddFreeFunc()
 		{
-			m_Dispatcher.sink<TEventType>().connect<Func>();
+			m_Dispatcher.sink<TEventType>().template connect<Func>();
 		}
 
 		template <typename TEventType>

@@ -20,4 +20,9 @@ namespace Feather {
 		std::string sFilepath{ "" };
 	};
 
+	struct CloseEditorEvent
+	{
+		// ...
+	};
+
 }

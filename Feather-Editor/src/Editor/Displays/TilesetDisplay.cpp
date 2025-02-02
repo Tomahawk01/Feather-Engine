@@ -7,7 +7,7 @@
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"
-#include "Editor/Utilities/ImGuiUtils.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <imgui.h>
@@ -71,8 +71,9 @@ namespace Feather {
 
 					// Create unique id for the buttons
 					ImGui::PushID(k++);
+					std::string buttonStr = "##tile_" + std::to_string(k);
 
-					if (ImGui::ImageButton((ImTextureID)(intptr_t)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
+					if (ImGui::ImageButton(buttonStr.c_str(), (ImTextureID)(intptr_t)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
 					{
 						m_Selected = id;
 						TOOL_MANAGER().SetTileToolStartCoords(j, i);
