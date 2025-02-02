@@ -10,6 +10,7 @@
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Systems/PhysicsSystem.h"
+#include "Core/Systems/RenderPickingSystem.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/Renderer.h"
 #include "Utils/HelperUtilities.h"
@@ -40,6 +41,7 @@ namespace Feather {
 
         // Enable alpha blending
         renderer->SetCapability(Renderer::GLCapability::BLEND, true);
+        renderer->SetCapability(Renderer::GLCapability::DEPTH_TEST, true);
         renderer->SetBlendCapability(
             Renderer::BlendingFactors::SRC_ALPHA,
             Renderer::BlendingFactors::ONE_MINUS_SRC_ALPHA
@@ -98,6 +100,7 @@ namespace Feather {
         AddToContext<std::shared_ptr<PhysicsSystem>>(std::make_shared<PhysicsSystem>());
         AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>());
         AddToContext<std::shared_ptr<EventDispatcher>>(std::make_shared<EventDispatcher>());
+        AddToContext<std::shared_ptr<RenderPickingSystem>>(std::make_shared<RenderPickingSystem>());
 
         return true;
     }

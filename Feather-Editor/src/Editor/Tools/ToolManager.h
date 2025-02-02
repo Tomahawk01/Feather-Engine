@@ -9,6 +9,7 @@ namespace Feather {
 
 	enum class ToolType;
 	enum class GizmoType;
+	class EventDispatcher;
 	class AbstractTool;
 	class Gizmo;
 	class TileTool;
@@ -69,6 +70,8 @@ namespace Feather {
 		bool SetupTools(SceneObject* sceneObject, Camera2D* camera);
 
 		void EnableGridSnap(bool enable);
+
+		std::vector<EventDispatcher*> GetDispatchers();
 
 	private:
 		std::map<ToolType, std::unique_ptr<TileTool>> m_mapTools;

@@ -63,4 +63,12 @@ namespace Feather {
 		float lineThickness;
 	};
 
+	struct PickingVertex
+	{
+		glm::vec2 position{ 0.0f };
+		glm::vec2 uvs{ 0.0f };
+		Color color{};
+		uint32_t uid{ 0 };
+	};
+
 }

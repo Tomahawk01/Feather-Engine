@@ -1,8 +1,10 @@
 #include "ToolManager.h"
+
 #include "CreateTileTool.h"
 #include "RectFillTool.h"
 #include "ToolAccessories.h"
 
+#include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/Camera2D.h"
 
 #include "Editor/Scene/SceneObject.h"
@@ -165,6 +167,17 @@ namespace Feather {
 			else
 				tool.second->DisableGridSnap();
 		}
+	}
+
+	std::vector<EventDispatcher*> ToolManager::GetDispatchers()
+	{
+		std::vector<EventDispatcher*> dispatchers{};
+		for (auto& [type, gizmo] : m_mapGizmos)
+		{
+			dispatchers.push_back(&gizmo->GetDispatcher());
+		}
+
+		return dispatchers;
 	}
 
 }

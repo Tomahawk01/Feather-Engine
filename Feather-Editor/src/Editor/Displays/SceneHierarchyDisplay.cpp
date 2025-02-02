@@ -3,12 +3,14 @@
 #include "Core/ECS/Entity.h"
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/ECS/MetaUtilities.h"
+#include "Core/Events/EventDispatcher.h"
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Events/EditorEventTypes.h"
 
 #include <imgui.h>
 
@@ -24,7 +26,9 @@ namespace Feather {
 	};
 
 	SceneHierarchyDisplay::SceneHierarchyDisplay()
-	{}
+	{
+		ADD_SWE_HANDLER(SwitchEntityEvent, &SceneHierarchyDisplay::OnEntityChanged, *this);
+	}
 
 	SceneHierarchyDisplay::~SceneHierarchyDisplay()
 	{}
@@ -309,6 +313,32 @@ namespace Feather {
 			ImGui::Spacing();
 			ImGui::Separator();
 		}
+	}
+
+	void SceneHierarchyDisplay::OnEntityChanged(SwitchEntityEvent& swEntEvent)
+	{
+		if (!swEntEvent.entity)
+		{
+			F_ERROR("Failed to change entity. Entity was invalid");
+			return;
+		}
+		auto pCurrentScene = SCENE_MANAGER().GetCurrentScene();
+		if (!pCurrentScene)
+		{
+			F_ERROR("Failed to change entity. Current scene was invalid");
+			return;
+		}
+
+		// Ensure that the entity is valid
+		if (!pCurrentScene->GetRegistry().IsValid(swEntEvent.entity->GetEntity()))
+		{
+			F_ERROR("Failed to change entity. Entity was invaild");
+			return;
+		}
+
+		m_SelectedEntity = std::make_shared<Entity>(pCurrentScene->GetRegistry(), swEntEvent.entity->GetEntity());
+
+		F_ASSERT(m_SelectedEntity && "Entity must be valid here!");
 	}
 
 }

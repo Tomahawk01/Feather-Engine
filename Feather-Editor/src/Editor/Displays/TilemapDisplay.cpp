@@ -5,11 +5,13 @@
 #include "Core/Systems/RenderSystem.h"
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
+#include "Core/Systems/RenderPickingSystem.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
+#include "Renderer/Essentials/PickingTexture.h"
 #include "Windowing/Input/Mouse.h"
 #include "Logger/Logger.h"
 
@@ -96,6 +98,11 @@ namespace Feather {
 			if (fb->GetWidth() != static_cast<int>(windowSize.x) || fb->GetHeight() != static_cast<int>(windowSize.y))
 			{
 				fb->Resize(static_cast<int>(windowSize.x), static_cast<int>(windowSize.y));
+
+				auto& pickingTexture = mainRegistry.GetContext<std::shared_ptr<PickingTexture>>();
+				if (pickingTexture)
+					pickingTexture->Resize(static_cast<int>(windowSize.x), static_cast<int>(windowSize.y));
+
 				m_TilemapCam->Resize(static_cast<int>(windowSize.x), static_cast<int>(windowSize.y));
 			}
 
@@ -155,6 +162,48 @@ namespace Feather {
 		auto& renderShapeSystem = mainRegistry.GetRenderShapeSystem();
 
 		auto activeGizmo = TOOL_MANAGER().GetActiveGizmo();
+		auto& mouse = INPUT_MANAGER().GetMouse();
+
+		if (activeGizmo && activeGizmo->IsOverTilemapWindow() && !activeGizmo->OverGizmo() &&
+			!ImGui::GetDragDropPayload() && mouse.IsButtonJustPressed(F_MOUSE_LEFT))
+		{
+			auto& renderPickingSystem = mainRegistry.GetContext<std::shared_ptr<RenderPickingSystem>>();
+			// Handle the picking texture/system
+			if (renderPickingSystem && currentScene)
+			{
+				auto& pickingTexture = mainRegistry.GetContext<std::shared_ptr<PickingTexture>>();
+				if (pickingTexture)
+				{
+					renderer->SetCapability(Renderer::GLCapability::BLEND, false);
+					pickingTexture->Bind();
+					renderer->SetViewport(0, 0, pickingTexture->GetWidth(), pickingTexture->GetHeight());
+					renderer->SetClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+					renderer->ClearBuffers(true, true);
+
+					renderPickingSystem->Update(currentScene->GetRegistry(), *m_TilemapCam);
+
+					const auto& pos = activeGizmo->GetMouseScreenCoords();
+					auto id = static_cast<entt::entity>(pickingTexture->ReadPixel(static_cast<int>(pos.x), static_cast<int>(pos.y)));
+
+					if (!currentScene->GetRegistry().IsValid(static_cast<entt::entity>(id)))
+					{
+						id = entt::null;
+					}
+					else
+					{
+						Entity checkedEntity{ currentScene->GetRegistry(), static_cast<entt::entity>(id) };
+						if (checkedEntity.HasComponent<TileComponent>())
+							id = entt::null;
+					}
+
+					SCENE_MANAGER().GetToolManager().SetSelectedEntity(id);
+				}
+
+				pickingTexture->Unbind();
+				pickingTexture->CheckResize();
+				renderer->SetCapability(Renderer::GLCapability::BLEND, true);
+			}
+		}
 
 		const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::TILEMAP];
 

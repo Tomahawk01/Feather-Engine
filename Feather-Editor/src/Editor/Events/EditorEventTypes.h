@@ -3,6 +3,8 @@
 
 namespace Feather {
 
+	class Entity;
+
 	enum class FileAction
 	{
 		Delete,
@@ -23,6 +25,11 @@ namespace Feather {
 	struct CloseEditorEvent
 	{
 		// ...
+	};
+
+	struct SwitchEntityEvent
+	{
+		Entity* entity{ nullptr };
 	};
 
 }

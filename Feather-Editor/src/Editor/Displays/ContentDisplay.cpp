@@ -6,6 +6,7 @@
 #include "Core/Events/EventDispatcher.h"
 #include "Utils/FeatherUtilities.h"
 #include "FileSystem/Dialogs/FileDialog.h"
+#include "FileSystem/Process/FileProcessor.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
@@ -118,7 +119,11 @@ namespace Feather {
 
 						if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 						{
-							// TODO: Open new process to run the file
+							FileProcessor fp{};
+							if (!fp.OpenApplicationFromFile(path.string(), {}))
+							{
+								F_ERROR("Failed to open file {}", path.string());
+							}
 						}
 						else if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))
 						{

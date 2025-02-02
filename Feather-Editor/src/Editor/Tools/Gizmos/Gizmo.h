@@ -9,6 +9,7 @@ namespace Feather {
 
 	class Entity;
 	class SpriteBatchRenderer;
+	class EventDispatcher;
 	struct GizmoAxisParams;
 
 	class Gizmo : public AbstractTool
@@ -25,7 +26,8 @@ namespace Feather {
 		void Hide();
 		void Show();
 
-		inline bool OverGizmo() const { return false; }
+		EventDispatcher& GetDispatcher();
+		inline bool OverGizmo() const { return !(!m_HoldingX && !m_HoldingY && !m_OverXAxis && !m_OverYAxis); }
 
 	protected:
 		void Init(const std::string& xAxisTexture, const std::string& yAxisTexture);
@@ -41,6 +43,7 @@ namespace Feather {
 		std::unique_ptr<GizmoAxisParams> m_XAxisParams;
 		std::unique_ptr<GizmoAxisParams> m_YAxisParams;
 		std::unique_ptr<SpriteBatchRenderer> m_BatchRenderer;
+		std::unique_ptr<EventDispatcher> m_EventDispatcher{ nullptr };
 
 		entt::entity m_SelectedEntity;
 		glm::vec2 m_LastMousePos;

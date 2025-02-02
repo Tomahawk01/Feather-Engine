@@ -2,6 +2,7 @@
 
 #include <Logger/Logger.h>
 #include <Renderer/Core/Renderer.h>
+#include <Renderer/Essentials/PickingTexture.h>
 
 #include <Core/ECS/MainRegistry.h>
 #include <Core/Resources/AssetManager.h>
@@ -68,6 +69,7 @@ namespace Feather {
 			ProcessEvents();
 			Update();
 			Render();
+			UpdateInputs();
 		}
 
 		CleanUp();
@@ -210,6 +212,18 @@ namespace Feather {
 			return false;
 		}
 
+		auto pickingTexture = std::make_shared<PickingTexture>(640, 480);
+		if (!pickingTexture)
+		{
+			F_ERROR("Failed to create the picking texture");
+			return false;
+		}
+		if (!MAIN_REGISTRY().AddToContext<std::shared_ptr<PickingTexture>>(pickingTexture))
+		{
+			F_ERROR("Failed to add the picking texture to the registry context");
+			return false;
+		}
+
 		ADD_EVENT_HANDLER(CloseEditorEvent, &Application::OnCloseEditor, *this);
 
 		// Register meta fuctions
@@ -242,6 +256,11 @@ namespace Feather {
 		if (!assetManager.AddShaderFromMemory("font", fontShaderVert, fontShaderFrag))
 		{
 			F_FATAL("Failed to add the font shader to the asset manager");
+			return false;
+		}
+		if (!assetManager.AddShaderFromMemory("picking", pickingShaderVert, pickingShaderFrag))
+		{
+			F_ERROR("Failed to add the picking shader to the asset manager");
 			return false;
 		}
 
@@ -425,8 +444,8 @@ namespace Feather {
 		}
     }
 
-    void Application::Update()
-    {
+	void Application::Update()
+	{
 		auto& engineData = CoreEngineData::GetInstance();
 		engineData.UpdateDeltaTime();
 
@@ -434,9 +453,13 @@ namespace Feather {
 		auto& displayHolder = mainRegistry.GetContext<std::shared_ptr<DisplayHolder>>();
 
 		for (const auto& display : displayHolder->displays)
+		{
 			display->Update();
+		}
+	}
 
-		// Updating inputs
+	void Application::UpdateInputs()
+	{
 		auto& inputManager = InputManager::GetInstance();
 		auto& keyboard = inputManager.GetKeyboard();
 		keyboard.Update();

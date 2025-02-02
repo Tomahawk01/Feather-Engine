@@ -13,6 +13,7 @@ namespace Feather {
 	class ToolManager;
 	class SceneObject;
 	class CommandManager;
+	class EventDispatcher;
 
 	class SceneManager
 	{
@@ -26,12 +27,10 @@ namespace Feather {
 		std::shared_ptr<SceneObject> GetScene(const std::string& sceneName);
 		std::shared_ptr<SceneObject> GetCurrentScene();
 
-		// TODO: May not be necessary
-		void AddLayerToCurrentScene(const std::string& layerName, bool visible);
-
 		std::vector<std::string> GetSceneNames() const;
 		ToolManager& GetToolManager();
 		CommandManager& GetCommandManager();
+		EventDispatcher& GetDispatcher();
 
 		void SetTileset(const std::string& tileset);
 
@@ -58,6 +57,18 @@ namespace Feather {
 
 		std::unique_ptr<ToolManager> m_ToolManager{ nullptr };
 		std::unique_ptr<CommandManager> m_CommandManager{ nullptr };
+
+		std::unique_ptr<EventDispatcher> m_SceneDispatcher{ nullptr };
 	};
 
 }
+
+#define ADD_SWE_HANDLER(Event, Func, Handler)							\
+	{																	\
+		for (auto& dispatcher : TOOL_MANAGER().GetDispatchers())		\
+		{																\
+			if (!dispatcher)											\
+				continue;												\
+			dispatcher->AddHandler<Event, Func>(Handler);				\
+		}																\
+	}

@@ -23,6 +23,7 @@ namespace Feather {
 
 		void ProcessEvents();
 		void Update();
+		void UpdateInputs();
 		void Render();
 
 		void CleanUp();

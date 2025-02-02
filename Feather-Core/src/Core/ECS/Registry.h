@@ -11,6 +11,8 @@ namespace Feather {
 		Registry();
 		~Registry() = default;
 
+		inline bool IsValid(entt::entity entity) const { return m_Registry != nullptr && m_Registry->valid(entity); }
+
 		inline entt::registry& GetRegistry() { return *m_Registry; }
 		inline entt::entity CreateEntity() { return m_Registry->create(); }
 		inline void ClearRegistry() { m_Registry->clear(); }

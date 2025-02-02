@@ -1,7 +1,9 @@
 #include "SceneManager.h"
+
+#include "Logger/Logger.h"
+#include "Core/Events/EventDispatcher.h"
 #include "SceneObject.h"
 #include "Utils/FeatherUtilities.h"
-#include "Logger/Logger.h"
 
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"
@@ -73,17 +75,6 @@ namespace Feather {
 		return sceneItr->second;
 	}
 
-	void SceneManager::AddLayerToCurrentScene(const std::string& layerName, bool visible)
-	{
-		if (auto currentScene = GetCurrentScene())
-		{
-			currentScene->AddLayer(layerName, visible);
-			return;
-		}
-
-		F_ERROR("Failed to add layer. Current scene is nullptr");
-	}
-
 	std::vector<std::string> SceneManager::GetSceneNames() const
 	{
 		return GetKeys(m_mapScenes);
@@ -105,6 +96,15 @@ namespace Feather {
 
 		F_ASSERT(m_CommandManager && "Command manager must be valid!");
 		return *m_CommandManager;
+	}
+
+	EventDispatcher& SceneManager::GetDispatcher()
+	{
+		if (!m_SceneDispatcher)
+			m_SceneDispatcher = std::make_unique<EventDispatcher>();
+
+		F_ASSERT(m_SceneDispatcher && "Event Dispatcher must be valid!");
+		return *m_SceneDispatcher;
 	}
 
 	void SceneManager::SetTileset(const std::string& tileset)

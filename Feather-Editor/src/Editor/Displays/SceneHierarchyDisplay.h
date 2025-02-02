@@ -5,6 +5,7 @@
 
 namespace Feather {
 
+	struct SwitchEntityEvent;
 	class Entity;
 
 	class SceneHierarchyDisplay : public IDisplay
@@ -21,6 +22,8 @@ namespace Feather {
 		void AddComponent(Entity& entity, bool* addComponent);
 		void DrawGameObjectDetails();
 		void DrawEntityComponents();
+
+		void OnEntityChanged(SwitchEntityEvent& swEntEvent);
 
 	private:
 		std::shared_ptr<Entity> m_SelectedEntity{ nullptr };

@@ -6,10 +6,12 @@
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Essentials/Vertex.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Events/EditorEventTypes.h"
 
 namespace Feather {
 
@@ -64,6 +66,7 @@ namespace Feather {
 		{
 			Entity ent{ *m_Registry, entity };
 			SetGizmoPosition(ent);
+			GetDispatcher().EmitEvent(SwitchEntityEvent{ .entity = &ent });
 		}
 	}
 
@@ -88,6 +91,16 @@ namespace Feather {
 
 			m_Hidden = false;
 		}
+	}
+
+	EventDispatcher& Gizmo::GetDispatcher()
+	{
+		if (!m_EventDispatcher)
+			m_EventDispatcher = std::make_unique<EventDispatcher>();
+
+		F_ASSERT(m_EventDispatcher && "Event Dispatcher must be valid");
+
+		return *m_EventDispatcher;
 	}
 
 	void Gizmo::Init(const std::string& xAxisTexture, const std::string& yAxisTexture)

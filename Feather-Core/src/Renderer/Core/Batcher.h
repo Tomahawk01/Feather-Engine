@@ -39,6 +39,7 @@ namespace Feather {
 		std::vector<std::shared_ptr<TBatch>> m_Batches;
 	protected:
 		void SetVertexAttribute(GLuint layoutPosition, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalized = GL_FALSE);
+		void SetVertexIAttribute(GLuint layoutPosition, GLuint numComponents, GLenum type, GLsizei stride, void* offset);
 
 		inline GLuint GetVBO() const { return m_VBO; }
 		inline GLuint GetIBO() const { return m_IBO; }
@@ -115,6 +116,15 @@ namespace Feather {
 	{
 		glBindVertexArray(m_VAO);
 		glVertexAttribPointer(layoutPosition, numComponents, type, normalized, stride, offset);
+		glEnableVertexAttribArray(layoutPosition);
+		glBindVertexArray(0);
+	}
+
+	template <typename TBatch, typename TGlyph>
+	inline void Batcher<TBatch, TGlyph>::SetVertexIAttribute(GLuint layoutPosition, GLuint numComponents, GLenum type, GLsizei stride, void* offset)
+	{
+		glBindVertexArray(m_VAO);
+		glVertexAttribIPointer(layoutPosition, numComponents, type, stride, offset);
 		glEnableVertexAttribArray(layoutPosition);
 		glBindVertexArray(0);
 	}
