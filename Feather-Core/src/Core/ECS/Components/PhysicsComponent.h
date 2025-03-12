@@ -48,12 +48,17 @@ namespace Feather {
 		~PhysicsComponent() = default;
 
 		void Init(PhysicsWorld physicsWorld, int windowWidth, int windowHeight);
-		b2Body* GetBody() { return m_RigidBody.get(); }
-		UserData* GetUserData() { return m_UserData.get(); }
-
 		const bool IsTrigger() const;
-		const PhysicsAttributes& GetAttributes() const { return m_InitialAttributes; }
-		PhysicsAttributes& GetChangableAttributes() { return m_InitialAttributes; }
+
+		ObjectData CastRay(const b2Vec2& point1, const b2Vec2& point2) const;
+		std::vector<ObjectData> BoxTrace(const b2Vec2& lowerBounds, const b2Vec2& upperBounds) const;
+
+		inline b2Body* GetBody() { return m_RigidBody.get(); }
+		inline UserData* GetUserData() { return m_UserData.get(); }
+
+		inline const PhysicsAttributes& GetAttributes() const { return m_InitialAttributes; }
+		inline PhysicsAttributes& GetChangableAttributes() { return m_InitialAttributes; }
+
 		static void CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry);
 
 	private:

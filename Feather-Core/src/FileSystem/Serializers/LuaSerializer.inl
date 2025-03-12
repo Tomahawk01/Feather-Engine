@@ -49,6 +49,26 @@ namespace Feather {
 	}
 
 	template<Streamable T>
+	inline LuaSerializer& LuaSerializer::AddWords(T words, bool newLine, bool indent, int indentSize)
+	{
+		if (newLine)
+			AddNewLine();
+
+		if (indent)
+		{
+			m_NumIndents += indentSize;
+			AddIndents();
+			m_NumIndents -= indentSize;
+		}
+
+		Stream(words);
+		m_NewLineAdded = false;
+		m_ValueAdded = false;
+
+		return *this;
+	}
+
+	template<Streamable T>
 	inline void LuaSerializer::Stream(const T& val)
 	{
 		m_FileStream << val;

@@ -47,6 +47,9 @@ namespace Feather {
 		template <Streamable TKey, Streamable TValue>
 		LuaSerializer& AddKeyValuePair(TKey key, const TValue& value, bool addNewLine = true, bool finalValue = false, bool quoteKey = false, bool quoteValue = false);
 
+		template<Streamable T>
+		LuaSerializer& AddWords(T words, bool newLine = false, bool indent = false, int indentSize = 1);
+
 	private:
 		void AddIndents();
 		void AddNewLine();

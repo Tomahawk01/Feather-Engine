@@ -32,4 +32,19 @@ namespace Feather {
 		Entity* entity{ nullptr };
 	};
 
+	enum class EContentCreateAction
+	{
+		Folder,
+		LuaClass,
+		LuaTable,
+
+		NoAction
+	};
+
+	struct ContentCreateEvent
+	{
+		EContentCreateAction eAction{ EContentCreateAction::NoAction };
+		std::string sFilepath{ "" };
+	};
+
 }

@@ -7,6 +7,7 @@
 #include "Utils/FeatherUtilities.h"
 #include "FileSystem/Dialogs/FileDialog.h"
 #include "FileSystem/Process/FileProcessor.h"
+#include "FileSystem/Serializers/LuaSerializer.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
@@ -137,17 +138,17 @@ namespace Feather {
 						if (m_ItemCut)
 						{
 							ImGui::BeginDisabled();
-							ImGui::Selectable("Cut");
+							ImGui::Selectable(ICON_FA_CUT "Cut");
 							ImGui::EndDisabled();
 						}
 						else
 						{
-							if (ImGui::Selectable("Cut"))
+							if (ImGui::Selectable(ICON_FA_CUT "Cut"))
 							{
 								m_FilepathToAction = path.string();
 								m_ItemCut = true;
 							}
-							if (ImGui::Selectable("Delete"))
+							if (ImGui::Selectable(ICON_FA_TRASH "Delete"))
 							{
 								if (m_Selected == id)
 								{
@@ -181,7 +182,7 @@ namespace Feather {
 				{
 					if (m_ItemCut && !m_FilepathToAction.empty())
 					{
-						if (ImGui::Selectable("Paste"))
+						if (ImGui::Selectable(ICON_FA_PASTE "Paste"))
 						{
 							m_FileDispatcher->EnqueueEvent(FileEvent{ .eAction = FileAction::Paste });
 						}
@@ -189,9 +190,33 @@ namespace Feather {
 					else
 					{
 						ImGui::BeginDisabled();
-						ImGui::Selectable("Paste");
+						ImGui::Selectable(ICON_FA_PASTE "Paste");
 						ImGui::EndDisabled();
 					}
+
+					if (ImGui::Selectable(ICON_FA_FOLDER " New Folder"))
+					{
+						m_FilepathToAction = m_CurrentDir.string();
+						m_CreateAction = EContentCreateAction::Folder;
+					}
+
+					if (ImGui::TreeNode("Lua Objects"))
+					{
+						if (ImGui::Selectable(ICON_FA_FILE " Create Lua Class"))
+						{
+							m_FilepathToAction = m_CurrentDir.string();
+							m_CreateAction = EContentCreateAction::LuaClass;
+						}
+						ImGui::ItemToolTip("Generates an empty lua class.");
+
+						if (ImGui::Selectable(ICON_FA_FILE " Create Lua Table"))
+						{
+						}
+						ImGui::ItemToolTip("Generates an empty lua table");
+
+						ImGui::TreePop();
+					}
+
 					ImGui::EndPopup();
 				}
 			}
@@ -199,7 +224,7 @@ namespace Feather {
 			ImGui::EndTable();
 		}
 
-		OpenDeletePopup();
+		HandlePopups();
 
 		ImGui::End();
 	}
@@ -351,6 +376,37 @@ namespace Feather {
 		}
 	}
 
+	void ContentDisplay::HandleCreateEvent(const ContentCreateEvent& createEvent)
+	{
+		if (createEvent.eAction == EContentCreateAction::NoAction)
+			return;
+
+		switch (createEvent.eAction)
+		{
+		case EContentCreateAction::Folder: OpenCreateFolderPopup(); break;
+		}
+	}
+
+	void ContentDisplay::HandlePopups()
+	{
+		if (m_FileAction != FileAction::NoAction)
+		{
+			switch (m_FileAction)
+			{
+			case FileAction::Delete: OpenDeletePopup(); break;
+			}
+		}
+
+		if (m_CreateAction != EContentCreateAction::NoAction)
+		{
+			switch (m_CreateAction)
+			{
+			case EContentCreateAction::Folder: OpenCreateFolderPopup(); break;
+			case EContentCreateAction::LuaClass: OpenCreateLuaClassPopup(); break;
+			}
+		}
+	}
+
 	void ContentDisplay::OpenDeletePopup()
 	{
 		if (m_FileAction != FileAction::Delete)
@@ -370,6 +426,225 @@ namespace Feather {
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel"))
 				m_FileAction = FileAction::NoAction;
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void ContentDisplay::OpenCreateFolderPopup()
+	{
+		if (m_CreateAction != EContentCreateAction::Folder)
+			return;
+
+		ImGui::OpenPopup("Create Folder");
+
+		if (ImGui::BeginPopupModal("Create Folder"))
+		{
+			static std::string newFolderStr{ "" };
+			char temp[256];
+			memset(temp, 0, sizeof(temp));
+			strcpy_s(temp, newFolderStr.c_str());
+			bool bNameEntered{ false }, bExit{ false };
+
+			ImGui::Text("folder name");
+			ImGui::SameLine();
+
+			if (!ImGui::IsAnyItemActive())
+				ImGui::SetKeyboardFocusHere();
+
+			if (ImGui::InputText("##folder name", temp, sizeof(temp), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				newFolderStr = std::string{ temp };
+				bNameEntered = true;
+			}
+			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+			{
+				bExit = true;
+			}
+
+			static std::string errorText{ "" };
+			if (bNameEntered && !newFolderStr.empty())
+			{
+				std::string folderPathStr = m_CurrentDir.string() + "\\" + newFolderStr;
+				std::error_code error{};
+				if (!std::filesystem::create_directory(std::filesystem::path{ folderPathStr }, error))
+				{
+					F_ERROR("Failed to create new folder: {}", error.message());
+					errorText = "Failed to create new folder: " + error.message();
+				}
+				else
+				{
+					m_CreateAction = EContentCreateAction::NoAction;
+					m_FilepathToAction.clear();
+					newFolderStr.clear();
+					errorText.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (ImGui::Button("Cancel") || bExit)
+			{
+				m_CreateAction = EContentCreateAction::NoAction;
+				m_FilepathToAction.clear();
+				errorText.clear();
+				newFolderStr.clear();
+				ImGui::CloseCurrentPopup();
+			}
+
+			if (!errorText.empty())
+			{
+				ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, errorText.c_str());
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void ContentDisplay::OpenCreateLuaClassPopup()
+	{
+		if (m_CreateAction != EContentCreateAction::LuaClass)
+			return;
+
+		ImGui::OpenPopup("Create Lua Class");
+
+		if (ImGui::BeginPopupModal("Create Lua Class"))
+		{
+			char buffer[256];
+			static std::string className{ "" };
+			memset(buffer, 0, sizeof(buffer));
+			strcpy_s(buffer, className.c_str());
+			bool bNameEntered{ false }, bExit{ false };
+			ImGui::Text("Class Name");
+			ImGui::SameLine();
+
+			if (!ImGui::IsAnyItemActive())
+				ImGui::SetKeyboardFocusHere();
+
+			if (ImGui::InputText("##ClassName", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				className = std::string{ buffer };
+				bNameEntered = true;
+			}
+			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+			{
+				bExit = true;
+			}
+
+			static std::string errorText{ "" };
+
+			if (bNameEntered && !className.empty())
+			{
+				std::string filename = m_FilepathToAction + +"\\" + className + ".lua";
+
+				if (std::filesystem::exists(std::filesystem::path{ filename }))
+				{
+					F_ERROR("Class file: '{}' already exists at '{}'", className, filename);
+					errorText = "Class file: '" + className + "' already exists at '" + filename + "'";
+				}
+				else
+				{
+					LuaSerializer lw{ filename };
+
+					lw.AddWords(className + " = {}")
+						.AddWords(className + ".__index = " + className, true)
+						.AddWords("function " + className + ":Create(params)", true)
+						.AddWords("local this = {}", true, true)
+						.AddWords("setmetatable(this, self)", true, true)
+						.AddWords("return this", true, true)
+						.AddWords("end", true);
+
+					errorText.clear();
+					className.clear();
+					m_CreateAction = EContentCreateAction::NoAction;
+					m_FilepathToAction.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (ImGui::Button("Cancel") || bExit)
+			{
+				ImGui::CloseCurrentPopup();
+				m_CreateAction = EContentCreateAction::NoAction;
+				className.clear();
+				m_FilepathToAction.clear();
+			}
+
+			if (!errorText.empty())
+			{
+				ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, errorText.c_str());
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void ContentDisplay::OpenCreateLuaTablePopup()
+	{
+		if (m_CreateAction != EContentCreateAction::LuaTable)
+			return;
+
+		ImGui::OpenPopup("Create Lua Table");
+
+		if (ImGui::BeginPopupModal("Create Lua Table"))
+		{
+			char buffer[256];
+			static std::string tableName{ "" };
+			memset(buffer, 0, sizeof(buffer));
+			strcpy_s(buffer, tableName.c_str());
+			bool bNameEntered{ false }, bExit{ false };
+			ImGui::Text("Table Name");
+			ImGui::SameLine();
+
+			if (!ImGui::IsAnyItemActive())
+				ImGui::SetKeyboardFocusHere();
+
+			if (ImGui::InputText("##TableName", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				tableName = std::string{ buffer };
+				bNameEntered = true;
+			}
+			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+			{
+				bExit = true;
+			}
+
+			static std::string errorText{ "" };
+
+			if (bNameEntered && !tableName.empty())
+			{
+				std::string filename = m_FilepathToAction + +"\\" + tableName + ".lua";
+
+				if (std::filesystem::exists(std::filesystem::path{ filename }))
+				{
+					F_ERROR("Table file: '{}' already exists at '{}'", tableName, filename);
+					errorText = "Table file: '" + tableName + "' already exists at '" + filename + "'";
+				}
+				else
+				{
+					LuaSerializer lw{ filename };
+
+					lw.StartNewTable(tableName).EndTable().FinishStream();
+
+					errorText.clear();
+					tableName.clear();
+					m_CreateAction = EContentCreateAction::NoAction;
+					m_FilepathToAction.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (ImGui::Button("Cancel") || bExit)
+			{
+				ImGui::CloseCurrentPopup();
+				m_CreateAction = EContentCreateAction::NoAction;
+				tableName.clear();
+				m_FilepathToAction.clear();
+			}
+
+			if (!errorText.empty())
+			{
+				ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, errorText.c_str());
+			}
 
 			ImGui::EndPopup();
 		}
