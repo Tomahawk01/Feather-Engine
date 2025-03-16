@@ -260,6 +260,51 @@ namespace Feather {
 				SERIALIZE_COMPONENT(*serializer, physics);
 			}
 
+			if (auto* relations = objectEnt.TryGetComponent<Relationship>())
+			{
+				serializer->StartNewObject("relationship");
+				if (relations->parent != entt::null)
+				{
+					Entity parent{ registry, relations->parent };
+					serializer->AddKeyValuePair("parent", parent.GetName());
+				}
+				else
+				{
+					serializer->AddKeyValuePair("parent", std::string{ "" });
+				}
+
+				if (relations->nextSibling != entt::null)
+				{
+					Entity nextSibling{ registry, relations->nextSibling };
+					serializer->AddKeyValuePair("nextSibling", nextSibling.GetName());
+				}
+				else
+				{
+					serializer->AddKeyValuePair("nextSibling", std::string{ "" });
+				}
+
+				if (relations->prevSibling != entt::null)
+				{
+					Entity prevSibling{ registry, relations->prevSibling };
+					serializer->AddKeyValuePair("prevSibling", prevSibling.GetName());
+				}
+				else
+				{
+					serializer->AddKeyValuePair("prevSibling", std::string{ "" });
+				}
+
+				if (relations->firstChild != entt::null)
+				{
+					Entity firstChild{ registry, relations->firstChild };
+					serializer->AddKeyValuePair("firstChild", firstChild.GetName());
+				}
+				else
+				{
+					serializer->AddKeyValuePair("firstChild", std::string{ "" });
+				}
+				serializer->EndObject(); // Relationship Object
+			}
+
 			serializer->EndObject(); // Components object
 			serializer->EndObject(); // Ent GameObject object
 		}
@@ -306,6 +351,9 @@ namespace Feather {
 			F_ERROR("Failed to load Game Objects: File '{}' - There needs to be at least 1 tile", objectMapFile);
 			return false;
 		}
+
+		// Map of entity to relationships
+		std::map<entt::entity, SaveRelationship> mapEntityToRelationship;
 
 		for (const auto& object : gameObjects.GetArray())
 		{
@@ -355,7 +403,57 @@ namespace Feather {
 				DESERIALIZE_COMPONENT(jsonID, id);
 			}
 
-			// TODO: Handle Relationships?
+			if (components.HasMember("relationship"))
+			{
+				const rapidjson::Value& relations = components["relationship"];
+				SaveRelationship saveRelations{};
+				saveRelations.Parent = relations["parent"].GetString();
+				saveRelations.NextSibling = relations["nextSibling"].GetString();
+				saveRelations.PrevSibling = relations["prevSibling"].GetString();
+				saveRelations.FirstChild = relations["firstChild"].GetString();
+
+				mapEntityToRelationship.emplace(gameObject.GetEntity(), saveRelations);
+			}
+
+			auto ids = registry.GetRegistry().view<Identification>(entt::exclude<TileComponent>);
+
+			auto findTag = [&](const std::string& sTag) {
+				auto parItr = std::ranges::find_if(ids, [&](const auto& e) {
+					Entity en{ registry, e };
+					return en.GetName() == sTag;
+				});
+
+				if (parItr != ids.end())
+					return *parItr;
+
+				return entt::entity{ entt::null };
+			};
+
+			for (auto& [entity, saveRelations] : mapEntityToRelationship)
+			{
+				Entity ent{ registry, entity };
+				auto& relations = ent.GetComponent<Relationship>();
+
+				if (!saveRelations.Parent.empty())
+				{
+					relations.parent = findTag(saveRelations.Parent);
+				}
+
+				if (!saveRelations.NextSibling.empty())
+				{
+					relations.nextSibling = findTag(saveRelations.NextSibling);
+				}
+
+				if (!saveRelations.PrevSibling.empty())
+				{
+					relations.prevSibling = findTag(saveRelations.PrevSibling);
+				}
+
+				if (!saveRelations.FirstChild.empty())
+				{
+					relations.firstChild = findTag(saveRelations.FirstChild);
+				}
+			}
 		}
 
 		mapFile.close();

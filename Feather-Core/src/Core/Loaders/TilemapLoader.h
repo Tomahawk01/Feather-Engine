@@ -27,4 +27,13 @@ namespace Feather {
 		// TODO: Save and load functions for Lua serializer
 	};
 
+	struct SaveRelationship
+	{
+		//entt::entity Self{ entt::null };
+		std::string Parent{ "" };
+		std::string NextSibling{ "" };
+		std::string PrevSibling{ "" };
+		std::string FirstChild{ "" };
+	};
+
 }
