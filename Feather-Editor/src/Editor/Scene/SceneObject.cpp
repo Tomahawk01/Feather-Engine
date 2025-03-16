@@ -4,9 +4,12 @@
 #include "Core/ECS/MetaUtilities.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Loaders/TilemapLoader.h"
+#include "Core/Events/EventDispatcher.h"
 #include "Filesystem/Serializers/JSONSerializer.h"
+#include "Utils/FeatherUtilities.h"
 
 #include "Editor/Utilities/SaveProject.h"
+#include "Editor/Events/EditorEventTypes.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -60,6 +63,8 @@ namespace Feather {
 		sceneData.open(m_SceneDataPath, std::ios::out | std::ios::trunc);
 		F_ASSERT(sceneData.is_open() && "File should have been created and opened");
 		sceneData.close();
+
+		ADD_EVENT_HANDLER(NameChangeEvent, &SceneObject::OnEntityNameChanges, *this);
 	}
 
 	SceneObject::SceneObject(const std::string& sceneName, const std::string& sceneData)
@@ -89,6 +94,8 @@ namespace Feather {
 		{
 			// Log some error
 		}
+
+		ADD_EVENT_HANDLER(NameChangeEvent, &SceneObject::OnEntityNameChanges, *this);
 	}
 
 	void SceneObject::CopySceneToRuntime()
@@ -136,6 +143,115 @@ namespace Feather {
 		return CheckContainsValue(m_LayerParams,
 			[&](SpriteLayerParams& spriteLayer) { return spriteLayer.layerName == layerName; }
 		);
+	}
+
+	bool SceneObject::AddGameObject()
+	{
+		Entity newObject{ m_Registry, "", "" };
+		newObject.AddComponent<TransformComponent>();
+		std::string tag{ "GameObject" };
+
+		auto objItr = m_mapTagToEntity.find(tag);
+		if (objItr != m_mapTagToEntity.end())
+		{
+			size_t objIndex{ 1 };
+			tag = "GameObject1";
+			objItr = m_mapTagToEntity.find(tag);
+			while (objItr != m_mapTagToEntity.end())
+			{
+				++objIndex;
+				tag = std::format("GameObject{}", objIndex);
+				objItr = m_mapTagToEntity.find(tag);
+			}
+		}
+
+		newObject.ChangeName(tag);
+		m_mapTagToEntity.emplace(tag, newObject.GetEntity());
+
+		return true;
+	}
+
+	bool SceneObject::DuplicateGameObject(entt::entity entity)
+	{
+		auto objItr = m_mapTagToEntity.begin();
+		for (; objItr != m_mapTagToEntity.end(); ++objItr)
+		{
+			if (objItr->second == entity)
+				break;
+		}
+
+		if (objItr == m_mapTagToEntity.end())
+		{
+			F_ERROR("Failed to duplicate game object with id '{}'. Does not exist or was not mapped correctly", static_cast<uint32_t>(entity));
+			return false;
+		}
+
+		// Create the new entity in the registry
+		auto& registry = m_Registry.GetRegistry();
+		auto newEntity = registry.create();
+
+		// Copy the components of the entity to the new entity
+		for (auto&& [id, storage] : registry.storage())
+		{
+			if (!storage.contains(entity))
+				continue;
+
+			InvokeMetaFunction(id, "copy_component"_hs, Entity{ m_Registry, entity }, Entity{ m_Registry, newEntity });
+		}
+
+		// Now we need to set the tag for the entity
+		size_t tagNum{ 1 };
+
+		while (CheckTagName(std::format("{}_{}", objItr->first, tagNum)))
+		{
+			++tagNum;
+		}
+
+		Entity newEnt{ m_Registry, newEntity };
+		newEnt.ChangeName(std::format("{}_{}", objItr->first, tagNum));
+
+		m_mapTagToEntity.emplace(newEnt.GetName(), newEntity);
+
+		return true;
+	}
+
+	bool SceneObject::DeleteGameObjectByTag(const std::string& tag)
+	{
+		auto objItr = m_mapTagToEntity.find(tag);
+		if (objItr == m_mapTagToEntity.end())
+		{
+			F_ERROR("Failed to delete game object with tag '{}'. Does not exist or was not mapped correctly", tag);
+			return false;
+		}
+
+		Entity ent{ m_Registry, objItr->second };
+		ent.Kill();
+
+		m_mapTagToEntity.erase(objItr);
+
+		return true;
+	}
+
+	bool SceneObject::DeleteGameObjectById(entt::entity entity)
+	{
+		auto objItr = m_mapTagToEntity.begin();
+		for (; objItr != m_mapTagToEntity.end(); ++objItr)
+		{
+			if (objItr->second == entity)
+				break;
+		}
+
+		if (objItr == m_mapTagToEntity.end())
+		{
+			F_ERROR("Failed to delete game object with id '{}'. Does not exist or was not mapped correctly", static_cast<uint32_t>(entity));
+			return false;
+		}
+
+		Entity ent{ m_Registry, objItr->second };
+		ent.Kill();
+
+		m_mapTagToEntity.erase(objItr);
+		return true;
 	}
 
 	bool SceneObject::LoadScene()
@@ -191,6 +307,11 @@ namespace Feather {
 	bool SceneObject::SaveScene()
 	{
 		return SaveSceneData();
+	}
+
+	bool SceneObject::CheckTagName(const std::string& tagName)
+	{
+		return m_mapTagToEntity.contains(tagName);
 	}
 
 	bool SceneObject::LoadSceneData()
@@ -333,6 +454,33 @@ namespace Feather {
 			success = false;
 
 		return success;
+	}
+
+	void SceneObject::OnEntityNameChanges(NameChangeEvent& nameChange)
+	{
+		if (nameChange.newName.empty() || nameChange.oldName.empty() || !nameChange.entity)
+			return;
+
+		auto objItr = m_mapTagToEntity.find(nameChange.oldName);
+		if (objItr == m_mapTagToEntity.end())
+			return;
+
+		// If the map already contains that name, don't change the name
+		if (m_mapTagToEntity.contains(nameChange.newName))
+		{
+			nameChange.entity->ChangeName(nameChange.oldName);
+			F_ERROR("Failed to change entity name. '{}' already exists", nameChange.newName);
+			return;
+		}
+
+		if (nameChange.entity->GetEntity() != objItr->second)
+			return;
+
+		if (!KeyChange(m_mapTagToEntity, nameChange.oldName, nameChange.newName))
+		{
+			F_ERROR("Failed to change entity name");
+			return;
+		}
 	}
 
 }

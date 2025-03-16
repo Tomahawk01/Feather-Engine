@@ -32,7 +32,7 @@ namespace Feather {
 		Entity* entity{ nullptr };
 	};
 
-	enum class EContentCreateAction
+	enum class ContentCreateAction
 	{
 		Folder,
 		LuaClass,
@@ -43,8 +43,20 @@ namespace Feather {
 
 	struct ContentCreateEvent
 	{
-		EContentCreateAction eAction{ EContentCreateAction::NoAction };
+		ContentCreateAction eAction{ ContentCreateAction::NoAction };
 		std::string sFilepath{ "" };
+	};
+
+	struct KeyPressedEvent
+	{
+		int key;
+	};
+
+	struct NameChangeEvent
+	{
+		std::string oldName{ "" };
+		std::string newName{ "" };
+		Entity* entity{ nullptr };
 	};
 
 }

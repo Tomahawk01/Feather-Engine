@@ -147,4 +147,12 @@ namespace Feather {
 		return success;
 	}
 
+	bool SceneManager::CheckTagName(const std::string& tagName)
+	{
+		if (auto pScene = GetCurrentScene())
+			return pScene->CheckTagName(tagName);
+
+		return false;
+	}
+
 }

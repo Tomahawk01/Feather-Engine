@@ -25,6 +25,7 @@ namespace Feather {
 		, m_FilepathToAction{ "" }
 		, m_Selected{ -1 }
 		, m_FileAction{ FileAction::NoAction }
+		, m_CreateAction{ ContentCreateAction::NoAction }
 		, m_ItemCut{ false }
 		, m_WindowHovered{ false }
 	{
@@ -52,7 +53,7 @@ namespace Feather {
 		int numCols = windowWidth / 128;
 		if (numCols == 0)
 		{
-			F_ERROR("NumCols is zero!");
+			// F_ERROR("NumCols is zero!");
 			ImGui::End();
 			return;
 		}
@@ -197,7 +198,7 @@ namespace Feather {
 					if (ImGui::Selectable(ICON_FA_FOLDER " New Folder"))
 					{
 						m_FilepathToAction = m_CurrentDir.string();
-						m_CreateAction = EContentCreateAction::Folder;
+						m_CreateAction = ContentCreateAction::Folder;
 					}
 
 					if (ImGui::TreeNode("Lua Objects"))
@@ -205,7 +206,7 @@ namespace Feather {
 						if (ImGui::Selectable(ICON_FA_FILE " Create Lua Class"))
 						{
 							m_FilepathToAction = m_CurrentDir.string();
-							m_CreateAction = EContentCreateAction::LuaClass;
+							m_CreateAction = ContentCreateAction::LuaClass;
 						}
 						ImGui::ItemToolTip("Generates an empty lua class.");
 
@@ -235,6 +236,8 @@ namespace Feather {
 
 		if (ImGui::Button(ICON_FA_FOLDER_PLUS))
 		{
+			m_FilepathToAction = m_CurrentDir.string();
+			m_CreateAction = ContentCreateAction::Folder;
 		}
 		ImGui::ItemToolTip("Create Folder");
 		ImGui::SameLine(0.0f, 16.0f);
@@ -378,12 +381,12 @@ namespace Feather {
 
 	void ContentDisplay::HandleCreateEvent(const ContentCreateEvent& createEvent)
 	{
-		if (createEvent.eAction == EContentCreateAction::NoAction)
+		if (createEvent.eAction == ContentCreateAction::NoAction)
 			return;
 
 		switch (createEvent.eAction)
 		{
-		case EContentCreateAction::Folder: OpenCreateFolderPopup(); break;
+		case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
 		}
 	}
 
@@ -397,12 +400,12 @@ namespace Feather {
 			}
 		}
 
-		if (m_CreateAction != EContentCreateAction::NoAction)
+		if (m_CreateAction != ContentCreateAction::NoAction)
 		{
 			switch (m_CreateAction)
 			{
-			case EContentCreateAction::Folder: OpenCreateFolderPopup(); break;
-			case EContentCreateAction::LuaClass: OpenCreateLuaClassPopup(); break;
+			case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
+			case ContentCreateAction::LuaClass: OpenCreateLuaClassPopup(); break;
 			}
 		}
 	}
@@ -433,7 +436,7 @@ namespace Feather {
 
 	void ContentDisplay::OpenCreateFolderPopup()
 	{
-		if (m_CreateAction != EContentCreateAction::Folder)
+		if (m_CreateAction != ContentCreateAction::Folder)
 			return;
 
 		ImGui::OpenPopup("Create Folder");
@@ -474,7 +477,7 @@ namespace Feather {
 				}
 				else
 				{
-					m_CreateAction = EContentCreateAction::NoAction;
+					m_CreateAction = ContentCreateAction::NoAction;
 					m_FilepathToAction.clear();
 					newFolderStr.clear();
 					errorText.clear();
@@ -484,7 +487,7 @@ namespace Feather {
 
 			if (ImGui::Button("Cancel") || bExit)
 			{
-				m_CreateAction = EContentCreateAction::NoAction;
+				m_CreateAction = ContentCreateAction::NoAction;
 				m_FilepathToAction.clear();
 				errorText.clear();
 				newFolderStr.clear();
@@ -502,7 +505,7 @@ namespace Feather {
 
 	void ContentDisplay::OpenCreateLuaClassPopup()
 	{
-		if (m_CreateAction != EContentCreateAction::LuaClass)
+		if (m_CreateAction != ContentCreateAction::LuaClass)
 			return;
 
 		ImGui::OpenPopup("Create Lua Class");
@@ -555,7 +558,7 @@ namespace Feather {
 
 					errorText.clear();
 					className.clear();
-					m_CreateAction = EContentCreateAction::NoAction;
+					m_CreateAction = ContentCreateAction::NoAction;
 					m_FilepathToAction.clear();
 					ImGui::CloseCurrentPopup();
 				}
@@ -564,7 +567,7 @@ namespace Feather {
 			if (ImGui::Button("Cancel") || bExit)
 			{
 				ImGui::CloseCurrentPopup();
-				m_CreateAction = EContentCreateAction::NoAction;
+				m_CreateAction = ContentCreateAction::NoAction;
 				className.clear();
 				m_FilepathToAction.clear();
 			}
@@ -580,7 +583,7 @@ namespace Feather {
 
 	void ContentDisplay::OpenCreateLuaTablePopup()
 	{
-		if (m_CreateAction != EContentCreateAction::LuaTable)
+		if (m_CreateAction != ContentCreateAction::LuaTable)
 			return;
 
 		ImGui::OpenPopup("Create Lua Table");
@@ -627,7 +630,7 @@ namespace Feather {
 
 					errorText.clear();
 					tableName.clear();
-					m_CreateAction = EContentCreateAction::NoAction;
+					m_CreateAction = ContentCreateAction::NoAction;
 					m_FilepathToAction.clear();
 					ImGui::CloseCurrentPopup();
 				}
@@ -636,7 +639,7 @@ namespace Feather {
 			if (ImGui::Button("Cancel") || bExit)
 			{
 				ImGui::CloseCurrentPopup();
-				m_CreateAction = EContentCreateAction::NoAction;
+				m_CreateAction = ContentCreateAction::NoAction;
 				tableName.clear();
 				m_FilepathToAction.clear();
 			}

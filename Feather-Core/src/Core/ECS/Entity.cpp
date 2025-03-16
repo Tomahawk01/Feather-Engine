@@ -177,6 +177,13 @@ namespace Feather {
 		}
 	}
 
+	void Entity::ChangeName(const std::string& name)
+	{
+		auto& id = GetComponent<Identification>();
+		id.name = name;
+		m_Name = name;
+	}
+
 	void Entity::CreateLuaEntityBind(sol::state& lua, Registry& registry)
 	{
 		using namespace entt::literals;

@@ -8,9 +8,10 @@
 namespace Feather {
 
 	enum class FileAction;
-	enum class EContentCreateAction;
+	enum class ContentCreateAction;
 	struct FileEvent;
 	struct ContentCreateEvent;
+	struct KeyPressedEvent;
 
 	class EventDispatcher;
 
@@ -42,7 +43,7 @@ namespace Feather {
 		std::string m_FilepathToAction;
 		int m_Selected;
 		FileAction m_FileAction;
-		EContentCreateAction m_CreateAction;
+		ContentCreateAction m_CreateAction;
 
 		bool m_ItemCut;
 		bool m_WindowHovered;

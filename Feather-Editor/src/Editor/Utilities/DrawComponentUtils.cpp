@@ -4,10 +4,14 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/Events/EventDispatcher.h"
 #include "Physics/PhysicsUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
+#include "Editor/Events/EditorEventTypes.h"
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
 
 #include <map>
 
@@ -674,7 +678,56 @@ namespace Feather {
 
 	void DrawComponentsUtil::DrawImGuiComponent(Entity& entity, Identification& identification)
 	{
-		DrawImGuiComponent(identification);
+		ImGui::SeparatorText("Identificaton");
+		ImGui::PushID(entt::type_hash<Identification>::value());
+		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			std::string error{ "" };
+			std::string nameBuffer{ identification.name };
+			bool nameError{ false };
+
+			ImGui::InlineLabel("name");
+			if (ImGui::InputText("##_name", nameBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				std::string sBufferStr{ nameBuffer.data() };
+				if (!sBufferStr.empty() && !SCENE_MANAGER().CheckTagName(sBufferStr))
+				{
+					std::string sOldName{ identification.name };
+					identification.name = std::string{ nameBuffer.data() };
+					EVENT_DISPATCHER().EmitEvent(NameChangeEvent{ .oldName = sOldName, .newName = identification.name, .entity = &entity });
+				}
+			}
+
+			// We need to display an error if the name is already in the scene or empty.
+			// Entity names need to be unique
+			if (ImGui::IsItemActive())
+			{
+				std::string sBufferStr{ nameBuffer.data() };
+				if (sBufferStr.empty())
+				{
+					error = "Name cannot be empty";
+				}
+				else if (SCENE_MANAGER().CheckTagName(sBufferStr))
+				{
+					error = std::format("{} already exists!", sBufferStr);
+				}
+
+				if (!error.empty())
+				{
+					ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, error.c_str());
+				}
+			}
+
+			std::string sGroupBuffer{ identification.group };
+			ImGui::InlineLabel("group");
+			if (ImGui::InputText("##_group", sGroupBuffer.data(), sizeof(char) * 255, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				identification.group = std::string{ sGroupBuffer.data() };
+			}
+
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
 	}
 
 }

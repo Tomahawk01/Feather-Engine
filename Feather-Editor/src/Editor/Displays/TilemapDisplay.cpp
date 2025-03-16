@@ -9,6 +9,7 @@
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
 #include "Renderer/Essentials/PickingTexture.h"
@@ -27,6 +28,7 @@
 #include "Editor/Tools/CreateTileTool.h"
 #include "Editor/Tools/Gizmos/Gizmo.h"
 #include "Editor/Commands/CommandManager.h"
+#include "Editor/Events/EditorEventTypes.h"
 
 #include "imgui.h"
 
@@ -34,7 +36,10 @@ namespace Feather {
 
 	TilemapDisplay::TilemapDisplay()
 		: m_TilemapCam{ std::make_unique<Camera2D>() }
-	{}
+		, m_WindowActive{ false }
+	{
+		ADD_EVENT_HANDLER(KeyPressedEvent, &TilemapDisplay::HandleKeyPressedEvent, *this);
+	}
 
 	void TilemapDisplay::Draw()
 	{
@@ -51,6 +56,8 @@ namespace Feather {
 
 		if (ImGui::BeginChild("##tilemap", ImVec2{0, 0}, false, ImGuiWindowFlags_NoScrollWithMouse))
 		{
+			m_WindowActive = ImGui::IsWindowFocused();
+
 			auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
 			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::TILEMAP];
 
@@ -309,6 +316,33 @@ namespace Feather {
 			m_TilemapCam->SetScreenOffset(screenOffset);
 
 		startPosition = mousePos;
+	}
+
+	void TilemapDisplay::HandleKeyPressedEvent(const KeyPressedEvent& keyEvent)
+	{
+		if (!m_WindowActive)
+			return;
+
+		if (keyEvent.key == F_KEY_W)
+		{
+			TOOL_MANAGER().SetGizmoActive(GizmoType::TRANSLATE);
+		}
+		else if (keyEvent.key == F_KEY_E)
+		{
+			TOOL_MANAGER().SetGizmoActive(GizmoType::SCALE);
+		}
+		else if (keyEvent.key == F_KEY_R)
+		{
+			TOOL_MANAGER().SetGizmoActive(GizmoType::ROTATE);
+		}
+		else if (keyEvent.key == F_KEY_T)
+		{
+			TOOL_MANAGER().SetToolActive(ToolType::CREATE_TILE);
+		}
+		else if (keyEvent.key == F_KEY_Y)
+		{
+			TOOL_MANAGER().SetToolActive(ToolType::RECT_FILL_TILE);
+		}
 	}
 
 	void TilemapDisplay::DrawToolbar()

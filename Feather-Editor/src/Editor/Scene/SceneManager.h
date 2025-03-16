@@ -39,6 +39,8 @@ namespace Feather {
 
 		bool SaveAllScenes();
 
+		bool CheckTagName(const std::string& tagName);
+
 		inline const std::map<std::string, std::shared_ptr<SceneObject>>& GetAllScenes() const { return m_mapScenes; }
 		inline void SetCurrentScene(const std::string& sceneName) { m_CurrentScene = sceneName; }
 		inline const std::string& GetCurrentSceneName() const { return m_CurrentScene; }

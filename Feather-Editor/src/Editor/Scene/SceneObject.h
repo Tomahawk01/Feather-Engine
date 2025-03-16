@@ -6,6 +6,8 @@
 
 namespace Feather {
 
+	struct NameChangeEvent;
+
 	class SceneObject
 	{
 	public:
@@ -20,9 +22,16 @@ namespace Feather {
 		void AddLayer(const std::string& layerName, bool visible);
 		bool CheckLayerName(const std::string& layerName);
 
+		bool AddGameObject();
+		bool DuplicateGameObject(entt::entity entity);
+		bool DeleteGameObjectByTag(const std::string& tag);
+		bool DeleteGameObjectById(entt::entity entity);
+
 		bool LoadScene();
 		bool UnloadScene();
 		bool SaveScene();
+
+		bool CheckTagName(const std::string& tagName);
 
 		inline bool HasTileLayers() const { return !m_LayerParams.empty(); }
 		inline std::vector<SpriteLayerParams>& GetLayerParams() { return m_LayerParams; }
@@ -37,6 +46,7 @@ namespace Feather {
 	private:
 		bool LoadSceneData();
 		bool SaveSceneData();
+		void OnEntityNameChanges(NameChangeEvent& nameChange);
 
 	private:
 		Registry m_Registry;
@@ -49,6 +59,7 @@ namespace Feather {
 
 		Canvas m_Canvas;
 		std::vector<SpriteLayerParams> m_LayerParams;
+		std::map<std::string, entt::entity> m_mapTagToEntity;
 		int m_CurrentLayer;
 		bool m_SceneLoaded{ false };
 	};

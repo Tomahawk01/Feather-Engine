@@ -34,6 +34,8 @@ namespace Feather {
 		*/
 		void UpdateTransform();
 
+		void ChangeName(const std::string& name);
+
 		inline const std::string& GetName() const { return m_Name; }
 		inline const std::string& GetGroup() const { return m_Group; }
 		inline std::uint32_t Kill() { return m_Registry.GetRegistry().destroy(m_Entity); }

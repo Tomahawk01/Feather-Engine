@@ -386,6 +386,7 @@ namespace Feather {
 				break;
 			case SDL_KEYDOWN:
 				keyboard.OnKeyPressed(m_Event.key.keysym.sym);
+				EVENT_DISPATCHER().EmitEvent(KeyPressedEvent{ .key = m_Event.key.keysym.sym });
 				break;
 			case SDL_KEYUP:
 				keyboard.OnKeyReleased(m_Event.key.keysym.sym);
