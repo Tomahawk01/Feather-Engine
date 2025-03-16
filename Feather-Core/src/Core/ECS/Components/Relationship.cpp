@@ -59,7 +59,7 @@ namespace Feather {
 		childRelationship.prevSibling = prevSibling.self;
 	}
 
-	void RelationshipUtils::RemoveAndDelete(Entity& entityToRemove)
+	void RelationshipUtils::RemoveAndDelete(Entity& entityToRemove, std::vector<std::string>& entitiesRemoved)
 	{
 		auto& registry = entityToRemove.GetEnttRegistry();
 		auto& Reg = entityToRemove.GetRegistry();
@@ -80,7 +80,7 @@ namespace Feather {
 			for (auto entity : childrenToDelete)
 			{
 				Entity ent{ Reg, entity };
-				RemoveAndDelete(ent);
+				RemoveAndDelete(ent, entitiesRemoved);
 			}
 		}
 
@@ -115,6 +115,7 @@ namespace Feather {
 
 		// Now that the links have been adjusted, we can delete the entity
 		F_TRACE("JUST KILLED: {}", static_cast<std::uint32_t>(entityToRemove.GetEntity()));
+		entitiesRemoved.emplace_back(entityToRemove.GetName());
 		entityToRemove.Kill();
 	}
 

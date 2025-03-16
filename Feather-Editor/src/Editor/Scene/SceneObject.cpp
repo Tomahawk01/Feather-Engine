@@ -171,6 +171,21 @@ namespace Feather {
 		return true;
 	}
 
+	bool SceneObject::AddGameObjectByTag(const std::string& tag, entt::entity entity)
+	{
+		F_ASSERT(entity != entt::null && "The entity passed in must be valid");
+
+		if (m_mapTagToEntity.contains(tag))
+		{
+			F_ERROR("Failed to add entity with tag '{}': Already exists!", tag);
+			return false;
+		}
+
+		m_mapTagToEntity.emplace(tag, entity);
+
+		return true;
+	}
+
 	bool SceneObject::DuplicateGameObject(entt::entity entity)
 	{
 		auto objItr = m_mapTagToEntity.begin();
@@ -224,10 +239,13 @@ namespace Feather {
 			return false;
 		}
 
+		std::vector<std::string> removedEntities;
 		Entity ent{ m_Registry, objItr->second };
-		ent.Kill();
 
-		m_mapTagToEntity.erase(objItr);
+		RelationshipUtils::RemoveAndDelete(ent, removedEntities);
+
+		for (const auto& sTag : removedEntities)
+			m_mapTagToEntity.erase(sTag);
 
 		return true;
 	}
@@ -247,10 +265,14 @@ namespace Feather {
 			return false;
 		}
 
+		std::vector<std::string> removedEntities;
 		Entity ent{ m_Registry, objItr->second };
-		ent.Kill();
 
-		m_mapTagToEntity.erase(objItr);
+		RelationshipUtils::RemoveAndDelete(ent, removedEntities);
+
+		for (const auto& sTag : removedEntities)
+			m_mapTagToEntity.erase(sTag);
+
 		return true;
 	}
 
@@ -279,7 +301,16 @@ namespace Feather {
 		{
 		}
 
+		// Map the entities
+		auto view = m_Registry.GetRegistry().view<entt::entity>(entt::exclude<TileComponent>);
+		for (auto entity : view)
+		{
+			Entity ent{ m_Registry, entity };
+			AddGameObjectByTag(ent.GetName(), entity);
+		}
+
 		m_SceneLoaded = true;
+
 		return true;
 	}
 
@@ -299,8 +330,9 @@ namespace Feather {
 
 		// Remove all objects in registry
 		m_Registry.ClearRegistry();
-
+		m_mapTagToEntity.clear();
 		m_SceneLoaded = false;
+
 		return false;
 	}
 

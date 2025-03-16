@@ -23,6 +23,7 @@ namespace Feather {
 		bool CheckLayerName(const std::string& layerName);
 
 		bool AddGameObject();
+		bool AddGameObjectByTag(const std::string& tag, entt::entity entity);
 		bool DuplicateGameObject(entt::entity entity);
 		bool DeleteGameObjectByTag(const std::string& tag);
 		bool DeleteGameObjectById(entt::entity entity);
