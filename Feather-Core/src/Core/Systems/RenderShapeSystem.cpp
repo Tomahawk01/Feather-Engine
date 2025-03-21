@@ -46,7 +46,13 @@ namespace Feather {
 			{
 				auto& physics = registry.GetRegistry().get<PhysicsComponent>(entity);
 				if (physics.IsTrigger())
+				{
 					color = Color{ 0, 255, 0, 100 };
+				}
+				else if (physics.GetAttributes().isTrigger)
+				{
+					color = Color{ 0, 255, 0, 100 };
+				}
 			}
 
 			Rect rect{

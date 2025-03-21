@@ -1,6 +1,8 @@
 #include "ComponentSerializer.h"
+
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "FileSystem/Serializers/JSONSerializer.h"
+#include "Physics/PhysicsUtilities.h"
 
 namespace Feather {
 
@@ -229,7 +231,36 @@ namespace Feather {
 
 	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, PhysicsComponent& physics)
 	{
-		// TODO: Implement
+		if (jsonValue.HasMember("attributes"))
+		{
+			const auto& attr = jsonValue["attributes"];
+			PhysicsAttributes attributes{
+				.eType = GetRigidBodyTypeByString(attr["type"].GetString()),
+				.density = attr["density"].GetFloat(),
+				.friction = attr["friction"].GetFloat(),
+				.restitution = attr["restitution"].GetFloat(),
+				.restitutionThreshold = attr["restitutionThreshold"].GetFloat(),
+				.radius = attr["radius"].GetFloat(),
+				.gravityScale = attr["gravityScale"].GetFloat(),
+				.position = glm::vec2{ attr["position"]["x"].GetFloat(), attr["position"]["y"].GetFloat() },
+				.scale = glm::vec2{ attr["scale"]["x"].GetFloat(), attr["scale"]["y"].GetFloat() },
+				.boxSize = glm::vec2{ attr["boxSize"]["x"].GetFloat(), attr["boxSize"]["y"].GetFloat() },
+				.offset = glm::vec2{ attr["offset"]["x"].GetFloat(), attr["offset"]["y"].GetFloat() },
+				.isCircle = attr["isCircle"].GetBool(),
+				.isBoxShape = attr["isBoxShape"].GetBool(),
+				.isFixedRotation = attr["isFixedRotation"].GetBool(),
+				.isTrigger = attr["isTrigger"].GetBool(),
+				.filterCategory = static_cast<uint16_t>(attr["filterCategory"].GetUint()),
+				.filterMask = static_cast<uint16_t>(attr["filterMask"].GetUint()),
+				.groupIndex = static_cast<int16_t>(attr["groupIndex"].GetInt()),
+				.objectData = ObjectData{.tag = attr["objectData"]["tag"].GetString(),
+										  .group = attr["objectData"]["group"].GetString(),
+										  .isCollider = attr["objectData"]["isCollider"].GetBool(),
+										  .isTrigger = attr["objectData"]["isTrigger"].GetBool(),
+										  .isFriendly = attr["objectData"]["isFriendly"].GetBool() } };
+
+			physics.GetChangableAttributes() = attributes;
+		}
 	}
 
 	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, RigidBodyComponent& rigidBody)
