@@ -1,11 +1,11 @@
 #include "JSONSerializer.h"
 #include "Logger/Logger.h"
 
-constexpr int MAX_DECIMAL_PLACES = 3;
+constexpr int MAX_DECIMAL_PLACES = 5;
 
 namespace Feather {
 
-	JSONSerializer::JSONSerializer(const std::string& filename)
+	JSONSerializer::JSONSerializer(const std::string& filename, int maxDecimalPlaces)
 		: m_FileStream{}, m_StringBuffer{},
 		m_Writer{ std::make_unique<rapidjson::PrettyWriter<rapidjson::StringBuffer>>(m_StringBuffer) },
 		m_NumObjectsStarted{ 0 }, m_NumArraysStarted{ 0 }
@@ -16,7 +16,7 @@ namespace Feather {
 		if (!m_FileStream.is_open())
 			throw std::runtime_error(std::format("JSONSerializer failed to open file '{}'", filename));
 
-		m_Writer->SetMaxDecimalPlaces(MAX_DECIMAL_PLACES);
+		m_Writer->SetMaxDecimalPlaces(MAX_DECIMAL_PLACES > 1 ? maxDecimalPlaces : MAX_DECIMAL_PLACES);
 	}
 
 	JSONSerializer::~JSONSerializer()

@@ -8,7 +8,7 @@ namespace Feather {
 	class JSONSerializer
 	{
 	public:
-		JSONSerializer(const std::string& filename);
+		JSONSerializer(const std::string& filename, int maxDecimalPlaces = -1);
 		~JSONSerializer();
 
 		bool StartDocument();
