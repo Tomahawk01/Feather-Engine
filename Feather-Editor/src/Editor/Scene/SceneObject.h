@@ -16,6 +16,7 @@ namespace Feather {
 		~SceneObject() = default;
 
 		void CopySceneToRuntime();
+		void CopySceneToRuntime(SceneObject& sceneToCopy);
 		void ClearRuntimeScene();
 
 		void AddNewLayer();
@@ -29,7 +30,7 @@ namespace Feather {
 		bool DeleteGameObjectById(entt::entity entity);
 
 		bool LoadScene();
-		bool UnloadScene();
+		bool UnloadScene(bool saveScene = true);
 		bool SaveScene();
 
 		bool CheckTagName(const std::string& tagName);
@@ -39,10 +40,13 @@ namespace Feather {
 
 		inline Canvas& GetCanvas() { return m_Canvas; }
 		inline const std::string& GetSceneName() { return m_SceneName; }
+		inline const std::string& GetRuntimeName() { return m_RuntimeSceneName; }
 		inline const std::string& GetSceneDataPath() { return m_SceneDataPath; }
 		inline Registry& GetRegistry() { return m_Registry; }
 		inline Registry* GetRegistryPtr() { return &m_Registry; }
 		inline Registry& GetRuntimeRegistry() { return m_RuntimeRegistry; }
+
+		inline bool IsLoaded() const { return m_SceneLoaded; }
 
 	private:
 		bool LoadSceneData();
@@ -54,6 +58,7 @@ namespace Feather {
 		Registry m_RuntimeRegistry;
 
 		std::string m_SceneName;
+		std::string m_RuntimeSceneName;
 		std::string m_TilemapPath;
 		std::string m_ObjectPath;
 		std::string m_SceneDataPath;
@@ -62,7 +67,7 @@ namespace Feather {
 		std::vector<SpriteLayerParams> m_LayerParams;
 		std::map<std::string, entt::entity> m_mapTagToEntity;
 		int m_CurrentLayer;
-		bool m_SceneLoaded{ false };
+		bool m_SceneLoaded;
 	};
 
 }

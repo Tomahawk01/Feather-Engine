@@ -32,6 +32,16 @@ namespace Feather {
 		return m_Registry->ctx().contains<TContext>();
 	}
 
+	template<typename... Excludes>
+	inline void Registry::DestroyEntities()
+	{
+		auto view = m_Registry->view<entt::entity>(entt::exclude<Excludes...>);
+		for (auto entity : view)
+		{
+			m_Registry->destroy(entity);
+		}
+	}
+
 	template <typename TComponent>
 	entt::runtime_view& add_component_to_view(Registry* registry, entt::runtime_view& view)
 	{

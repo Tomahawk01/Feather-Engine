@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "MetaUtilities.h"
+#include "ECSUtils.h"
 
 namespace Feather {
 
@@ -73,6 +74,13 @@ namespace Feather {
 				}
 
 				return view;
+			},
+			"findEntityByTag",
+			[&](const std::string& tag, sol::this_state s)
+			{
+				auto entity = FindEntityByTag(registry, tag);
+
+				return entity == entt::null ? sol::lua_nil_t{} : sol::make_reference(s, Entity{ registry, entity });
 			},
 			"clear", [&]() { registry.GetRegistry().clear(); }
 		);

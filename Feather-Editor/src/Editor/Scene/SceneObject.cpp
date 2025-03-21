@@ -26,11 +26,13 @@ namespace Feather {
 		: m_Registry{}
 		, m_RuntimeRegistry{}
 		, m_SceneName{ sceneName }
+		, m_RuntimeSceneName{ "" }
 		, m_TilemapPath{ "" }
 		, m_ObjectPath{ "" }
 		, m_SceneDataPath{ "" }
 		, m_Canvas{}
 		, m_CurrentLayer{ 0 }
+		, m_SceneLoaded{ false }
 	{
 		auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
 		F_ASSERT(pSaveProject && "SaveProject must exists here!");
@@ -76,6 +78,7 @@ namespace Feather {
 		, m_SceneDataPath{ sceneData }
 		, m_Canvas{}
 		, m_CurrentLayer{ 0 }
+		, m_SceneLoaded{ false }
 	{
 		// We need to load the scene data from the json file!
 		if (!LoadSceneData())
@@ -100,6 +103,8 @@ namespace Feather {
 
 	void SceneObject::CopySceneToRuntime()
 	{
+		m_RuntimeSceneName = m_SceneName;
+
 		auto& registryToCopy = m_Registry.GetRegistry();
 
 		for (auto entityToCopy : registryToCopy.view<entt::entity>(entt::exclude<ScriptComponent>))
@@ -117,9 +122,32 @@ namespace Feather {
 		}
 	}
 
+	void SceneObject::CopySceneToRuntime(SceneObject& sceneToCopy)
+	{
+		m_RuntimeSceneName = sceneToCopy.GetSceneName();
+
+		auto& registry = sceneToCopy.GetRegistry();
+		auto& registryToCopy = registry.GetRegistry();
+
+		for (auto entityToCopy : registryToCopy.view<entt::entity>(entt::exclude<ScriptComponent>))
+		{
+			entt::entity newEntity = m_RuntimeRegistry.CreateEntity();
+
+			// Copy the components of the entity to the new entity
+			for (auto&& [id, storage] : registryToCopy.storage())
+			{
+				if (!storage.contains(entityToCopy))
+					continue;
+
+				InvokeMetaFunction(id, "copy_component"_hs, Entity{ registry, entityToCopy }, Entity{ m_RuntimeRegistry, newEntity });
+			}
+		}
+	}
+
 	void SceneObject::ClearRuntimeScene()
 	{
 		m_RuntimeRegistry.ClearRegistry();
+		m_RuntimeSceneName.clear();
 	}
 
 	void SceneObject::AddNewLayer()
@@ -314,7 +342,7 @@ namespace Feather {
 		return true;
 	}
 
-	bool SceneObject::UnloadScene()
+	bool SceneObject::UnloadScene(bool saveScene)
 	{
 		if (!m_SceneLoaded)
 		{
@@ -322,7 +350,7 @@ namespace Feather {
 			return false;
 		}
 
-		if (!SaveSceneData())
+		if (saveScene && !SaveSceneData())
 		{
 			F_ERROR("Failed to unload scene data");
 			return false;

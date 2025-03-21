@@ -1,4 +1,7 @@
 #pragma once
+
+#include <sol/sol.hpp>
+
 #include <map>
 #include <memory>
 #include <string>
@@ -45,6 +48,8 @@ namespace Feather {
 		inline void SetCurrentScene(const std::string& sceneName) { m_CurrentScene = sceneName; }
 		inline const std::string& GetCurrentSceneName() const { return m_CurrentScene; }
 		inline const std::string& GetCurrentTileset() const { return m_CurrentTileset; }
+
+		static void CreateSceneManagerLuaBind(sol::state& lua);
 
 	private:
 		SceneManager() = default;

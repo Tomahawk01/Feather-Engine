@@ -144,6 +144,7 @@ namespace Feather {
 
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
+		SceneManager::CreateSceneManagerLuaBind(*lua);
 
 		// Initialize all of the physics entities
 		auto physicsEntities = runtimeRegistry.GetRegistry().view<PhysicsComponent>();

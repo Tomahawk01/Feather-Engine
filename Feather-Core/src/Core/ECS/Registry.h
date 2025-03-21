@@ -32,6 +32,9 @@ namespace Feather {
 		template <typename TContext>
 		bool HasContext();
 
+		template <typename... Excludes>
+		void DestroyEntities();
+
 		static void CreateLuaRegistryBind(sol::state& lua, Registry& registry);
 
 		template <typename TComponent>

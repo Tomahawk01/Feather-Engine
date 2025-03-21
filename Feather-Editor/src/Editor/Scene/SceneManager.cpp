@@ -1,8 +1,10 @@
 #include "SceneManager.h"
 
+#include "SceneObject.h"
+
 #include "Logger/Logger.h"
 #include "Core/Events/EventDispatcher.h"
-#include "SceneObject.h"
+#include "Core/ECS/Components/AllComponents.h"
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Tools/ToolManager.h"
@@ -153,6 +155,46 @@ namespace Feather {
 			return pScene->CheckTagName(tagName);
 
 		return false;
+	}
+
+	void SceneManager::CreateSceneManagerLuaBind(sol::state& lua)
+	{
+		lua.new_usertype<SceneManager>(
+			"SceneManager", sol::no_constructor, "changeScene", [&](const std::string& sSceneName)
+			{
+				auto& sceneManager = SCENE_MANAGER();
+
+				auto currentScene = sceneManager.GetCurrentScene();
+				if (!currentScene)
+				{
+					F_ERROR("Failed to change to scene '{}': Current scene is invalid", sSceneName);
+					return false;
+				}
+
+				if (currentScene->GetRuntimeName() == sSceneName)
+				{
+					F_ERROR("Failed to load scene '{}': Scene has already been loaded", sSceneName);
+					return false;
+				}
+
+				auto scene = sceneManager.GetScene(sSceneName);
+				if (!scene)
+				{
+					F_ERROR("Failed to change to scene '{}': Scene '{}' is invalid", sSceneName, sSceneName);
+					return false;
+				}
+
+				currentScene->GetRuntimeRegistry().DestroyEntities<ScriptComponent>();
+				if (!scene->IsLoaded())
+				{
+					scene->LoadScene();
+				}
+
+				currentScene->CopySceneToRuntime(*scene);
+				scene->UnloadScene();
+
+				return true;
+			});
 	}
 
 }
