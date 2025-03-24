@@ -1,4 +1,5 @@
 #include "SceneDisplay.h"
+
 #include "Renderer/Buffers/Framebuffer.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
@@ -12,6 +13,9 @@
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/Events/EventDispatcher.h"
+#include "Core/Events/EngineEventTypes.h"
+#include "Windowing/Input/Keys.h"
 #include "Sounds/MusicPlayer/MusicPlayer.h"
 #include "Sounds/SoundPlayer/SoundFXPlayer.h"
 #include "Physics/Box2DWrappers.h"
@@ -31,8 +35,12 @@ constexpr float one_over_sixty = 1.0f / 60.0f;
 namespace Feather {
 
 	SceneDisplay::SceneDisplay()
-		: m_PlayScene{ false }, m_SceneLoaded{ false }
-	{}
+		: m_PlayScene{ false }
+		, m_WindowActive{ false }
+		, m_SceneLoaded{ false }
+	{
+		ADD_EVENT_HANDLER(KeyEvent, &SceneDisplay::HandleKeyEvent, *this);
+	}
 
 	void SceneDisplay::Draw()
 	{
@@ -48,6 +56,8 @@ namespace Feather {
 
 		if (ImGui::BeginChild("##SceneChild", ImVec2{ 0.0f, 0.0f }, ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollWithMouse))
 		{
+			m_WindowActive = ImGui::IsWindowFocused();
+
 			auto& editorFramebuffers = MAIN_REGISTRY().GetContext<std::shared_ptr<EditorFramebuffers>>();
 			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
 
@@ -101,6 +111,34 @@ namespace Feather {
 			auto& physicsWorld = runtimeRegistry.GetContext<PhysicsWorld>();
 			physicsWorld->Step(one_over_sixty, coreGlobals.GetVelocityIterations(), coreGlobals.GetPositionIterations());
 			physicsWorld->ClearForces();
+
+			auto& dispatch = runtimeRegistry.GetContext<std::shared_ptr<EventDispatcher>>();
+
+			// If there are no listeners for contact events, don't emit event
+			if (dispatch->HasHandlers<ContactEvent>())
+			{
+				if (auto& contactListener = runtimeRegistry.GetContext<std::shared_ptr<ContactListener>>())
+				{
+					auto userDataA = contactListener->GetUserDataA();
+					auto userDataB = contactListener->GetUserDataB();
+
+					// Only emit contact event if both contacts are valid
+					if (userDataA && userDataB)
+					{
+						try
+						{
+							auto ObjectA = std::any_cast<ObjectData>(userDataA->userData);
+							auto ObjectB = std::any_cast<ObjectData>(userDataB->userData);
+
+							dispatch->EmitEvent(ContactEvent{ .objectA = ObjectA, .objectB = ObjectB });
+						}
+						catch (const std::bad_any_cast& e)
+						{
+							F_ERROR("Failed to cast to object data: {}", e.what());
+						}
+					}
+				}
+			}
 		}
 
 		auto& physicsSystem = mainRegistry.GetPhysicsSystem();
@@ -126,6 +164,9 @@ namespace Feather {
 		auto contactListener = runtimeRegistry.AddToContext<std::shared_ptr<ContactListener>>(std::make_shared<ContactListener>());
 		physicsWorld->SetContactListener(contactListener.get());
 
+		// Add the temporary event dispatcher
+		runtimeRegistry.AddToContext<std::shared_ptr<EventDispatcher>>(std::make_shared<EventDispatcher>());
+
 		// Add necessary systems
 		auto scriptSystem = runtimeRegistry.AddToContext<std::shared_ptr<ScriptingSystem>>(std::make_shared<ScriptingSystem>());
 
@@ -144,6 +185,8 @@ namespace Feather {
 
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
+		ScriptingSystem::RegisterLuaEvents(*lua, runtimeRegistry);
+
 		SceneManager::CreateSceneManagerLuaBind(*lua);
 
 		// Initialize all of the physics entities
@@ -209,10 +252,11 @@ namespace Feather {
 
 		runtimeRegistry.ClearRegistry();
 		runtimeRegistry.RemoveContext<std::shared_ptr<Camera2D>>();
-		runtimeRegistry.RemoveContext<std::shared_ptr<sol::state>>();
 		runtimeRegistry.RemoveContext<PhysicsWorld>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<ContactListener>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<ScriptingSystem>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<EventDispatcher>>();
+		runtimeRegistry.RemoveContext<std::shared_ptr<sol::state>>();
 
 		auto& mainRegistry = MAIN_REGISTRY();
 		mainRegistry.GetMusicPlayer().Stop();
@@ -249,6 +293,35 @@ namespace Feather {
 		}
 		fb->Unbind();
 		fb->CheckResize();
+	}
+
+	void SceneDisplay::HandleKeyEvent(const KeyEvent keyEvent)
+	{
+		if (m_SceneLoaded)
+		{
+			if (keyEvent.type == EKeyEventType::Released)
+			{
+				if (keyEvent.key == F_KEY_ESCAPE)
+				{
+					UnloadScene();
+				}
+			}
+		}
+
+		// Send double dispatch events to the scene dispatcher
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		if (!currentScene)
+			return;
+
+		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
+
+		if (auto* eventDispatcher = runtimeRegistry.TryGetContext<std::shared_ptr<EventDispatcher>>())
+		{
+			if (!eventDispatcher->get()->HasHandlers<KeyEvent>())
+				return;
+
+			eventDispatcher->get()->EmitEvent(keyEvent);
+		}
 	}
 
 	void SceneDisplay::DrawToolbar()

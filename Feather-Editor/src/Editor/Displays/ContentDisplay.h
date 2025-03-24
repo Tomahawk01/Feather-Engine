@@ -36,6 +36,7 @@ namespace Feather {
 
 		void OpenCreateLuaClassPopup();
 		void OpenCreateLuaTablePopup();
+		void OpenCreateEmptyLuaFilePopup();
 
 	private:
 		std::unique_ptr<EventDispatcher> m_FileDispatcher;

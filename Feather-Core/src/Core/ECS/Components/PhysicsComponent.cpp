@@ -197,6 +197,30 @@ namespace Feather {
 		return objectDataVec;
 	}
 
+	ObjectData PhysicsComponent::GetCurrentObjectData()
+	{
+		F_ASSERT(m_RigidBody);
+
+		if (!m_RigidBody)
+			return {};
+
+		auto& userData = m_RigidBody->GetFixtureList()->GetUserData();
+
+		UserData* data = reinterpret_cast<UserData*>(userData.pointer);
+
+		try
+		{
+			auto objectData = std::any_cast<ObjectData>(data->userData);
+			return objectData;
+		}
+		catch (const std::bad_any_cast& e)
+		{
+			F_ERROR("Failed to cast to object data: {}", e.what());
+		}
+
+		return {};
+	}
+
 	void PhysicsComponent::CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry)
 	{
 		lua.new_usertype<ObjectData>(
@@ -206,7 +230,7 @@ namespace Feather {
 			sol::factories(
 				[](const std::string& tag, const std::string& group, bool isCollider, bool isTrigger, bool isFriendly, std::uint32_t entityID)
 				{
-					return ObjectData {
+					return ObjectData{
 						.tag = tag,
 						.group = group,
 						.isCollider = isCollider,
@@ -250,8 +274,9 @@ namespace Feather {
 			sol::call_constructor,
 			sol::factories(
 				[] { return PhysicsAttributes{}; },
-				[](const sol::table& physAttr) {
-					return PhysicsAttributes {
+				[](const sol::table& physAttr)
+				{
+					return PhysicsAttributes{
 						.eType = physAttr["type"].get_or(RigidBodyType::STATIC),
 						.density = physAttr["density"].get_or(100.0f),
 						.friction = physAttr["friction"].get_or(0.2f),
@@ -313,7 +338,7 @@ namespace Feather {
 		auto& physicsWorld = registry.ctx().get<PhysicsWorld>();
 		if (!physicsWorld)
 			return;
-		
+
 		lua.new_usertype<PhysicsComponent>(
 			"PhysicsComponent",
 			"type_id", &entt::type_hash<PhysicsComponent>::value,
@@ -357,7 +382,7 @@ namespace Feather {
 					return;
 				}
 
-				body->SetLinearVelocity(b2Vec2{velocity.x, velocity.y});
+				body->SetLinearVelocity(b2Vec2{ velocity.x, velocity.y });
 			},
 			"get_linear_velocity", [](PhysicsComponent& pc)
 			{
@@ -435,10 +460,12 @@ namespace Feather {
 
 				body->SetTransform(b2Vec2{ bx, by }, 0.0f);
 			},
-			"get_transform", [](const PhysicsComponent& pc) {
+			"get_transform", [](const PhysicsComponent& pc)
+			{
 
 			},
-			"set_body_type", [&](PhysicsComponent& pc, RigidBodyType type) {
+			"set_body_type", [&](PhysicsComponent& pc, RigidBodyType type)
+			{
 				auto body = pc.GetBody();
 				if (!body)
 				{
@@ -465,7 +492,8 @@ namespace Feather {
 
 				body->SetType(bodyType);
 			},
-			"set_bullet", [&](PhysicsComponent& pc, bool bullet) {
+			"set_bullet", [&](PhysicsComponent& pc, bool bullet)
+			{
 				auto body = pc.GetBody();
 				if (!body)
 				{
@@ -475,7 +503,8 @@ namespace Feather {
 
 				body->SetBullet(bullet);
 			},
-			"is_bullet", [&](PhysicsComponent& pc) {
+			"is_bullet", [&](PhysicsComponent& pc)
+			{
 				auto body = pc.GetBody();
 				if (!body)
 				{
@@ -486,7 +515,8 @@ namespace Feather {
 				return body->IsBullet();
 			},
 			"set_filter_category",
-			[](PhysicsComponent& pc) {
+			[](PhysicsComponent& pc)
+			{
 				auto body = pc.GetBody();
 				if (!body)
 					return;
@@ -502,6 +532,11 @@ namespace Feather {
 			{
 				auto vecObjectData = pc.BoxTrace(b2Vec2{ lowerBounds.x, lowerBounds.y }, b2Vec2{ upperBounds.x, upperBounds.y });
 				return vecObjectData.empty() ? sol::lua_nil_t{} : sol::make_object(s, vecObjectData);
+			},
+			"object_data",
+			[](PhysicsComponent& pc)
+			{
+				return pc.GetCurrentObjectData();
 			}
 		);
 	}

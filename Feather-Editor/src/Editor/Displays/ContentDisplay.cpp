@@ -212,8 +212,17 @@ namespace Feather {
 
 						if (ImGui::Selectable(ICON_FA_FILE " Create Lua Table"))
 						{
+							m_FilepathToAction = m_CurrentDir.string();
+							m_CreateAction = ContentCreateAction::LuaTable;
 						}
 						ImGui::ItemToolTip("Generates an empty lua table");
+
+						if (ImGui::Selectable(ICON_FA_FILE " Create Lua File"))
+						{
+							m_FilepathToAction = m_CurrentDir.string();
+							m_CreateAction = ContentCreateAction::EmptyLuaFile;
+						}
+						ImGui::ItemToolTip("Generates an empty lua File.");
 
 						ImGui::TreePop();
 					}
@@ -406,6 +415,8 @@ namespace Feather {
 			{
 			case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
 			case ContentCreateAction::LuaClass: OpenCreateLuaClassPopup(); break;
+			case ContentCreateAction::LuaTable: OpenCreateLuaTablePopup(); break;
+			case ContentCreateAction::EmptyLuaFile: OpenCreateEmptyLuaFilePopup(); break;
 			}
 		}
 	}
@@ -460,7 +471,7 @@ namespace Feather {
 				newFolderStr = std::string{ temp };
 				bNameEntered = true;
 			}
-			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+			else if (ImGui::IsKeyPressed(ImGuiKey_Escape))
 			{
 				bExit = true;
 			}
@@ -528,7 +539,7 @@ namespace Feather {
 				className = std::string{ buffer };
 				bNameEntered = true;
 			}
-			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+			else if (ImGui::IsKeyPressed(ImGuiKey_Escape))
 			{
 				bExit = true;
 			}
@@ -569,6 +580,7 @@ namespace Feather {
 				ImGui::CloseCurrentPopup();
 				m_CreateAction = ContentCreateAction::NoAction;
 				className.clear();
+				errorText.clear();
 				m_FilepathToAction.clear();
 			}
 
@@ -606,7 +618,7 @@ namespace Feather {
 				tableName = std::string{ buffer };
 				bNameEntered = true;
 			}
-			else if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape)))
+			else if (ImGui::IsKeyPressed(ImGuiKey_Escape))
 			{
 				bExit = true;
 			}
@@ -641,6 +653,79 @@ namespace Feather {
 				ImGui::CloseCurrentPopup();
 				m_CreateAction = ContentCreateAction::NoAction;
 				tableName.clear();
+				errorText.clear();
+				m_FilepathToAction.clear();
+			}
+
+			if (!errorText.empty())
+			{
+				ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, errorText.c_str());
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void ContentDisplay::OpenCreateEmptyLuaFilePopup()
+	{
+		if (m_CreateAction != ContentCreateAction::EmptyLuaFile)
+			return;
+
+		ImGui::OpenPopup("Create Lua File");
+
+		if (ImGui::BeginPopupModal("Create Lua File"))
+		{
+			char buffer[256];
+			static std::string tableName{ "" };
+			memset(buffer, 0, sizeof(buffer));
+			strcpy_s(buffer, tableName.c_str());
+			bool bNameEntered{ false }, bExit{ false };
+			ImGui::Text("FileName");
+			ImGui::SameLine();
+
+			if (!ImGui::IsAnyItemActive())
+				ImGui::SetKeyboardFocusHere();
+
+			if (ImGui::InputText("##FileName", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				tableName = std::string{ buffer };
+				bNameEntered = true;
+			}
+			else if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+			{
+				bExit = true;
+			}
+
+			static std::string errorText{ "" };
+
+			if (bNameEntered && !tableName.empty())
+			{
+				std::string filename = m_FilepathToAction + "\\" + tableName + ".lua";
+
+				if (std::filesystem::exists(std::filesystem::path{ filename }))
+				{
+					F_ERROR("File '{}' already exists at '{}'", tableName, filename);
+					errorText = "File '" + tableName + "' already exists at '" + filename + "'";
+				}
+				else
+				{
+					LuaSerializer lw{ filename };
+					lw.FinishStream();
+
+					errorText.clear();
+					tableName.clear();
+					m_CreateAction = ContentCreateAction::NoAction;
+					m_FilepathToAction.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (ImGui::Button("Cancel") || bExit)
+			{
+				ImGui::CloseCurrentPopup();
+				m_CreateAction = ContentCreateAction::NoAction;
+				tableName.clear();
+				errorText.clear();
 				m_FilepathToAction.clear();
 			}
 

@@ -232,12 +232,12 @@ namespace Feather {
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##offset_x", &boxCollider.offset.x, 1.0f, 4.0f))
-				boxCollider.offset.x = std::clamp(boxCollider.offset.x, 0.0f, 128.0f);
+				boxCollider.offset.x = std::clamp(boxCollider.offset.x, -256.0f, 256.0f);
 			ImGui::SameLine();
 			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##offset_y", &boxCollider.offset.y, 1.0f, 4.0f))
-				boxCollider.offset.y = std::clamp(boxCollider.offset.y, 0.0f, 128.0f);
+				boxCollider.offset.y = std::clamp(boxCollider.offset.y, -256.0f, 256.0f);
 			ImGui::TreePop();
 			ImGui::PopItemWidth();
 		}

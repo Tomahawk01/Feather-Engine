@@ -44,6 +44,9 @@ namespace Feather {
 		inline const bool IsPhysicsEnabled() const { return m_PhysicsEnabled; }
 		inline const bool IsPhysicsPaused() const { return m_PhysicsPaused; }
 
+		inline const std::string& GetProjectPath() const { return m_ProjectPath; }
+		inline void SetProjectPath(const std::string& path) { m_ProjectPath = path; }
+
 		static void RegisterMetaFunctions();
 
 	private:
@@ -66,6 +69,8 @@ namespace Feather {
 		bool m_PhysicsEnabled;
 		bool m_PhysicsPaused;
 		bool m_RenderColliders;
+
+		std::string m_ProjectPath;
 	};
 
 }

@@ -7,7 +7,7 @@
 
 namespace Feather {
 
-	struct KeyPressedEvent;
+	struct KeyEvent;
 	class Camera2D;
 
 	class TilemapDisplay : public IDisplay
@@ -24,7 +24,7 @@ namespace Feather {
 		void LoadNewScene();
 		void PanZoomCamera(const glm::vec2& mousePos);
 
-		void HandleKeyPressedEvent(const KeyPressedEvent& keyEvent);
+		void HandleKeyPressedEvent(const KeyEvent& keyEvent);
 
 	protected:
 		virtual void DrawToolbar() override;

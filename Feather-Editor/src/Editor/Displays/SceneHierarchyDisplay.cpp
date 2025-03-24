@@ -4,6 +4,7 @@
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/ECS/MetaUtilities.h"
 #include "Core/Events/EventDispatcher.h"
+#include "Core/Events/EngineEventTypes.h"
 #include "Core/Scripting/InputManager.h"
 
 #include "Editor/Scene/SceneManager.h"
@@ -24,7 +25,7 @@ namespace Feather {
 	SceneHierarchyDisplay::SceneHierarchyDisplay()
 	{
 		ADD_SWE_HANDLER(SwitchEntityEvent, &SceneHierarchyDisplay::OnEntityChanged, *this);
-		ADD_EVENT_HANDLER(KeyPressedEvent, &SceneHierarchyDisplay::OnKeyPressed, *this);
+		ADD_EVENT_HANDLER(KeyEvent, &SceneHierarchyDisplay::OnKeyPressed, *this);
 	}
 
 	SceneHierarchyDisplay::~SceneHierarchyDisplay()
@@ -384,9 +385,9 @@ namespace Feather {
 		F_ASSERT(m_SelectedEntity && "Entity must be valid here!");
 	}
 
-	void SceneHierarchyDisplay::OnKeyPressed(KeyPressedEvent& keyPressed)
+	void SceneHierarchyDisplay::OnKeyPressed(KeyEvent& keyEvent)
 	{
-		if (!m_WindowActive)
+		if (!m_WindowActive || keyEvent.type == EKeyEventType::Released)
 			return;
 
 		if (m_SelectedEntity)
@@ -394,14 +395,14 @@ namespace Feather {
 			auto& keyboard = INPUT_MANAGER().GetKeyboard();
 			if (keyboard.IsKeyPressed(F_KEY_RCTRL) || keyboard.IsKeyPressed(F_KEY_LCTRL))
 			{
-				if (keyPressed.key == F_KEY_D)
+				if (keyEvent.key == F_KEY_D)
 				{
 					DuplicateSelectedEntity();
 				}
 			}
 			else
 			{
-				if (keyPressed.key == F_KEY_DELETE)
+				if (keyEvent.key == F_KEY_DELETE)
 				{
 					DeleteSelectedEntity();
 				}

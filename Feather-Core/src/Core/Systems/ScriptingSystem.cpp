@@ -24,6 +24,9 @@
 #include "Core/States/StateStack.h"
 #include "Core/States/StateMachine.h"
 
+#include "Core/Events/EngineEventTypes.h"
+#include "Core/Events/EventDispatcher.h"
+
 #include <filesystem>
 
 namespace Feather {
@@ -402,6 +405,8 @@ namespace Feather {
 		lua.set_function("F_EnableCollisionRendering", [&] { engine.EnableColliderRender(); });
 		lua.set_function("F_CollisionRenderingEnabled", [&] { return engine.RenderCollidersEnabled(); });
 
+		lua.set_function("F_GetProjecPath", [&] { return engine.GetProjectPath(); });
+
 		lua.new_usertype<RandomIntGenerator>(
 			"RandomInt",
 			sol::call_constructor,
@@ -423,6 +428,18 @@ namespace Feather {
 				return EntityInView(transform, width, height, *camera);
 			}
 		);
+	}
+
+	void ScriptingSystem::RegisterLuaEvents(sol::state& lua, Registry& registry)
+	{
+		auto* dispatcher = registry.TryGetContext<std::shared_ptr<EventDispatcher>>();
+		F_ASSERT(dispatcher && "There must be at least one registered dispatcher");
+
+		LuaEventBinder::CreateLuaEventBindings(lua);
+		EventDispatcher::RegisterMetaEventFuncs<ContactEvent>();
+		EventDispatcher::RegisterMetaEventFuncs<KeyEvent>();
+		EventDispatcher::RegisterMetaEventFuncs<LuaEvent>();
+		EventDispatcher::CreateEventDispatcherLuaBind(lua, **dispatcher);
 	}
 
 }

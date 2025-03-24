@@ -5,6 +5,8 @@
 
 namespace Feather {
 
+	struct KeyEvent;
+
 	class SceneDisplay : public IDisplay
 	{
 	public:
@@ -14,17 +16,19 @@ namespace Feather {
 		virtual void Draw() override;
 		virtual void Update() override;
 
-	private:
-		void LoadScene();
-		void UnloadScene();
-
-		void RenderScene() const;
-
 	protected:
 		virtual void DrawToolbar() override;
 
 	private:
+		void LoadScene();
+		void UnloadScene();
+		void RenderScene() const;
+
+		void HandleKeyEvent(const KeyEvent keyEvent);
+
+	private:
 		bool m_PlayScene;
+		bool m_WindowActive;
 		bool m_SceneLoaded;
 	};
 }

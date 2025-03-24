@@ -3,6 +3,7 @@
 #include "Logger/Logger.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/CoreUtils/CoreEngineData.h"
 #include "Editor/Utilities/SaveProject.h"
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Scene/SceneManager.h"
@@ -116,6 +117,7 @@ namespace Feather {
 
 		// Get the project path before we adjust it to the content path
 		saveProject->projectPath = contentPath + PATH_SEPARATOR;
+		CORE_GLOBALS().SetProjectPath(saveProject->projectPath);
 
 		contentPath += PATH_SEPARATOR;
 		contentPath += "content";

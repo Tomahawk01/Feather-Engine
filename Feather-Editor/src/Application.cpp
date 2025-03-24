@@ -10,6 +10,7 @@
 #include <Core/CoreUtils/CoreEngineData.h>
 #include <Core/CoreUtils/EngineShaders.h>
 #include <Core/Events/EventDispatcher.h>
+#include <Core/Events/EngineEventTypes.h>
 #include <Core/Scripting/InputManager.h>
 
 #include <Windowing/Window/Window.h>
@@ -377,8 +378,6 @@ namespace Feather {
 		// Process Events
 		while (SDL_PollEvent(&m_Event))
 		{
-			ImGui_ImplSDL2_ProcessEvent(&m_Event);
-
 			switch (m_Event.type)
 			{
 			case SDL_QUIT:
@@ -386,10 +385,11 @@ namespace Feather {
 				break;
 			case SDL_KEYDOWN:
 				keyboard.OnKeyPressed(m_Event.key.keysym.sym);
-				EVENT_DISPATCHER().EmitEvent(KeyPressedEvent{ .key = m_Event.key.keysym.sym });
+				EVENT_DISPATCHER().EmitEvent(KeyEvent{ .key = m_Event.key.keysym.sym, .type = EKeyEventType::Pressed });
 				break;
 			case SDL_KEYUP:
 				keyboard.OnKeyReleased(m_Event.key.keysym.sym);
+				EVENT_DISPATCHER().EmitEvent(KeyEvent{ .key = m_Event.key.keysym.sym, .type = EKeyEventType::Released });
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				mouse.OnButtonPressed(m_Event.button.button);
@@ -442,6 +442,9 @@ namespace Feather {
 			default:
 				break;
 			}
+
+			// Process ImGui events after other events
+			ImGui_ImplSDL2_ProcessEvent(&m_Event);
 		}
     }
 

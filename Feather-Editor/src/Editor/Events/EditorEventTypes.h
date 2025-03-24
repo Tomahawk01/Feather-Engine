@@ -37,6 +37,7 @@ namespace Feather {
 		Folder,
 		LuaClass,
 		LuaTable,
+		EmptyLuaFile,
 
 		NoAction
 	};
@@ -45,11 +46,6 @@ namespace Feather {
 	{
 		ContentCreateAction eAction{ ContentCreateAction::NoAction };
 		std::string sFilepath{ "" };
-	};
-
-	struct KeyPressedEvent
-	{
-		int key;
 	};
 
 	struct NameChangeEvent

@@ -6,7 +6,7 @@
 namespace Feather {
 
 	struct SwitchEntityEvent;
-	struct KeyPressedEvent;
+	struct KeyEvent;
 	class Entity;
 
 	class SceneHierarchyDisplay : public IDisplay
@@ -27,7 +27,7 @@ namespace Feather {
 		bool DuplicateSelectedEntity();
 
 		void OnEntityChanged(SwitchEntityEvent& swEntEvent);
-		void OnKeyPressed(KeyPressedEvent& keyPressed);
+		void OnKeyPressed(KeyEvent& keyEvent);
 
 	private:
 		std::shared_ptr<Entity> m_SelectedEntity{ nullptr };
