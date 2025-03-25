@@ -27,7 +27,7 @@ namespace Feather {
 		int layer{ 0 };
 
 		bool isHidden{ false };
-		std::string texture_name{ "" };
+		std::string textureName{ "" };
 
 		// void generate_uvs(int textureWidth, int textureHeight);
 		[[nodiscard]] std::string to_string() const;

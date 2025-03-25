@@ -210,7 +210,7 @@ namespace Feather {
 			ImGui::AddSpaces(2);
 
 			ImGui::InlineLabel("texture: ");
-			ImGui::TextColored(ImVec4{ 0.0f, 1.0f, 0.0f, 1.0f }, sprite.texture_name.c_str());
+			ImGui::TextColored(ImVec4{ 0.0f, 1.0f, 0.0f, 1.0f }, sprite.textureName.c_str());
 
 			std::string layer{ "" };
 
@@ -265,7 +265,7 @@ namespace Feather {
 			}
 			else
 			{
-				auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+				auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
 				if (!texture)
 					return;
 

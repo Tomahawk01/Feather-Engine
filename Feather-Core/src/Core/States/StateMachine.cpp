@@ -144,7 +144,7 @@ namespace Feather {
 			return;
 		}
 
-		m_mapStates.emplace(state.name, std::make_unique<State>(state));
+		m_mapStates.emplace(state.name, std::make_shared<State>(state));
 	}
 
 	void StateMachine::ExitState()

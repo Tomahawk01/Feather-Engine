@@ -186,6 +186,7 @@ namespace Feather {
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaEvents(*lua, runtimeRegistry);
+		ScriptingSystem::RegisterLuaSystems(*lua, runtimeRegistry);
 
 		SceneManager::CreateSceneManagerLuaBind(*lua);
 
@@ -290,6 +291,9 @@ namespace Feather {
 			if (CORE_GLOBALS().RenderCollidersEnabled())
 				renderShapeSystem.Update(runtimeRegistry, *camera);
 			renderUISystem.Update(runtimeRegistry);
+
+			auto& scriptSystem = runtimeRegistry.GetContext<std::shared_ptr<ScriptingSystem>>();
+			scriptSystem->Render(runtimeRegistry);
 		}
 		fb->Unbind();
 		fb->CheckResize();

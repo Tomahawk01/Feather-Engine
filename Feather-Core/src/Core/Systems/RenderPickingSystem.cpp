@@ -47,13 +47,13 @@ namespace Feather {
 			if (!EntityInView(transform, sprite.width, sprite.height, camera))
 				continue;
 
-			if (sprite.texture_name.empty() || sprite.isHidden)
+			if (sprite.textureName.empty() || sprite.isHidden)
 				continue;
 
-			auto texture = assetManager.GetTexture(sprite.texture_name);
+			auto texture = assetManager.GetTexture(sprite.textureName);
 			if (!texture)
 			{
-				F_ERROR("Texture '{0}' was not created correctly!", sprite.texture_name);
+				F_ERROR("Texture '{0}' was not created correctly!", sprite.textureName);
 				return;
 			}
 

@@ -29,7 +29,7 @@ namespace Feather {
 			.AddKeyValuePair("startX", sprite.start_x)
 			.AddKeyValuePair("startY", sprite.start_y)
 			.AddKeyValuePair("layer", sprite.layer)
-			.AddKeyValuePair("texture_name", sprite.texture_name)
+			.AddKeyValuePair("texture_name", sprite.textureName)
 			.StartNewObject("uvs")
 			.AddKeyValuePair("u", sprite.uvs.u)
 			.AddKeyValuePair("v", sprite.uvs.v)
@@ -190,7 +190,7 @@ namespace Feather {
 		sprite.start_y = jsonValue["startY"].GetInt();
 		sprite.layer = jsonValue["layer"].GetInt();
 		sprite.isHidden = jsonValue["isHidden"].GetBool();
-		sprite.texture_name = jsonValue["texture_name"].GetString();
+		sprite.textureName = jsonValue["texture_name"].GetString();
 	}
 
 	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, AnimationComponent& animation)

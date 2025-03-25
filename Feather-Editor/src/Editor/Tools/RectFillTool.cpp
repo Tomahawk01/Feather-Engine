@@ -115,7 +115,7 @@ namespace Feather {
 	{
 		const auto& sprite = m_MouseTile->sprite;
 		const auto& transform = m_MouseTile->transform;
-		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
 		if (!texture)
 			return;
 
@@ -260,7 +260,7 @@ namespace Feather {
 	{
 		const auto& sprite = m_MouseTile->sprite;
 		const auto& transform = m_MouseTile->transform;
-		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
 		if (!texture)
 			return;
 

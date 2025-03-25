@@ -1,4 +1,6 @@
 #include "AnimationSystem.h"
+
+#include "Logger/Logger.h"
 #include "Core/ECS/Registry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 
@@ -18,7 +20,7 @@ namespace Feather {
 			auto& sprite = view.get<SpriteComponent>(entity);
 			auto& animation = view.get<AnimationComponent>(entity);
 
-			if (!EntityInView(transform, sprite.width, sprite.height, camera))
+			if (!registry.GetRegistry().all_of<UIComponent>(entity) && !EntityInView(transform, sprite.width, sprite.height, camera))
 				continue;
 
 			if (animation.numFrames <= 0)
@@ -38,6 +40,21 @@ namespace Feather {
 				sprite.uvs.u = (animation.currentFrame * sprite.uvs.uv_width) + (animation.frameOffset * sprite.uvs.uv_width);
 			}
 		}
+	}
+
+	void AnimationSystem::CreateAnimationSystemLuaBind(sol::state& lua, Registry& registry)
+	{
+		auto& camera = registry.GetContext<std::shared_ptr<Camera2D>>();
+
+		F_ASSERT(camera && "A camera must exist in the current scene!");
+
+		lua.new_usertype<AnimationSystem>(
+			"AnimationSystem",
+			sol::call_constructor,
+			sol::constructors<AnimationSystem()>(),
+			"update",
+			[&](AnimationSystem& system, Registry& reg) { system.Update(reg, *camera); }
+		);
 	}
 
 }

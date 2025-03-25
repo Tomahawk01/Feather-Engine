@@ -191,11 +191,15 @@ namespace Feather {
 			"Entity",
 			sol::call_constructor,
 			sol::factories(
+				[&](Registry& reg, const std::string& name, const std::string& group)
+				{
+					return Entity{ reg, name, group };
+				},
 				[&](const std::string& name, const std::string& group)
 				{
 					return Entity{ registry, name, group };
 				},
-				[&](int32_t id)
+				[&](uint32_t id)
 				{
 					return Entity{ registry, static_cast<entt::entity>(id) };
 				}

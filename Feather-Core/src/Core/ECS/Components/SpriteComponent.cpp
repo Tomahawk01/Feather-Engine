@@ -9,7 +9,7 @@ std::string Feather::SpriteComponent::to_string() const
 {
 	std::stringstream ss;
 	ss << "==== Sprite Component ==== \n" << std::boolalpha <<
-		  "Texture Name: " << texture_name << "\n" <<
+		  "Texture Name: " << textureName << "\n" <<
 		  "Width: " << width << "\n" <<
 		  "Height: " << height << "\n" <<
 		  "StartX: " << start_x << "\n" <<
@@ -74,11 +74,11 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 					.start_x = start_x,
 					.start_y = start_y,
 					.layer = layer,
-					.texture_name = textureName
+					.textureName = textureName
 				};
 			}
 		),
-		"texture_name", &SpriteComponent::texture_name,
+		"texture_name", &SpriteComponent::textureName,
 		"width", &SpriteComponent::width,
 		"height", &SpriteComponent::height,
 		"start_x", &SpriteComponent::start_x,
@@ -89,11 +89,11 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 		"color", &SpriteComponent::color,
 		"generate_uvs", [&](SpriteComponent& sprite)
 		{
-			auto pTexture = assetManager.GetTexture(sprite.texture_name);
+			auto pTexture = assetManager.GetTexture(sprite.textureName);
 
 			if (!pTexture)
 			{
-				F_ERROR("Failed to generate uvs - texture '{0}' does not exists or invalid!", sprite.texture_name);
+				F_ERROR("Failed to generate uvs - texture '{0}' does not exists or invalid!", sprite.textureName);
 				return;
 			}
 

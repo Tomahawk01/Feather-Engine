@@ -84,7 +84,7 @@ namespace Feather {
 			glm::vec4 xAxisUVs{ xAxisSprite.uvs.u, xAxisSprite.uvs.v,
 								xAxisSprite.uvs.uv_width, xAxisSprite.uvs.uv_height };
 
-			const auto xAxisTexture = MAIN_REGISTRY().GetAssetManager().GetTexture(xAxisSprite.texture_name);
+			const auto xAxisTexture = MAIN_REGISTRY().GetAssetManager().GetTexture(xAxisSprite.textureName);
 			if (xAxisTexture)
 				m_BatchRenderer->AddSprite(xAxisPosition, xAxisUVs, xAxisTexture->GetID(), 99, glm::mat4{ 1.0f }, xAxisSprite.color);
 		}
@@ -99,7 +99,7 @@ namespace Feather {
 			glm::vec4 yAxisUVs{ yAxisSprite.uvs.u, yAxisSprite.uvs.v,
 								yAxisSprite.uvs.uv_width, yAxisSprite.uvs.uv_height };
 
-			const auto yAxisTexture = MAIN_REGISTRY().GetAssetManager().GetTexture(yAxisSprite.texture_name);
+			const auto yAxisTexture = MAIN_REGISTRY().GetAssetManager().GetTexture(yAxisSprite.textureName);
 			if (yAxisTexture)
 				m_BatchRenderer->AddSprite(yAxisPosition, yAxisUVs, yAxisTexture->GetID(), 99, glm::mat4{ 1.0f }, yAxisSprite.color);
 		}

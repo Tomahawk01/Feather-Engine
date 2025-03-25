@@ -20,6 +20,7 @@ namespace Feather {
 		static void RegisterLuaBindings(sol::state& lua, Registry& registry);
 		static void RegisterLuaFunctions(sol::state& lua, Registry& registry);
 		static void RegisterLuaEvents(sol::state& lua, Registry& registry);
+		static void RegisterLuaSystems(sol::state& lua, Registry& registry);
 
 	private:
 		bool m_MainLoaded;

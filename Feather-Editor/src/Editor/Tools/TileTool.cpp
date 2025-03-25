@@ -44,7 +44,7 @@ namespace Feather {
 			.start_x = 0,
 			.start_y = 0,
 			.layer = currentLayer,
-			.texture_name = textureName
+			.textureName = textureName
 		};
 
 		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(textureName);
@@ -54,7 +54,7 @@ namespace Feather {
 
 	const std::string& TileTool::GetSpriteTexture() const
 	{
-		return m_MouseTile->sprite.texture_name;
+		return m_MouseTile->sprite.textureName;
 	}
 
 	void TileTool::SetSpriteUVs(int startX, int startY)
@@ -67,7 +67,7 @@ namespace Feather {
 
 	void TileTool::SetSpriteRect(const glm::vec2& spriteRect)
 	{
-		if (m_MouseTile->sprite.texture_name.empty())
+		if (m_MouseTile->sprite.textureName.empty())
 			return;
 
 		m_MouseRect = spriteRect;
@@ -75,14 +75,14 @@ namespace Feather {
 		sprite.width = m_MouseRect.x;
 		sprite.height = m_MouseRect.y;
 
-		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
 		F_ASSERT(texture && "Texture must exist");
 		GenerateUVs(sprite, texture->GetWidth(), texture->GetHeight());
 	}
 
 	const bool TileTool::SpriteValid() const
 	{
-		return !m_MouseTile->sprite.texture_name.empty();
+		return !m_MouseTile->sprite.textureName.empty();
 	}
 
 	const bool TileTool::CanDrawOrCreate() const
@@ -145,7 +145,7 @@ namespace Feather {
 			sprite.uvs.uv_height
 		};
 
-		const auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+		const auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
 		if (texture)
 			m_BatchRenderer->AddSprite(position, uvs, texture->GetID(), MOUSE_SPRITE_LAYER, glm::mat4{ 1.0f }, sprite.color);
 

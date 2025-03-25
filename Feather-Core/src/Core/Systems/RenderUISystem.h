@@ -1,5 +1,8 @@
 #pragma once
+
 #include "Core/ECS/Registry.h"
+
+#include <sol/sol.hpp>
 
 namespace Feather {
 	
@@ -14,6 +17,8 @@ namespace Feather {
 		~RenderUISystem();
 
 		void Update(Registry& registry);
+
+		static void CreateRenderUISystemLuaBind(sol::state& lua);
 
 	private:
 		std::unique_ptr<SpriteBatchRenderer> m_SpriteRenderer;

@@ -6,6 +6,7 @@
 
 #include "Core/ECS/Entity.h"
 #include "Core/ECS/MainRegistry.h"
+#include "Core/ECS/ECSUtils.h"
 
 #include "Core/Scripting/GlmLuaBindings.h"
 #include "Core/Scripting/InputManager.h"
@@ -26,6 +27,13 @@
 
 #include "Core/Events/EngineEventTypes.h"
 #include "Core/Events/EventDispatcher.h"
+
+#include "Core/Systems/RenderSystem.h"
+#include "Core/Systems/RenderUISystem.h"
+#include "Core/Systems/AnimationSystem.h"
+
+#include "Core/Character/Character.h"
+#include "Utils/HelperUtilities.h"
 
 #include <filesystem>
 
@@ -88,19 +96,22 @@ namespace Feather {
 	{
 		if (!m_MainLoaded)
 		{
-			F_ERROR("Main lua script has not been loaded!");
+			F_FATAL("Main lua script has not been loaded!");
 			return;
 		}
 
-		auto view = registry.GetRegistry().view<ScriptComponent>();
-		for (const auto& entity : view)
+		auto mainScript = FindEntityByTag(registry, "main_script");
+		if (mainScript == entt::null)
 		{
-			Entity ent{ registry, entity };
-			if (ent.GetName() != "main_script")
-				continue;
+			F_FATAL("Failed to run main Update script. Entity does not exist");
+			return;
+		}
 			
-			auto& script = ent.GetComponent<ScriptComponent>();
-			auto error = script.update(entity);
+		Entity scriptEnt{ registry, mainScript };
+
+		if (auto* script = scriptEnt.TryGetComponent<ScriptComponent>())
+		{
+			auto error = script->update();
 			if (!error.valid())
 			{
 				sol::error err = error;
@@ -108,28 +119,30 @@ namespace Feather {
 			}
 		}
 
-		auto& lua = registry.GetContext<std::shared_ptr<sol::state>>();
-		if (lua)
-			lua->collect_garbage();
+		if (auto* lua = registry.TryGetContext<std::shared_ptr<sol::state>>())
+			(*lua)->collect_garbage();
 	}
 
 	void ScriptingSystem::Render(Registry& registry)
 	{
 		if (!m_MainLoaded)
 		{
-			F_ERROR("Main lua script has not been loaded!");
+			F_FATAL("Main lua script has not been loaded!");
 			return;
 		}
 
-		auto view = registry.GetRegistry().view<ScriptComponent>();
-		for (const auto& entity : view)
+		auto mainScript = FindEntityByTag(registry, "main_script");
+		if (mainScript == entt::null)
 		{
-			Entity ent{ registry, entity };
-			if (ent.GetName() != "main_script")
-				continue;
+			F_FATAL("Failed to run main render script. Entity does not exist");
+			return;
+		}
 
-			auto& script = ent.GetComponent<ScriptComponent>();
-			auto error = script.render(entity);
+		Entity scriptEnt{ registry, mainScript };
+
+		if (auto* script = scriptEnt.TryGetComponent<ScriptComponent>())
+		{
+			auto error = script->render();
 			if (!error.valid())
 			{
 				sol::error err = error;
@@ -137,9 +150,8 @@ namespace Feather {
 			}
 		}
 
-		auto& lua = registry.GetContext<std::shared_ptr<sol::state>>();
-		if (lua)
-			lua->collect_garbage();
+		if (auto* lua = registry.TryGetContext<std::shared_ptr<sol::state>>())
+			(*lua)->collect_garbage();
 	}
 
 	auto create_timer = [](sol::state& lua){
@@ -303,6 +315,7 @@ namespace Feather {
 		LuaFilesystem::CreateLuaFileSytemBind(lua);
 
 		FollowCamera::CreateLuaFollowCamera(lua, registry);
+		Character::CreateCharacterLuaBind(lua, registry);
 
 		create_timer(lua);
 		create_lua_logger(lua);
@@ -319,8 +332,9 @@ namespace Feather {
 		BoxColliderComponent::CreateLuaBoxColliderBind(lua);
 		CircleColliderComponent::CreateLuaCircleColliderBind(lua);
 		PhysicsComponent::CreatePhysicsLuaBind(lua, registry.GetRegistry());
-		RigidBodyComponent::CreateRigidBodyLuaBind(lua);
 		TextComponent::CreateLuaTextBindings(lua);
+		RigidBodyComponent::CreateRigidBodyLuaBind(lua);
+		UIComponent::CreateLuaBind(lua);
 	}
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)
@@ -440,6 +454,13 @@ namespace Feather {
 		EventDispatcher::RegisterMetaEventFuncs<KeyEvent>();
 		EventDispatcher::RegisterMetaEventFuncs<LuaEvent>();
 		EventDispatcher::CreateEventDispatcherLuaBind(lua, **dispatcher);
+	}
+
+	void ScriptingSystem::RegisterLuaSystems(sol::state& lua, Registry& registry)
+	{
+		RenderSystem::CreateRenderSystemLuaBind(lua, registry);
+		RenderUISystem::CreateRenderUISystemLuaBind(lua);
+		AnimationSystem::CreateAnimationSystemLuaBind(lua, registry);
 	}
 
 }

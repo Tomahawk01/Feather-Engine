@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sol/sol.hpp>
+
 namespace Feather {
 
 	class Registry;
@@ -12,6 +14,8 @@ namespace Feather {
 		~AnimationSystem() = default;
 
 		void Update(Registry& registry, Camera2D& camera);
+
+		static void CreateAnimationSystemLuaBind(sol::state& lua, Registry& registry);
 	};
 
 }

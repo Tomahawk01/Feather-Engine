@@ -106,7 +106,7 @@ namespace Feather {
 	void Gizmo::Init(const std::string& xAxisTexture, const std::string& yAxisTexture)
 	{
 		// Setup x-axis
-		m_XAxisParams->sprite.texture_name = xAxisTexture;
+		m_XAxisParams->sprite.textureName = xAxisTexture;
 		auto xAxisTex = MAIN_REGISTRY().GetAssetManager().GetTexture(xAxisTexture);
 		F_ASSERT(xAxisTex && "Texture must exist!");
 		m_XAxisParams->sprite.width = xAxisTex->GetWidth();
@@ -117,7 +117,7 @@ namespace Feather {
 		// Setup y-axis
 		if (!m_OnlyOneAxis)
 		{
-			m_YAxisParams->sprite.texture_name = yAxisTexture;
+			m_YAxisParams->sprite.textureName = yAxisTexture;
 			auto yAxisTex = MAIN_REGISTRY().GetAssetManager().GetTexture(yAxisTexture);
 			F_ASSERT(yAxisTex && "Texture must exist!");
 			m_YAxisParams->sprite.width = yAxisTex->GetWidth();

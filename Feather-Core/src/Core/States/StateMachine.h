@@ -23,7 +23,7 @@ namespace Feather {
 		static void CreateLuaStateMachineBind(sol::state& lua);
 
 	private:
-		std::map<std::string, std::unique_ptr<State>> m_mapStates;
+		std::map<std::string, std::shared_ptr<State>> m_mapStates;
 		std::string m_CurrentState;
 		std::optional<sol::table> m_StateTable;
 	};

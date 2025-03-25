@@ -84,7 +84,7 @@ namespace Feather {
 					std::string textureStr{ texture };
 					F_ASSERT(!textureStr.empty() && "Texture name is empty!");
 					if (!textureStr.empty())
-						sprite.texture_name = textureStr;
+						sprite.textureName = textureStr;
 				}
 				ImGui::EndDragDropTarget();
 			}
@@ -102,7 +102,7 @@ namespace Feather {
 			}
 
 			auto& assetManager = MAIN_REGISTRY().GetAssetManager();
-			std::string selectedTexture{ sprite.texture_name };
+			std::string selectedTexture{ sprite.textureName };
 			ImGui::InlineLabel("texture");
 			ImGui::ItemToolTip("The current active texture of the sprite to be drawn");
 			if (ImGui::BeginCombo("##texture", selectedTexture.c_str()))
@@ -112,7 +112,7 @@ namespace Feather {
 					if (ImGui::Selectable(textureName.c_str(), textureName == selectedTexture))
 					{
 						selectedTexture = textureName;
-						sprite.texture_name = selectedTexture;
+						sprite.textureName = selectedTexture;
 						IsChanged = true;
 					}
 				}
@@ -170,7 +170,7 @@ namespace Feather {
 
 		if (IsChanged)
 		{
-			auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.texture_name);
+			auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
 			if (!texture)
 			{
 				F_ERROR("Texture is not valid");
