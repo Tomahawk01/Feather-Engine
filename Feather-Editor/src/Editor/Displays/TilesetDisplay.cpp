@@ -2,6 +2,7 @@
 #include "Logger/Logger.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Scene/SceneManager.h"
@@ -9,8 +10,10 @@
 #include "Editor/Tools/TileTool.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Utilities/EditorUtilities.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Feather {
 
@@ -40,57 +43,104 @@ namespace Feather {
 			return;
 		}
 
-		int textureWidth = texture->GetWidth();
-		int textureHeight = texture->GetHeight();
+		ImGuiIO& io = ImGui::GetIO();
+		bool mouseHeld{ ImGui::IsMouseDown(ImGuiMouseButton_Left) };
+		bool mouseReleased{ ImGui::IsMouseReleased(ImGuiMouseButton_Left) };
 
-		int cols = textureWidth / 32;
-		int rows = textureHeight / 32;
+		// TODO: Get the tile sizes from the scene's canvas
+		int tileWidth{ 32 };
+		int tileHeight{ 32 };
 
-		float uvW = 32 / static_cast<float>(textureWidth);
-		float uvH = 32 / static_cast<float>(textureHeight);
+		float textureWidth = static_cast<float>(texture->GetWidth());
+		float textureHeight = static_cast<float>(texture->GetHeight());
 
-		float ux{ 0.0f }, uy{ 0.0f }, vx{ uvW }, vy{ uvH };
+		const int COLS = textureWidth / tileWidth;
+		const int ROWS = textureHeight / tileHeight;
 
 		ImGuiTableFlags tableFlags{ 0 };
 		tableFlags |= ImGuiTableFlags_SizingFixedFit;
 		tableFlags |= ImGuiTableFlags_ScrollX;
 
-		int k{ 0 }, id{ 0 };
+		int id{ 0 };
 
-		if (ImGui::BeginTable("Tileset", cols, tableFlags))
+		if (ImGui::BeginTable("Tileset", COLS, tableFlags))
 		{
-			for (int i = 0; i < rows; i++)
+			for (int row = 0; row < ROWS; row++)
 			{
 				ImGui::TableNextRow();
-				for (int j = 0; j < cols; j++)
+				for (int col = 0; col < COLS; col++)
 				{
-					ImGui::TableSetColumnIndex(j);
-
-					if (m_Selected == id)
-						ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImGui::GetColorU32(ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f }));
+					ImGui::TableSetColumnIndex(col);
 
 					// Create unique id for the buttons
-					ImGui::PushID(k++);
-					std::string buttonStr = "##tile_" + std::to_string(k);
+					id = row * COLS + col;
+					ImGui::PushID(id);
+					std::string buttonStr = "##tile_" + std::to_string(id);
 
-					if (ImGui::ImageButton(buttonStr.c_str(), (ImTextureID)(intptr_t)texture->GetID(), ImVec2{ 32.0f * 1.5f, 32.0f * 1.5f }, ImVec2{ ux, uy }, ImVec2{ vx, vy }))
+					// Get UV coordinates for this cell
+					float u0 = col * tileWidth / textureWidth;
+					float v0 = row * tileHeight / textureHeight;
+					float u1 = (col + 1) * tileWidth / textureWidth;
+					float v1 = (row + 1) * tileHeight / textureHeight;
+
+					ImVec2 cellMin = ImGui::GetCursorScreenPos();
+					ImVec2 cellMax = { cellMin.x + tileWidth, cellMin.y + tileHeight };
+
+					if (mouseHeld && ImGui::IsMouseHoveringRect(cellMin, cellMax) && m_Selection.IsValid() &&
+						m_Selection.selecting)
 					{
-						m_Selected = id;
-						TOOL_MANAGER().SetTileToolStartCoords(j, i);
+						m_Selection.endRow = row;
+						m_Selection.endCol = col;
+					}
+					else if (mouseReleased)
+					{
+						m_Selection.selecting = false;
+					}
+
+					bool selected{ false };
+					if (m_Selection.IsValid())
+					{
+						int minRow = std::min(m_Selection.startRow, m_Selection.endRow);
+						int maxRow = std::max(m_Selection.startRow, m_Selection.endRow);
+						int minCol = std::min(m_Selection.startCol, m_Selection.endCol);
+						int maxCol = std::max(m_Selection.startCol, m_Selection.endCol);
+
+						selected = (row >= minRow && row <= maxRow && col >= minCol && col <= maxCol);
+
+						if (auto pActiveTool = TOOL_MANAGER().GetActiveTool(); mouseHeld)
+						{
+							auto& tileData = pActiveTool->GetTileData();
+
+							tileData.sprite.width = (std::abs(maxCol - minCol) + 1) * tileWidth;
+							tileData.sprite.height = (std::abs(maxRow - minRow) + 1) * tileHeight;
+
+							GenerateUVsExt(tileData.sprite, textureWidth, textureHeight, minCol * tileWidth / textureWidth, minRow * tileHeight / textureHeight);
+						}
+					}
+
+					ImVec4 tintColor = selected ? ImVec4{ 0.3f, 0.6f, 1.0f, 1.0f } : ImVec4{ 1.0f, 1.0f, 1.0f, 1.0f };
+					ImVec4 borderColor = selected ? ImVec4{ 1.0f, 1.0f, 1.0f, 1.0f } : ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f };
+
+					if (selected)
+						ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImGui::GetColorU32(ImVec4{ 0.0f, 0.9f, 0.0f, 0.2f }));
+
+					if (ImGui::ImageButtonEx(ImGui::GetID(std::format("##ImageBtn_{}", id).c_str()),
+						(ImTextureID)(intptr_t)texture->GetID(),
+						ImVec2{ static_cast<float>(tileWidth), static_cast<float>(tileHeight) },
+						ImVec2{ u0, v0 },
+						ImVec2{ u1, v1 },
+						borderColor,
+						tintColor,
+						ImGuiButtonFlags_PressedOnClick))
+					{
+						m_Selection.Reset();
+						m_Selection.startRow = m_Selection.endRow = row;
+						m_Selection.startCol = m_Selection.endCol = col;
+						m_Selection.selecting = true;
 					}
 
 					ImGui::PopID();
-
-					// Advance the UVs to the next column
-					ux += uvW;
-					vx += uvW;
-					++id;
 				}
-				// Put the UVs back to start column of the next row
-				ux = 0.0f;
-				vx = uvW;
-				uy += uvH;
-				vy += uvH;
 			}
 
 			ImGui::EndTable();
