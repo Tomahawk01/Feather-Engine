@@ -450,9 +450,6 @@ namespace Feather {
 
 	void Application::Update()
 	{
-		auto& engineData = CoreEngineData::GetInstance();
-		engineData.UpdateDeltaTime();
-
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& displayHolder = mainRegistry.GetContext<std::shared_ptr<DisplayHolder>>();
 

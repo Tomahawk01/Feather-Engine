@@ -60,7 +60,7 @@ namespace Feather {
 	void CoreEngineData::UpdateDeltaTime()
 	{
 		auto now = std::chrono::steady_clock::now();
-		m_DeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(now - m_LastUpdate).count() / 1000000.0f;
+		m_DeltaTime = std::chrono::duration<double>(now - m_LastUpdate).count();
 		m_LastUpdate = now;
 	}
 

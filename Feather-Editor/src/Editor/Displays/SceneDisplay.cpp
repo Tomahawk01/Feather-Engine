@@ -31,8 +31,10 @@
 #include "Editor/Scene/SceneObject.h"
 
 #include <imgui.h>
+#include <thread>
 
-constexpr float one_over_sixty = 1.0f / 60.0f;
+constexpr float TARGET_FRAME_TIME_F = 1.0f / 60.0f;
+constexpr double TARGET_FRAME_TIME = 1.0 / 60.0;
 
 namespace Feather {
 
@@ -112,6 +114,14 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& coreGlobals = CORE_GLOBALS();
 
+		double dt = coreGlobals.GetDeltaTime();
+		coreGlobals.UpdateDeltaTime();
+
+		if (dt < TARGET_FRAME_TIME)
+		{
+			std::this_thread::sleep_for(std::chrono::duration<double>(TARGET_FRAME_TIME - dt));
+		}
+
 		auto& camera = runtimeRegistry.GetContext<std::shared_ptr<Camera2D>>();
 		if (!camera)
 		{
@@ -126,7 +136,7 @@ namespace Feather {
 		if (coreGlobals.IsPhysicsEnabled())
 		{
 			auto& physicsWorld = runtimeRegistry.GetContext<PhysicsWorld>();
-			physicsWorld->Step(one_over_sixty, coreGlobals.GetVelocityIterations(), coreGlobals.GetPositionIterations());
+			physicsWorld->Step(TARGET_FRAME_TIME_F, coreGlobals.GetVelocityIterations(), coreGlobals.GetPositionIterations());
 			physicsWorld->ClearForces();
 
 			auto& dispatch = runtimeRegistry.GetContext<std::shared_ptr<EventDispatcher>>();
