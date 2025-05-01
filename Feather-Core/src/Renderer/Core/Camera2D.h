@@ -21,7 +21,15 @@ namespace Feather {
 
 		inline void SetPosition(glm::vec2 newPosition) { m_Position = newPosition; m_NeedUpdate = true; }
 		inline void SetScreenOffset(glm::vec2 newOffset) { m_ScreenOffset = newOffset; m_NeedUpdate = true; }
-		inline void SetScale(float scale) { m_Scale = scale; m_NeedUpdate = true; }
+		inline void SetScale(float scale)
+		{
+			// NOTE: Prevent scale from being zero
+			if (scale <= 0.0f)
+				scale = 0.1f;
+
+			m_Scale = scale;
+			m_NeedUpdate = true;
+		}
 
 		inline const glm::vec2 GetPosition() const { return m_Position; }
 		inline const glm::vec2 GetScreenOffset() const { return m_ScreenOffset; }

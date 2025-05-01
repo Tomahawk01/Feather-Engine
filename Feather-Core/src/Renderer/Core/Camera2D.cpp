@@ -54,7 +54,7 @@ namespace Feather {
 		// Set coords to the center of the screen, scale them and translate the camera
 		worldCoords -= m_ScreenOffset;
 		worldCoords /= m_Scale;
-		worldCoords += m_Position;
+		worldCoords += (m_Position / m_Scale);
 
 		return worldCoords;
 	}

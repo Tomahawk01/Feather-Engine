@@ -10,7 +10,9 @@
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Systems/PhysicsSystem.h"
+#ifdef IN_FEATHER_EDITOR
 #include "Core/Systems/RenderPickingSystem.h"
+#endif
 #include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/Renderer.h"
 #include "Utils/HelperUtilities.h"
@@ -100,7 +102,10 @@ namespace Feather {
         AddToContext<std::shared_ptr<PhysicsSystem>>(std::make_shared<PhysicsSystem>());
         AddToContext<std::shared_ptr<AnimationSystem>>(std::make_shared<AnimationSystem>());
         AddToContext<std::shared_ptr<EventDispatcher>>(std::make_shared<EventDispatcher>());
+#ifdef IN_FEATHER_EDITOR
         AddToContext<std::shared_ptr<RenderPickingSystem>>(std::make_shared<RenderPickingSystem>());
+        F_TRACE("Added Render Picking System to main registry");
+#endif
 
         return true;
     }

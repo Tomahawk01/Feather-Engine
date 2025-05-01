@@ -14,7 +14,10 @@ project "Feather-Core"
     defines
     {
         "_CRT_SECURE_NO_WARNINGS",
-        "NOMINMAX"
+        "NOMINMAX",
+
+        -- NOTE: Custom defines for the Feather Engine
+        "IN_FEATHER_EDITOR"
     }
 
     includedirs

@@ -56,6 +56,12 @@ namespace Feather {
 	constexpr Color YAXIS_HOVERED_GIZMO_COLOR = { 0, 255, 255, 175 };
 	constexpr Color GRAYED_OUT_GIZMO_COLOR = { 135, 135, 135, 175 };
 
+	struct MouseGuiInfo
+	{
+		glm::vec2 position{ 0.0f };
+		glm::vec2 windowSize{ 0.0f };
+	};
+
 	struct GizmoAxisParams
 	{
 		TransformComponent transform{};

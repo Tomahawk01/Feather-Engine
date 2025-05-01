@@ -23,8 +23,10 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
+#include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/SaveProject.h"
+#include "Editor/Scripting/EditorCoreLuaWrappers.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 
@@ -61,7 +63,21 @@ namespace Feather {
 			auto& editorFramebuffers = MAIN_REGISTRY().GetContext<std::shared_ptr<EditorFramebuffers>>();
 			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
 
-			ImGui::SetCursorPos(ImVec2{ 0.0f, 0.0f });
+			if (auto currentScene = SCENE_MANAGER().GetCurrentScene())
+			{
+				auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
+				// NOTE: We need to set the relative mouse window, so that any scripts will take into account
+				// the position of the imgui window relative to the actual window position, size, etc.
+				if (auto* mouseInfo = runtimeRegistry.TryGetContext<std::shared_ptr<MouseGuiInfo>>())
+				{
+					ImGuiIO io = ImGui::GetIO();
+					auto relativePos = ImGui::GetCursorScreenPos();
+					ImVec2 windowSize{ ImGui::GetWindowSize() };
+
+					(*mouseInfo)->position = glm::vec2{ io.MousePos.x - relativePos.x, io.MousePos.y - relativePos.y };
+					(*mouseInfo)->windowSize = glm::vec2{ fb->GetWidth(), fb->GetHeight() };
+				}
+			}
 
 			ImGui::Image(
 				(ImTextureID)(intptr_t)fb->GetTextureID(),
@@ -71,6 +87,7 @@ namespace Feather {
 				},
 				ImVec2{ 0.0f, 1.0f }, ImVec2{ 1.0f, 0.0f }
 			);
+
 			ImGui::EndChild();
 
 			// Check for resize based on window size
@@ -169,6 +186,7 @@ namespace Feather {
 
 		// Add necessary systems
 		auto scriptSystem = runtimeRegistry.AddToContext<std::shared_ptr<ScriptingSystem>>(std::make_shared<ScriptingSystem>());
+		runtimeRegistry.AddToContext<std::shared_ptr<MouseGuiInfo>>(std::make_shared<MouseGuiInfo>());
 
 		auto lua = runtimeRegistry.AddToContext<std::shared_ptr<sol::state>>(std::make_shared<sol::state>());
 
@@ -187,6 +205,7 @@ namespace Feather {
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaEvents(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaSystems(*lua, runtimeRegistry);
+		LuaCoreBinder::CreateLuaBind(*lua, runtimeRegistry);
 
 		SceneManager::CreateSceneManagerLuaBind(*lua);
 

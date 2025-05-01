@@ -33,7 +33,8 @@ namespace Feather {
             "just_pressed", [&](int key) { return keyboard.IsKeyJustPressed(key); },
             "just_released", [&](int key) { return keyboard.IsKeyJustReleased(key); },
             "pressed", [&](int key) { return keyboard.IsKeyPressed(key); },
-            "pressed_keys", [&]() {
+            "pressed_keys", [&]()
+            {
                 std::vector<int> keys;
                 for (const auto& [key, button] : keyboard.GetButtonMap())
                 {
@@ -44,6 +45,8 @@ namespace Feather {
             }
         );
 
+// NOTE: In order for this to work in the editor, we need to take into account the imgui window position, to get the world position.
+#ifdef IN_FEATHER_EDITOR
         auto& mouse = inputManager.GetMouse();
         lua.new_usertype<Mouse>(
             "Mouse",
@@ -51,17 +54,20 @@ namespace Feather {
             "just_pressed", [&](int btn) { return mouse.IsButtonJustPressed(btn); },
             "just_released", [&](int btn) { return mouse.IsButtonJustReleased(btn); },
             "pressed", [&](int btn) { return mouse.IsButtonPressed(btn); },
-            "screen_position", [&]() {
+            "screen_position", [&]()
+            {
                 auto [x, y] = mouse.GetMouseScreenPosition();
                 return glm::vec2{ x, y };
             },
-            "world_position", [&]() {
+            "world_position", [&]()
+            {
                 auto [x, y] = mouse.GetMouseScreenPosition();
                 return camera->ScreenCoordsToWorld(glm::vec2{ x, y });
             },
             "wheel_x", [&]() { return mouse.GetMouseWheelX(); },
             "wheel_y", [&]() { return mouse.GetMouseWheelY(); }
         );
+#endif
 
         lua.new_usertype<Gamepad>(
             "Gamepad",
