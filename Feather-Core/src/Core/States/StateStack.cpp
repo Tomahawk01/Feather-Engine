@@ -1,13 +1,12 @@
 #include "StateStack.h"
+
 #include "Logger/Logger.h"
 
 namespace Feather {
 
 	void StateStack::Push(State& state)
 	{
-		auto hasState = std::find_if(m_States.begin(), m_States.end(),
-									 [&](const auto& s) { return s.name == state.name; }
-		);
+		auto hasState = std::ranges::find_if(m_States, [&](const auto& s) { return s.name == state.name; });
 
 		if (hasState == m_States.end())
 		{
@@ -37,6 +36,18 @@ namespace Feather {
 			Pop();
 
 		Push(state);
+	}
+
+	void StateStack::RemoveState(const std::string& state)
+	{
+		auto stateItr = std::ranges::find_if(m_States, [&](State& stateObj) { return stateObj.name == state; });
+		if (stateItr == m_States.end())
+		{
+			F_ERROR("Failed to remove state '{}' - Does not exist or is invalid", state);
+			return;
+		}
+
+		stateItr->killState = true;
 	}
 
 	void StateStack::Update(const float dt)
