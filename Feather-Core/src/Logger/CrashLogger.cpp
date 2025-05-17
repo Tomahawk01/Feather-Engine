@@ -129,13 +129,15 @@ namespace Feather {
 	void CrashLogger::ExtractCrashLocation()
 	{
 #ifdef _WIN32
-		void* stack[62];
-		// Capture the call stack
-		USHORT frames = CaptureStackBackTrace(0, 62, stack, nullptr);
+		SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
 		// Retrive a handle to the current process
 		HANDLE process = GetCurrentProcess();
 		// Initialize the symbol handler for stack trace resolution
 		SymInitialize(process, NULL, TRUE);
+
+		void* stack[62];
+		// Capture the call stack
+		USHORT frames = CaptureStackBackTrace(0, 62, stack, nullptr);
 
 		// Skip the first few frames so we ignore the crash handler frames
 		for (USHORT i = 3; i < frames; ++i)
@@ -155,12 +157,15 @@ namespace Feather {
 					SymGetLineFromAddr64(process, address, &displacement, &line))
 				{
 					std::string filename = line.FileName;
-					if (filename.find(".cpp") != std::string::npos)
+					if (!filename.empty() && filename.find("vcstartup") == std::string::npos)
 					{
-						s_CrashFile = filename;
-						s_CrashLine = line.LineNumber;
-						free(symbol);
-						break;
+						if (filename.find(".cpp") != std::string::npos)
+						{
+							s_CrashFile = filename;
+							s_CrashLine = line.LineNumber;
+							free(symbol);
+							break;
+						}
 					}
 				}
 
