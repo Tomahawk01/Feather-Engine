@@ -39,7 +39,7 @@ namespace Feather {
 			}
 		};
 
-		TableSelection m_Selection;
+		TableSelection m_TableSelection;
 	};
 
 }

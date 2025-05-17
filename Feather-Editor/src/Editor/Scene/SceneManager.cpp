@@ -217,12 +217,17 @@ namespace Feather {
 
 				// TODO: Check to see if this is valid
 				auto sceneObject = dynamic_cast<SceneObject*>(scene);
-				F_ASSERT(sceneObject);
+				F_ASSERT(sceneObject && "Scene must be a valid SceneObject if run in the editor!");
+				if (!sceneObject)
+				{
+					F_ERROR("Failed to load scene '{}': Scene is not a valid SceneObject", sSceneName);
+
+					return scene->UnloadScene();
+				}
 
 				currentScene->CopySceneToRuntime(*sceneObject);
-				scene->UnloadScene();
 
-				return true;
+				return scene->UnloadScene();
 			},
 			"getCanvas", [&]
 			{

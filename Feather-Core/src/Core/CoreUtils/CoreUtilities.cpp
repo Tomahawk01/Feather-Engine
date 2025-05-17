@@ -8,20 +8,24 @@ namespace Feather {
 
     bool EntityInView(const TransformComponent& transform, float width, float height, const Camera2D& camera)
     {
-		const auto& cameraPos = camera.GetPosition() - camera.GetScreenOffset();
-		const auto& cameraWidth = camera.GetWidth();
-		const auto& cameraHeight = camera.GetHeight();
-		const auto& cameraScale = camera.GetScale();
+		const glm::vec2 cameraPos = camera.GetPosition() - camera.GetScreenOffset();
+		const int cameraWidth = camera.GetWidth();
+		const int cameraHeight = camera.GetHeight();
+		const float cameraScale = camera.GetScale();
+		const float invCameraScale = 1.0f / cameraScale;
 
-		if ((transform.position.x <= ((cameraPos.x - (width * transform.scale.x * cameraScale)) / cameraScale) ||
-			 transform.position.x >= ((cameraPos.x + cameraWidth) / cameraScale)) ||
-			(transform.position.y <= ((cameraPos.y - (height * transform.scale.y * cameraScale)) / cameraScale) ||
-			 transform.position.y >= ((cameraPos.y + cameraHeight) / cameraScale)))
+		const float cameraLeft = (cameraPos.x - (width * transform.scale.x * cameraScale)) * invCameraScale;
+		const float cameraRight = (cameraPos.x + cameraWidth) * invCameraScale;
+		const float cameraTop = (cameraPos.y - (height * transform.scale.y * cameraScale)) * invCameraScale;
+		const float cameraBottom = (cameraPos.y + cameraHeight) * invCameraScale;
+
+		if ((transform.position.x <= cameraLeft || transform.position.x >= cameraRight) ||
+			(transform.position.y <= cameraTop || transform.position.y >= cameraBottom))
 		{
 			return false;
 		}
 
-		// Sprite is in view
+		// Entity is at least partially in view
         return true;
     }
 

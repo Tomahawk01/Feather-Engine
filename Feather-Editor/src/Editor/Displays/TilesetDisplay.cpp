@@ -53,8 +53,8 @@ namespace Feather {
 		int tileWidth{ 32 };
 		int tileHeight{ 32 };
 
-		float textureWidth = static_cast<float>(texture->GetWidth());
-		float textureHeight = static_cast<float>(texture->GetHeight());
+		const float textureWidth = static_cast<float>(texture->GetWidth());
+		const float textureHeight = static_cast<float>(texture->GetHeight());
 
 		const int COLS = textureWidth / tileWidth;
 		const int ROWS = textureHeight / tileHeight;
@@ -88,24 +88,24 @@ namespace Feather {
 					ImVec2 cellMin = ImGui::GetCursorScreenPos();
 					ImVec2 cellMax = { cellMin.x + tileWidth, cellMin.y + tileHeight };
 
-					if (mouseHeld && ImGui::IsMouseHoveringRect(cellMin, cellMax) && m_Selection.IsValid() &&
-						m_Selection.selecting)
+					if (mouseHeld && ImGui::IsMouseHoveringRect(cellMin, cellMax) && m_TableSelection.IsValid() &&
+						m_TableSelection.selecting)
 					{
-						m_Selection.endRow = row;
-						m_Selection.endCol = col;
+						m_TableSelection.endRow = row;
+						m_TableSelection.endCol = col;
 					}
 					else if (mouseReleased)
 					{
-						m_Selection.selecting = false;
+						m_TableSelection.selecting = false;
 					}
 
 					bool selected{ false };
-					if (m_Selection.IsValid())
+					if (m_TableSelection.IsValid())
 					{
-						int minRow = std::min(m_Selection.startRow, m_Selection.endRow);
-						int maxRow = std::max(m_Selection.startRow, m_Selection.endRow);
-						int minCol = std::min(m_Selection.startCol, m_Selection.endCol);
-						int maxCol = std::max(m_Selection.startCol, m_Selection.endCol);
+						int minRow = std::min(m_TableSelection.startRow, m_TableSelection.endRow);
+						int maxRow = std::max(m_TableSelection.startRow, m_TableSelection.endRow);
+						int minCol = std::min(m_TableSelection.startCol, m_TableSelection.endCol);
+						int maxCol = std::max(m_TableSelection.startCol, m_TableSelection.endCol);
 
 						selected = (row >= minRow && row <= maxRow && col >= minCol && col <= maxCol);
 
@@ -135,10 +135,10 @@ namespace Feather {
 						tintColor,
 						ImGuiButtonFlags_PressedOnClick))
 					{
-						m_Selection.Reset();
-						m_Selection.startRow = m_Selection.endRow = row;
-						m_Selection.startCol = m_Selection.endCol = col;
-						m_Selection.selecting = true;
+						m_TableSelection.Reset();
+						m_TableSelection.startRow = m_TableSelection.endRow = row;
+						m_TableSelection.startCol = m_TableSelection.endCol = col;
+						m_TableSelection.selecting = true;
 					}
 
 					ImGui::PopID();
