@@ -78,7 +78,8 @@ namespace Feather {
 			}
 		}
 
-		m_PlayerStart.CreatePlayer(m_RuntimeRegistry);
+		if (m_UsePlayerStart)
+			m_PlayerStart.CreatePlayer(m_RuntimeRegistry);
 	}
 
 	void SceneObject::CopySceneToRuntime(SceneObject& sceneToCopy)
@@ -102,7 +103,8 @@ namespace Feather {
 			}
 		}
 
-		m_PlayerStart.CreatePlayer(m_RuntimeRegistry);
+		if (m_UsePlayerStart)
+			m_PlayerStart.CreatePlayer(m_RuntimeRegistry);
 	}
 
 	void SceneObject::ClearRuntimeScene()

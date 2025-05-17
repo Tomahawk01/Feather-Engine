@@ -149,6 +149,26 @@ namespace Feather {
 					if (ImGui::TreeNode("Settings"))
 					{
 						bool isChanged{ false };
+						bool isPlayerStartEnabled{ pCurrentScene->IsPlayerStartEnabled() };
+						ImGui::InlineLabel("Enable Player Start:");
+						ImGui::SetCursorPosX(250.0f);
+
+						ImGui::ItemToolTip("Enable or Disable the player start.\n"
+										   "The player start is the character that we want to use when the scene is played.");
+
+						if (ImGui::Checkbox("##_enablePlayerStart", &isPlayerStartEnabled))
+						{
+							pCurrentScene->SetPlayerStartEnabled(isPlayerStartEnabled);
+							if (isPlayerStartEnabled)
+							{
+								pCurrentScene->GetPlayerStart().LoadVisualEntity();
+							}
+							else
+							{
+								pCurrentScene->GetPlayerStart().Unload();
+							}
+						}
+
 						std::string sPlayerStartCharacter{ pCurrentScene->GetPlayerStart().GetCharacterName() };
 						auto prefabs = GetKeys(ASSET_MANAGER().GetAllPrefabs()/*, [](auto& prefab) {
 							return prefab.second->GetType() == EPrefabType::Character;
@@ -186,7 +206,8 @@ namespace Feather {
 						musicNames.push_back("None");
 
 						std::string sDefaultSceneMusic{ pCurrentScene->GetDefaultMusicName() };
-						if (sDefaultSceneMusic.empty()) sDefaultSceneMusic = "None";
+						if (sDefaultSceneMusic.empty())
+							sDefaultSceneMusic = "None";
 
 						ImGui::InlineLabel(ICON_FA_MUSIC " Default Music:");
 						ImGui::SetCursorPosX(250.0f);

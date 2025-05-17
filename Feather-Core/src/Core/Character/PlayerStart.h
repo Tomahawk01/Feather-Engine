@@ -35,7 +35,7 @@ namespace Feather {
 
 	private:
 		Scene& m_SceneRef;
-		Entity m_VisualEntity;
+		std::shared_ptr<Entity> m_VisualEntity;
 		std::shared_ptr<Prefab> m_CharacterPrefab;
 		std::string m_CharacterName;
 		bool m_CharacterLoaded;

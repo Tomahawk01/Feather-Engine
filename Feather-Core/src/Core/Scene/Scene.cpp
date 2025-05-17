@@ -30,6 +30,7 @@ namespace Feather {
 		, m_SceneDataPath{ "" }
 		, m_DefaultMusic{ "" }
 		, m_SceneLoaded{ false }
+		, m_UsePlayerStart{ false }
 		, m_Canvas{}
 		, m_MapType{ EMapType::Grid }
 		, m_PlayerStart{ m_Registry, *this }
@@ -45,6 +46,7 @@ namespace Feather {
 		, m_SceneDataPath{ "" }
 		, m_DefaultMusic{ "" }
 		, m_SceneLoaded{ false }
+		, m_UsePlayerStart{ false }
 		, m_Canvas{}
 		, m_MapType{ type }
 		, m_PlayerStart{ m_Registry, *this }
@@ -253,18 +255,32 @@ namespace Feather {
 
 		if (sceneData.HasMember("playerStart"))
 		{
+			const rapidjson::Value& playerStart = sceneData["playerStart"];
+			if (playerStart.HasMember("enabled"))
+			{
+				m_UsePlayerStart = playerStart["enabled"].GetBool();
+			}
+			else
+			{
+				m_UsePlayerStart = false;
+			}
+
 			std::string sPlayerStartPrefab = sceneData["playerStart"]["character"].GetString();
 			if (sPlayerStartPrefab != "default")
 			{
 				m_PlayerStart.Load(sPlayerStartPrefab);
 			}
-			else if (!m_PlayerStart.IsPlayerStartCreated())
+			else if (m_UsePlayerStart && !m_PlayerStart.IsPlayerStartCreated())
 			{
 				m_PlayerStart.LoadVisualEntity();
 			}
 
-			m_PlayerStart.SetPosition(glm::vec2{ sceneData["playerStart"]["position"]["x"].GetFloat(),
-												 sceneData["playerStart"]["position"]["y"].GetFloat() });
+			// Do not set the position if we are not using the player start
+			if (m_UsePlayerStart)
+			{
+				m_PlayerStart.SetPosition(glm::vec2{ sceneData["playerStart"]["position"]["x"].GetFloat(),
+													 sceneData["playerStart"]["position"]["y"].GetFloat() });
+			}
 		}
 
 		if (sceneData.HasMember("defaultMusic"))
@@ -320,7 +336,7 @@ namespace Feather {
 		std::string sTilemapPath = m_TilemapPath.substr(m_TilemapPath.find(ASSETS));
 		std::string sObjectPath = m_ObjectPath.substr(m_ObjectPath.find(ASSETS));
 
-		glm::vec2 playerStartPosition = m_PlayerStart.GetPosition();
+		glm::vec2 playerStartPosition = m_UsePlayerStart ? m_PlayerStart.GetPosition() : glm::vec2{ 0.0f };
 
 		pSerializer->AddKeyValuePair("name", m_SceneName)
 			.AddKeyValuePair("tilemapPath", sTilemapPath)
@@ -334,7 +350,8 @@ namespace Feather {
 			.EndObject() // Canvas
 			.AddKeyValuePair("mapType", (m_MapType == EMapType::Grid ? std::string{ "grid" } : std::string{ "iso" }))
 			.StartNewObject("playerStart")
-			.AddKeyValuePair("character", m_PlayerStart.GetCharacterName())
+			.AddKeyValuePair("enabled", m_UsePlayerStart)
+			.AddKeyValuePair("character", m_UsePlayerStart ? m_PlayerStart.GetCharacterName() : std::string{ "default" })
 			.StartNewObject("position")
 			.AddKeyValuePair("x", playerStartPosition.x)
 			.AddKeyValuePair("y", playerStartPosition.y)

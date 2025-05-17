@@ -84,7 +84,10 @@ namespace Feather {
 		 */
 		inline bool HasTileLayers() const { return !m_LayerParams.empty(); }
 		inline std::vector<SpriteLayerParams>& GetLayerParams() { return m_LayerParams; }
+
 		inline PlayerStart& GetPlayerStart() { return m_PlayerStart; }
+		inline bool IsPlayerStartEnabled() const { return m_UsePlayerStart; }
+		inline void SetPlayerStartEnabled(bool enable) { m_UsePlayerStart = enable; }
 
 		static void CreateLuaBind(sol::state& lua);
 
@@ -108,6 +111,8 @@ namespace Feather {
 		std::string m_DefaultMusic;
 		/* Has this scene been loaded in the editor */
 		bool m_SceneLoaded;
+		/* All scenes will have a default player start. This flag will control it's use */
+		bool m_UsePlayerStart;
 
 		Canvas m_Canvas;
 
