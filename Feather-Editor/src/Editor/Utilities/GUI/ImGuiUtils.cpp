@@ -1,5 +1,9 @@
 #include "ImGuiUtils.h"
+
 #include "Logger/Logger.h"
+
+#include <Windows.h>
+#include <shellapi.h>
 
 namespace ImGui {
 
@@ -98,6 +102,39 @@ namespace ImGui {
 			ImGui::SetItemTooltip(disabledMsg.c_str());
 		
 		ImGui::EndDisabled();
+	}
+
+	void TextLinkOpenURL(const char* label, const char* url)
+	{
+		ImVec2 startPos = ImGui::GetCursorPos();
+		ImVec2 textSize = ImGui::CalcTextSize(label);
+
+		ImGui::InvisibleButton(label, textSize);
+
+		bool hovered = ImGui::IsItemHovered();
+		bool clicked = ImGui::IsItemClicked();
+
+		ImGui::SetCursorPos(startPos);
+
+		ImVec4 textColor = hovered ?
+			ImVec4(0.4f, 0.7f, 1.0f, 1.0f) :  // Light blue when hovered
+			ImVec4(0.2f, 0.5f, 0.9f, 1.0f);   // Blue when not hovered
+
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::ColorConvertFloat4ToU32(textColor));
+		ImGui::Text(label);
+		ImGui::PopStyleColor();
+
+		// Change cursor to hand when hovering
+		if (hovered)
+		{
+			ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+		}
+
+		// Open URL when clicked
+		if (clicked)
+		{
+			ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
+		}
 	}
 
 }

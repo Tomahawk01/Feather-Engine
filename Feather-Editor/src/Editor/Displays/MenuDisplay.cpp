@@ -319,6 +319,7 @@ namespace Feather {
 					ImGui::Text("By Alex (Tomahawk)");
 					ImGui::AddSpaces(2);
 					ImGui::Text("Helpful Links: ");
+					ImGui::TextLinkOpenURL("Github", "https://github.com/Tomahawk01/Feather-Engine");
 					ImGui::Separator();
 					ImGui::TreePop();
 				}

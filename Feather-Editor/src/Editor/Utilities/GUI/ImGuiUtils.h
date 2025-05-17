@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <format>
 
@@ -32,6 +33,8 @@ namespace ImGui {
 
 	void ActiveImageButton(const char* buttonId, ImTextureID textureID, ImVec2 size = TOOL_BUTTON_SIZE);
 	void DisabledImageButton(const char* buttonId, ImTextureID textureID, ImVec2 size = TOOL_BUTTON_SIZE, const std::string& disabledMsg = "");
+
+	void TextLinkOpenURL(const char* label, const char* url);
 
 	template <typename... Args>
 	void ItemToolTip(const std::string_view tipMsg, Args&&... args)
