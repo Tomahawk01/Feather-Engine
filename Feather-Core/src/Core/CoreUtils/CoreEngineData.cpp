@@ -9,6 +9,51 @@ namespace Feather {
 	constexpr float METERS_TO_PIXELS = 12.0f;
 	constexpr float PIXELS_TO_METERS = 1.0f / METERS_TO_PIXELS;
 
+	static std::unordered_map<GameType, std::string> g_mapGameTypeToStr
+	{
+		{ GameType::TopDown,		"Top Down" },
+		{ GameType::Platformer,		"Platformer" },
+		{ GameType::Fighting,		"Fighting" },
+		{ GameType::Puzzle,			"Puzzle" },
+		{ GameType::Rougelike,		"Rougelike" },
+		{ GameType::NoType,			"No Type" }
+	};
+
+	static std::unordered_map<std::string, GameType> g_mapStrToGameType
+	{
+		{ "Top Down",				GameType::TopDown },
+		{ "Platformer" ,			GameType::Platformer},
+		{ "Fighting",				GameType::Fighting },
+		{ "Puzzle",					GameType::Puzzle},
+		{ "Rougelike",				GameType::Rougelike },
+		{ "No Type",				GameType::NoType }
+	};
+
+	std::string CoreEngineData::GetGameTypeStr(GameType eType)
+	{
+		if (auto itr = g_mapGameTypeToStr.find(eType); itr != g_mapGameTypeToStr.end())
+		{
+			return itr->second;
+		}
+
+		return {};
+	}
+
+	GameType CoreEngineData::GetGameTypeFromStr(const std::string& sType)
+	{
+		if (auto itr = g_mapStrToGameType.find(sType); itr != g_mapStrToGameType.end())
+		{
+			return itr->second;
+		}
+
+		return GameType::NoType;
+	}
+
+	const std::unordered_map<GameType, std::string>& CoreEngineData::GetGameTypesMap()
+	{
+		return g_mapGameTypeToStr;
+	}
+
 	void CoreEngineData::RegisterMetaFunctions()
 	{
 		Entity::RegisterMetaComponent<Identification>();

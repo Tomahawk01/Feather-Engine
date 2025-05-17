@@ -69,6 +69,9 @@ namespace Feather {
 		 */
 		bool SaveScene() { return SaveSceneData(); }
 
+		inline const std::string& GetDefaultMusicName() const { return m_DefaultMusic; }
+		inline void SetDefaultMusic(const std::string& defaultMusic) { m_DefaultMusic = defaultMusic; }
+
 		inline Canvas& GetCanvas() { return m_Canvas; }
 		inline Registry& GetRegistry() { return m_Registry; }
 		inline Registry* GetRegistryPtr() { return &m_Registry; }
@@ -101,6 +104,8 @@ namespace Feather {
 		std::string m_ObjectPath;
 		/* The filepath which to load and save the scene data */
 		std::string m_SceneDataPath;
+		/* The default music to play for the scene */
+		std::string m_DefaultMusic;
 		/* Has this scene been loaded in the editor */
 		bool m_SceneLoaded;
 

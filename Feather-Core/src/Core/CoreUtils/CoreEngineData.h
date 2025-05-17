@@ -1,10 +1,22 @@
 #pragma once
 
 #include <chrono>
+#include <unordered_map>
 
 #define CORE_GLOBALS() Feather::CoreEngineData::GetInstance()
 
 namespace Feather {
+
+	enum class GameType
+	{
+		TopDown,
+		Platformer,
+		Fighting,
+		Puzzle,
+		Rougelike,
+
+		NoType
+	};
 
 	class CoreEngineData
 	{
@@ -50,6 +62,14 @@ namespace Feather {
 		inline const std::string& GetProjectPath() const { return m_ProjectPath; }
 		inline void SetProjectPath(const std::string& path) { m_ProjectPath = path; }
 
+		inline void SetGameType(GameType type) { m_GameType = type; }
+		inline GameType GetGameType() const { return m_GameType; }
+
+		static std::string GetGameTypeStr(GameType eType);
+		static GameType GetGameTypeFromStr(const std::string& sType);
+
+		static const std::unordered_map<GameType, std::string>& GetGameTypesMap();
+
 		static void RegisterMetaFunctions();
 
 	private:
@@ -74,6 +94,8 @@ namespace Feather {
 		bool m_RenderColliders;
 
 		std::string m_ProjectPath;
+
+		GameType m_GameType{ GameType::NoType };
 	};
 
 }

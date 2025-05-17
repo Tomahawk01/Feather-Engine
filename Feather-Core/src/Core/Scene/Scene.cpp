@@ -28,6 +28,7 @@ namespace Feather {
 		, m_TilemapPath{ "" }
 		, m_ObjectPath{ "" }
 		, m_SceneDataPath{ "" }
+		, m_DefaultMusic{ "" }
 		, m_SceneLoaded{ false }
 		, m_Canvas{}
 		, m_MapType{ EMapType::Grid }
@@ -42,6 +43,7 @@ namespace Feather {
 		, m_TilemapPath{ "" }
 		, m_ObjectPath{ "" }
 		, m_SceneDataPath{ "" }
+		, m_DefaultMusic{ "" }
 		, m_SceneLoaded{ false }
 		, m_Canvas{}
 		, m_MapType{ type }
@@ -265,6 +267,11 @@ namespace Feather {
 												 sceneData["playerStart"]["position"]["y"].GetFloat() });
 		}
 
+		if (sceneData.HasMember("defaultMusic"))
+		{
+			m_DefaultMusic = sceneData["defaultMusic"].GetString();
+		}
+
 		F_ASSERT(sceneData.HasMember("sprite_layers") && "Sprite layers must be a part of scene data");
 		const rapidjson::Value& spriteLayers = sceneData["sprite_layers"];
 		for (const auto& layer : spriteLayers.GetArray())
@@ -318,6 +325,7 @@ namespace Feather {
 		pSerializer->AddKeyValuePair("name", m_SceneName)
 			.AddKeyValuePair("tilemapPath", sTilemapPath)
 			.AddKeyValuePair("objectmapPath", sObjectPath)
+			.AddKeyValuePair("defaultMusic", m_DefaultMusic)
 			.StartNewObject("canvas")
 			.AddKeyValuePair("width", m_Canvas.width)
 			.AddKeyValuePair("height", m_Canvas.height)

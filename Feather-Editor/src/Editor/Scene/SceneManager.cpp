@@ -235,6 +235,13 @@ namespace Feather {
 					return currentScene->GetCanvas();
 
 				return Canvas{};
+			},
+			"getDefaultMusic", [&]
+			{
+				if (auto currentScene = sceneManager.GetCurrentScene())
+					return currentScene->GetDefaultMusicName();
+
+				return std::string{ "" };
 			}
 		);
 	}

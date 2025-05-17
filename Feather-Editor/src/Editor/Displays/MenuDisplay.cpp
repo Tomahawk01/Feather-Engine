@@ -180,6 +180,36 @@ namespace Feather {
 							}
 						}
 
+						isChanged = true;
+
+						auto musicNames = GetKeys(ASSET_MANAGER().GetAllMusic());
+						musicNames.push_back("None");
+
+						std::string sDefaultSceneMusic{ pCurrentScene->GetDefaultMusicName() };
+						if (sDefaultSceneMusic.empty()) sDefaultSceneMusic = "None";
+
+						ImGui::InlineLabel(ICON_FA_MUSIC " Default Music:");
+						ImGui::SetCursorPosX(250.0f);
+						ImGui::ItemToolTip("Music to play when the scene starts");
+						if (ImGui::BeginCombo("##DefaultMusic", sDefaultSceneMusic.c_str()))
+						{
+							for (const auto& sMusicName : musicNames)
+							{
+								if (ImGui::Selectable(sMusicName.c_str(), sMusicName == sDefaultSceneMusic))
+								{
+									sDefaultSceneMusic = sMusicName;
+									isChanged = true;
+								}
+							}
+
+							ImGui::EndCombo();
+						}
+
+						if (isChanged)
+						{
+							pCurrentScene->SetDefaultMusic(sDefaultSceneMusic);
+						}
+
 						ImGui::TreePop();
 					}
 				}
@@ -225,6 +255,35 @@ namespace Feather {
 						coreGlobals.SetPositionIterations(positionIterations);
 					}
 					ImGui::TreePop();
+				}
+
+				auto& coreGlobals = CORE_GLOBALS();
+				bool bChanged{ false };
+				std::string sGameType{ coreGlobals.GetGameTypeStr(coreGlobals.GetGameType()) };
+				GameType gameType{ coreGlobals.GetGameType() };
+
+				ImGui::InlineLabel(ICON_FA_GAMEPAD " Game Type:");
+				ImGui::SetCursorPosX(250.f);
+				ImGui::ItemToolTip("The type of game this is going to be");
+
+				if (ImGui::BeginCombo("##DefaultMusic", sGameType.c_str()))
+				{
+					for (const auto& [eType, sTypeStr] : coreGlobals.GetGameTypesMap())
+					{
+						if (ImGui::Selectable(sTypeStr.c_str(), sTypeStr == sGameType))
+						{
+							sGameType = sTypeStr;
+							gameType = eType;
+							bChanged = true;
+						}
+					}
+
+					ImGui::EndCombo();
+				}
+
+				if (bChanged)
+				{
+					coreGlobals.SetGameType(gameType);
 				}
 
 				ImGui::EndMenu();

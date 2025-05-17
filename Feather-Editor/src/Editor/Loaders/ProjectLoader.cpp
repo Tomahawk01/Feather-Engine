@@ -130,6 +130,13 @@ namespace Feather {
 		if (projectData.HasMember("main_lua_script"))
 			saveProject->mainLuaScript = contentPath + projectData["main_lua_script"].GetString();
 
+		auto& coreGlobals = CORE_GLOBALS();
+
+		if (projectData.HasMember("game_type"))
+		{
+			coreGlobals.SetGameType(coreGlobals.GetGameTypeFromStr(projectData["game_type"].GetString()));
+		}
+
 		const rapidjson::Value& assets = projectData["assets"];
 		auto& assetManager = ASSET_MANAGER();
 
@@ -284,6 +291,24 @@ namespace Feather {
 			}
 		}
 
+		if (projectData.HasMember("physics"))
+		{
+			const rapidjson::Value& physics = projectData["physics"];
+			bool bEnabled = physics["enabled"].GetBool();
+			if (bEnabled)
+			{
+				coreGlobals.EnablePhysics();
+			}
+			else
+			{
+				coreGlobals.DisablePhysics();
+			}
+
+			coreGlobals.SetGravity(physics["gravity"].GetFloat());
+			coreGlobals.SetVelocityIterations(physics["velocityIterations"].GetInt());
+			coreGlobals.SetPositionIterations(physics["positionIterations"].GetInt());
+		}
+
 		return true;
 	}
 
@@ -313,6 +338,7 @@ namespace Feather {
 		if (!sceneMananger.SaveAllScenes())
 			F_ERROR("Failed to save all scenes");
 
+		auto& coreGlobals = CORE_GLOBALS();
 		serializer->StartDocument();
 		serializer->StartNewObject("warnings");
 		serializer->AddKeyValuePair("warning", std::string{ "This file is engine generated" })
@@ -322,6 +348,7 @@ namespace Feather {
 		serializer->StartNewObject("project_data")
 			.AddKeyValuePair("project_name", save.projectName)
 			.AddKeyValuePair("main_lua_script", save.mainLuaScript.substr(save.mainLuaScript.find(SCRIPTS)))
+			.AddKeyValuePair("game_type", coreGlobals.GetGameTypeStr(coreGlobals.GetGameType()))
 			.StartNewObject("assets");
 
 		serializer->StartNewArray("textures");
@@ -388,6 +415,12 @@ namespace Feather {
 		serializer->EndArray(); // Prefabs
 
 		serializer->EndObject(); // Assets
+		serializer->StartNewObject("physics")
+			.AddKeyValuePair("enabled", coreGlobals.IsPhysicsEnabled())
+			.AddKeyValuePair("gravity", coreGlobals.GetGravity())
+			.AddKeyValuePair("velocityIterations", coreGlobals.GetVelocityIterations())
+			.AddKeyValuePair("positionIterations", coreGlobals.GetPositionIterations())
+			.EndObject();		 // Physics
 		serializer->EndObject(); // Project Data
 
 		return serializer->EndDocument();
@@ -434,6 +467,7 @@ namespace Feather {
 			.AddKeyValuePair("project_name", projectName)
 			.AddKeyValuePair("main_lua_file",
 				saveFile->mainLuaScript.substr(saveFile->mainLuaScript.find(SCRIPTS)))
+			.AddKeyValuePair("game_type", "No Type")
 			.StartNewObject("assets")
 			.StartNewArray("textures")
 			.EndArray() // Textures
@@ -442,8 +476,14 @@ namespace Feather {
 			.StartNewArray("music")
 			.EndArray() // Music
 			.StartNewArray("scenes")
-			.EndArray()			  // Scenes
-			.EndObject();		  // Assets
+			.EndArray()	 // Scenes
+			.EndObject() // Assets
+			.StartNewObject("physics")
+			.AddKeyValuePair("enabled", true)
+			.AddKeyValuePair("gravity", 9.8f)
+			.AddKeyValuePair("velocityIterations", 8)
+			.AddKeyValuePair("positionIterations", 10)
+			.EndObject();		  // Physics
 		serializer->EndObject(); // Project Data
 
 		return serializer->EndDocument();
