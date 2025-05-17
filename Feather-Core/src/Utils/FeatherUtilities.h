@@ -21,6 +21,7 @@ namespace Feather {
 		SOUNDFX,
 		MUSIC,
 		SCENE,
+		SHADER,
 		PREFAB,
 
 		NO_TYPE

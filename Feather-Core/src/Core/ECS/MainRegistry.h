@@ -26,7 +26,7 @@ namespace Feather {
 	{
 	public:
 		static MainRegistry& GetInstance();
-		bool Initialize();
+		bool Initialize(bool enableFilewatcher = false);
 
 		AssetManager& GetAssetManager();
 		MusicPlayer& GetMusicPlayer();

@@ -81,6 +81,18 @@ namespace Feather {
 						coreGlobals.DisableColliderRender();
 				}
 
+				if (ImGui::TreeNode("Project Settings"))
+				{
+					// TODO: Add specific Project settings
+					/*
+					* Desired Settings
+					* - Window Size
+					* - Window Position
+					* - Window flags
+					*/
+					ImGui::TreePop();
+				}
+
 				ImGui::EndMenu();
 			}
 

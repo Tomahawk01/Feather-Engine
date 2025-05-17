@@ -1,16 +1,23 @@
 #pragma once
 
-#include <map>
-#include <memory>
-#include <string>
-#include <sol/sol.hpp>
-
 #include "Renderer/Essentials/Shader.h"
 #include "Renderer/Essentials/Texture.h"
 #include "Renderer/Essentials/Font.h"
 #include "Core/ECS/Registry.h"
 #include "Sounds/Essentials/Music.h"
 #include "Sounds/Essentials/SoundFX.h"
+
+#include <map>
+#include <unordered_map>
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <mutex>
+#include <shared_mutex>
+#include <atomic>
+#include <thread>
+
+#include <sol/sol.hpp>
 
 namespace Feather {
 	
@@ -21,8 +28,8 @@ namespace Feather {
 	class AssetManager
 	{
 	public:
-		AssetManager() = default;
-		~AssetManager() = default;
+		AssetManager(bool enableFilewatcher = false);
+		~AssetManager();
 
 		bool CreateDefaultFonts();
 
@@ -65,6 +72,28 @@ namespace Feather {
 
 		static void CreateLuaAssetManager(sol::state& lua);
 
+		void Update();
+
+	private:
+		void FileWatcher();
+
+		struct AssetWatchParams
+		{
+			std::string assetName{ "" };
+			std::string filepath{ "" };
+			std::filesystem::file_time_type lastWrite;
+			AssetType type{};
+			bool isDirty{ false };
+		};
+
+		void ReloadAsset(const AssetWatchParams& assetParams);
+
+		void ReloadTexture(const std::string& textureName);
+		void ReloadSoundFx(const std::string& soundName);
+		void ReloadMusic(const std::string& musicName);
+		void ReloadFont(const std::string& fontName);
+		void ReloadShader(const std::string& shaderName);
+
 	private:
 		std::map<std::string, std::shared_ptr<Texture>> m_mapTextures{};
 		std::map<std::string, std::shared_ptr<Shader>> m_mapShaders{};
@@ -73,6 +102,13 @@ namespace Feather {
 		std::map<std::string, std::shared_ptr<Music>> m_mapMusic{};
 		std::map<std::string, std::shared_ptr<SoundFX>> m_mapSoundFX{};
 		std::map<std::string, std::shared_ptr<Prefab>> m_mapPrefabs{};
+
+		std::vector<AssetWatchParams> m_FilewatchParams;
+
+		std::atomic<bool> m_FileWatcherRunning;
+		std::jthread m_WatchThread;
+		std::mutex m_CallbackMutex;
+		std::shared_mutex m_AssetMutex;
 	};
 
 }

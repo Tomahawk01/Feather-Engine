@@ -11,7 +11,28 @@
 
 #include "Utils/FeatherUtilities.h"
 
+namespace fs = std::filesystem;
+using namespace std::chrono_literals;
+
 namespace Feather {
+
+    AssetManager::AssetManager(bool enableFilewatcher)
+        : m_FileWatcherRunning{ enableFilewatcher }
+    {
+        if (enableFilewatcher)
+        {
+            m_WatchThread = std::jthread(&AssetManager::FileWatcher, this);
+        }
+    }
+
+    AssetManager::~AssetManager()
+    {
+        m_FileWatcherRunning = false;
+        if (m_WatchThread.joinable())
+        {
+            m_WatchThread.join();
+        }
+    }
 
     bool AssetManager::CreateDefaultFonts()
     {
@@ -44,6 +65,23 @@ namespace Feather {
         }
 
         auto [itr, isSuccess] = m_mapTextures.emplace(textureName, std::move(texture));
+
+        if (m_FileWatcherRunning && isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+
+            fs::path path{ texturePath };
+            auto lastWrite = fs::last_write_time(path);
+            if (CheckContainsValue(m_FilewatchParams, [&](const auto& params) { return params.filepath == texturePath; }))
+            {
+                m_FilewatchParams.emplace_back(
+                    AssetWatchParams{
+                        .assetName = textureName,
+                        .filepath = texturePath,
+                        .lastWrite = lastWrite,
+                        .type = AssetType::TEXTURE });
+            }
+        }
 
         return isSuccess;
     }
@@ -105,6 +143,22 @@ namespace Feather {
 
         auto [itr, isSuccess] = m_mapFonts.emplace(fontName, std::move(pFont));
 
+        if (m_FileWatcherRunning && isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+
+            fs::path path{ fontPath };
+            auto lastWrite = fs::last_write_time(path);
+            if (CheckContainsValue(m_FilewatchParams, [&](const auto& params) { return params.filepath == fontPath; }))
+            {
+                m_FilewatchParams.emplace_back(
+                    AssetWatchParams{ .assetName = fontName,
+                                      .filepath = fontPath,
+                                      .lastWrite = lastWrite,
+                                      .type = AssetType::FONT });
+            }
+        }
+
         return isSuccess;
     }
 
@@ -157,6 +211,33 @@ namespace Feather {
         }
 
         auto [itr, isSuccess] = m_mapShaders.emplace(shaderName, std::move(shader));
+
+        if (m_FileWatcherRunning && isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+
+            fs::path pathVert{ vertexPath };
+            auto lastWriteVert = fs::last_write_time(pathVert);
+            if (CheckContainsValue(m_FilewatchParams, [&](const auto& params) { return params.filepath == vertexPath; }))
+            {
+                m_FilewatchParams.emplace_back(
+                    AssetWatchParams{ .assetName = shaderName + "_vert",
+                                      .filepath = vertexPath,
+                                      .lastWrite = lastWriteVert,
+                                      .type = AssetType::SHADER });
+            }
+
+            fs::path pathFrag{ fragmentPath };
+            auto lastWriteFrag = fs::last_write_time(pathFrag);
+            if (CheckContainsValue(m_FilewatchParams, [&](const auto& params) { return params.filepath == fragmentPath; }))
+            {
+                m_FilewatchParams.emplace_back(
+                    AssetWatchParams{ .assetName = shaderName + "_frag",
+                                      .filepath = fragmentPath,
+                                      .lastWrite = lastWriteFrag,
+                                      .type = AssetType::SHADER });
+            }
+        }
 
         return isSuccess;
     }
@@ -215,6 +296,22 @@ namespace Feather {
 
         auto [itr, isSuccess] = m_mapMusic.emplace(musicName, std::move(musicPtr));
 
+        if (m_FileWatcherRunning && isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+
+            fs::path path{ filepath };
+            auto lastWrite = fs::last_write_time(path);
+            if (CheckContainsValue(m_FilewatchParams, [&](const auto& params) { return params.filepath == filepath; }))
+            {
+                m_FilewatchParams.emplace_back(
+                    AssetWatchParams{ .assetName = musicName,
+                                      .filepath = filepath,
+                                      .lastWrite = lastWrite,
+                                      .type = AssetType::MUSIC });
+            }
+        }
+
         return isSuccess;
     }
 
@@ -250,6 +347,21 @@ namespace Feather {
 
         auto pSoundFx = std::make_shared<SoundFX>(params, SoundFXPtr{ chunk });
         auto [itr, isSuccess] = m_mapSoundFX.emplace(soundFxName, std::move(pSoundFx));
+
+        if (isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+            fs::path path{ filepath };
+            auto lastWrite = fs::last_write_time(path);
+            if (CheckContainsValue(m_FilewatchParams, [&](const auto& params) { return params.filepath == filepath; }))
+            {
+                m_FilewatchParams.emplace_back(
+                    AssetWatchParams{ .assetName = soundFxName,
+                                      .filepath = filepath,
+                                      .lastWrite = lastWrite,
+                                      .type = AssetType::SOUNDFX });
+            }
+        }
 
         return isSuccess;
     }
@@ -313,21 +425,35 @@ namespace Feather {
 
     bool AssetManager::ChangeAssetName(const std::string& oldName, const std::string& newName, AssetType assetType)
     {
+        bool isSuccess{ false };
+
         switch (assetType)
         {
         case AssetType::TEXTURE:
-            return KeyChange(m_mapTextures, oldName, newName);
+            isSuccess = KeyChange(m_mapTextures, oldName, newName); break;
         case AssetType::FONT:
-            return KeyChange(m_mapFonts, oldName, newName);
+            isSuccess = KeyChange(m_mapFonts, oldName, newName); break;
         case AssetType::SOUNDFX:
-            return KeyChange(m_mapSoundFX, oldName, newName);
+            isSuccess = KeyChange(m_mapSoundFX, oldName, newName); break;
         case AssetType::MUSIC:
-            return KeyChange(m_mapMusic, oldName, newName);
+            isSuccess = KeyChange(m_mapMusic, oldName, newName); break;
         default:
-            F_ASSERT(false && "Cannot get this type!");
+            F_ASSERT(false && "Cannot get this type!"); break;
         }
 
-        return false;
+        // If we are using the filewatcher, we need to also ensure to adjust the name
+        if (m_FileWatcherRunning && isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+            auto fileItr = std::ranges::find_if(m_FilewatchParams, [&](const auto& param) { return param.assetName == oldName; });
+
+            if (fileItr != m_FilewatchParams.end())
+            {
+                fileItr->assetName = newName;
+            }
+        }
+
+        return isSuccess;
     }
 
     bool AssetManager::HasAsset(const std::string& assetName, AssetType assetType)
@@ -353,16 +479,18 @@ namespace Feather {
 
     bool AssetManager::DeleteAsset(const std::string& assetName, AssetType assetType)
     {
+        bool isSuccess{ false };
+
         switch (assetType)
         {
         case AssetType::TEXTURE:
-            return std::erase_if(m_mapTextures, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+            isSuccess = std::erase_if(m_mapTextures, [&](const auto& pair) { return pair.first == assetName; }) > 0; break;
         case AssetType::FONT:
-            return std::erase_if(m_mapFonts, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+            isSuccess = std::erase_if(m_mapFonts, [&](const auto& pair) { return pair.first == assetName; }) > 0; break;
         case AssetType::SOUNDFX:
-            return std::erase_if(m_mapSoundFX, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+            isSuccess = std::erase_if(m_mapSoundFX, [&](const auto& pair) { return pair.first == assetName; }) > 0; break;
         case AssetType::MUSIC:
-            return std::erase_if(m_mapMusic, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+            isSuccess = std::erase_if(m_mapMusic, [&](const auto& pair) { return pair.first == assetName; }) > 0; break;
         case AssetType::PREFAB:
         {
             // Prefabs contain files that must be cleaned up
@@ -374,7 +502,8 @@ namespace Feather {
                     return false;
                 }
 
-                return m_mapPrefabs.erase(assetName) > 0;
+                isSuccess = m_mapPrefabs.erase(assetName) > 0;
+                break;
             }
 
             F_ERROR("Failed to delete prefab '{}' - Does not exist in asset manager", assetName);
@@ -384,7 +513,20 @@ namespace Feather {
             F_ASSERT(false && "Cannot get this type!");
         }
 
-        return false;
+        // If the file watcher is enabled, we need to remove the file from being watched
+        if (m_FileWatcherRunning && isSuccess)
+        {
+            std::lock_guard lock{ m_AssetMutex };
+            bool erased = std::erase_if(m_FilewatchParams, [&](const auto& param) { return param.assetName == assetName; }) > 0;
+
+            if (!erased)
+            {
+                F_WARN("Failed to erase '{}' from File Watcher Params: Must not be present", assetName);
+                // Non-fatal error
+            }
+        }
+
+        return isSuccess;
     }
 
     void AssetManager::CreateLuaAssetManager(sol::state& lua)
@@ -422,6 +564,169 @@ namespace Feather {
                 return asset_manager.AddFont(fontName, fontPath, fontSize);
             }
         );
+    }
+
+    void AssetManager::Update()
+    {
+        std::shared_lock sharedLock{ m_AssetMutex };
+        auto dirtyView = m_FilewatchParams | std::views::filter([](const auto& param) { return param.isDirty; });
+
+        if (!dirtyView.empty())
+        {
+            sharedLock.unlock();
+            std::unique_lock lock{ m_AssetMutex };
+            for (auto& param : dirtyView)
+            {
+                ReloadAsset(param);
+                param.isDirty = false;
+            }
+        }
+    }
+
+    void AssetManager::FileWatcher()
+    {
+        while (m_FileWatcherRunning)
+        {
+            std::this_thread::sleep_for(2s);
+
+            for (auto& fileParam : m_FilewatchParams)
+            {
+                std::shared_lock sharedLock{ m_AssetMutex };
+                fs::path path{ fileParam.filepath };
+                if (fileParam.lastWrite != fs::last_write_time(path))
+                {
+                    sharedLock.unlock();
+                    std::unique_lock lock{ m_AssetMutex };
+                    fileParam.isDirty = true;
+                }
+            }
+        }
+    }
+
+    void AssetManager::ReloadAsset(const AssetWatchParams& assetParams)
+    {
+        switch (assetParams.type)
+        {
+        case AssetType::TEXTURE: ReloadTexture(assetParams.assetName); break;
+        case AssetType::FONT: ReloadFont(assetParams.assetName); break;
+        case AssetType::SHADER: ReloadShader(assetParams.assetName); break;
+        case AssetType::MUSIC: ReloadMusic(assetParams.assetName); break;
+        case AssetType::SOUNDFX: ReloadSoundFx(assetParams.assetName); break;
+        }
+    }
+
+    void AssetManager::ReloadTexture(const std::string& textureName)
+    {
+        auto fileParamItr = std::ranges::find_if(m_FilewatchParams, [&](const auto& param) { return param.assetName == textureName; });
+
+        if (fileParamItr == m_FilewatchParams.end())
+        {
+            F_ERROR("Trying to reload a texture that has not been loaded?");
+            return;
+        }
+
+        // We are assuming that the texture is in the map.
+        // Could potentially cause a crash, will look more into this.
+        auto& pTexture = m_mapTextures[textureName];
+
+        fileParamItr->lastWrite = fs::last_write_time(fs::path{ pTexture->GetPath() });
+        // Delete the old texture and then reload
+        auto id = pTexture->GetID();
+        glDeleteTextures(1, &id);
+
+        auto pNewTexture = TextureLoader::Create(pTexture->GetType(), pTexture->GetPath(), pTexture->IsTileset());
+
+        pTexture = pNewTexture;
+        F_TRACE("Reloaded texture: {}", textureName);
+    }
+
+    void AssetManager::ReloadSoundFx(const std::string& soundName)
+    {
+        auto fileParamItr = std::ranges::find_if(m_FilewatchParams, [&](const auto& param) { return param.assetName == soundName; });
+
+        if (fileParamItr == m_FilewatchParams.end())
+        {
+            F_ERROR("Trying to reload a texture that has not been loaded?");
+            return;
+        }
+
+        fileParamItr->lastWrite = fs::last_write_time(fs::path{ fileParamItr->filepath });
+
+        if (!DeleteAsset(soundName, AssetType::SOUNDFX))
+        {
+            F_ERROR("Failed to reload SoundFx: {}", soundName);
+            return;
+        }
+
+        if (!AddSoundFx(soundName, fileParamItr->filepath))
+        {
+            F_ERROR("Failed to reload SoundFx: {}", soundName);
+            return;
+        }
+
+        F_TRACE("Reloaded SoundFx: {}", soundName);
+    }
+
+    void AssetManager::ReloadMusic(const std::string& musicName)
+    {
+        auto fileParamItr = std::ranges::find_if(m_FilewatchParams, [&](const auto& param) { return param.assetName == musicName; });
+
+        if (fileParamItr == m_FilewatchParams.end())
+        {
+            F_ERROR("Trying to music that has not been loaded?");
+            return;
+        }
+
+        fileParamItr->lastWrite = fs::last_write_time(fs::path{ fileParamItr->filepath });
+
+        if (!DeleteAsset(musicName, AssetType::MUSIC))
+        {
+            F_ERROR("Failed to reload SoundFx: {}", musicName);
+            return;
+        }
+
+        if (!AddMusic(musicName, fileParamItr->filepath))
+        {
+            F_ERROR("Failed to reload SoundFx: {}", musicName);
+            return;
+        }
+
+        F_TRACE("Reloaded Music: {}", musicName);
+    }
+
+    void AssetManager::ReloadFont(const std::string& fontName)
+    {
+        auto fileParamItr = std::ranges::find_if(m_FilewatchParams, [&](const auto& param) { return param.assetName == fontName; });
+
+        if (fileParamItr == m_FilewatchParams.end())
+        {
+            F_ERROR("Trying to music that has not been loaded?");
+            return;
+        }
+
+        fileParamItr->lastWrite = fs::last_write_time(fs::path{ fileParamItr->filepath });
+
+        auto& pFont = m_mapFonts[fontName];
+        float fontSize = pFont->GetFontSize();
+
+        if (!DeleteAsset(fontName, AssetType::FONT))
+        {
+            F_ERROR("Failed to reload SoundFx: {}", fontName);
+            return;
+        }
+
+        if (!AddFont(fontName, fileParamItr->filepath, fontSize))
+        {
+            F_ERROR("Failed to reload SoundFx: {}", fontName);
+            return;
+        }
+
+        F_TRACE("Reloaded Font: {}", fontName);
+    }
+
+    void AssetManager::ReloadShader(const std::string& shaderName)
+    {
+        // TODO:
     }
 
 }

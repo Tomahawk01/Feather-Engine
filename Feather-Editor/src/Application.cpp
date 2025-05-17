@@ -152,7 +152,7 @@ namespace Feather {
 		}
 
 		auto& mainRegistry = MAIN_REGISTRY();
-		if (!mainRegistry.Initialize())
+		if (!mainRegistry.Initialize(true))
 		{
 			F_FATAL("Failed to initialize the main registry!");
 			return false;
@@ -473,6 +473,8 @@ namespace Feather {
 		{
 			display->Update();
 		}
+
+		mainRegistry.GetAssetManager().Update();
 	}
 
 	void Application::UpdateInputs()

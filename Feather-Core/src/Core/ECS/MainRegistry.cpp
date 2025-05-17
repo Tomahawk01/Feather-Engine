@@ -25,12 +25,12 @@ namespace Feather {
         return instance;
     }
 
-    bool MainRegistry::Initialize()
+    bool MainRegistry::Initialize(bool enableFilewatcher)
     {
         m_MainRegistry = std::make_unique<Registry>();
         F_ASSERT(m_MainRegistry && "Failed to initialize main registry");
 
-        auto pAssetManager = std::make_shared<AssetManager>();
+        auto pAssetManager = std::make_shared<AssetManager>(enableFilewatcher);
         m_MainRegistry->AddToContext<std::shared_ptr<AssetManager>>(std::move(pAssetManager));
 
         auto pMusicPlayer = std::make_shared<MusicPlayer>();
