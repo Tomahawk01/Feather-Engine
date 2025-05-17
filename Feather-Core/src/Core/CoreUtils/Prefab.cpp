@@ -53,7 +53,7 @@ namespace Feather {
 		if (fs::exists(m_PrefabPath))
 		{
 			F_ERROR("Failed to create prefab. '{}' Already exists!", m_Name);
-			throw std::exception(std::format("Failed to create prefab. '{}' Already exists!", m_Name).c_str());
+			throw std::runtime_error(std::format("Failed to create prefab. '{}' Already exists!", m_Name).c_str());
 		}
 
 		Save();
@@ -69,7 +69,7 @@ namespace Feather {
 		if (!Load(prefabPath))
 		{
 			F_ERROR("Failed to load prefab from path '{}'", prefabPath);
-			throw std::exception(std::format("Failed to load prefab from path '{}'", prefabPath).c_str());
+			throw std::runtime_error(std::format("Failed to load prefab from path '{}'", prefabPath).c_str());
 		}
 	}
 
