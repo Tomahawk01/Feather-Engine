@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 
+#include <entt.hpp>
+
 namespace Feather {
 
 	struct UserData
@@ -21,7 +23,11 @@ namespace Feather {
 		bool isTrigger{ false };
 		bool isFriendly{ false };
 		std::uint32_t entityID{};
-		std::vector<const ObjectData*> contactEntities;
+		
+		ObjectData() = default;
+		ObjectData(const std::string& tag, const std::string& group, bool collider, bool trigger, bool friendly, uint32_t entityId = entt::null);
+
+		inline const std::vector<const ObjectData*>& GetContactEntities() const { return contactEntities; }
 
 		friend bool operator==(const ObjectData& a, const ObjectData& b);
 		[[nodiscard]] std::string to_string() const;
@@ -29,8 +35,12 @@ namespace Feather {
 	private:
 		bool AddContact(const ObjectData* objectData);
 		bool RemoveContact(const ObjectData* objectData);
+		void ClearContacts() { contactEntities.clear(); }
 
 		friend class ContactListener;
+
+	private:
+		std::vector<const ObjectData*> contactEntities;
 	};
 
 }

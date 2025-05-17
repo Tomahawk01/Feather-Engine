@@ -317,24 +317,17 @@ namespace Feather {
 			sol::factories(
 				[](const std::string& tag, const std::string& group, bool isCollider, bool isTrigger, bool isFriendly, std::uint32_t entityID)
 				{
-					return ObjectData{
-						.tag = tag,
-						.group = group,
-						.isCollider = isCollider,
-						.isTrigger = isTrigger,
-						.isFriendly = isFriendly,
-						.entityID = entityID
-					};
+					return ObjectData{ tag, group, isCollider, isTrigger, isFriendly, entityID };
 				},
 				[](const sol::table& objectData)
 				{
 					return ObjectData{
-						.tag = objectData["tag"].get_or(std::string{""}),
-						.group = objectData["group"].get_or(std::string{""}),
-						.isCollider = objectData["isCollider"].get_or(false),
-						.isTrigger = objectData["isTrigger"].get_or(false),
-						.isFriendly = objectData["isFriendly"].get_or(false),
-						.entityID = objectData["entityID"].get_or((std::uint32_t)0)
+						objectData["tag"].get_or(std::string{""}),
+						objectData["group"].get_or(std::string{""}),
+						objectData["isCollider"].get_or(false),
+						objectData["isTrigger"].get_or(false),
+						objectData["isFriendly"].get_or(false),
+						objectData["entityID"].get_or((std::uint32_t)0)
 					};
 				}
 			),
@@ -344,7 +337,7 @@ namespace Feather {
 			"isTrigger", &ObjectData::isTrigger,
 			"isFriendly", &ObjectData::isFriendly,
 			"entityID", &ObjectData::entityID,
-			"contactEntities", &ObjectData::contactEntities,
+			"contactEntities", sol::readonly_property([](ObjectData& objData) { return objData.GetContactEntities(); }),
 			"to_string", &ObjectData::to_string
 		);
 
@@ -394,11 +387,12 @@ namespace Feather {
 						.filterCategory = physAttr["filterCategory"].get_or((uint16_t)0),
 						.filterMask = physAttr["filterMask"].get_or((uint16_t)0),
 						.objectData = ObjectData {
-							.tag = physAttr["objectData"]["tag"].get_or(std::string{""}),
-							.group = physAttr["objectData"]["group"].get_or(std::string{""}),
-							.isCollider = physAttr["objectData"]["isCollider"].get_or(false),
-							.isTrigger = physAttr["objectData"]["isTrigger"].get_or(false),
-							.entityID = physAttr["objectData"]["entityID"].get_or((std::uint32_t)0)
+							physAttr["objectData"]["tag"].get_or(std::string{""}),
+							physAttr["objectData"]["group"].get_or(std::string{""}),
+							physAttr["objectData"]["isCollider"].get_or(false),
+							physAttr["objectData"]["isTrigger"].get_or(false),
+							physAttr["objectData"]["isFriendly"].get_or(false),
+							physAttr["objectData"]["entityID"].get_or((std::uint32_t)0)
 						}
 					};
 				}

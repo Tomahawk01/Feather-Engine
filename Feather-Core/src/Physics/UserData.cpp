@@ -51,6 +51,15 @@ namespace Feather {
 		return true;
 	}
 
+	ObjectData::ObjectData(const std::string& tag, const std::string& group, bool collider, bool trigger, bool friendly, uint32_t entityId)
+		: tag{ tag }
+		, group{ group }
+		, isCollider{ collider }
+		, isTrigger{ trigger }
+		, isFriendly{ friendly }
+		, entityID{ entityId }
+	{}
+
 	std::string ObjectData::to_string() const
 	{
 		std::stringstream ss;

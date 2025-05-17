@@ -271,11 +271,11 @@ namespace Feather {
 				.filterCategory = static_cast<uint16_t>(attr["filterCategory"].GetUint()),
 				.filterMask = static_cast<uint16_t>(attr["filterMask"].GetUint()),
 				.groupIndex = static_cast<int16_t>(attr["groupIndex"].GetInt()),
-				.objectData = ObjectData{.tag = attr["objectData"]["tag"].GetString(),
-										  .group = attr["objectData"]["group"].GetString(),
-										  .isCollider = attr["objectData"]["isCollider"].GetBool(),
-										  .isTrigger = attr["objectData"]["isTrigger"].GetBool(),
-										  .isFriendly = attr["objectData"]["isFriendly"].GetBool() } };
+				.objectData = ObjectData{ attr["objectData"]["tag"].GetString(),
+										  attr["objectData"]["group"].GetString(),
+										  attr["objectData"]["isCollider"].GetBool(),
+										  attr["objectData"]["isTrigger"].GetBool(),
+										  attr["objectData"]["isFriendly"].GetBool() } };
 
 			physics.GetChangableAttributes() = attributes;
 		}
