@@ -11,6 +11,7 @@
 #include "Core/Systems/RenderSystem.h"
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
+#include "Core/Scripting/CrashLoggerTestBindings.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/SaveProject.h"
 #include "Core/Resources/AssetManager.h"
@@ -22,6 +23,7 @@
 #include "Physics/Box2DWrappers.h"
 #include "Physics/ContactListener.h"
 #include "Logger/Logger.h"
+#include "Logger/CrashLogger.h"
 
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/EditorUtilities.h"
@@ -280,6 +282,13 @@ namespace Feather {
 			F_FATAL("Failed to load main lua script");
 			return;
 		}
+
+		// Setup Crash Tests
+		CrashLoggerTests::CreateLuaBind(*lua);
+
+		// Set the lua state for the crash logger
+		// This is used to log the lua stack trace in case of a crash
+		FEATHER_CRASH_LOGGER().SetLuaState(lua->lua_state());
 
 		m_SceneLoaded = true;
 		m_PlayScene = true;

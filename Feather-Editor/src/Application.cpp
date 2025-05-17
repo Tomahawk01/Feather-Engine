@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <Logger/Logger.h>
+#include <Logger/CrashLogger.h>
 #include <Renderer/Core/Renderer.h>
 #include <Renderer/Essentials/PickingTexture.h>
 
@@ -83,6 +84,9 @@ namespace Feather {
 #else
 		F_INIT_LOGS(false, true);
 #endif
+
+		FEATHER_INIT_CRASH_LOGS();
+
 		// Init SDL
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 		{
@@ -230,6 +234,10 @@ namespace Feather {
 		// Register meta fuctions
 		RegisterEditorMetaFunctions();
 		CoreEngineData::RegisterMetaFunctions();
+
+		// Set the Crash Logger path to the running project
+		const auto& projectPath = CORE_GLOBALS().GetProjectPath();
+		FEATHER_CRASH_LOGGER().SetProjectPath(projectPath);
 
 		return true;
     }
