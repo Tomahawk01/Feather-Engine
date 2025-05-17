@@ -94,7 +94,7 @@ namespace Feather {
             return false;
         }
 
-        auto texture = std::move(TextureLoader::CreateFromMemory(imageData, length, pixelArt, isTileset));
+        auto texture = TextureLoader::CreateFromMemory(imageData, length, pixelArt, isTileset);
         // Load texture
         if (!texture)
         {
@@ -203,7 +203,7 @@ namespace Feather {
             return false;
         }
 
-        auto shader = std::move(ShaderLoader::Create(vertexPath, fragmentPath));
+        auto shader = ShaderLoader::Create(vertexPath, fragmentPath);
         if (!shader)
         {
             F_ERROR("Failed to load shader '{0}' at vert path '{1}' and frag path '{2}'", shaderName, vertexPath, fragmentPath);
@@ -250,7 +250,7 @@ namespace Feather {
             return false;
         }
 
-        auto shader = std::move(ShaderLoader::CreateFromMemory(vertexShader, fragmentShader));
+        auto shader = ShaderLoader::CreateFromMemory(vertexShader, fragmentShader);
         auto [itr, isSuccess] = m_mapShaders.insert(std::make_pair(shaderName, std::move(shader)));
 
         return isSuccess;
