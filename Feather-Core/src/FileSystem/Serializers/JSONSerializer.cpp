@@ -16,7 +16,7 @@ namespace Feather {
 		if (!m_FileStream.is_open())
 			throw std::runtime_error(std::format("JSONSerializer failed to open file '{}'", filename));
 
-		m_Writer->SetMaxDecimalPlaces(MAX_DECIMAL_PLACES > 1 ? maxDecimalPlaces : MAX_DECIMAL_PLACES);
+		m_Writer->SetMaxDecimalPlaces(maxDecimalPlaces > 1 ? maxDecimalPlaces : MAX_DECIMAL_PLACES);
 	}
 
 	JSONSerializer::~JSONSerializer()

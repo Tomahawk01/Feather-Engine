@@ -304,7 +304,7 @@ namespace Feather {
 				coreGlobals.DisablePhysics();
 			}
 
-			coreGlobals.SetGravity(physics["gravity"].GetFloat());
+			coreGlobals.SetGravity(physics["gravityScale"].GetFloat());
 			coreGlobals.SetVelocityIterations(physics["velocityIterations"].GetInt());
 			coreGlobals.SetPositionIterations(physics["positionIterations"].GetInt());
 		}
@@ -417,7 +417,7 @@ namespace Feather {
 		serializer->EndObject(); // Assets
 		serializer->StartNewObject("physics")
 			.AddKeyValuePair("enabled", coreGlobals.IsPhysicsEnabled())
-			.AddKeyValuePair("gravity", coreGlobals.GetGravity())
+			.AddKeyValuePair("gravityScale", coreGlobals.GetGravity())
 			.AddKeyValuePair("velocityIterations", coreGlobals.GetVelocityIterations())
 			.AddKeyValuePair("positionIterations", coreGlobals.GetPositionIterations())
 			.EndObject();		 // Physics
@@ -467,7 +467,7 @@ namespace Feather {
 			.AddKeyValuePair("project_name", projectName)
 			.AddKeyValuePair("main_lua_file",
 				saveFile->mainLuaScript.substr(saveFile->mainLuaScript.find(SCRIPTS)))
-			.AddKeyValuePair("game_type", "No Type")
+			.AddKeyValuePair("game_type", std::string{ "No Type" })
 			.StartNewObject("assets")
 			.StartNewArray("textures")
 			.EndArray() // Textures
@@ -480,7 +480,7 @@ namespace Feather {
 			.EndObject() // Assets
 			.StartNewObject("physics")
 			.AddKeyValuePair("enabled", true)
-			.AddKeyValuePair("gravity", 9.8f)
+			.AddKeyValuePair("gravityScale", 9.8f)
 			.AddKeyValuePair("velocityIterations", 8)
 			.AddKeyValuePair("positionIterations", 10)
 			.EndObject();		  // Physics
