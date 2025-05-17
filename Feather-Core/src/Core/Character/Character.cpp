@@ -78,6 +78,9 @@ namespace Feather {
 		: Entity{ entity }
 	{}
 
+    Character::~Character()
+    {}
+
 	StateMachine& Character::GetStateMachine()
 	{
         if (!m_StateMachine)

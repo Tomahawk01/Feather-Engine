@@ -1,6 +1,7 @@
 #include "TilemapDisplay.h"
 
 #include "Core/ECS/MainRegistry.h"
+#include "Core/ECS/Components/AllComponents.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/Systems/RenderSystem.h"
 #include "Core/Systems/RenderUISystem.h"
@@ -9,6 +10,7 @@
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/CoreUtils/Prefab.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/Events/EngineEventTypes.h"
 #include "Renderer/Core/Camera2D.h"
@@ -89,14 +91,21 @@ namespace Feather {
 			// Accept scene drop target
 			if (ImGui::BeginDragDropTarget())
 			{
-				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_SCENE_SRC);
-				if (payload)
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_SCENE_SRC))
 				{
 					SCENE_MANAGER().UnloadCurrentScene();
 					SCENE_MANAGER().SetCurrentScene(std::string{ (const char*)payload->Data });
 					SCENE_MANAGER().LoadCurrentScene();
 					LoadNewScene();
 					m_TilemapCam->Reset();
+				}
+				else if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_PREFAB_SRC))
+				{
+					if (auto prefab = ASSET_MANAGER().GetPrefab(std::string{ (const char*)payload->Data }))
+					{
+						const auto& prefabbed = prefab->GetPrefabbedEntity();
+						AddPrefabbedEntityToScene(prefabbed);
+					}
 				}
 
 				ImGui::EndDragDropTarget();
@@ -251,13 +260,13 @@ namespace Feather {
 
 	void TilemapDisplay::LoadNewScene()
 	{
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 		if (!currentScene)
 			return;
 
 		auto& toolManager = TOOL_MANAGER();
 
-		if (!toolManager.SetupTools(currentScene.get(), m_TilemapCam.get()))
+		if (!toolManager.SetupTools(currentScene, m_TilemapCam.get()))
 		{
 			F_ASSERT(false && "This should work!?");
 			__debugbreak();
@@ -324,6 +333,11 @@ namespace Feather {
 		if (!m_WindowActive || keyEvent.type == EKeyEventType::Released)
 			return;
 
+		// No need to change the tools if there is no scene loaded
+		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		if (!currentScene)
+			return;
+
 		if (keyEvent.key == F_KEY_W)
 		{
 			TOOL_MANAGER().SetGizmoActive(GizmoType::TRANSLATE);
@@ -342,8 +356,62 @@ namespace Feather {
 		}
 		else if (keyEvent.key == F_KEY_Y)
 		{
-			TOOL_MANAGER().SetToolActive(ToolType::RECT_FILL_TILE);
+			// IsoGrid scenes are not currently supported for rect tool
+			if (currentScene->GetMapType() == EMapType::Grid)
+			{
+				TOOL_MANAGER().SetToolActive(ToolType::RECT_FILL_TILE);
+			}
 		}
+	}
+
+	void TilemapDisplay::AddPrefabbedEntityToScene(const PrefabbedEntity& prefabbed)
+	{
+		auto pCurrentScene = SCENE_MANAGER().GetCurrentSceneObject();
+		if (!pCurrentScene)
+			return;
+
+		int count{ 1 };
+		std::string sTag{ prefabbed.id->name };
+		while (pCurrentScene->CheckTagName(sTag))
+		{
+			sTag = prefabbed.id->name + std::to_string(count);
+			++count;
+		}
+
+		Entity newEnt{ pCurrentScene->GetRegistry(), sTag, prefabbed.id->group };
+
+		newEnt.AddComponent<TransformComponent>(prefabbed.transform);
+		if (prefabbed.sprite)
+		{
+			newEnt.AddComponent<SpriteComponent>(prefabbed.sprite.value());
+		}
+
+		if (prefabbed.animation)
+		{
+			newEnt.AddComponent<AnimationComponent>(prefabbed.animation.value());
+		}
+
+		if (prefabbed.boxCollider)
+		{
+			newEnt.AddComponent<BoxColliderComponent>(prefabbed.boxCollider.value());
+		}
+
+		if (prefabbed.circleCollider)
+		{
+			newEnt.AddComponent<CircleColliderComponent>(prefabbed.circleCollider.value());
+		}
+
+		if (prefabbed.textComp)
+		{
+			newEnt.AddComponent<TextComponent>(prefabbed.textComp.value());
+		}
+
+		if (prefabbed.physics)
+		{
+			newEnt.AddComponent<PhysicsComponent>(prefabbed.physics.value());
+		}
+
+		pCurrentScene->AddGameObjectByTag(sTag, newEnt.GetEntity());
 	}
 
 	void TilemapDisplay::DrawToolbar()
@@ -438,22 +506,54 @@ namespace Feather {
 
 		ImGui::SameLine();
 
-		if (activeToolType == ToolType::RECT_FILL_TILE)
+		bool isIsoScene{ false };
+		if (auto pCurrentScene = SCENE_MANAGER().GetCurrentScene())
 		{
-			ImGui::ActiveButton(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE);
+			isIsoScene = pCurrentScene->GetMapType() == EMapType::IsoGrid;
+		}
+
+		if (isIsoScene)
+		{
+			ImGui::DisabledButton(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE, "Rect Tile Tool [Y] - Isometric grids not currently supported.");
 		}
 		else
 		{
-			if (ImGui::Button(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE))
-				toolManager.SetToolActive(ToolType::RECT_FILL_TILE);
+			if (activeToolType == ToolType::RECT_FILL_TILE)
+			{
+				ImGui::ActiveButton(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE);
+			}
+			else
+			{
+				if (ImGui::Button(ICON_FA_CHESS_BOARD, TOOL_BUTTON_SIZE))
+				{
+					toolManager.SetToolActive(ToolType::RECT_FILL_TILE);
+				}
+			}
+
+			ImGui::ItemToolTip("Rect Tile Tool [Y] - Creates tiles inside of rectangle");
 		}
-		ImGui::ItemToolTip("Rect Fill tool [Y] - creates tiles inside of rectangle");
 
 		ImGui::SameLine();
 
 		ImGui::DisabledButton(ICON_FA_TOOLS, TOOL_BUTTON_SIZE);
 
 		ImGui::PopStyleVar(2);
+
+		ImGui::SameLine(0.0f, 16.0f);
+
+		if (auto pActiveTool = TOOL_MANAGER().GetActiveTool())
+		{
+			const auto& gridCoords = pActiveTool->GetGridCoords();
+			ImGui::TextColored(ImVec4{ 0.7f, 1.0f, 7.0f, 1.0f },
+				std::format("Grid Coords [x = {}, y = {}]", gridCoords.x, gridCoords.y).c_str());
+
+			ImGui::SameLine(0.0f, 16.0f);
+
+			const auto& worldCoords = pActiveTool->GetMouseWorldCoords();
+			ImGui::TextColored(ImVec4{ 0.7f, 0.7f, 1.0f, 1.0f },
+				std::format("World Coords [x = {}, y = {}]", worldCoords.x, worldCoords.y).c_str());
+		}
+
 		ImGui::Separator();
 		ImGui::AddSpaces(1);
 	}

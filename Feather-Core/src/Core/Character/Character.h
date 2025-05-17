@@ -32,6 +32,7 @@ namespace Feather {
 		Character(Registry& registry, const CharacterParams& params);
 		Character(Registry& registry, entt::entity entity);
 		Character(const Entity& entity);
+		~Character();
 
 		StateMachine& GetStateMachine();
 

@@ -1,10 +1,12 @@
 #include "TilesetDisplay.h"
+
 #include "Logger/Logger.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
+#include "Editor/Scene/SceneObject.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"

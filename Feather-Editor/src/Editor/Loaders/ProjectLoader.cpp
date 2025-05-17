@@ -4,12 +4,14 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
-#include "Editor/Utilities/SaveProject.h"
+#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/Prefab.h"
+#include "Filesystem/Serializers/JSONSerializer.h"
+#include "Filesystem/Serializers/LuaSerializer.h"
+
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
-#include "Filesystem/Serializers/JSONSerializer.h"
-#include "Filesystem/Serializers/LuaSerializer.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -43,6 +45,7 @@ namespace Feather {
 			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "textures", ec) ||
 			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "shaders", ec) ||
 			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "fonts", ec) ||
+			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "prefabs", ec) ||
 			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "scenes", ec))
 		{
 			F_ERROR("Failed to create directories - {}", ec.message());
@@ -244,9 +247,39 @@ namespace Feather {
 				std::string sceneName{ jsonScenes["name"].GetString() };
 				std::string sceneDataPath{ contentPath + jsonScenes["sceneData"].GetString() };
 
-				if (!sceneManager.AddScene(sceneName, sceneDataPath))
+				if (!sceneManager.AddSceneObject(sceneName, sceneDataPath))
 				{
 					F_ERROR("Failed to load scene: {}", sceneName);
+				}
+			}
+		}
+
+		// Load all prefabs to the scene manager
+		if (assets.HasMember("prefabs"))
+		{
+			const rapidjson::Value& prefabs = assets["prefabs"];
+
+			if (!prefabs.IsArray())
+			{
+				F_ERROR("Failed to load project file '{}': Expecting \"prefabs\" must be an array", filepath);
+				return false;
+			}
+
+			for (const auto& jsonPrefab : prefabs.GetArray())
+			{
+				std::string sName{ jsonPrefab["name"].GetString() };
+				std::string sFilepath{ contentPath + jsonPrefab["path"].GetString() };
+
+				if (auto pPrefab = PrefabCreator::CreatePrefab(sFilepath))
+				{
+					if (!assetManager.AddPrefab(sName, std::move(pPrefab)))
+					{
+						F_ERROR("Failed to load scene: {}", sName);
+					}
+				}
+				else
+				{
+					F_ERROR("Failed to load prefab '{}' from path '{}'", sName, sFilepath);
 				}
 			}
 		}
@@ -342,7 +375,18 @@ namespace Feather {
 				.AddKeyValuePair("sceneData", scenePath)
 				.EndObject();
 		}
-		serializer->EndArray();  // Scenes
+		serializer->EndArray(); // Scenes
+
+		serializer->StartNewArray("prefabs");
+
+		for (const auto& [sName, pPrefab] : assetManager.GetAllPrefabs())
+		{
+			std::string sFilepath = pPrefab->GetFilepath().substr(pPrefab->GetFilepath().find(ASSETS));
+			serializer->StartNewObject().AddKeyValuePair("name", sName).AddKeyValuePair("path", sFilepath).EndObject();
+		}
+
+		serializer->EndArray(); // Prefabs
+
 		serializer->EndObject(); // Assets
 		serializer->EndObject(); // Project Data
 

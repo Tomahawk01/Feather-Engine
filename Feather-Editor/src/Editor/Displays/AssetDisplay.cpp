@@ -5,12 +5,15 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/Resources/AssetManager.h"
+#include "Core/CoreUtils/Prefab.h"
+#include "Core/CoreUtils/SaveProject.h"
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
+#include "Editor/Loaders/ProjectLoader.h"
 
 #include <imgui.h>
 
@@ -104,6 +107,11 @@ namespace Feather {
 			m_eSelectedType = AssetType::SCENE;
 			m_DragSource = std::string{ DROP_SCENE_SRC };
 		}
+		else if (m_SelectedType == "Prefabs")
+		{
+			m_eSelectedType = AssetType::PREFAB;
+			m_DragSource = std::string{ DROP_PREFAB_SRC };
+		}
 		else
 		{
 			m_eSelectedType = AssetType::NO_TYPE;
@@ -170,7 +178,27 @@ namespace Feather {
 						break;
 
 					std::string assetBtn = "##asset" + std::to_string(id);
-					ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
+
+					if (m_eSelectedType == AssetType::PREFAB)
+					{
+						// TODO: We are currently assuming that all prefabs will have a sprite component.
+						// We need to create an engine/editor texture that will be used in case of the prefab not having a sprite
+						if (auto pPrefab = assetManager.GetPrefab(*assetItr))
+						{
+							auto& sprite = pPrefab->GetPrefabbedEntity().sprite;
+							if (textureID && sprite)
+							{
+								ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID,
+												   ImVec2{ m_AssetSize, m_AssetSize },
+												   ImVec2{ sprite->uvs.u, sprite->uvs.v },
+												   ImVec2{ sprite->uvs.uv_width, sprite->uvs.uv_height });
+							}
+						}
+					}
+					else
+					{
+						ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
+					}
 
 					if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0) && !m_Rename)
 						m_SelectedID = id;
@@ -269,6 +297,21 @@ namespace Feather {
 				return texture->GetID();
 			break;
 		}
+		case Feather::AssetType::PREFAB:
+		{
+			if (auto prefab = assetManager.GetPrefab(assetName))
+			{
+				if (auto& sprite = prefab->GetPrefabbedEntity().sprite)
+				{
+					if (auto texture = assetManager.GetTexture(sprite->textureName))
+					{
+						return texture->GetID();
+					}
+				}
+			}
+
+			break;
+		}
 		}
 
 		return 0;
@@ -281,12 +324,11 @@ namespace Feather {
 
 		if (m_eSelectedType == AssetType::SCENE)
 		{
-			// TODO: Change scene name
+			return SCENE_MANAGER().ChangeSceneName(oldName, newName);
 		}
 		else
 		{
-			auto& assetManager = MAIN_REGISTRY().GetAssetManager();
-			return assetManager.ChangeAssetName(oldName, newName, m_eSelectedType);
+			return ASSET_MANAGER().ChangeAssetName(oldName, newName, m_eSelectedType);
 		}
 
 		F_ASSERT(false && "How did it get here?");
@@ -305,7 +347,8 @@ namespace Feather {
 
 		if (m_eSelectedType == AssetType::SCENE)
 		{
-			// TODO: Check if scene name already exists
+			if (SCENE_MANAGER().HasScene(checkName))
+				hasAsset = true;
 		}
 		else
 		{
@@ -326,16 +369,40 @@ namespace Feather {
 		}
 		if (ImGui::Selectable("delete"))
 		{
+			bool isSuccess{ false };
 			if (m_eSelectedType == AssetType::SCENE)
 			{
-				// TODO: Check if scene name already exists
+				if (!SCENE_MANAGER().DeleteScene(assetName))
+				{
+					F_ERROR("Failed to delete scene '{}'", assetName);
+				}
+
+				isSuccess = true;
 			}
 			else
 			{
-				auto& assetManager = MAIN_REGISTRY().GetAssetManager();
-				if (!assetManager.DeleteAsset(assetName, m_eSelectedType))
+				if (!ASSET_MANAGER().DeleteAsset(assetName, m_eSelectedType))
 				{
 					F_ERROR("Failed to delete asset '{}'", assetName);
+				}
+
+				isSuccess = true;
+			}
+
+			// Whenever an asset is deleted, we want to save the project.
+			// There should be some sort of message to the user before deleting??
+			if (isSuccess)
+			{
+				auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
+				F_ASSERT(pSaveProject && "Save Project must exist!");
+				// Save entire project
+				ProjectLoader pl{};
+				if (!pl.SaveLoadedProject(*pSaveProject))
+				{
+					F_ERROR("Failed to save project '{}' at file '{}' after deleting asset '{}'",
+							pSaveProject->projectName,
+							pSaveProject->projectFilePath,
+							assetName);
 				}
 			}
 		}

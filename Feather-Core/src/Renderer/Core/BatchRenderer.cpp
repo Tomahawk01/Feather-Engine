@@ -65,6 +65,31 @@ namespace Feather {
 		m_Glyphs.push_back(std::move(newSprite));
 	}
 
+	void SpriteBatchRenderer::AddSpriteIso(const glm::vec4& spriteRect, const glm::vec4 uvRect, GLuint textureID, int cellX, int cellY, int layer, glm::mat4 model, const Color& color)
+	{
+		auto newSprite = std::make_shared<SpriteGlyph>(SpriteGlyph{
+			.topLeft = Vertex{
+					.position = model * glm::vec4{ spriteRect.x, spriteRect.y + spriteRect.w, 0.0f, 1.0f },							   
+					.uvs = glm::vec2{ uvRect.x, uvRect.y + uvRect.w },
+					.color = color },
+			.bottomLeft = Vertex{
+					.position = model * glm::vec4{ spriteRect.x, spriteRect.y, 0.0f, 1.0f },
+					.uvs = glm::vec2{ uvRect.x, uvRect.y },
+					.color = color },
+			.topRight = Vertex{
+					.position = model * glm::vec4{ spriteRect.x + spriteRect.z, spriteRect.y + spriteRect.w, 0.0f, 1.0f },
+					.uvs = glm::vec2{ uvRect.x + uvRect.z, uvRect.y + uvRect.w },
+					.color = color },
+			.bottomRight = Vertex{
+					.position = model * glm::vec4{ spriteRect.x + spriteRect.z, spriteRect.y, 0.0f, 1.0f },
+					.uvs = glm::vec2{ uvRect.x + uvRect.z, uvRect.y },
+					.color = color },
+			.layer = cellY + cellX + static_cast<int>(layer * spriteRect.w),
+			.textureID = textureID
+		});
+
+		m_Glyphs.push_back(std::move(newSprite));
+	}
 
 	void SpriteBatchRenderer::Initialize()
 	{

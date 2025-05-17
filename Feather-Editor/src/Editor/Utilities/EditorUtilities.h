@@ -11,30 +11,7 @@ namespace Feather {
 	constexpr const char* DROP_MUSIC_SRC = "DropMusicSource";
 	constexpr const char* DROP_SOUNDFX_SRC = "DropSoundFXSource";
 	constexpr const char* DROP_SCENE_SRC = "DropSceneSource";
-
-#define BASE_PATH                                                                                                      \
-	std::string                                                                                                        \
-	{                                                                                                                  \
-		SDL_GetBasePath()                                                                                              \
-	}
-#ifdef _WIN32
-	constexpr char PATH_SEPARATOR = '\\';
-#define DEFAULT_PROJECT_PATH BASE_PATH + "FeatherProjects"
-#else
-	constexpr char PATH_SEPARATOR = '/';
-#define DEFAULT_PROJECT_PATH BASE_PATH + PATH_SEPARATOR + "FeatherProjects"
-#endif
-
-#define SCRIPTS "scripts"
-#define ASSETS "assets" 
-
-	constexpr const char* FEATHER_PRJ_FILE_EXT = ".fprj";
-
-	struct Canvas
-	{
-		int width{ 640 }, height{ 480 };
-		int tileWidth{ 16 }, tileHeight{ 16 };
-	};
+	constexpr const char* DROP_PREFAB_SRC = "DropPrefabSource";
 
 	struct Tile
 	{

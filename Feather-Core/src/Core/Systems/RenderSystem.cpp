@@ -84,7 +84,21 @@ namespace Feather {
 
 			glm::mat4 model = TRSModel(transform, sprite.width, sprite.height);
 
-			m_BatchRenderer->AddSprite(spriteRect, uvRect, pTexture->GetID(), sprite.layer, model, sprite.color);
+			if (sprite.isIsometric)
+			{
+				m_BatchRenderer->AddSpriteIso(spriteRect,
+					uvRect,
+					pTexture->GetID(),
+					sprite.isoCellX,
+					sprite.isoCellY,
+					sprite.layer,
+					model,
+					sprite.color);
+			}
+			else
+			{
+				m_BatchRenderer->AddSprite(spriteRect, uvRect, pTexture->GetID(), sprite.layer, model, sprite.color);
+			}
 		}
 
 		m_BatchRenderer->End();

@@ -17,6 +17,7 @@ namespace Feather {
 
 	struct SpriteComponent
 	{
+		std::string textureName{ "" };
 		float width{ 16.0f };
 		float height{ 16.0f };
 		UVs uvs{ .u = 0.0f, .v = 0.0f, .uv_width = 0.0f, .uv_height = 0.0f };
@@ -27,7 +28,11 @@ namespace Feather {
 		int layer{ 0 };
 
 		bool isHidden{ false };
-		std::string textureName{ "" };
+		bool isIsometric{ false };
+		/* Iso cell is needed to sort when rendering */
+		int isoCellX{ 0 };
+		/* Iso cell is needed to sort when rendering */
+		int isoCellY{ 0 };
 
 		// void generate_uvs(int textureWidth, int textureHeight);
 		[[nodiscard]] std::string to_string() const;

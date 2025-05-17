@@ -11,6 +11,8 @@
 #include "Renderer/Core/CircleBatchRenderer.h"
 #include "Renderer/Essentials/Primitives.h"
 
+#include "Utils/MathUtilities.h"
+
 namespace Feather {
 
 	RenderShapeSystem::RenderShapeSystem()
@@ -42,16 +44,24 @@ namespace Feather {
 
 			auto color = Color{ 255, 0, 0, 100 };
 
+			bool useIso{ false }; // We need another way to determine if we are using iso coords. The user might want to use their own physics
 			if (registry.GetRegistry().all_of<PhysicsComponent>(entity))
 			{
 				auto& physics = registry.GetRegistry().get<PhysicsComponent>(entity);
+				const auto& attrs = physics.GetAttributes();
 				if (physics.IsTrigger())
 				{
 					color = Color{ 0, 255, 0, 100 };
 				}
-				else if (physics.GetAttributes().isTrigger)
+				else if (attrs.isTrigger)
 				{
 					color = Color{ 0, 255, 0, 100 };
+				}
+
+				// If not a box or circle, consider this an iso shape
+				if (!attrs.isBoxShape && !attrs.isCircle)
+				{
+					useIso = true;
 				}
 			}
 
@@ -61,7 +71,17 @@ namespace Feather {
 				.height = static_cast<float>(boxCollider.height),
 				.color = color
 			};
-			m_RectRenderer->AddRect(rect, model);
+
+			if (useIso)
+			{
+				rect.position += glm::vec2{ boxCollider.width * 0.5f, boxCollider.height * 0.5f };
+				rect.height *= -1.0f;
+				m_RectRenderer->AddIsoRect(rect, model);
+			}
+			else
+			{
+				m_RectRenderer->AddRect(rect, model);
+			}
 		}
 
 		m_RectRenderer->End();

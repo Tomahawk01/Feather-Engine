@@ -1,17 +1,21 @@
 #include "MenuDisplay.h"
+
 #include "Logger/Logger.h"
 #include "FileSystem/Dialogs/FileDialog.h"
 #include "Core/Loaders/TilemapLoader.h"
 #include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/CoreUtils/Prefab.h"
+#include "Core/CoreUtils/SaveProject.h"
+#include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Events/EventDispatcher.h"
+#include "Utils/FeatherUtilities.h"
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
-#include "Editor/Utilities/SaveProject.h"
 #include "Editor/Loaders/ProjectLoader.h"
 #include "Editor/Events/EditorEventTypes.h"
 
@@ -29,13 +33,13 @@ namespace Feather {
 				ImGui::InlineLabel(ICON_FA_FILE_ALT, 32.0f);
 				if (ImGui::MenuItem("New", "Ctrl + N"))
 				{
-					F_TRACE("New pressed");
+					F_ERROR("New not implemented yet!");
 				}
 
 				ImGui::InlineLabel(ICON_FA_FOLDER_OPEN, 32.0f);
 				if (ImGui::MenuItem("Open", "Ctrl + O"))
 				{
-					F_TRACE("OPEN PRESSED");
+					F_ERROR("Open not implemented yet!");
 				}
 
 				ImGui::InlineLabel(ICON_FA_SAVE, 32.0f);
@@ -92,6 +96,7 @@ namespace Feather {
 				if (auto pCurrentScene = SCENE_MANAGER().GetCurrentScene())
 				{
 					ImGui::Text("Current Scene");
+					ImGui::Separator();
 					if (ImGui::TreeNode("Canvas"))
 					{
 						auto& canvas = pCurrentScene->GetCanvas();
@@ -125,6 +130,43 @@ namespace Feather {
 							canvas.tileHeight = std::clamp(canvas.tileHeight, 8, 128);
 						}
 						ImGui::ItemToolTip("Tile Height - Range [8 : 128]");
+
+						ImGui::TreePop();
+					}
+					ImGui::Separator();
+					if (ImGui::TreeNode("Settings"))
+					{
+						bool isChanged{ false };
+						std::string sPlayerStartCharacter{ pCurrentScene->GetPlayerStart().GetCharacterName() };
+						auto prefabs = GetKeys(ASSET_MANAGER().GetAllPrefabs()/*, [](auto& prefab) {
+							return prefab.second->GetType() == EPrefabType::Character;
+						} */);
+
+						ImGui::InlineLabel(ICON_FA_FLAG ICON_FA_GAMEPAD " Player Start Character:");
+						ImGui::SetCursorPosX(250.0f);
+						ImGui::ItemToolTip("The default player to spawn when starting the scene");
+						if (ImGui::BeginCombo("##DefaultPlayerStart", sPlayerStartCharacter.c_str()))
+						{
+							for (const auto& sPrefabName : prefabs)
+							{
+								if (ImGui::Selectable(sPrefabName.c_str(), sPrefabName == sPlayerStartCharacter))
+								{
+									sPlayerStartCharacter = sPrefabName;
+
+									isChanged = true;
+								}
+							}
+
+							ImGui::EndCombo();
+						}
+
+						if (isChanged)
+						{
+							if (auto pPrefab = ASSET_MANAGER().GetPrefab(sPlayerStartCharacter))
+							{
+								pCurrentScene->GetPlayerStart().SetCharacter(*pPrefab);
+							}
+						}
 
 						ImGui::TreePop();
 					}

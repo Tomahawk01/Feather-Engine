@@ -27,8 +27,8 @@ namespace Feather {
 		Vertex bottomLeft;
 		Vertex topRight;
 		Vertex bottomRight;
-		int layer;
-		GLuint textureID;
+		int layer{ 0 };
+		GLuint textureID{ 0 };
 	};
 
 	struct LineGlyph

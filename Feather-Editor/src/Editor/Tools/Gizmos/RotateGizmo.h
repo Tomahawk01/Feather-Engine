@@ -8,7 +8,7 @@ namespace Feather {
 	public:
 		RotateGizmo();
 
-		virtual void Update(struct Canvas& canvas) override;
+		virtual void Update(Canvas& canvas) override;
 		virtual void Draw() override;
 	};
 

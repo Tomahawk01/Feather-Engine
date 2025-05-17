@@ -25,6 +25,7 @@ namespace Feather {
 
 		inline const glm::vec2& GetMouseScreenCoords() const { return m_MouseScreenCoords; }
 		inline const glm::vec2& GetMouseWorldCoords() const { return m_MouseWorldCoords; }
+		inline const glm::vec2& GetGridCoords() const { return m_GridCoords; }
 
 		inline void Activate() { m_Activated = true; }
 		inline void Deactivate() { m_Activated = false; }
@@ -75,6 +76,7 @@ namespace Feather {
 		Registry* m_Registry{ nullptr };
 		Camera2D* m_Camera{ nullptr };
 		SceneObject* m_CurrentScene{ nullptr };
+		glm::vec2 m_GridCoords;
 	};
 
 }

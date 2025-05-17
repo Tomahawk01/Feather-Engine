@@ -43,6 +43,9 @@ namespace Feather {
 			.AddKeyValuePair("a", sprite.color.a)
 			.EndObject()
 			.AddKeyValuePair("isHidden", sprite.isHidden)
+			.AddKeyValuePair("isIsometric", sprite.isIsometric)
+			.AddKeyValuePair("isoCellX", sprite.isoCellX)
+			.AddKeyValuePair("isoCellY", sprite.isoCellY)
 			.EndObject();
 	}
 
@@ -191,6 +194,21 @@ namespace Feather {
 		sprite.layer = jsonValue["layer"].GetInt();
 		sprite.isHidden = jsonValue["isHidden"].GetBool();
 		sprite.textureName = jsonValue["texture_name"].GetString();
+
+		// Check if sprite should be isometic
+		if (jsonValue.HasMember("isIsometric"))
+		{
+			sprite.isIsometric = jsonValue["isIsometric"].GetBool();
+
+			if (jsonValue.HasMember("isoCellX"))
+			{
+				sprite.isoCellX = jsonValue["isoCellX"].GetInt();
+			}
+			if (jsonValue.HasMember("isoCellY"))
+			{
+				sprite.isoCellY = jsonValue["isoCellY"].GetInt();
+			}
+		}
 	}
 
 	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, AnimationComponent& animation)

@@ -1,6 +1,8 @@
 #include "Entity.h"
 
 #include "Components/AllComponents.h"
+#include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/Scene/Scene.h"
 #include "MetaUtilities.h"
 
 namespace Feather {
@@ -251,6 +253,21 @@ namespace Feather {
 			"kill", &Entity::Kill,
 			"addChild", [](Entity& entity, Entity& child) { entity.AddChild(child.GetEntity()); },
 			"updateTransform", &Entity::UpdateTransform,
+			"updateIsoSorting",
+			[](Entity& entity, const Canvas& canvas)
+			{
+				if (auto* sprite = entity.TryGetComponent<SpriteComponent>(); sprite->isIsometric)
+				{
+					auto& transform = entity.GetComponent<TransformComponent>();
+					auto [cellX, cellY] = ConvertWorldPosToIsoCoords(transform.position, canvas);
+					sprite->isoCellX = cellX;
+					sprite->isoCellY = cellY;
+				}
+				else
+				{
+					F_ERROR("Entity does not have a sprite component or is not using iso sorting");
+				}
+			},
 			"id", [](Entity& entity) { return static_cast<uint32_t>(entity.GetEntity()); }
 		);
 	}

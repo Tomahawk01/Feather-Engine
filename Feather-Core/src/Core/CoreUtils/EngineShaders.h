@@ -5,7 +5,7 @@ namespace Feather {
 	static const char* basicShaderVert = R"(
 #version 450 core
 
-layout (location = 0) in vec3 in_Position;
+layout (location = 0) in vec2 in_Position;
 layout (location = 1) in vec2 in_TexCoords;
 layout (location = 2) in vec4 in_Color;
 
@@ -15,7 +15,7 @@ uniform mat4 uProjection;
 
 void main()
 {
-	gl_Position = uProjection * vec4(in_Position, 1.0);
+	gl_Position = uProjection * vec4(in_Position.x, in_Position.y, 0.0, 1.0);
 	FragUVs = in_TexCoords;
 	FragColor = in_Color;
 }

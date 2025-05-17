@@ -6,7 +6,7 @@
 namespace Feather {
 
 	struct SpriteComponent;
-	class SceneObject;
+	class Scene;
 
 	class TileDetailsDisplay : public IDisplay
 	{
@@ -17,7 +17,7 @@ namespace Feather {
 		virtual void Draw() override;
 
 	private:
-		void DrawSpriteComponent(SpriteComponent& sprite, SceneObject* scene);
+		void DrawSpriteComponent(SpriteComponent& sprite, Scene* scene);
 
 	private:
 		int m_SelectedLayer;

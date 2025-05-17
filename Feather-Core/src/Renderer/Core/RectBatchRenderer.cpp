@@ -67,6 +67,25 @@ namespace Feather {
 		m_Glyphs.push_back(std::move(newGlyph));
 	}
 
+	void RectBatchRenderer::AddIsoRect(const Rect& rect, glm::mat4 model)
+	{
+		std::shared_ptr<RectGlyph> newGlyph = std::make_shared<RectGlyph>();
+
+		newGlyph->topLeft.color = rect.color;
+		newGlyph->topLeft.position = model * glm::vec4{ rect.position.x, rect.position.y, 0.0f, 1.0f };
+
+		newGlyph->bottomLeft.color = rect.color;
+		newGlyph->bottomLeft.position = model * glm::vec4{ rect.position.x - rect.width / 2, rect.position.y + rect.height / 2, 0.0f, 1.0f };
+
+		newGlyph->bottomRight.color = rect.color;
+		newGlyph->bottomRight.position = model * glm::vec4{ rect.position.x, rect.position.y + rect.height, 0.0f, 1.0f };
+
+		newGlyph->topRight.color = rect.color;
+		newGlyph->topRight.position = model * glm::vec4{ rect.position.x + rect.width / 2, rect.position.y + rect.height / 2, 0.0f, 1.0f };
+
+		m_Glyphs.push_back(std::move(newGlyph));
+	}
+
 	void RectBatchRenderer::GenerateBatches()
 	{
 		std::vector<Vertex> vertices;

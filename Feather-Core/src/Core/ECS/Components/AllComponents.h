@@ -11,6 +11,24 @@
 #include "Identification.h"
 #include "TextComponent.h"
 #include "TileComponent.h"
-#include "Identification.h"
 #include "Relationship.h"
 #include "UIComponent.h"
+
+namespace Feather {
+
+	enum class EUneditableType
+	{
+		PlayerStart,
+		/* TODO: add more uneditable types as needed */
+		NoType
+	};
+	/*
+	 * UneditableComponent
+	 */
+
+	struct UneditableComponent
+	{
+		EUneditableType type{ EUneditableType::PlayerStart };
+	};
+
+}

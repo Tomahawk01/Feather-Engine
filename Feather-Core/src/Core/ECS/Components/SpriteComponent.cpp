@@ -67,14 +67,14 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 			[](const std::string& textureName, float width, float height, int start_x, int start_y, int layer)
 			{
 				return SpriteComponent{
+					.textureName = textureName,
 					.width = width,
 					.height = height,
 					.uvs = UVs{},
 					.color = Feather::Color{255, 255, 255, 255},
 					.start_x = start_x,
 					.start_y = start_y,
-					.layer = layer,
-					.textureName = textureName
+					.layer = layer
 				};
 			}
 		),

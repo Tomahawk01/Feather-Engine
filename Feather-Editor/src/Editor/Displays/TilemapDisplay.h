@@ -8,7 +8,9 @@
 namespace Feather {
 
 	struct KeyEvent;
+	struct PrefabbedEntity;
 	class Camera2D;
+	class Entity;
 
 	class TilemapDisplay : public IDisplay
 	{
@@ -25,6 +27,7 @@ namespace Feather {
 		void PanZoomCamera(const glm::vec2& mousePos);
 
 		void HandleKeyPressedEvent(const KeyEvent& keyEvent);
+		void AddPrefabbedEntityToScene(const PrefabbedEntity& prefabbed);
 
 	protected:
 		virtual void DrawToolbar() override;

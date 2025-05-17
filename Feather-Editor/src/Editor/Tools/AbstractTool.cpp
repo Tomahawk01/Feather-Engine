@@ -15,6 +15,7 @@ namespace Feather {
 		m_GUICursorCoords{ 0.0f }, m_GUIRelativeCoords{ 0.0f },
 		m_WindowPos{ 0.0f }, m_WindowSize{ 0.0f },
 		m_Activated{ false }, m_OutOfBounds{ false }, m_OverTileMapWindow{ false }
+		, m_GridCoords{ 0.f }
 	{}
 
 	void AbstractTool::Update(Canvas& canvas)
@@ -63,17 +64,40 @@ namespace Feather {
 
 	void AbstractTool::CheckOutOfBounds(const Canvas& canvas)
 	{
-		auto boundsWidth{ canvas.width - canvas.tileWidth * 0.5f };
-		auto boundsHeight{ canvas.height - canvas.tileHeight * 0.5f };
-
-		if (m_MouseWorldCoords.x <= boundsWidth && m_MouseWorldCoords.y <= boundsHeight &&
-			m_MouseWorldCoords.x >= 0.0f && m_MouseWorldCoords.y >= 0.0f)
+		if (!m_CurrentScene)
 		{
-			m_OutOfBounds = false;
+			m_OutOfBounds = true;
+			return;
+		}
+
+		if (m_CurrentScene->GetMapType() == EMapType::Grid)
+		{
+			auto boundsWidth{ canvas.width - (canvas.tileWidth * 0.5f) };
+			auto boundsHeight{ canvas.height - (canvas.tileHeight * 0.5f) };
+
+			if (m_MouseWorldCoords.x <= boundsWidth && m_MouseWorldCoords.y <= boundsHeight &&
+				m_MouseWorldCoords.x >= 0.0f && m_MouseWorldCoords.y >= 0.0f)
+			{
+				m_OutOfBounds = false;
+			}
+			else
+			{
+				m_OutOfBounds = true;
+			}
 		}
 		else
 		{
-			m_OutOfBounds = true;
+			const auto& canvas = m_CurrentScene->GetCanvas();
+			int xNumTiles = canvas.height / canvas.tileWidth - 1;
+			int yNumTiles = canvas.width / (canvas.tileHeight * 2.9f) - 1;
+			if (m_GridCoords.x >= 0 && m_GridCoords.y >= 0 && m_GridCoords.x <= xNumTiles && m_GridCoords.y <= yNumTiles)
+			{
+				m_OutOfBounds = false;
+			}
+			else
+			{
+				m_OutOfBounds = true;
+			}
 		}
 	}
 

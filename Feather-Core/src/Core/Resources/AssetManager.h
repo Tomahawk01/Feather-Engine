@@ -16,6 +16,8 @@ namespace Feather {
 	
 	enum class AssetType;
 
+	class Prefab;
+
 	class AssetManager
 	{
 	public:
@@ -43,12 +45,17 @@ namespace Feather {
 
 		bool AddSoundFx(const std::string& soundFxName, const std::string& filepath);
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
+		
+		bool AddPrefab(const std::string& prefabName, std::shared_ptr<Prefab> prefab);
+
+		std::shared_ptr<Prefab> GetPrefab(const std::string& prefabName);
 
 		inline const std::map<std::string, std::shared_ptr<Texture>>& GetAllTextures() const { return m_mapTextures; }
 		inline const std::map<std::string, std::shared_ptr<SoundFX>>& GetAllSoundFx() const { return m_mapSoundFX; }
 		inline const std::map<std::string, std::shared_ptr<Shader>>& GetAllShaders() const { return m_mapShaders; }
 		inline const std::map<std::string, std::shared_ptr<Font>>& GetAllFonts() const { return m_mapFonts; }
 		inline const std::map<std::string, std::shared_ptr<Music>>& GetAllMusic() const { return m_mapMusic; }
+		inline const std::map<std::string, std::shared_ptr<Prefab>>& GetAllPrefabs() const { return m_mapPrefabs; }
 
 		std::vector<std::string> GetAssetKeyNames(AssetType assetType) const;
 
@@ -65,6 +72,7 @@ namespace Feather {
 
 		std::map<std::string, std::shared_ptr<Music>> m_mapMusic{};
 		std::map<std::string, std::shared_ptr<SoundFX>> m_mapSoundFX{};
+		std::map<std::string, std::shared_ptr<Prefab>> m_mapPrefabs{};
 	};
 
 }

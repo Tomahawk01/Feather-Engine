@@ -217,7 +217,7 @@ namespace Feather {
 		serializer->StartDocument();
 		serializer->StartNewArray("game_objects");
 
-		auto gameObjects = registry.GetRegistry().view<entt::entity>(entt::exclude<TileComponent>);
+		auto gameObjects = registry.GetRegistry().view<entt::entity>(entt::exclude<TileComponent, UneditableComponent>);
 
 		for (auto object : gameObjects)
 		{

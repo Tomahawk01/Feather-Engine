@@ -35,7 +35,6 @@ namespace Feather {
 
 	private:
 		glm::vec2 m_MouseRect;
-		glm::vec2 m_GridCoords;
 
 		bool m_GridSnap;
 

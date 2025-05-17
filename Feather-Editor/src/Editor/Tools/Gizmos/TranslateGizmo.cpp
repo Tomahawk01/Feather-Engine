@@ -52,6 +52,14 @@ namespace Feather {
 		if (bTransformChanged)
 		{
 			selectedEntity.UpdateTransform();
+
+			// Update sprite cells
+			if (auto* pSprite = selectedEntity.TryGetComponent<SpriteComponent>(); pSprite->isIsometric)
+			{
+				auto [cellX, cellY] = ConvertWorldPosToIsoCoords(selectedTransform.position + glm::vec2{ pSprite->width / 2.0f, pSprite->height }, canvas);
+				pSprite->isoCellX = cellX;
+				pSprite->isoCellX = cellY;
+			}
 		}
 
 		SetGizmoPosition(selectedEntity);

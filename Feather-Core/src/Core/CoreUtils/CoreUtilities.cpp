@@ -1,5 +1,8 @@
 #include "CoreUtilities.h"
+
 #include "Core/ECS/Components/AllComponents.h"
+#include "Core/Scene/Scene.h"
+#include "Utils/MathUtilities.h"
 
 namespace Feather {
 
@@ -57,6 +60,29 @@ namespace Feather {
 
 		sprite.uvs.u = u;
 		sprite.uvs.v = v;
+	}
+
+	std::tuple<int, int> ConvertWorldPosToIsoCoords(const glm::vec2& position, const Canvas& canvas)
+	{
+		// TODO: Enforce width being double height. Double width hack for now. 
+		float doubleWidth = canvas.tileWidth * 2.0f;
+
+		// Move the x position back the halfWidth of one tile.
+		// We are not currently using any offset for we have a camera that can go into the negatives.
+		float xPos = (position.x /*- canvas.offset.x*/) - doubleWidth * 0.5f;
+		// Stretch the Y position by 2 in the negative to make the tile a square. Allows for easier rotations.
+		float yPos = position.y * -2.0f;
+
+		// Rotate both the x and the y positions by 45 degrees
+		float px = xPos * cos(PIOver4) - yPos * sin(PIOver4);
+		float py = xPos * sin(PIOver4) + yPos * cos(PIOver4);
+
+		float diagonal = canvas.tileHeight * sqrt(2.0f);
+
+		int cellX = static_cast<int>(px / diagonal);
+		int cellY = static_cast<int>(-py / diagonal);
+
+		return std::make_tuple(cellX, cellY);
 	}
 
 }

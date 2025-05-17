@@ -58,7 +58,19 @@ namespace Feather {
 		}
 		else
 		{
-			// TODO: Polygon shape
+			// TODO: Add the ability to create various convex polygon shapes based on the number of vertices and their position.
+			// Currently hardcoded to a 4 vertice shape, square, rect, diamond, etc.
+			auto halfWidth = PIXELS_TO_METERS * m_InitialAttributes.boxSize.x * m_InitialAttributes.scale.x * 0.5f;
+			auto halfHeight = PIXELS_TO_METERS * m_InitialAttributes.boxSize.y * m_InitialAttributes.scale.y * 0.5f;
+
+			b2Vec2 vertices[4];
+
+			vertices[0].Set(0.0f, 0.0f);
+			vertices[1].Set(halfWidth, -halfHeight);
+			vertices[2].Set(-halfWidth, -halfHeight);
+			vertices[3].Set(0.0f, -halfHeight * 2.0f);
+
+			polyShape.Set(vertices, 4);
 		}
 
 		// Create user data
@@ -219,6 +231,81 @@ namespace Feather {
 		}
 
 		return {};
+	}
+
+	void PhysicsComponent::SetFilterCategory(uint16_t category)
+	{
+		if (!m_RigidBody)
+		{
+			m_InitialAttributes.filterCategory = category;
+			return;
+		}
+
+		auto fixtureList = m_RigidBody->GetFixtureList();
+		if (!fixtureList)
+		{
+			return;
+		}
+
+		auto copyFilter = fixtureList->GetFilterData();
+		copyFilter.categoryBits = category;
+		fixtureList->SetFilterData(copyFilter);
+		m_InitialAttributes.filterCategory = category;
+	}
+
+	void PhysicsComponent::SetFilterCategory()
+	{
+		SetFilterCategory(m_InitialAttributes.filterCategory);
+	}
+
+	void PhysicsComponent::SetFilterMask(uint16_t mask)
+	{
+		if (!m_RigidBody)
+		{
+			m_InitialAttributes.filterMask = mask;
+			return;
+		}
+
+		auto pFixtureList = m_RigidBody->GetFixtureList();
+		if (!pFixtureList)
+		{
+			return;
+		}
+
+		auto copyFilter = pFixtureList->GetFilterData();
+		copyFilter.maskBits = mask;
+		pFixtureList->SetFilterData(copyFilter);
+		m_InitialAttributes.filterMask = mask;
+	}
+
+	void PhysicsComponent::SetFilterMask()
+	{
+		SetFilterMask(m_InitialAttributes.filterMask);
+	}
+
+	void PhysicsComponent::SetGroupIndex(int index)
+	{
+		if (!m_RigidBody)
+		{
+			m_InitialAttributes.groupIndex = index;
+			return;
+		}
+
+		auto pFixtureList = m_RigidBody->GetFixtureList();
+		if (!pFixtureList)
+		{
+			return;
+		}
+
+		auto copyFilter = pFixtureList->GetFilterData();
+		copyFilter.groupIndex = index;
+		pFixtureList->SetFilterData(copyFilter);
+		m_InitialAttributes.groupIndex = index;
+	}
+
+	void PhysicsComponent::SetGroupIndex()
+	{
+		SetGroupIndex(m_InitialAttributes.groupIndex);
 	}
 
 	void PhysicsComponent::CreatePhysicsLuaBind(sol::state& lua, entt::registry& registry)

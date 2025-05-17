@@ -4,9 +4,10 @@
 #include "Renderer/Essentials/TextureLoader.h"
 #include "Renderer/Essentials/ShaderLoader.h"
 #include "Renderer/Essentials/FontLoader.h"
+#include "Core/ECS/MainRegistry.h"
+#include "Core/CoreUtils/Prefab.h"
 
 #include "Core/Resources/fonts/default_fonts.h"
-#include "Core/ECS/MainRegistry.h"
 
 #include "Utils/FeatherUtilities.h"
 
@@ -265,6 +266,30 @@ namespace Feather {
         return soundItr->second;
     }
 
+    bool AssetManager::AddPrefab(const std::string& prefabName, std::shared_ptr<Prefab> prefab)
+    {
+        if (m_mapPrefabs.contains(prefabName))
+        {
+            F_ERROR("Failed to add prefab '{}': Already exists in AssetManager", prefabName);
+            return false;
+        }
+
+        auto [itr, bSuccess] = m_mapPrefabs.emplace(prefabName, std::move(prefab));
+        return bSuccess;
+    }
+
+    std::shared_ptr<Prefab> AssetManager::GetPrefab(const std::string& prefabName)
+    {
+        auto prefabItr = m_mapPrefabs.find(prefabName);
+        if (prefabItr == m_mapPrefabs.end())
+        {
+            F_ERROR("Failed to get Prefab '{}': Does not exist", prefabName);
+            return nullptr;
+        }
+
+        return prefabItr->second;
+    }
+
     std::vector<std::string> AssetManager::GetAssetKeyNames(AssetType assetType) const
     {
         switch (assetType)
@@ -277,6 +302,8 @@ namespace Feather {
             return GetKeys(m_mapSoundFX);
         case AssetType::MUSIC:
             return GetKeys(m_mapMusic);
+        case AssetType::PREFAB:
+            return GetKeys(m_mapPrefabs);
         default:
             F_ASSERT(false && "Cannot get this type!");
         }
@@ -315,6 +342,8 @@ namespace Feather {
             return m_mapSoundFX.contains(assetName);
         case AssetType::MUSIC:
             return m_mapMusic.contains(assetName);
+        case AssetType::PREFAB:
+            return m_mapPrefabs.contains(assetName);
         default:
             F_ASSERT(false && "Cannot get this type!");
         }
@@ -334,6 +363,23 @@ namespace Feather {
             return std::erase_if(m_mapSoundFX, [&](const auto& pair) { return pair.first == assetName; }) > 0;
         case AssetType::MUSIC:
             return std::erase_if(m_mapMusic, [&](const auto& pair) { return pair.first == assetName; }) > 0;
+        case AssetType::PREFAB:
+        {
+            // Prefabs contain files that must be cleaned up
+            if (auto pPrefab = GetPrefab(assetName))
+            {
+                if (!PrefabCreator::DeletePrefab(*pPrefab))
+                {
+                    F_ERROR("Failed to delete prefab '{}'", assetName);
+                    return false;
+                }
+
+                return m_mapPrefabs.erase(assetName) > 0;
+            }
+
+            F_ERROR("Failed to delete prefab '{}' - Does not exist in asset manager", assetName);
+            return false;
+        }
         default:
             F_ASSERT(false && "Cannot get this type!");
         }

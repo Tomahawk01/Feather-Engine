@@ -38,7 +38,7 @@ namespace Feather {
 		pickingShader->SetUniformMat4("uProjection", cam_mat);
 
 		m_BatchRenderer->Begin();
-		auto spriteView = registry.GetRegistry().view<SpriteComponent, TransformComponent>();
+		auto spriteView = registry.GetRegistry().view<SpriteComponent, TransformComponent>(entt::exclude<TileComponent>);
 		for (auto entity : spriteView)
 		{
 			const auto& transform = spriteView.get<TransformComponent>(entity);

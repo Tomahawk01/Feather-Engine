@@ -5,7 +5,10 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Filesystem/Dialogs/FileDialog.h"
-#include "Editor/scene/SceneManager.h"
+
+#include "Editor/Scene/SceneManager.h"
+#include "Editor/Scene/SceneObject.h"
+#include "Editor/Utilities/GUI/ImGuiUtils.h"
 
 #include <imgui.h>
 #include <filesystem>
@@ -30,6 +33,11 @@
 	{                                                                                                                  \
 		"*.mp3", "*.wav", "*.ogg"                                                                                      \
 	}
+
+static const std::map<std::string, Feather::EMapType> g_mapStringToMapTypes{
+	{ "Grid", Feather::EMapType::Grid },
+	{ "IsoGrid", Feather::EMapType::IsoGrid }
+};
 
 namespace {
 
@@ -80,8 +88,33 @@ namespace {
 
 			if (ImGui::BeginPopupModal("Add New Scene"))
 			{
+				ImGui::InlineLabel("Name");
 				static std::string assetName{ "" };
 				ImGui::InputText("##assetName", assetName.data(), 255);
+
+				static std::vector<std::string> mapTypes{ "Grid", "IsoGrid" };
+				static std::string mapType{ "Grid" };
+				static Feather::EMapType selectedType{ Feather::EMapType::Grid };
+
+				ImGui::InlineLabel("Map Type");
+				if (ImGui::BeginCombo("##Map Type", mapType.c_str()))
+				{
+					for (const auto& [sMapStr, eMapType] : g_mapStringToMapTypes)
+					{
+						if (ImGui::Selectable(sMapStr.c_str(), sMapStr == mapType))
+						{
+							mapType = sMapStr;
+							selectedType = eMapType;
+						}
+
+						ImGui::ItemToolTip("{}",
+							eMapType == Feather::EMapType::IsoGrid
+							? "Warning! IsoGrid maps are not fully supported"
+							: "2D Grid tile map");
+					}
+
+					ImGui::EndCombo();
+				}
 
 				std::string checkName{ assetName.data() };
 				std::string nameError{ CheckForAsset(checkName, Feather::AssetType::SCENE) };
@@ -90,7 +123,7 @@ namespace {
 				{
 					if (ImGui::Button("Ok"))
 					{
-						if (!SCENE_MANAGER().AddScene(checkName))
+						if (!SCENE_MANAGER().AddScene(checkName, selectedType))
 							F_ERROR("Failed to add new scene '{}'", checkName);
 
 						assetName.clear();
@@ -103,6 +136,11 @@ namespace {
 				else
 				{
 					ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, nameError.c_str());
+				}
+
+				if (selectedType == Feather::EMapType::IsoGrid)
+				{
+					ImGui::TextColored(ImVec4{ 1.0f, 1.0f, 0.0f, 1.0f }, "IsoGrid maps are not fully supported yet!");
 				}
 
 				// We always want to be able to cancel

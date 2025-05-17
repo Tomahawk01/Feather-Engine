@@ -4,7 +4,9 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/Events/EventDispatcher.h"
+#include "Core/CoreUtils/SaveProject.h"
 #include "Utils/FeatherUtilities.h"
+#include "Utils/HelperUtilities.h"
 #include "FileSystem/Dialogs/FileDialog.h"
 #include "FileSystem/Process/FileProcessor.h"
 #include "FileSystem/Serializers/LuaSerializer.h"
@@ -13,7 +15,6 @@
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/fonts/IconsFontAwesome5.h"
 #include "Editor/Events/EditorEventTypes.h"
-#include "Editor/Utilities/SaveProject.h"
 
 #include <imgui.h>
 
@@ -479,7 +480,7 @@ namespace Feather {
 			static std::string errorText{ "" };
 			if (bNameEntered && !newFolderStr.empty())
 			{
-				std::string folderPathStr = m_CurrentDir.string() + "\\" + newFolderStr;
+				std::string folderPathStr = m_CurrentDir.string() + PATH_SEPARATOR + newFolderStr;
 				std::error_code error{};
 				if (!std::filesystem::create_directory(std::filesystem::path{ folderPathStr }, error))
 				{
@@ -548,7 +549,7 @@ namespace Feather {
 
 			if (bNameEntered && !className.empty())
 			{
-				std::string filename = m_FilepathToAction + +"\\" + className + ".lua";
+				std::string filename = m_FilepathToAction + PATH_SEPARATOR + className + ".lua";
 
 				if (std::filesystem::exists(std::filesystem::path{ filename }))
 				{
@@ -627,7 +628,7 @@ namespace Feather {
 
 			if (bNameEntered && !tableName.empty())
 			{
-				std::string filename = m_FilepathToAction + +"\\" + tableName + ".lua";
+				std::string filename = m_FilepathToAction + PATH_SEPARATOR + tableName + ".lua";
 
 				if (std::filesystem::exists(std::filesystem::path{ filename }))
 				{
@@ -700,7 +701,7 @@ namespace Feather {
 
 			if (bNameEntered && !tableName.empty())
 			{
-				std::string filename = m_FilepathToAction + "\\" + tableName + ".lua";
+				std::string filename = m_FilepathToAction + PATH_SEPARATOR + tableName + ".lua";
 
 				if (std::filesystem::exists(std::filesystem::path{ filename }))
 				{

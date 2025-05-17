@@ -1,4 +1,5 @@
 #include "SceneHierarchyDisplay.h"
+
 #include "Core/ECS/MainRegistry.h"
 #include "Core/ECS/Entity.h"
 #include "Core/ECS/Components/AllComponents.h"
@@ -6,6 +7,8 @@
 #include "Core/Events/EventDispatcher.h"
 #include "Core/Events/EngineEventTypes.h"
 #include "Core/Scripting/InputManager.h"
+#include "Core/CoreUtils/Prefab.h"
+#include "Core/Resources/AssetManager.h"
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
@@ -37,7 +40,7 @@ namespace Feather {
 
 	void SceneHierarchyDisplay::Draw()
 	{
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 		if (!ImGui::Begin("Scene Hierarchy") || !currentScene)
 		{
 			ImGui::End();
@@ -48,8 +51,24 @@ namespace Feather {
 
 		if (ImGui::BeginPopupContextWindow())
 		{
-			if (ImGui::Selectable("Add new GameObject"))
-				currentScene->AddGameObject();
+			if (ImGui::Selectable("Add New GameObject"))
+			{
+				if (!currentScene->AddGameObject())
+				{
+					F_ERROR("Failed to add new game object to scene '{}'", currentScene->GetSceneName());
+				}
+			}
+
+			// Uneditable entities cannot be made into prefabs
+			if (m_SelectedEntity && !m_SelectedEntity->HasComponent<UneditableComponent>())
+			{
+				if (ImGui::Selectable("Create Prefab"))
+				{
+					auto newPrefab = PrefabCreator::CreatePrefab(EPrefabType::Character, *m_SelectedEntity);
+
+					ASSET_MANAGER().AddPrefab(m_SelectedEntity->GetName() + "_pfab", std::move(newPrefab));
+				}
+			}
 
 			ImGui::EndPopup();
 		}
@@ -277,16 +296,48 @@ namespace Feather {
 			AddComponent(*m_SelectedEntity, &m_AddComponent);
 
 		if (m_SelectedEntity)
-			DrawEntityComponents();
+		{
+			if (!m_SelectedEntity->HasComponent<UneditableComponent>())
+			{
+				DrawEntityComponents();
+			}
+			else
+			{
+				DrawUneditableTypes();
+			}
+		}
 
 		ImGui::End();
 	}
 
-	void SceneHierarchyDisplay::DrawEntityComponents()
+	void SceneHierarchyDisplay::DrawUneditableTypes()
 	{
 		if (!m_SelectedEntity)
 			return;
 
+		if (auto* pUnedit = m_SelectedEntity->TryGetComponent<UneditableComponent>())
+		{
+			if (pUnedit->type == EUneditableType::PlayerStart)
+			{
+				DrawPlayerStart();
+			}
+		}
+	}
+
+	void SceneHierarchyDisplay::DrawPlayerStart()
+	{
+		ImGui::SeparatorText("Player Start");
+		ImGui::InlineLabel(ICON_FA_FLAG ICON_FA_GAMEPAD " Player Start Character: ");
+		if (auto pCurrentScene = SCENE_MANAGER().GetCurrentScene())
+		{
+			std::string playerStartCharacter{ pCurrentScene->GetPlayerStart().GetCharacterName() };
+			ImGui::SetCursorPosX(225.0f);
+			ImGui::TextColored(ImVec4{ 0.7f, 0.7f, 0.7f, 1.0f }, playerStartCharacter.c_str());
+		}
+	}
+
+	void SceneHierarchyDisplay::DrawEntityComponents()
+	{
 		auto& registry = m_SelectedEntity->GetEnttRegistry();
 
 		for (const auto&& [id, storage] : registry.storage())
@@ -319,8 +370,14 @@ namespace Feather {
 	{
 		F_ASSERT(m_SelectedEntity && "Selected Entity must be valid if trying to delete!");
 
-		if (auto currentScene = SCENE_MANAGER().GetCurrentScene())
+		if (auto currentScene = SCENE_MANAGER().GetCurrentSceneObject())
 		{
+			if (m_SelectedEntity->HasComponent<UneditableComponent>())
+			{
+				F_ERROR("Failed to delete selected entity: Selected entity is uneditable");
+				return false;
+			}
+
 			if (!currentScene->DeleteGameObjectById(m_SelectedEntity->GetEntity()))
 			{
 				F_ERROR("Failed to delete selected entity");
@@ -328,6 +385,7 @@ namespace Feather {
 			}
 
 			m_SelectedEntity = nullptr;
+			SCENE_MANAGER().GetToolManager().SetSelectedEntity(entt::null);
 		}
 		else
 		{
@@ -342,7 +400,7 @@ namespace Feather {
 	{
 		F_ASSERT(m_SelectedEntity && "Selected Entity must be valid if trying to duplicate!");
 
-		if (auto currentScene = SCENE_MANAGER().GetCurrentScene())
+		if (auto currentScene = SCENE_MANAGER().GetCurrentSceneObject())
 		{
 			if (!currentScene->DuplicateGameObject(m_SelectedEntity->GetEntity()))
 			{

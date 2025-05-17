@@ -141,7 +141,7 @@ namespace Feather {
 			ImGui::ItemToolTip("Z-Index in which to draw the sprite");
 			if (ImGui::InputInt("##layer", &sprite.layer, 1.0f, 1.0f))
 			{
-				sprite.layer = glm::clamp(sprite.layer, 0, 99);
+				sprite.layer = glm::clamp(sprite.layer, 0, 255);
 			}
 
 			ImGui::InlineLabel("start pos");
@@ -161,6 +161,10 @@ namespace Feather {
 				sprite.start_y = glm::clamp(sprite.start_y, 0, 32); // TODO: Get texure and divide by width to get maxvalue
 				IsChanged = true;
 			}
+
+			ImGui::InlineLabel("Iso Sorting");
+			ImGui::Checkbox("##isoSorting", &sprite.isIsometric);
+			ImGui::ItemToolTip("If the scene is Isometric, the sprite should use iso sorting.");
 
 			ImGui::TreePop();
 			ImGui::PopItemWidth();

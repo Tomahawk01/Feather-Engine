@@ -12,7 +12,7 @@ namespace Feather {
 		Entity(Registry& registry);
 		Entity(Registry& registry, const std::string& name = "", const std::string& group = "");
 		Entity(Registry& registry, const entt::entity& entity);
-		~Entity() = default;
+		virtual ~Entity() = default;
 
 		Entity& operator=(const Entity& other)
 		{

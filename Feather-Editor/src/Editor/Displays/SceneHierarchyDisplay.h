@@ -22,6 +22,8 @@ namespace Feather {
 		bool OpenTreeNode(Entity& entity);
 		void AddComponent(Entity& entity, bool* addComponent);
 		void DrawGameObjectDetails();
+		void DrawUneditableTypes();
+		void DrawPlayerStart();
 		void DrawEntityComponents();
 		bool DeleteSelectedEntity();
 		bool DuplicateSelectedEntity();

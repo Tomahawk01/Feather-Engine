@@ -30,6 +30,7 @@ namespace Feather {
 		bool isFixedRotation{ true };
 		bool isTrigger{ false };
 		bool isBullet{ false };
+		bool useFilters{ false };
 
 		// Used to filter collisions on shapes
 		uint16_t filterCategory{ 0 };
@@ -52,8 +53,17 @@ namespace Feather {
 
 		ObjectData CastRay(const b2Vec2& point1, const b2Vec2& point2) const;
 		std::vector<ObjectData> BoxTrace(const b2Vec2& lowerBounds, const b2Vec2& upperBounds) const;
-
 		ObjectData GetCurrentObjectData();
+
+		void SetFilterCategory(uint16_t category);
+		void SetFilterCategory();
+		void SetFilterMask(uint16_t mask);
+		void SetFilterMask();
+		void SetGroupIndex(int index);
+		void SetGroupIndex();
+
+		bool UseFilters() const { return m_InitialAttributes.useFilters; }
+
 		inline b2Body* GetBody() { return m_RigidBody.get(); }
 		inline UserData* GetUserData() { return m_UserData.get(); }
 

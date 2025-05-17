@@ -5,22 +5,27 @@
 #include "Logger/Logger.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/ECS/Components/AllComponents.h"
+#include "Core/ECS/MainRegistry.h"
+#include "Core/CoreUtils/SaveProject.h"
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"
 #include "Editor/Tools/Gizmos/Gizmo.h"
 #include "Editor/Commands/CommandManager.h"
+#include "Editor/Loaders/ProjectLoader.h"
+
+#include <filesystem>
 
 namespace Feather {
 
-	SceneManager& SceneManager::GetInstance()
+	EditorSceneManager& EditorSceneManager::GetInstance()
 	{
-		static SceneManager instance{};
+		static EditorSceneManager instance{};
 		return instance;
 	}
 
-	bool SceneManager::AddScene(const std::string& sceneName)
+	bool EditorSceneManager::AddScene(const std::string& sceneName, EMapType type)
 	{
 		if (m_mapScenes.contains(sceneName))
 		{
@@ -28,12 +33,12 @@ namespace Feather {
 			return false;
 		}
 
-		auto [itr, isSuccess] = m_mapScenes.emplace(sceneName, std::move(std::make_shared<SceneObject>(sceneName)));
+		auto [itr, isSuccess] = m_mapScenes.emplace(sceneName, std::move(std::make_shared<SceneObject>(sceneName, type)));
 
 		return isSuccess;
 	}
 
-	bool SceneManager::AddScene(const std::string& sceneName, const std::string& sceneData)
+	bool EditorSceneManager::AddSceneObject(const std::string& sceneName, const std::string& sceneData)
 	{
 		if (m_mapScenes.contains(sceneName))
 		{
@@ -41,48 +46,69 @@ namespace Feather {
 			return false;
 		}
 
-		auto [itr, success] = m_mapScenes.emplace(sceneName, std::move(std::make_shared<SceneObject>(sceneName, sceneData)));
-		return success;
+		auto [itr, bSuccess] = m_mapScenes.emplace(sceneName, std::move(std::make_shared<SceneObject>(sceneName, sceneData)));
+		return bSuccess;
 	}
 
-	bool SceneManager::HasScene(const std::string& sceneName)
-	{
-		return m_mapScenes.contains(sceneName);
-	}
-
-	std::shared_ptr<SceneObject> SceneManager::GetScene(const std::string& sceneName)
+	bool EditorSceneManager::DeleteScene(const std::string& sceneName)
 	{
 		auto sceneItr = m_mapScenes.find(sceneName);
 		if (sceneItr == m_mapScenes.end())
 		{
-			F_ERROR("Failed to get scene object: '{}' does not exist", sceneName);
-			return nullptr;
+			F_ERROR("Failed to delete scene object: '{}' does not exist in the scene manager", sceneName);
+			return false;
 		}
 
-		return sceneItr->second;
-	}
-
-	std::shared_ptr<SceneObject> SceneManager::GetCurrentScene()
-	{
-		if (m_CurrentScene.empty())
-			return nullptr;
-
-		auto sceneItr = m_mapScenes.find(m_CurrentScene);
-		if (sceneItr == m_mapScenes.end())
+		// Check to see if the scene is loaded. We do not want to delete a loaded scene.
+		if (sceneItr->second->IsLoaded())
 		{
-			F_ERROR("Failed to get scene object: '{}' does not exist", m_CurrentScene);
-			return nullptr;
+			F_ERROR("Failed to delete scene '{}': Loaded scenes cannot be deleted. Please unload the scene if you want to delete it", sceneName);
+			return false;
 		}
 
-		return sceneItr->second;
+		const std::string& sDataPath{ sceneItr->second->GetSceneDataPath() };
+		std::filesystem::path dataPath{ sDataPath };
+
+		if (std::filesystem::exists(dataPath.parent_path()) && std::filesystem::is_directory(dataPath.parent_path()))
+		{
+			if (dataPath.parent_path().stem().string() == sceneName)
+			{
+				std::error_code ec;
+				if (!std::filesystem::remove_all(dataPath.parent_path(), ec))
+				{
+					F_ERROR("Failed to delete scene '{}' and remove files", sceneName, ec.message());
+					return false;
+				}
+			}
+		}
+
+		// Recheck if the path exists
+		if (std::filesystem::exists(dataPath.parent_path()))
+		{
+			F_ERROR("Failed to delete scene '{}' and remove files", sceneName);
+			return false;
+		}
+
+		if (m_mapScenes.erase(sceneName) > 0)
+		{
+			auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
+			F_ASSERT(pSaveProject && "Save Project must exist!");
+			// Save entire project
+			ProjectLoader pl{};
+			if (!pl.SaveLoadedProject(*pSaveProject))
+			{
+				F_ERROR("Failed to save project '{}' at file '{}' after deleting scene. Please ensure the scene files have been removed",
+					pSaveProject->projectName,
+					pSaveProject->projectFilePath);
+
+				return false;
+			}
+		}
+
+		return true;
 	}
 
-	std::vector<std::string> SceneManager::GetSceneNames() const
-	{
-		return GetKeys(m_mapScenes);
-	}
-
-	ToolManager& SceneManager::GetToolManager()
+	ToolManager& EditorSceneManager::GetToolManager()
 	{
 		if (!m_ToolManager)
 			m_ToolManager = std::make_unique<ToolManager>();
@@ -91,7 +117,7 @@ namespace Feather {
 		return *m_ToolManager;
 	}
 
-	CommandManager& SceneManager::GetCommandManager()
+	CommandManager& EditorSceneManager::GetCommandManager()
 	{
 		if (!m_CommandManager)
 			m_CommandManager = std::make_unique<CommandManager>();
@@ -100,7 +126,7 @@ namespace Feather {
 		return *m_CommandManager;
 	}
 
-	EventDispatcher& SceneManager::GetDispatcher()
+	EventDispatcher& EditorSceneManager::GetDispatcher()
 	{
 		if (!m_SceneDispatcher)
 			m_SceneDispatcher = std::make_unique<EventDispatcher>();
@@ -109,7 +135,7 @@ namespace Feather {
 		return *m_SceneDispatcher;
 	}
 
-	void SceneManager::SetTileset(const std::string& tileset)
+	void EditorSceneManager::SetTileset(const std::string& tileset)
 	{
 		m_CurrentTileset = tileset;
 		if (!m_ToolManager)
@@ -118,23 +144,15 @@ namespace Feather {
 		m_ToolManager->SetToolsCurrentTileset(tileset);
 	}
 
-	bool SceneManager::LoadCurrentScene()
+	SceneObject* EditorSceneManager::GetCurrentSceneObject()
 	{
-		if (auto currentScene = GetCurrentScene())
-			return currentScene->LoadScene();
+		if (auto pCurrentScene = dynamic_cast<SceneObject*>(GetCurrentScene()))
+			return pCurrentScene;
 
-		return false;
+		return nullptr;
 	}
 
-	bool SceneManager::UnloadCurrentScene()
-	{
-		if (auto currentScene = GetCurrentScene())
-			return currentScene->UnloadScene();
-
-		return false;
-	}
-
-	bool SceneManager::SaveAllScenes()
+	bool EditorSceneManager::SaveAllScenes()
 	{
 		bool success{ true };
 		for (const auto& [name, scene] : m_mapScenes)
@@ -149,22 +167,29 @@ namespace Feather {
 		return success;
 	}
 
-	bool SceneManager::CheckTagName(const std::string& tagName)
+	bool EditorSceneManager::CheckTagName(const std::string& tagName)
 	{
 		if (auto pScene = GetCurrentScene())
-			return pScene->CheckTagName(tagName);
+		{
+			auto pSceneObject = dynamic_cast<SceneObject*>(pScene);
+			return pSceneObject->CheckTagName(tagName);
+		}
 
 		return false;
 	}
 
-	void SceneManager::CreateSceneManagerLuaBind(sol::state& lua)
+	EditorSceneManager::EditorSceneManager()
+		: SceneManager()
+	{}
+
+	void EditorSceneManager::CreateSceneManagerLuaBind(sol::state& lua)
 	{
-		lua.new_usertype<SceneManager>(
+		auto& sceneManager = SCENE_MANAGER();
+
+		lua.new_usertype<EditorSceneManager>(
 			"SceneManager", sol::no_constructor, "changeScene", [&](const std::string& sSceneName)
 			{
-				auto& sceneManager = SCENE_MANAGER();
-
-				auto currentScene = sceneManager.GetCurrentScene();
+				auto currentScene = sceneManager.GetCurrentSceneObject();
 				if (!currentScene)
 				{
 					F_ERROR("Failed to change to scene '{}': Current scene is invalid", sSceneName);
@@ -190,11 +215,23 @@ namespace Feather {
 					scene->LoadScene();
 				}
 
-				currentScene->CopySceneToRuntime(*scene);
+				// TODO: Check to see if this is valid
+				auto sceneObject = dynamic_cast<SceneObject*>(scene);
+				F_ASSERT(sceneObject);
+
+				currentScene->CopySceneToRuntime(*sceneObject);
 				scene->UnloadScene();
 
 				return true;
-			});
+			},
+			"getCanvas", [&]
+			{
+				if (auto currentScene = sceneManager.GetCurrentScene())
+					return currentScene->GetCanvas();
+
+				return Canvas{};
+			}
+		);
 	}
 
 }

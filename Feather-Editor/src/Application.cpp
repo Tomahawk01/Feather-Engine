@@ -9,6 +9,7 @@
 #include <Core/CoreUtils/CoreUtilities.h>
 #include <Core/CoreUtils/CoreEngineData.h>
 #include <Core/CoreUtils/EngineShaders.h>
+#include <Core/CoreUtils/SaveProject.h>
 #include <Core/Events/EventDispatcher.h>
 #include <Core/Events/EngineEventTypes.h>
 #include <Core/Scripting/InputManager.h>
@@ -31,7 +32,6 @@
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
-#include "Editor/Utilities/SaveProject.h"
 
 #include "Editor/Systems/GridSystem.h"
 #include "Editor/Events/EditorEventTypes.h"
@@ -365,6 +365,14 @@ namespace Feather {
 			return false;
 		}
 		assetManager.GetTexture("feather_logo")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("ZZ_F_PlayerStart", ZZ_F_PlayerStart, ZZ_F_PlayerStart_size))
+		{
+			F_ERROR("Failed to load texture 'ZZ_F_PlayerStart' from memory");
+			return false;
+		}
+
+		assetManager.GetTexture("ZZ_F_PlayerStart")->SetIsEditorTexture(true);
 
 		return true;
 	}

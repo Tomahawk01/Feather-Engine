@@ -28,7 +28,7 @@ namespace Feather {
 		virtual void DrawToolbar() override;
 
 	private:
-		const std::vector<std::string> m_SelectableTypes{ "Textures", "Fonts", "Music", "SoundFX", "Scenes" };
+		const std::vector<std::string> m_SelectableTypes{ "Textures", "Fonts", "Music", "SoundFX", "Scenes", "Prefabs" };
 		bool m_AssetTypeChanged;
 		bool m_Rename;
 		bool m_WindowSelected;

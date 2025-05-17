@@ -12,6 +12,7 @@
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/CoreUtils/CoreEngineData.h"
+#include "Core/CoreUtils/SaveProject.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/Events/EngineEventTypes.h"
@@ -25,7 +26,6 @@
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
-#include "Editor/Utilities/SaveProject.h"
 #include "Editor/Scripting/EditorCoreLuaWrappers.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
@@ -106,7 +106,7 @@ namespace Feather {
 		if (!m_PlayScene)
 			return;
 
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 		if (!currentScene)
 			return;
 
@@ -177,7 +177,7 @@ namespace Feather {
 
 	void SceneDisplay::LoadScene()
 	{
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 		if (!currentScene)
 			return;
 
@@ -217,10 +217,14 @@ namespace Feather {
 		ScriptingSystem::RegisterLuaSystems(*lua, runtimeRegistry);
 		LuaCoreBinder::CreateLuaBind(*lua, runtimeRegistry);
 
-		SceneManager::CreateSceneManagerLuaBind(*lua);
+		EditorSceneManager::CreateSceneManagerLuaBind(*lua);
 
 		// Initialize all of the physics entities
 		auto physicsEntities = runtimeRegistry.GetRegistry().view<PhysicsComponent>();
+		auto& editorFramebuffers = MAIN_REGISTRY().GetContext<std::shared_ptr<EditorFramebuffers>>();
+		const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
+		CORE_GLOBALS().SetScaledWidth(fb->GetWidth());
+		CORE_GLOBALS().SetScaledHeight(fb->GetHeight());
 
 		for (auto entity : physicsEntities)
 		{
@@ -256,9 +260,17 @@ namespace Feather {
 			physicsAttributes.scale = transform.scale;
 			physicsAttributes.objectData.entityID = static_cast<int32_t>(entity);
 
-			// TODO: Set Filters/Masks/Group Index
+			physics.Init(physicsWorld, fb->GetWidth(), fb->GetHeight());
 
-			physics.Init(physicsWorld, 640, 480);
+			// Set Filters/Masks/Group Index
+			if (physics.UseFilters()) // Right now filters are disabled, since there is no way to set this from the editor
+			{
+				physics.SetFilterCategory();
+				physics.SetFilterMask();
+
+				// Should the group index be set based on the sprite layer?
+				physics.SetGroupIndex();
+			}
 		}
 
 		// Get the main script path
@@ -277,7 +289,9 @@ namespace Feather {
 	{
 		m_PlayScene = false;
 		m_SceneLoaded = false;
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
+		F_ASSERT(currentScene && "Current Scene must be valid");
+
 		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 
 		runtimeRegistry.ClearRegistry();
@@ -310,7 +324,7 @@ namespace Feather {
 		renderer->SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		renderer->ClearBuffers(true, true, false);
 
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 
 		if (currentScene && m_PlayScene)
 		{
@@ -342,7 +356,7 @@ namespace Feather {
 		}
 
 		// Send double dispatch events to the scene dispatcher
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 		if (!currentScene)
 			return;
 

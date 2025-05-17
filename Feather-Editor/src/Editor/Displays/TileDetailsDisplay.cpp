@@ -29,7 +29,7 @@ namespace Feather {
 
 	void TileDetailsDisplay::Draw()
 	{
-		auto currentScene = SCENE_MANAGER().GetCurrentScene();
+		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
 		auto& toolManager = SCENE_MANAGER().GetToolManager();
 
 		auto activeTool = toolManager.GetActiveTool();
@@ -49,7 +49,7 @@ namespace Feather {
 		ImGui::AddSpaces(2);
 
 		// Sprite
-		DrawSpriteComponent(tileData.sprite, currentScene.get());
+		DrawSpriteComponent(tileData.sprite, currentScene);
 
 		ImGui::AddSpaces(2);
 		ImGui::Separator();
@@ -199,7 +199,7 @@ namespace Feather {
 		}
 	}
 
-	void TileDetailsDisplay::DrawSpriteComponent(SpriteComponent& sprite, SceneObject* scene)
+	void TileDetailsDisplay::DrawSpriteComponent(SpriteComponent& sprite, Scene* scene)
 	{
 		bool IsChanged{ false };
 

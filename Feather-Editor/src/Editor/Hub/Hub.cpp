@@ -1,6 +1,7 @@
 #include "Hub.h"
 
 #include "Logger/Logger.h"
+#include "Utils/HelperUtilities.h"
 #include "Windowing/Window/Window.h"
 #include "Filesystem/Dialogs/FileDialog.h"
 #include "Core/ECS/MainRegistry.h"

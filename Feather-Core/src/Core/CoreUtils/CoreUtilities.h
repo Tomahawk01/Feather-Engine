@@ -12,4 +12,6 @@ namespace Feather {
 	void GenerateUVs(SpriteComponent& sprite, int textureWidth, int textureHeight);
 	void GenerateUVsExt(SpriteComponent& sprite, int textureWidth, int textureHeight, float u, float v);
 
+	std::tuple<int, int> ConvertWorldPosToIsoCoords(const glm::vec2& position, const struct Canvas& canvas);
+
 }

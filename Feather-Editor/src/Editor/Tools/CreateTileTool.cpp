@@ -56,6 +56,14 @@ namespace Feather {
 
 		Entity tile{ CreateEntity() };
 		tile.AddComponent<TransformComponent>(m_MouseTile->transform);
+
+		if (m_CurrentScene->GetMapType() == EMapType::IsoGrid)
+		{
+			m_MouseTile->sprite.isIsometric = true;
+			m_MouseTile->sprite.isoCellX = m_GridCoords.x;
+			m_MouseTile->sprite.isoCellY = m_GridCoords.y;
+		}
+
 		tile.AddComponent<SpriteComponent>(m_MouseTile->sprite);
 
 		if (m_MouseTile->isCollider)

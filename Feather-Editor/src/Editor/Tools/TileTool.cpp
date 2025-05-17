@@ -6,6 +6,7 @@
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Core/Camera2D.h"
+#include "Utils/MathUtilities.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Scene/SceneObject.h"
@@ -15,11 +16,14 @@ constexpr int MOUSE_SPRITE_LAYER = 10;
 namespace Feather {
 
 	TileTool::TileTool()
-		: AbstractTool(),
-		m_MouseRect{ 32.0f }, m_GridCoords{ 0.0f }, m_GridSnap{ true },
-		m_BatchRenderer{ std::make_shared<SpriteBatchRenderer>() },
-		m_MouseTile{ std::make_shared<Tile>() }
-	{}
+		: AbstractTool()
+		, m_MouseRect{ 32.0f }
+		, m_GridSnap{ true }
+		, m_BatchRenderer{ std::make_shared<SpriteBatchRenderer>() }
+		, m_MouseTile{ std::make_shared<Tile>() }
+	{
+		m_GridCoords = glm::vec2{ 0.0f };
+	}
 
 	void TileTool::Update(Canvas& canvas)
 	{
@@ -38,13 +42,13 @@ namespace Feather {
 		int currentLayer = m_MouseTile->sprite.layer;
 
 		m_MouseTile->sprite = SpriteComponent{
+			.textureName = textureName,
 			.width = m_MouseRect.x,
 			.height = m_MouseRect.y,
 			.color = Color{255, 255, 255, 255},
 			.start_x = 0,
 			.start_y = 0,
-			.layer = currentLayer,
-			.textureName = textureName
+			.layer = currentLayer
 		};
 
 		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(textureName);
@@ -103,11 +107,32 @@ namespace Feather {
 			const auto& transform = tile.GetComponent<TransformComponent>();
 			const auto& sprite = tile.GetComponent<SpriteComponent>();
 
-			if (position.x >= transform.position.x && position.x < transform.position.x + sprite.width * transform.scale.x &&
-				position.y >= transform.position.y && position.y < transform.position.y + sprite.height * transform.scale.y &&
-				m_MouseTile->sprite.layer == sprite.layer)
+			if (m_CurrentScene && m_CurrentScene->GetMapType() == EMapType::Grid)
 			{
-				return static_cast<uint32_t>(entity);
+				if (position.x >= transform.position.x &&
+					position.x < transform.position.x + sprite.width * transform.scale.x &&
+					position.y >= transform.position.y &&
+					position.y < transform.position.y + sprite.height * transform.scale.y &&
+					m_MouseTile->sprite.layer == sprite.layer)
+				{
+					return static_cast<uint32_t>(entity);
+				}
+			}
+			else // Iso Grids, we check at the center of the tile if there is an entity
+			{
+				// Get the center pos of the sprite
+				int spriteCenterX = transform.position.x + ((sprite.width * transform.scale.x) / 2.0f);
+				int spriteCenterY = transform.position.y + ((sprite.height * transform.scale.y) / 2.0f);
+
+				// Get the offset of the position + sprite center
+				int positionOffsetX = position.x + ((sprite.width * transform.scale.x) / 2.0f);
+				int positionOffsetY = position.y + ((sprite.height * transform.scale.y) / 2.0f);
+
+				if (positionOffsetX == spriteCenterX && positionOffsetY == spriteCenterY &&
+					m_MouseTile->sprite.layer == sprite.layer)
+				{
+					return static_cast<uint32_t>(entity);
+				}
 			}
 		}
 
@@ -166,21 +191,38 @@ namespace Feather {
 
 		if (m_GridSnap)
 		{
-			glm::vec2 mouseGrid{
-				mouseWorldPos.x / (m_MouseRect.x * transform.scale.x) * cameraScale,
-				mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) * cameraScale
-			};
+			if (m_CurrentScene->GetMapType() == EMapType::Grid)
+			{
+				glm::vec2 mouseGrid{ mouseWorldPos.x / (m_MouseRect.x * transform.scale.x) * cameraScale,
+									 mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) * cameraScale };
 
-			float scaledGridToCamX = std::floor(mouseGrid.x / cameraScale);
-			float scaledGridToCamY = std::floor(mouseGrid.y / cameraScale);
+				float scaledGridToCamX = std::floor(mouseGrid.x / cameraScale);
+				float scaledGridToCamY = std::floor(mouseGrid.y / cameraScale);
 
-			transform.position.x = scaledGridToCamX * m_MouseRect.x * transform.scale.x;
-			transform.position.y = scaledGridToCamY * m_MouseRect.y * transform.scale.y;
+				transform.position.x = scaledGridToCamX * m_MouseRect.x * transform.scale.x;
+				transform.position.y = scaledGridToCamY * m_MouseRect.y * transform.scale.y;
 
-			m_GridCoords.x = scaledGridToCamX;
-			m_GridCoords.y = scaledGridToCamY;
+				m_GridCoords.x = scaledGridToCamX;
+				m_GridCoords.y = scaledGridToCamY;
 
-			SetMouseWorldCoords(transform.position);
+				SetMouseWorldCoords(transform.position);
+			}
+			else
+			{
+				const auto& canvas = m_CurrentScene->GetCanvas();
+
+				float doubleWidth = canvas.tileWidth * 2.0f;
+				float doubleWidthOver4 = doubleWidth / 4.0f;
+				float tileHeightOver4 = canvas.tileHeight / 4.0f;
+
+				auto [cellX, cellY] = ConvertWorldPosToIsoCoords(mouseWorldPos, canvas);
+
+				transform.position.x = ((doubleWidthOver4 * cellX) - (doubleWidthOver4 * cellY)) * 2.0f/* + canvas.offset.x*/;
+				transform.position.y = ((tileHeightOver4 * cellX) + (tileHeightOver4 * cellY)) * 2.0f;
+
+				m_GridCoords = glm::vec2{ cellX, cellY };
+				SetMouseWorldCoords(transform.position);
+			}
 		}
 		else
 		{

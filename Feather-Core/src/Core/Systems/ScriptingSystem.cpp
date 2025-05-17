@@ -32,6 +32,7 @@
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/AnimationSystem.h"
 
+#include "Core/Scene/Scene.h"
 #include "Core/Character/Character.h"
 #include "Utils/HelperUtilities.h"
 
@@ -442,6 +443,8 @@ namespace Feather {
 				return EntityInView(transform, width, height, *camera);
 			}
 		);
+
+		Scene::CreateLuaBind(lua);
 	}
 
 	void ScriptingSystem::RegisterLuaEvents(sol::state& lua, Registry& registry)
