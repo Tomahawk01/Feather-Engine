@@ -31,15 +31,15 @@ namespace Feather {
 		return true;
 	}
 
-	bool ObjectData::RemoveContact(const ObjectData& objectData)
+	bool ObjectData::RemoveContact(const ObjectData* objectData)
 	{
-		if (objectData.tag.empty() && objectData.group.empty())
+		if (objectData->tag.empty() && objectData->group.empty())
 			return true;
 
 		auto contactItr = std::remove_if(
 			contactEntities.begin(), contactEntities.end(),
 			[&](const ObjectData* contactInfo) {
-				return *contactInfo == objectData;
+				return *contactInfo == *objectData;
 			}
 		);
 
