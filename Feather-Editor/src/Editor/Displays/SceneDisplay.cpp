@@ -67,7 +67,7 @@ namespace Feather {
 			auto& editorFramebuffers = MAIN_REGISTRY().GetContext<std::shared_ptr<EditorFramebuffers>>();
 			const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
 
-			if (auto currentScene = SCENE_MANAGER().GetCurrentScene())
+			if (auto currentScene = SCENE_MANAGER().GetCurrentSceneObject())
 			{
 				auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 				// NOTE: We need to set the relative mouse window, so that any scripts will take into account
@@ -119,6 +119,7 @@ namespace Feather {
 		double dt = coreGlobals.GetDeltaTime();
 		coreGlobals.UpdateDeltaTime();
 
+		// NOTE: Clamp delta time to the target frame rate
 		if (dt < TARGET_FRAME_TIME)
 		{
 			std::this_thread::sleep_for(std::chrono::duration<double>(TARGET_FRAME_TIME - dt));
@@ -187,7 +188,7 @@ namespace Feather {
 		auto& runtimeRegistry = currentScene->GetRuntimeRegistry();
 
 		const auto& canvas = currentScene->GetCanvas();
-		runtimeRegistry.AddToContext<std::shared_ptr<Camera2D>>(std::make_shared<Camera2D>(canvas.width, canvas.height));
+		auto camera = runtimeRegistry.AddToContext<std::shared_ptr<Camera2D>>(std::make_shared<Camera2D>(canvas.width, canvas.height));
 
 		auto physicsWorld = runtimeRegistry.AddToContext<PhysicsWorld>(std::make_shared<b2World>(b2Vec2{ 0.0f, CORE_GLOBALS().GetGravity() }));
 		auto contactListener = runtimeRegistry.AddToContext<std::shared_ptr<ContactListener>>(std::make_shared<ContactListener>());
@@ -223,11 +224,7 @@ namespace Feather {
 
 		// Initialize all of the physics entities
 		auto physicsEntities = runtimeRegistry.GetRegistry().view<PhysicsComponent>();
-		auto& editorFramebuffers = MAIN_REGISTRY().GetContext<std::shared_ptr<EditorFramebuffers>>();
-		const auto& fb = editorFramebuffers->mapFramebuffers[FramebufferType::SCENE];
-		CORE_GLOBALS().SetScaledWidth(fb->GetWidth());
-		CORE_GLOBALS().SetScaledHeight(fb->GetHeight());
-
+		
 		for (auto entity : physicsEntities)
 		{
 			Entity ent{ runtimeRegistry, entity };
@@ -262,7 +259,7 @@ namespace Feather {
 			physicsAttributes.scale = transform.scale;
 			physicsAttributes.objectData.entityID = static_cast<int32_t>(entity);
 
-			physics.Init(physicsWorld, fb->GetWidth(), fb->GetHeight());
+			physics.Init(physicsWorld, camera->GetWidth(), camera->GetHeight());
 
 			// Set Filters/Masks/Group Index
 			if (physics.UseFilters()) // Right now filters are disabled, since there is no way to set this from the editor
