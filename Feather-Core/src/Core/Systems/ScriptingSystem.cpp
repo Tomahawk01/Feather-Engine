@@ -1,9 +1,6 @@
 #include "ScriptingSystem.h"
 
 #include "Logger/Logger.h"
-#include "Utils/Timer.h"
-#include "Utils/RandomGenerator.h"
-
 #include "Core/ECS/Entity.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/ECS/ECSUtils.h"
@@ -34,7 +31,11 @@
 
 #include "Core/Scene/Scene.h"
 #include "Core/Character/Character.h"
+
+#include "Utils/Timer.h"
+#include "Utils/RandomGenerator.h"
 #include "Utils/HelperUtilities.h"
+#include "Utils/Tween.h"
 
 #include <filesystem>
 
@@ -176,6 +177,42 @@ namespace Feather {
 			}
 		);
 	};
+
+	auto createTweenLuaBind = [](sol::state& lua)
+		{
+			// We only need to expose the easing function type to the user not how it was implemented
+			lua.new_enum<EasingFunc>("EasingFuncType",
+				{ { "Linear", EasingFunc::LINEAR },
+				  { "EaseInQuad", EasingFunc::EASE_IN_QUAD },
+				  { "EaseOutQuad", EasingFunc::EASE_OUT_QUAD },
+				  { "EaseInSine", EasingFunc::EASE_IN_SINE },
+				  { "EaseOutSine", EasingFunc::EASE_OUT_SINE },
+				  { "EaseInOutSine", EasingFunc::EASE_IN_OUT_SINE },
+				  { "EaseOutElastic", EasingFunc::EASE_OUT_ELASTIC },
+				  { "EaseInElastic", EasingFunc::EASE_IN_ELASTIC },
+				  { "EaseInOutElastic", EasingFunc::EASE_IN_OUT_ELASTIC },
+				  { "EaseInExponential", EasingFunc::EASE_IN_EXPONENTIAL },
+				  { "EaseOutExponential", EasingFunc::EASE_OUT_EXPONENTIAL },
+				  { "EaseInOutExponential", EasingFunc::EASE_IN_OUT_EXPONENTIAL },
+				  { "EaseInBound", EasingFunc::EASE_IN_BOUNCE },
+				  { "EaseOutBound", EasingFunc::EASE_OUT_BOUNCE },
+				  { "EaseInOutBound", EasingFunc::EASE_IN_OUT_BOUNCE },
+				  { "EaseInCirc", EasingFunc::EASE_IN_CIRC },
+				  { "EaseOutCirc", EasingFunc::EASE_OUT_CIRC },
+				  { "EaseInOutCirc", EasingFunc::EASE_IN_OUT_CIRC } });
+
+			lua.new_usertype<Tween>("Tween",
+				sol::call_constructor,
+				sol::constructors<Tween(), Tween(float, float, float, EasingFunc)>(),
+				"update",
+				&Tween::Update,
+				"totalDistance",
+				&Tween::TotalDistance,
+				"currentValue",
+				&Tween::CurrentValue,
+				"isFinished",
+				&Tween::IsFinished);
+		};
 
 	auto create_lua_logger = [](sol::state& lua) {
 		auto& logger = Log::GetInstance();
@@ -320,6 +357,7 @@ namespace Feather {
 
 		create_timer(lua);
 		create_lua_logger(lua);
+		createTweenLuaBind(lua);
 
 		State::CreateLuaStateBind(lua);
 		StateStack::CreateLuaStateStackBind(lua);
