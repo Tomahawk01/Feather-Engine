@@ -53,15 +53,16 @@ namespace Feather {
 		EventDispatcher& GetEventDispatcher();
 
 	private:
-		std::unique_ptr<Registry> m_MainRegistry{ nullptr };
-		bool m_Initialized{ false };
-
 		MainRegistry() = default;
 		~MainRegistry() = default;
 		MainRegistry(const MainRegistry&) = delete;
 		MainRegistry& operator=(const MainRegistry&) = delete;
 
 		bool RegisterMainSystems();
+
+	private:
+		std::unique_ptr<Registry> m_MainRegistry{ nullptr };
+		bool m_Initialized{ false };
 	};
 
 }

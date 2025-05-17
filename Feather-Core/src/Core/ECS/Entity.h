@@ -77,9 +77,13 @@ namespace Feather {
 		auto RemoveComponent();
 
 	private:
+		/* Reference to the registry this entity belongs to */
 		Registry& m_Registry;
+		/* Underlying entity */
 		entt::entity m_Entity;
+		/* Entities specific name */
 		std::string m_Name;
+		/* The group this entity belongs to */
 		std::string m_Group;
 	};
 

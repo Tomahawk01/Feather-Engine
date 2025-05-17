@@ -26,17 +26,6 @@ namespace Feather {
 		virtual void End() = 0;
 		virtual void Render() = 0;
 
-	private:
-		GLuint m_VAO;
-		GLuint m_VBO;
-		GLuint m_IBO;
-		bool m_UseIBO;
-	private:
-		void Initialize();
-
-	protected:
-		std::vector<std::shared_ptr<TGlyph>> m_Glyphs;
-		std::vector<std::shared_ptr<TBatch>> m_Batches;
 	protected:
 		void SetVertexAttribute(GLuint layoutPosition, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset, GLboolean normalized = GL_FALSE);
 		void SetVertexIAttribute(GLuint layoutPosition, GLuint numComponents, GLenum type, GLsizei stride, void* offset);
@@ -47,6 +36,19 @@ namespace Feather {
 		inline void DisableVAO() { glBindVertexArray(0); }
 
 		virtual void GenerateBatches() = 0;
+
+	protected:
+		std::vector<std::shared_ptr<TGlyph>> m_Glyphs;
+		std::vector<std::shared_ptr<TBatch>> m_Batches;
+
+	private:
+		void Initialize();
+
+	private:
+		GLuint m_VAO;
+		GLuint m_VBO;
+		GLuint m_IBO;
+		bool m_UseIBO;
 	};
 
 	template<typename TBatch, typename TGlyph>
