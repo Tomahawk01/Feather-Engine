@@ -2,24 +2,24 @@
 
 namespace Feather {
 
-	bool ObjectData::AddContact(const ObjectData& objectData)
+	bool ObjectData::AddContact(const ObjectData* objectData)
 	{
 		if (tag.empty() && group.empty())
 			return false;
 
-		if (objectData.tag.empty() && objectData.group.empty())
+		if (objectData->tag.empty() && objectData->group.empty())
 			return false;
 
-		if (objectData.tag == tag && objectData.group == group)
+		if (objectData->tag == tag && objectData->group == group)
 			return false;
 
-		if (isFriendly && objectData.isFriendly && isTrigger && objectData.isTrigger)
+		if (isFriendly && objectData->isFriendly && isTrigger && objectData->isTrigger)
 			return false;
 
 		auto contactItr = std::find_if(
 			contactEntities.begin(), contactEntities.end(),
-			[&](ObjectData& contactInfo) {
-				return contactInfo == objectData;
+			[&](const ObjectData* contactInfo) {
+				return *contactInfo == *objectData;
 			}
 		);
 
@@ -27,6 +27,7 @@ namespace Feather {
 			return false;
 
 		contactEntities.push_back(objectData);
+
 		return true;
 	}
 
@@ -37,15 +38,16 @@ namespace Feather {
 
 		auto contactItr = std::remove_if(
 			contactEntities.begin(), contactEntities.end(),
-			[&](ObjectData& contactInfo) {
-				return contactInfo == objectData;
+			[&](const ObjectData* contactInfo) {
+				return *contactInfo == objectData;
 			}
 		);
 
 		if (contactItr == contactEntities.end())
 			return false;
 
-		contactEntities.erase(contactItr);
+		contactEntities.erase(contactItr, contactEntities.end());
+
 		return true;
 	}
 

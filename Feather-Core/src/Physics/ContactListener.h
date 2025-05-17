@@ -18,10 +18,11 @@ namespace Feather {
 		UserData* GetUserDataB() { return m_UserDataB; }
 
 	private:
+		void SetUserContacts(UserData* a, UserData* b);
+
+	private:
 		UserData* m_UserDataA{ nullptr };
 		UserData* m_UserDataB{ nullptr };
-
-		void SetUserContacts(UserData* a, UserData* b);
 	};
 
 }

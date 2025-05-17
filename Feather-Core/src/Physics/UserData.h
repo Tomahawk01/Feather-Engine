@@ -21,10 +21,10 @@ namespace Feather {
 		bool isTrigger{ false };
 		bool isFriendly{ false };
 		std::uint32_t entityID{};
-		std::vector<ObjectData> contactEntities;
+		std::vector<const ObjectData*> contactEntities;
 
 		friend bool operator==(const ObjectData& a, const ObjectData& b);
-		bool AddContact(const ObjectData& objectData);
+		bool AddContact(const ObjectData* objectData);
 		bool RemoveContact(const ObjectData& objectData);
 
 		[[nodiscard]] std::string to_string() const;
