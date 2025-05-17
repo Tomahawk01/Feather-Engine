@@ -7,24 +7,20 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 
+constexpr const char* PlayerStartTag = "F_PlayerStart";
+
 namespace Feather {
 
 	PlayerStart::PlayerStart(Registry& registry, Scene& sceneRef)
 		: m_SceneRef{ sceneRef }
-		, m_VisualEntity{ registry, "F_PlayerStart", "" }
+		, m_VisualEntity{ registry, PlayerStartTag, "" }
 		, m_CharacterPrefab{ nullptr }
 		, m_Character { nullptr }
 		, m_CharacterName{ "default" }
 		, m_CharacterLoaded{ false }
+		, m_VisualEntityCreated{ false }
 	{
-		m_VisualEntity.AddComponent<TransformComponent>(TransformComponent{});
-		m_VisualEntity.AddComponent<UneditableComponent>(UneditableComponent{ .type = EUneditableType::PlayerStart });
-		auto& sprite = m_VisualEntity.AddComponent<SpriteComponent>(SpriteComponent{ .textureName = "ZZ_F_PlayerStart", .width = 64, .height = 64, .layer = 999999 });
-
-		auto texture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
-		F_ASSERT(texture && "ZZ_F_PlayerStart texture must be loaded into the asset manager!");
-
-		GenerateUVs(sprite, texture->GetWidth(), texture->GetHeight());
+		LoadVisualEntity();
 	}
 
 	void PlayerStart::CreatePlayer(Registry& registry)
@@ -124,14 +120,51 @@ namespace Feather {
 
 	void PlayerStart::SetPosition(const glm::vec2& position)
 	{
-		auto& transform = m_VisualEntity.GetComponent<TransformComponent>();
-		transform.position = position;
+		auto* transform = m_VisualEntity.TryGetComponent<TransformComponent>();
+		F_ASSERT(transform && "Visual entity was not setup correctly");
+		transform->position = position;
 	}
 
 	void PlayerStart::Load(const std::string& prefabName)
 	{
 		m_CharacterName = prefabName;
 		m_CharacterLoaded = true;
+	}
+
+	void PlayerStart::Unload()
+	{
+		m_VisualEntity.GetEntity() = entt::null;
+		m_VisualEntityCreated = false;
+
+		//m_Character.reset( );
+		//m_CharacterPrefab.reset( );
+		//m_CharacterLoaded = false;
+		//m_CharacterName.clear();
+	}
+
+	void PlayerStart::LoadVisualEntity()
+	{
+		if (m_VisualEntityCreated)
+		{
+			F_ERROR("Failed to load visual entity. Already created");
+			return;
+		}
+
+		if (m_VisualEntity.GetEntity() == entt::null)
+		{
+			m_VisualEntity = Entity{ m_SceneRef.GetRegistry(), PlayerStartTag, "" };
+		}
+
+		m_VisualEntity.AddComponent<TransformComponent>(TransformComponent{});
+		m_VisualEntity.AddComponent<UneditableComponent>(UneditableComponent{ .type = EUneditableType::PlayerStart });
+		auto& sprite = m_VisualEntity.AddComponent<SpriteComponent>(SpriteComponent{ .textureName = "ZZ_F_PlayerStart", .width = 64, .height = 64, .layer = 999999 });
+
+		auto pTexture = MAIN_REGISTRY().GetAssetManager().GetTexture(sprite.textureName);
+		F_ASSERT(pTexture && "ZZ_F_PlayerStart texture must be loaded into the asset manager!");
+
+		GenerateUVs(sprite, pTexture->GetWidth(), pTexture->GetHeight());
+
+		m_VisualEntityCreated = true;
 	}
 
 }

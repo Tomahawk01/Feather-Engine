@@ -87,10 +87,14 @@ namespace Feather {
 		sceneData.open(m_SceneDataPath, std::ios::out | std::ios::trunc);
 		F_ASSERT(sceneData.is_open() && "File should have been created and opened");
 		sceneData.close();
+
+		SaveSceneData();
 	}
 
 	bool Scene::LoadScene()
 	{
+		F_TRACE("LOADED SCENE");
+
 		if (m_SceneLoaded)
 		{
 			F_ERROR("Scene '{}' has already been loaded", m_SceneName);
@@ -133,8 +137,10 @@ namespace Feather {
 		}
 
 		// Remove all objects in registry
+		m_PlayerStart.Unload();
 		m_Registry.ClearRegistry();
 		m_SceneLoaded = false;
+
 		return false;
 	}
 
@@ -249,6 +255,10 @@ namespace Feather {
 			if (sPlayerStartPrefab != "default")
 			{
 				m_PlayerStart.Load(sPlayerStartPrefab);
+			}
+			else if (!m_PlayerStart.IsPlayerStartCreated())
+			{
+				m_PlayerStart.LoadVisualEntity();
 			}
 
 			m_PlayerStart.SetPosition(glm::vec2{ sceneData["playerStart"]["position"]["x"].GetFloat(),
