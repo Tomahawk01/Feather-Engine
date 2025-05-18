@@ -428,21 +428,28 @@ namespace Feather {
 		lua.set_function("F_GetTicks", [] { return SDL_GetTicks(); });
 
 		auto& assetManager = mainRegistry.GetAssetManager();
-		lua.set_function(
-			"F_MeasureText", [&](const std::string& text, const std::string& fontName) {
-				const auto& pFont = assetManager.GetFont(fontName);
-				if (!pFont)
+		lua.set_function("F_MeasureText",
+			sol::overload(
+				[&](const std::string& text, const std::string& fontName)
 				{
-					F_ERROR("Failed to get font '{}': Does not exist in asset manager!", fontName);
-					return -1.0f;
+					const auto& pFont = assetManager.GetFont(fontName);
+					if (!pFont)
+					{
+						F_ERROR("Failed to get font '{}': Does not exist in asset manager!", fontName);
+						return -1.0f;
+					}
+
+					glm::vec2 position{ 0.0f }, temp_pos{ position };
+					for (const auto& character : text)
+						pFont->GetNextCharPos(character, temp_pos);
+
+					return std::abs((position - temp_pos).x);
+				},
+				[&](const TextComponent& text, const TransformComponent& transform)
+				{
+					return GetTextBlockSize(text, transform, assetManager);
 				}
-
-				glm::vec2 position{ 0.0f }, temp_pos{ position };
-				for (const auto& character : text)
-					pFont->GetNextCharPos(character, temp_pos);
-
-				return std::abs((position - temp_pos).x);
-			}
+			)
 		);
 
 		auto& engine = CoreEngineData::GetInstance();

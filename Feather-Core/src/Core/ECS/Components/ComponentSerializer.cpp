@@ -238,7 +238,7 @@ namespace Feather {
 		text.textStr = jsonValue["text"].GetString();
 		text.fontName = jsonValue["fontName"].GetString();
 		text.padding = jsonValue["padding"].GetInt();
-		text.wrap = jsonValue["wrap"].GetInt();
+		text.wrap = jsonValue["wrap"].GetFloat();
 		text.isHidden = jsonValue["isHidden"].GetBool();
 		text.color = Color{ .r = static_cast<GLubyte>(jsonValue["color"]["r"].GetInt()),
 							.g = static_cast<GLubyte>(jsonValue["color"]["g"].GetInt()),

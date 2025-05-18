@@ -7,6 +7,7 @@
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/CoreUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Tools/ToolManager.h"
@@ -178,6 +179,15 @@ namespace Feather {
 		return false;
 	}
 
+	void EditorSceneManager::UpdateScenes()
+	{
+		if (auto currentScene = GetCurrentSceneObject())
+		{
+			UpdateDirtyEntities(currentScene->GetRegistry());
+			UpdateDirtyEntities(currentScene->GetRuntimeRegistry());
+		}
+	}
+
 	EditorSceneManager::EditorSceneManager()
 		: SceneManager()
 	{}
@@ -187,25 +197,27 @@ namespace Feather {
 		auto& sceneManager = SCENE_MANAGER();
 
 		lua.new_usertype<EditorSceneManager>(
-			"SceneManager", sol::no_constructor, "changeScene", [&](const std::string& sSceneName)
+			"SceneManager",
+			sol::no_constructor,
+			"changeScene", [&](const std::string& sceneName)
 			{
 				auto currentScene = sceneManager.GetCurrentSceneObject();
 				if (!currentScene)
 				{
-					F_ERROR("Failed to change to scene '{}': Current scene is invalid", sSceneName);
+					F_ERROR("Failed to change to scene '{}': Current scene is invalid", sceneName);
 					return false;
 				}
 
-				if (currentScene->GetRuntimeName() == sSceneName)
+				if (currentScene->GetRuntimeName() == sceneName)
 				{
-					F_ERROR("Failed to load scene '{}': Scene has already been loaded", sSceneName);
+					F_ERROR("Failed to load scene '{}': Scene has already been loaded", sceneName);
 					return false;
 				}
 
-				auto scene = sceneManager.GetScene(sSceneName);
+				auto scene = sceneManager.GetScene(sceneName);
 				if (!scene)
 				{
-					F_ERROR("Failed to change to scene '{}': Scene '{}' is invalid", sSceneName, sSceneName);
+					F_ERROR("Failed to change to scene '{}': Scene '{}' is invalid", sceneName, sceneName);
 					return false;
 				}
 
@@ -220,7 +232,7 @@ namespace Feather {
 				F_ASSERT(sceneObject && "Scene must be a valid SceneObject if run in the editor!");
 				if (!sceneObject)
 				{
-					F_ERROR("Failed to load scene '{}': Scene is not a valid SceneObject", sSceneName);
+					F_ERROR("Failed to load scene '{}': Scene is not a valid SceneObject", sceneName);
 
 					return scene->UnloadScene();
 				}

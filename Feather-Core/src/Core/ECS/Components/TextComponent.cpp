@@ -52,6 +52,30 @@ namespace Feather {
 			"padding", &TextComponent::padding,
 			"wrap", &TextComponent::wrap,
 			"color", &TextComponent::color,
+			"setWrap", // Should be used instead of direct member variables
+			[](TextComponent& text, const float wrap)
+			{
+				text.wrap = wrap;
+				text.isDirty = true;
+			},
+			"setText", // Should be used instead of direct member variables
+			[](TextComponent& text, const std::string& sText)
+			{
+				text.textStr = sText;
+				text.isDirty = true;
+			},
+			"setFont", // Should be used instead of direct member variables
+			[](TextComponent& text, const std::string& font)
+			{
+				text.fontName = font;
+				text.isDirty = true;
+			},
+			"setPadding", // Should be used instead of direct member variables
+			[](TextComponent& text, const int padding)
+			{
+				text.padding = padding;
+				text.isDirty = true;
+			},
 			"isHidden", &TextComponent::isHidden,
 			"toString", &TextComponent::to_string
 		);

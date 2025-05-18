@@ -35,6 +35,7 @@
 #include "Editor/Utilities/DrawComponentUtils.h"
 
 #include "Editor/Systems/GridSystem.h"
+#include "Editor/Scene/SceneManager.h"
 #include "Editor/Events/EditorEventTypes.h"
 #include "Editor/Hub/Hub.h"
 
@@ -72,6 +73,7 @@ namespace Feather {
 			Update();
 			Render();
 			UpdateInputs();
+			SCENE_MANAGER().UpdateScenes();
 		}
 
 		CleanUp();

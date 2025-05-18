@@ -98,7 +98,7 @@ namespace Feather {
 
 		for (auto entity : textView)
 		{
-			const auto& text = textView.get<TextComponent>(entity);
+			auto& text = textView.get<TextComponent>(entity);
 			if (text.fontName.empty() || text.isHidden)
 				continue;
 
@@ -110,9 +110,15 @@ namespace Feather {
 			}
 
 			const auto& transform = textView.get<TransformComponent>(entity);
-			const auto fontSize = font->GetFontSize();
+			
+			if (transform.isDirty || text.isDirty)
+			{
+				const auto [textWidth, textHeight] = GetTextBlockSize(text, transform, assetManager);
+				text.textBoxWidth = textWidth;
+				text.textBoxHeight = textHeight;
+			}
 
-			glm::mat4 model = TRSModel(transform, fontSize, fontSize);
+			glm::mat4 model = TRSModel(transform, text.textBoxWidth, text.textBoxHeight);
 
 			m_TextRenderer->AddText(text.textStr, font, transform.position, text.padding, text.wrap, text.color, model);
 		}

@@ -49,15 +49,24 @@ namespace Feather {
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 0.1f, 1.0f, "%.2f"))
+			{
 				transform.scale.x = glm::clamp(transform.scale.x, 0.1f, 500.0f);
+				transform.isDirty = true;
+			}
 			ImGui::SameLine();
 			ImGui::ColoredLabel("y" "##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 0.1f, 1.0f, "%.2f"))
+			{
 				transform.scale.y = glm::clamp(transform.scale.y, 0.1f, 500.0f);
+				transform.isDirty = true;
+			}
 
 			ImGui::InlineLabel("rotation");
-			ImGui::InputFloat("##rotation", &transform.rotation, 1.0f, 2.0f, "%.2f");
+			if (ImGui::InputFloat("##rotation", &transform.rotation, 1.0f, 2.0f, "%.2f"))
+			{
+				transform.isDirty = true;
+			}
 
 			ImGui::PopItemWidth();
 			ImGui::TreePop();
@@ -521,6 +530,7 @@ namespace Feather {
 			if (ImGui::InputText("##_textStr", sTextBuffer.data(), sizeof(char) * 1024, 0/*ImGuiInputTextFlags_EnterReturnsTrue*/))
 			{
 				text.textStr = std::string{ sTextBuffer.data() };
+				text.isDirty = true;
 			}
 
 			std::string fontName{ text.fontName };
@@ -535,6 +545,7 @@ namespace Feather {
 					{
 						fontName = font;
 						text.fontName = fontName;
+						text.isDirty = true;
 					}
 				}
 				ImGui::EndCombo();
@@ -544,13 +555,13 @@ namespace Feather {
 			ImGui::InlineLabel("padding");
 			if (ImGui::InputInt("##padding", &text.padding, 0, 0))
 			{
-				// TODO: Add padding
+				text.isDirty = true;
 			}
 
 			ImGui::InlineLabel("wrap");
 			if (ImGui::InputFloat("##textWrap", &text.wrap, 0.0f, 0.0f))
 			{
-				// TODO: Add textWrap
+				text.isDirty = true;
 			}
 
 			ImGui::PopItemWidth();
@@ -600,7 +611,7 @@ namespace Feather {
 			ImGui::ItemToolTip(hasParent ? "Game object has a parent. This is the relative position based on the parent's position"
 										 : "World or absolute position of the game object");
 
-			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::ColoredLabel("x##pos_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat(
 				"##position_x", hasParent ? &transform.localPosition.x : &transform.position.x, 1.0f, 10.0f, "%.1f"))
@@ -609,7 +620,7 @@ namespace Feather {
 			}
 
 			ImGui::SameLine();
-			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::ColoredLabel("y##pos_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputFloat(
 				"##position_y", hasParent ? &transform.localPosition.y : &transform.position.y, 1.0f, 10.0f, "%.1f"))
@@ -622,22 +633,28 @@ namespace Feather {
 			}
 
 			ImGui::InlineLabel("scale");
-			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::ColoredLabel("x##scl_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 1.0f, 1.0f, "%.1f"))
 			{
 				transform.scale.x = std::clamp(transform.scale.x, 0.01f, 150.0f);
+				transform.isDirty = true;
 			}
 			ImGui::SameLine();
-			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::ColoredLabel("y##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 1.0f, 1.0f, "%.1f"))
 			{
 				transform.scale.y = std::clamp(transform.scale.y, 0.01f, 150.0f);
+				transform.isDirty = true;
 			}
 
 			ImGui::InlineLabel("rotation");
-			ImGui::InputFloat("##rotation", &transform.rotation, 1.0f, 1.0f, "%.1f");
+			if (ImGui::InputFloat("##rotation", &transform.rotation, 1.0f, 1.0f, "%.1f"))
+			{
+				transform.isDirty = true;
+			}
+
 			ImGui::PopItemWidth();
 			ImGui::TreePop();
 		}

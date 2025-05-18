@@ -12,8 +12,11 @@ namespace Feather {
 		std::string textStr{ "" };
 		int padding{ 0 };
 		float wrap{ -1.0f };
+		float textBoxWidth{ -1.0f };
+		float textBoxHeight{ -1.0f };
 		Color color{ 255, 255, 255, 255 };
 		bool isHidden{ false };
+		bool isDirty{ false };
 
 		[[nodiscard]] std::string to_string();
 

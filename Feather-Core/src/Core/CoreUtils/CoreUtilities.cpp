@@ -2,6 +2,8 @@
 
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/Scene/Scene.h"
+#include "Core/Resources/AssetManager.h"
+#include "Core/ECS/Registry.h"
 #include "Utils/MathUtilities.h"
 
 namespace Feather {
@@ -87,6 +89,125 @@ namespace Feather {
 		int cellY = static_cast<int>(-py / diagonal);
 
 		return std::make_tuple(cellX, cellY);
+	}
+
+	std::tuple<float, float> GetTextBlockSize(const TextComponent& textComp, const TransformComponent& transform, AssetManager& assetManager)
+	{
+		const auto& pFont = assetManager.GetFont(textComp.fontName);
+		if (!pFont)
+		{
+			F_ERROR("Failed to get font '{}': Does not exist in asset manager!", textComp.fontName);
+			return std::make_tuple(-1.0f, -1.0f);
+		}
+		float fontSize = pFont->GetFontSize();
+		// There is no wrap, find width, height is not needed
+		if (textComp.wrap < 0.0f || textComp.wrap < fontSize)
+		{
+			glm::vec2 position{ 0.0f }, temp_pos{ position };
+			for (const auto& character : textComp.textStr)
+			{
+				pFont->GetNextCharPos(character, temp_pos);
+			}
+
+			const auto& paddingInfo = pFont->AveragePaddingInfo();
+			return std::make_tuple(std::abs((position - temp_pos).x - (paddingInfo.paddingX * 0.5f)), 1 * fontSize + (paddingInfo.paddingY * 0.5f));
+		}
+
+		// Calculate Text boxSize
+		int numRows{ 0 };
+		glm::vec2 pos{ transform.position }, temp_pos{ pos };
+		std::string text_holder{ "" };
+
+		float wrap{ textComp.wrap };
+
+		int infiniteLoopCheck{ 0 };
+
+		for (int i = 0; i < textComp.textStr.size(); i++)
+		{
+			if (infiniteLoopCheck >= SANITY_LOOP_CHECK)
+			{
+				F_ERROR("Failed to get Text Box size correctly. Please check you text wrap, padding, textStr, etc");
+				return std::make_tuple(-1.0f, -1.0f);
+			}
+
+			char character = textComp.textStr[i];
+
+			text_holder += character;
+			bool bNewLine = character == '\n';
+			size_t text_size = text_holder.size();
+			pFont->GetNextCharPos(character, temp_pos);
+
+			if (text_size > 0 && (temp_pos.x > (wrap + pos.x) || character == '\0' || bNewLine))
+			{
+				if (!bNewLine)
+				{
+					while (textComp.textStr[i] != ' ' && textComp.textStr[i] != '.' &&
+						   textComp.textStr[i] != '!' && textComp.textStr[i] != '?' && text_size > 0)
+					{
+						i--;
+						text_holder.pop_back();
+						text_size = text_holder.size();
+						infiniteLoopCheck++;
+						if (i < 0)
+						{
+							F_ERROR("Text wrap is too small!");
+							return std::make_tuple(-1.0f, -1.0f);
+						}
+					}
+				}
+				else
+				{
+					text_holder.pop_back();
+					text_size = text_holder.size();
+				}
+
+				if (text_size > 0)
+				{
+					if (std::isalpha(text_holder[0]))
+					{
+						temp_pos = pos;
+						text_holder.clear();
+						infiniteLoopCheck = 0;
+						numRows++;
+					}
+					else
+					{
+						text_holder.erase(0, 1);
+						temp_pos.x -= fontSize;
+					}
+				}
+			}
+		}
+
+		if (!text_holder.empty())
+			numRows++;
+
+		float height = numRows * fontSize;
+		if (height < fontSize)
+			height = fontSize;
+
+		const auto& paddingInfo = pFont->AveragePaddingInfo();
+		return std::make_tuple(wrap - paddingInfo.paddingX * 0.5f, height + paddingInfo.paddingY * 0.5f);
+	}
+
+	void UpdateDirtyEntities(Registry& registry)
+	{
+		auto& reg = registry.GetRegistry();
+		auto view = reg.view<TransformComponent>();
+		for (auto entity : view)
+		{
+			auto& transform = view.get<TransformComponent>(entity);
+			if (transform.isDirty)
+			{
+				transform.isDirty = false;
+			}
+
+			if (reg.all_of<TextComponent>(entity))
+			{
+				auto& text = reg.get<TextComponent>(entity);
+				text.isDirty = false;
+			}
+		}
 	}
 
 }

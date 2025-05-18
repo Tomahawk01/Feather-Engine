@@ -5,6 +5,9 @@
 
 namespace Feather {
 
+	class AssetManager;
+	class Registry;
+
 	/**
 	* @brief Checks if an entity is fully within the camera's view before culling.
 	*
@@ -57,5 +60,31 @@ namespace Feather {
 	* @return A tuple containing the isometric grid coordinates (x, y).
 	*/
 	std::tuple<int, int> ConvertWorldPosToIsoCoords(const glm::vec2& position, const struct Canvas& canvas);
+
+	/**
+	* @brief Returns the pixel size of a text block based on font metrics and wrapping settings.
+	*
+	* Calculates the width and height required to render the text from a TextComponent,
+	* using font data from the AssetManager and optional word wrapping.
+	*
+	* @param textComp Text data including string, font, and wrap width.
+	* @param transform Starting position for text rendering.
+	* @param assetManager Asset manager used to retrieve the font.
+	* @return A tuple (width, height) representing the text block size in pixels.
+	*/
+	std::tuple<float, float> GetTextBlockSize(const TextComponent& textComp, const TransformComponent& transform, AssetManager& assetManager);
+
+	/**
+	 * @brief Resets the dirty flags on all necessary components in the registry.
+	 * Marks updated entities as clean by clearing their `bDirty` flags.
+	 */
+	void UpdateDirtyEntities(Registry& registry);
+
+	/* Target time per frame. Used to help clamp delta time */
+	constexpr double TARGET_FRAME_TIME = 1.0 / 60.0;
+	/* Target time per frame. Used for Box2D step */
+	constexpr float TARGET_FRAME_TIME_F = 1.0f / 60.0f;
+	/* Used to prevent specific loops from looping forever */
+	constexpr int SANITY_LOOP_CHECK = 100;
 
 }

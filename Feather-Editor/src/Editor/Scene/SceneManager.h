@@ -42,6 +42,8 @@ namespace Feather {
 
 		bool CheckTagName(const std::string& tagName);
 
+		void UpdateScenes();
+
 		inline const std::map<std::string, std::shared_ptr<Scene>>& GetAllScenes() const { return m_mapScenes; }
 		inline const std::string& GetCurrentTileset() const { return m_CurrentTileset; }
 

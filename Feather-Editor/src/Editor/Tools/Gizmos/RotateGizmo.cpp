@@ -37,12 +37,23 @@ namespace Feather {
 		Entity selectedEntity{ *m_Registry, m_SelectedEntity };
 		auto& selectedTransform = selectedEntity.GetComponent<TransformComponent>();
 
-		selectedTransform.rotation += GetDeltaX();
+		float deltaX{ GetDeltaX() };
+		if (deltaX > 0.0f)
+		{
+			selectedTransform.rotation += deltaX;
 
-		if (selectedTransform.rotation < 0.0f)
-			selectedTransform.rotation = 360.0f + selectedTransform.rotation;
-		else if (selectedTransform.rotation > 360.0f)
-			selectedTransform.rotation = selectedTransform.rotation - 360.0f;
+			// Clamp the values between 0 and 360
+			if (selectedTransform.rotation < 0.0f)
+			{
+				selectedTransform.rotation = 360.0f + selectedTransform.rotation;
+			}
+			else if (selectedTransform.rotation > 360.0f)
+			{
+				selectedTransform.rotation = selectedTransform.rotation - 360.0f;
+			}
+
+			selectedTransform.isDirty = true;
+		}
 
 		SetGizmoPosition(selectedEntity);
 

@@ -259,6 +259,11 @@ namespace Feather {
 				const auto& physics = objectEnt.GetComponent<PhysicsComponent>();
 				SERIALIZE_COMPONENT(*serializer, physics);
 			}
+			if (objectEnt.HasComponent<TextComponent>())
+			{
+				const auto& text = objectEnt.GetComponent<TextComponent>();
+				SERIALIZE_COMPONENT(*serializer, text);
+			}
 
 			if (auto* relations = objectEnt.TryGetComponent<Relationship>())
 			{
@@ -401,6 +406,12 @@ namespace Feather {
 				const auto& jsonID = components["id"];
 				auto& id = gameObject.GetComponent<Identification>();
 				DESERIALIZE_COMPONENT(jsonID, id);
+			}
+			if (components.HasMember("text"))
+			{
+				const auto& jsonText = components["text"];
+				auto& text = gameObject.AddComponent<TextComponent>();
+				DESERIALIZE_COMPONENT(jsonText, text);
 			}
 
 			if (components.HasMember("relationship"))

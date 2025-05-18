@@ -2,6 +2,9 @@
 
 #include "Logger/Logger.h"
 
+/* If the loop is more that 100, fail and let the user know */
+constexpr int MAX_LOOP_FAIL_CHECK = 100;
+
 namespace Feather {
 
 	TextBatchRenderer::TextBatchRenderer()
@@ -81,12 +84,19 @@ namespace Feather {
 			std::string text_holder{ "" };
 			glm::vec2 temp_pos = textGlyph->position;
 			auto fontSize = textGlyph->font->GetFontSize();
+			int infiniteLoopCheck{ 0 };
 
 			if (textGlyph->wrap > 100.0f)
 			{
 				// Create the text chunks for each line
 				for (int i = 0; i < textGlyph->textStr.size(); i++)
 				{
+					if (infiniteLoopCheck >= MAX_LOOP_FAIL_CHECK)
+					{
+						F_ERROR("Failed to draw text batch correctly. Please check your text wrap, padding, textStr, etc");
+						return;
+					}
+
 					auto character = textGlyph->textStr[i];
 					text_holder += character;
 					bool newLine = character == '\n';
@@ -101,6 +111,8 @@ namespace Feather {
 							while (textGlyph->textStr[i] != ' ' && textGlyph->textStr[i] != '.' && textGlyph->textStr[i] != '!' && textGlyph->textStr[i] != '?' && text_size > 0)
 							{
 								i--;
+								infiniteLoopCheck++;
+
 								if (i < 0)
 								{
 									F_ERROR("Failed to draw text '{0}': Wrap '{1}', is too small for the text to wrap successfully!", textGlyph->textStr, textGlyph->wrap);
@@ -127,6 +139,7 @@ namespace Feather {
 								textChunks.push_back(text_holder);
 								temp_pos = textGlyph->position;
 								text_holder.clear();
+								infiniteLoopCheck = 0;
 							}
 							else
 							{
@@ -166,14 +179,14 @@ namespace Feather {
 					};
 
 					vertices[currentVertex++] = Vertex{
-						.position = textGlyph->model * glm::vec4{glyph.max.position.x, glyph.min.position.y, 0.0f, 1.0f},
-						.uvs = glm::vec2{glyph.max.uvs.x, glyph.min.uvs.y},
+						.position = textGlyph->model * glm::vec4{glyph.max.position.x, glyph.max.position.y, 0.0f, 1.0f},
+						.uvs = glm::vec2{glyph.max.uvs.x, glyph.max.uvs.y},
 						.color = textGlyph->color
 					};
 
 					vertices[currentVertex++] = Vertex{
-						.position = textGlyph->model * glm::vec4{glyph.max.position.x, glyph.max.position.y, 0.0f, 1.0f},
-						.uvs = glm::vec2{glyph.max.uvs.x, glyph.max.uvs.y},
+						.position = textGlyph->model * glm::vec4{glyph.max.position.x, glyph.min.position.y, 0.0f, 1.0f},
+						.uvs = glm::vec2{glyph.max.uvs.x, glyph.min.uvs.y},
 						.color = textGlyph->color
 					};
 
@@ -185,14 +198,14 @@ namespace Feather {
 					};
 
 					vertices[currentVertex++] = Vertex{
-						.position = textGlyph->model * glm::vec4{glyph.max.position.x, glyph.max.position.y, 0.0f, 1.0f},
-						.uvs = glm::vec2{glyph.max.uvs.x, glyph.max.uvs.y},
+						.position = textGlyph->model * glm::vec4{glyph.min.position.x, glyph.max.position.y, 0.0f, 1.0f},
+						.uvs = glm::vec2{glyph.min.uvs.x, glyph.max.uvs.y},
 						.color = textGlyph->color
 					};
 
 					vertices[currentVertex++] = Vertex{
-						.position = textGlyph->model * glm::vec4{glyph.min.position.x, glyph.max.position.y, 0.0f, 1.0f},
-						.uvs = glm::vec2{glyph.min.uvs.x, glyph.max.uvs.y},
+						.position = textGlyph->model * glm::vec4{glyph.max.position.x, glyph.max.position.y, 0.0f, 1.0f},
+						.uvs = glm::vec2{glyph.max.uvs.x, glyph.max.uvs.y},
 						.color = textGlyph->color
 					};
 
