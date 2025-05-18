@@ -13,12 +13,6 @@ namespace Feather {
 
 	void StateMachine::ChangeState(const std::string& stateName, bool removeState, const sol::object& enterParams)
 	{
-		/*if (m_StateTable)
-		{
-			ChangeStateTable(stateName, removeState, enterParams);
-			return;
-		}*/
-
 		auto stateItr = m_mapStates.find(stateName);
 		if (stateItr == m_mapStates.end())
 		{
@@ -177,7 +171,7 @@ namespace Feather {
 			"StateMachine",
 			sol::call_constructor,
 			sol::constructors<StateMachine(), StateMachine(const sol::table&)>(),
-			"change_state", sol::overload(
+			"changeState", sol::overload(
 				[](StateMachine& sm, const std::string& state, bool remove, const sol::object& enterParams) {
 					sm.ChangeState(state, remove, enterParams);
 				},
@@ -190,9 +184,9 @@ namespace Feather {
 			),
 			"update", &StateMachine::Update,
 			"render", &StateMachine::Render,
-			"current_state", &StateMachine::CurrentState,
-			"add_state", &StateMachine::AddState,
-			"exit_state", &StateMachine::ExitState,
+			"currentState", &StateMachine::CurrentState,
+			"addState", &StateMachine::AddState,
+			"exitState", &StateMachine::ExitState,
 			"destroy", &StateMachine::DestroyStates
 		);
 	}

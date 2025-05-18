@@ -5,25 +5,25 @@
 
 namespace Feather {
 
-	void FunctionC()
+	static void FunctionC()
 	{
 		// Crash happens here
 		int* ptr{ nullptr };
 		*ptr = 194;
 	}
 
-	void FunctionB()
+	static void FunctionB()
 	{
 		FunctionC();
 	}
 
-	void FunctionA()
+	static void FunctionA()
 	{
 		FunctionB();
 	}
 
 	// Bind this function to Lua
-	void CrashFromLua()
+	static void CrashFromLua()
 	{
 		FunctionA();
 	}

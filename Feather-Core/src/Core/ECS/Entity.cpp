@@ -206,7 +206,7 @@ namespace Feather {
 					return Entity{ registry, static_cast<entt::entity>(id) };
 				}
 			),
-			"add_component", [](Entity& entity, const sol::table& comp, sol::this_state s) -> sol::object
+			"addComponent", [](Entity& entity, const sol::table& comp, sol::this_state s) -> sol::object
 			{
 				if (!comp.valid())
 					return sol::lua_nil_t{};
@@ -220,7 +220,7 @@ namespace Feather {
 
 				return component ? component.cast<sol::reference>() : sol::lua_nil_t{};
 			},
-			"has_component", [](Entity& entity, const sol::table& comp)
+			"hasComponent", [](Entity& entity, const sol::table& comp)
 			{
 				const auto has_comp = InvokeMetaFunction(
 					GetIdType(comp),
@@ -229,7 +229,7 @@ namespace Feather {
 
 				return has_comp ? has_comp.cast<bool>() : false;
 			},
-			"get_component", [](Entity& entity, const sol::table& comp, sol::this_state s)
+			"getComponent", [](Entity& entity, const sol::table& comp, sol::this_state s)
 			{
 				const auto component = InvokeMetaFunction(
 					GetIdType(comp),
@@ -239,7 +239,7 @@ namespace Feather {
 
 				return component ? component.cast<sol::reference>() : sol::lua_nil_t{};
 			},
-			"remove_component", [](Entity& entity, const sol::table& comp)
+			"removeComponent", [](Entity& entity, const sol::table& comp)
 			{
 				const auto component = InvokeMetaFunction(
 					GetIdType(comp),

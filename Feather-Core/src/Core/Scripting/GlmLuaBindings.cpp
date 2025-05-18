@@ -1,12 +1,14 @@
 #include "GlmLuaBindings.h"
 
+#include "Core/Scripting/ScriptingUtilities.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
 
 namespace Feather {
 
 	// glm::vec2
-	void CreateVec2Bind(sol::state& lua)
+	static void CreateVec2Bind(sol::state& lua)
 	{
 		// Multiplier overloads
 		auto vec2_multiply_overloads = sol::overload(
@@ -54,7 +56,7 @@ namespace Feather {
 	}
 
 	// glm::vec3
-	void CreateVec3Bind(sol::state& lua)
+	static void CreateVec3Bind(sol::state& lua)
 	{
 		// Multiplier overloads
 		auto vec3_multiply_overloads = sol::overload(
@@ -104,7 +106,7 @@ namespace Feather {
 	}
 
 	// glm::vec4
-	void CreateVec4Bind(sol::state& lua)
+	static void CreateVec4Bind(sol::state& lua)
 	{
 		// Multiplier overloads
 		auto vec4_multiply_overloads = sol::overload(
@@ -155,7 +157,7 @@ namespace Feather {
 		);
 	}
 
-	void CreateQuaternionLuaBind(sol::state& lua)
+	static void CreateQuaternionLuaBind(sol::state& lua)
 	{
 		lua.new_usertype<glm::quat>(
 			"quat",
@@ -180,7 +182,7 @@ namespace Feather {
 	}
 
 	// Helper math functions
-	void MathFreeFunctions(sol::state& lua)
+	static void MathFreeFunctions(sol::state& lua)
 	{
 		lua.set_function("F_distance", sol::overload(
 			[](glm::vec2& a, glm::vec2& b) { return glm::distance(a, b); },
@@ -225,20 +227,23 @@ namespace Feather {
 			}));
 	}
 
-	void MathConstants(sol::state& lua)
+	static void MathConstants(sol::state& lua)
 	{
-		lua.set("F_PI", 3.14159265359f);
-		lua.set("F_TWO_PI", 6.28318530717f);
-		lua.set("F_PI_SQUARED", 9.86960440108f);
-		lua.set("F_PI_OVER_2", 1.57079632679f);
-		lua.set("F_PI_OVER_4", 0.78539816339f);
-		lua.set("F_PHI", 1.6180339887498948482045868343656381f);
-		lua.set("F_EULERS", 2.71828182845904523536f);
+		auto constants = MakeReadOnlyTable(lua, {
+			std::make_pair("PI", 3.14159265359f),
+			std::make_pair("TWO_PI", 6.28318530717f),
+			std::make_pair("PI_SQUARED", 9.86960440108f),
+			std::make_pair("PI_OVER_2", 1.57079632679f),
+			std::make_pair("PI_OVER_4", 0.78539816339f),
+			std::make_pair("PHI", 1.6180339887498948482045868343656381f),
+			std::make_pair("EULERS", 2.71828182845904523536f),
+			std::make_pair("SQRT_2", 1.4142135623730950488016887242097f),
+			std::make_pair("SQRT_3", 1.7320508075688772935274463415059f),
+			std::make_pair("INV_SQRT_2", 0.70710678118654752440084436210485f),
+			std::make_pair("INV_SQRT_3", 0.57735026918962576450914878050196f)
+		});
 
-		lua.set("F_SQRT_2", 1.4142135623730950488016887242097f);
-		lua.set("F_SQRT_3", 1.7320508075688772935274463415059f);
-		lua.set("F_INV_SQRT_2", 0.70710678118654752440084436210485f);
-		lua.set("F_INV_SQRT_3", 0.57735026918962576450914878050196f);
+		lua["F_Constants"] = constants;
 	}
 
 	void Feather::GLMBinding::CreateGLMBindings(sol::state& lua)

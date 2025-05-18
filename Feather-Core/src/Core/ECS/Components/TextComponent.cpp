@@ -53,7 +53,7 @@ namespace Feather {
 			"wrap", &TextComponent::wrap,
 			"color", &TextComponent::color,
 			"isHidden", &TextComponent::isHidden,
-			"to_string", &TextComponent::to_string
+			"toString", &TextComponent::to_string
 		);
 	}
 

@@ -18,7 +18,7 @@ namespace Feather {
 		lua.new_usertype<ContactListener>(
 			"ContactListener",
 			sol::no_constructor,
-			"get_user_data", [&](sol::this_state s) { return GetUserData(*contactListener, s); }
+			"getUserData", [&](sol::this_state s) { return GetUserData(*contactListener, s); }
 		);
     }
 

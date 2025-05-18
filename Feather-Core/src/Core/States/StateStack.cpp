@@ -189,7 +189,7 @@ namespace Feather {
 			"StateStack",
 			sol::call_constructor,
 			sol::constructors<StateStack()>(),
-			"change_state", &StateStack::ChangeState,
+			"changeState", &StateStack::ChangeState,
 			"push", &StateStack::Push,
 			"pop", &StateStack::Pop,
 			"update", &StateStack::Update,

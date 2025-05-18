@@ -31,18 +31,18 @@ void Feather::AnimationComponent::CreateAnimationLuaBind(sol::state& lua)
 					.isLooped = isLooped,
 			};
 		}),
-		"num_frames", &AnimationComponent::numFrames,
-		"frame_rate", &AnimationComponent::frameRate,
-		"frame_offset", &AnimationComponent::frameOffset,
-		"current_frame", &AnimationComponent::currentFrame,
-		"start_time", &AnimationComponent::startTime,
-		"is_vertical", &AnimationComponent::isVertical,
-		"is_looped", &AnimationComponent::isLooped,
+		"numFrames", &AnimationComponent::numFrames,
+		"frameRate", &AnimationComponent::frameRate,
+		"frameOffset", &AnimationComponent::frameOffset,
+		"currentFrame", &AnimationComponent::currentFrame,
+		"startTime", &AnimationComponent::startTime,
+		"isVertical", &AnimationComponent::isVertical,
+		"isLooped", &AnimationComponent::isLooped,
 		"reset", [](AnimationComponent& anim)
 		{
 			anim.currentFrame = 0;
 			anim.startTime = SDL_GetTicks();
 		},
-		"to_string", &AnimationComponent::to_string
+		"toString", &AnimationComponent::to_string
 	);
 }

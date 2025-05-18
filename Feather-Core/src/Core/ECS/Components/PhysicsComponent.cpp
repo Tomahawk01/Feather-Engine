@@ -247,7 +247,7 @@ namespace Feather {
 			return;
 		}
 
-		auto copyFilter = fixtureList->GetFilterData();
+		b2Filter copyFilter{ fixtureList->GetFilterData() };
 		copyFilter.categoryBits = category;
 		fixtureList->SetFilterData(copyFilter);
 		m_InitialAttributes.filterCategory = category;
@@ -266,15 +266,15 @@ namespace Feather {
 			return;
 		}
 
-		auto pFixtureList = m_RigidBody->GetFixtureList();
-		if (!pFixtureList)
+		auto fixtureList = m_RigidBody->GetFixtureList();
+		if (!fixtureList)
 		{
 			return;
 		}
 
-		auto copyFilter = pFixtureList->GetFilterData();
+		b2Filter copyFilter{ fixtureList->GetFilterData() };
 		copyFilter.maskBits = mask;
-		pFixtureList->SetFilterData(copyFilter);
+		fixtureList->SetFilterData(copyFilter);
 		m_InitialAttributes.filterMask = mask;
 	}
 
@@ -432,7 +432,7 @@ namespace Feather {
 					return pc;
 				}
 			),
-			"linear_impulse", [](PhysicsComponent& pc, const glm::vec2& impulse)
+			"linearImpulse", [](PhysicsComponent& pc, const glm::vec2& impulse)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -443,7 +443,7 @@ namespace Feather {
 
 				body->ApplyLinearImpulse(b2Vec2{ impulse.x, impulse.y }, body->GetPosition(), true);
 			},
-			"angular_impulse", [](PhysicsComponent& pc, float impulse)
+			"angularImpulse", [](PhysicsComponent& pc, float impulse)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -454,7 +454,7 @@ namespace Feather {
 
 				body->ApplyAngularImpulse(impulse, true);
 			},
-			"set_linear_velocity", [](PhysicsComponent& pc, const glm::vec2& velocity)
+			"setLinearVelocity", [](PhysicsComponent& pc, const glm::vec2& velocity)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -465,7 +465,7 @@ namespace Feather {
 
 				body->SetLinearVelocity(b2Vec2{ velocity.x, velocity.y });
 			},
-			"get_linear_velocity", [](PhysicsComponent& pc)
+			"getLinearVelocity", [](PhysicsComponent& pc)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -477,7 +477,7 @@ namespace Feather {
 				const auto& linearVelocity = body->GetLinearVelocity();
 				return glm::vec2{ linearVelocity.x, linearVelocity.y };
 			},
-			"set_angular_velocity", [](PhysicsComponent& pc, float angularVelocity)
+			"setAngularVelocity", [](PhysicsComponent& pc, float angularVelocity)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -488,7 +488,7 @@ namespace Feather {
 
 				body->SetAngularVelocity(angularVelocity);
 			},
-			"get_angular_velocity", [](PhysicsComponent& pc)
+			"getAngularVelocity", [](PhysicsComponent& pc)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -499,7 +499,7 @@ namespace Feather {
 
 				return body->GetAngularVelocity();
 			},
-			"set_gravity_scale", [](PhysicsComponent& pc, float gravityScale)
+			"setGravityScale", [](PhysicsComponent& pc, float gravityScale)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -510,7 +510,7 @@ namespace Feather {
 
 				body->SetGravityScale(gravityScale);
 			},
-			"get_gravity_scale", [](PhysicsComponent& pc)
+			"getGravityScale", [](PhysicsComponent& pc)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -521,7 +521,7 @@ namespace Feather {
 
 				return body->GetGravityScale();
 			},
-			"set_transform", [](PhysicsComponent& pc, const glm::vec2& position)
+			"setTransform", [](PhysicsComponent& pc, const glm::vec2& position)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -541,11 +541,11 @@ namespace Feather {
 
 				body->SetTransform(b2Vec2{ bx, by }, 0.0f);
 			},
-			"get_transform", [](const PhysicsComponent& pc)
+			"getTransform", [](const PhysicsComponent& pc)
 			{
 
 			},
-			"set_body_type", [&](PhysicsComponent& pc, RigidBodyType type)
+			"setBodyType", [&](PhysicsComponent& pc, RigidBodyType type)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -573,7 +573,7 @@ namespace Feather {
 
 				body->SetType(bodyType);
 			},
-			"set_bullet", [&](PhysicsComponent& pc, bool bullet)
+			"setAsBullet", [&](PhysicsComponent& pc, bool bullet)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -584,7 +584,7 @@ namespace Feather {
 
 				body->SetBullet(bullet);
 			},
-			"is_bullet", [&](PhysicsComponent& pc)
+			"isBullet", [&](PhysicsComponent& pc)
 			{
 				auto body = pc.GetBody();
 				if (!body)
@@ -595,26 +595,26 @@ namespace Feather {
 
 				return body->IsBullet();
 			},
-			"set_filter_category",
+			"setFilterCategory",
 			[](PhysicsComponent& pc)
 			{
 				auto body = pc.GetBody();
 				if (!body)
 					return;
 			},
-			"cast_ray",
+			"castRay",
 			[](PhysicsComponent& pc, const glm::vec2& p1, const glm::vec2& p2, sol::this_state s)
 			{
 				auto objectData = pc.CastRay(b2Vec2{ p1.x, p1.y }, b2Vec2{ p2.x, p2.y });
 				return objectData.entityID == entt::null ? sol::lua_nil_t{} : sol::make_object(s, objectData);
 			},
-			"box_trace",
+			"boxTrace",
 			[](PhysicsComponent& pc, const glm::vec2& lowerBounds, const glm::vec2& upperBounds, sol::this_state s)
 			{
 				auto vecObjectData = pc.BoxTrace(b2Vec2{ lowerBounds.x, lowerBounds.y }, b2Vec2{ upperBounds.x, upperBounds.y });
 				return vecObjectData.empty() ? sol::lua_nil_t{} : sol::make_object(s, vecObjectData);
 			},
-			"object_data",
+			"objectData",
 			[](PhysicsComponent& pc)
 			{
 				return pc.GetCurrentObjectData();

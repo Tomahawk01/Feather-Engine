@@ -23,7 +23,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 				};
 			}
 		),
-		"set_on_enter", [](State& state, sol::protected_function on_enter) {
+		"setOnEnter", [](State& state, sol::protected_function on_enter) {
 			if (!on_enter.valid())
 			{
 				F_ERROR("Failed to set on_enter function");
@@ -31,7 +31,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 			}
 			state.on_enter = on_enter;
 		},
-		"set_on_exit", [](State& state, sol::protected_function on_exit) {
+		"setOnExit", [](State& state, sol::protected_function on_exit) {
 			if (!on_exit.valid())
 			{
 				F_ERROR("Failed to set on_exit function");
@@ -39,7 +39,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 			}
 			state.on_exit = on_exit;
 		},
-		"set_on_update", [](State& state, sol::protected_function on_update) {
+		"setOnUpdate", [](State& state, sol::protected_function on_update) {
 			if (!on_update.valid())
 			{
 				F_ERROR("Failed to set on_update function");
@@ -47,7 +47,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 			}
 			state.on_update = on_update;
 		},
-		"set_on_render", [](State& state, sol::protected_function on_render) {
+		"setOnRender", [](State& state, sol::protected_function on_render) {
 			if (!on_render.valid())
 			{
 				F_ERROR("Failed to set on_render function");
@@ -55,7 +55,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 			}
 			state.on_render = on_render;
 		},
-		"set_handle_inputs", [](State& state, sol::protected_function handle_inputs) {
+		"setHandleInputs", [](State& state, sol::protected_function handle_inputs) {
 			if (!handle_inputs.valid())
 			{
 				F_ERROR("Failed to set handle_inputs function");
@@ -63,7 +63,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 			}
 			state.handle_inputs = handle_inputs;
 		},
-		"set_variable_table", [](State& state, const sol::table& table) {
+		"setVariableTable", [](State& state, const sol::table& table) {
 			if (!table.valid())
 			{
 				F_ERROR("Failed to set variables");

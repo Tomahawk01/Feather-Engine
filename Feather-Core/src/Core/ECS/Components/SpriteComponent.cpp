@@ -55,8 +55,8 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 		),
 		"u", &UVs::u,
 		"v", &UVs::v,
-		"uv_width", &UVs::uv_width,
-		"uv_height", &UVs::uv_height
+		"uvWidth", &UVs::uv_width,
+		"uvHeight", &UVs::uv_height
 	);
 
 	lua.new_usertype<SpriteComponent>(
@@ -81,13 +81,13 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 		"texture_name", &SpriteComponent::textureName,
 		"width", &SpriteComponent::width,
 		"height", &SpriteComponent::height,
-		"start_x", &SpriteComponent::start_x,
-		"start_y", &SpriteComponent::start_y,
+		"startX", &SpriteComponent::start_x,
+		"startY", &SpriteComponent::start_y,
 		"layer", &SpriteComponent::layer,
 		"hidden", &SpriteComponent::isHidden,
 		"uvs", &SpriteComponent::uvs,
 		"color", &SpriteComponent::color,
-		"generate_uvs", [&](SpriteComponent& sprite)
+		"generateUVs", [&](SpriteComponent& sprite)
 		{
 			auto pTexture = assetManager.GetTexture(sprite.textureName);
 
@@ -99,14 +99,14 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 
 			GenerateUVs(sprite, pTexture->GetWidth(), pTexture->GetHeight());
 		},
-		"inspect_uvs", [](SpriteComponent& sprite) {
+		"inspectUVs", [](SpriteComponent& sprite) {
 			sprite.uvs.u = sprite.start_x * sprite.uvs.uv_width;
 			sprite.uvs.v = sprite.start_y * sprite.uvs.uv_height;
 		},
-		"inspect_x", [](SpriteComponent& sprite) {
+		"inspectX", [](SpriteComponent& sprite) {
 			sprite.uvs.u = sprite.start_x * sprite.uvs.uv_width;
 		},
-		"inspect_y", [](SpriteComponent& sprite) {
+		"inspectY", [](SpriteComponent& sprite) {
 			sprite.uvs.v = sprite.start_y * sprite.uvs.uv_height;
 		}
 	);

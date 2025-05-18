@@ -49,34 +49,34 @@ namespace Feather {
                 else
                     return dispatcher;
             }),
-            "add_handler",
+            "addHandler",
             [](EventDispatcher& eventDispatcher, const sol::table& handler, const sol::object& type)
             {
                 const auto handle = InvokeMetaFunction(GetIdType(type), "add_handler"_hs, eventDispatcher, handler);
                 F_TRACE("TYPE: {}", handle.type().info().name());
             },
-            "remove_handler",
+            "removeHandler",
             [](EventDispatcher& eventDispatcher, const sol::table& handler, const sol::object& type)
             {
                 InvokeMetaFunction(GetIdType(type), "remove_handler"_hs, eventDispatcher, handler);
             },
-            "emit_event",
+            "emitEvent",
             [](EventDispatcher& eventDispatcher, const sol::table& event)
             {
                 const auto ev = InvokeMetaFunction(GetIdType(event), "emit_event"_hs, eventDispatcher, event);
             },
-            "enqueue_event",
+            "enqueueEvent",
             [](EventDispatcher& eventDispatcher, const sol::table& event)
             {
                 const auto ev = InvokeMetaFunction(GetIdType(event), "enqueue_event"_hs, eventDispatcher, event);
             },
-            "has_handlers",
+            "hasHandlers",
             [](EventDispatcher& eventDispatcher, const sol::table& event)
             {
                 const auto has_handlers = InvokeMetaFunction(GetIdType(event), "has_handlers"_hs, eventDispatcher);
                 return has_handlers ? has_handlers.cast<bool>() : false;
             },
-            "update_event",
+            "updateEvent",
             [](EventDispatcher& eventDispatcher, const sol::table& event)
             {
                 const auto ev = InvokeMetaFunction(GetIdType(event), "update_event"_hs, eventDispatcher);
@@ -86,7 +86,7 @@ namespace Feather {
             {
                 eventDispatcher.UpdateAll();
             },
-            "clear_queue",
+            "clearQueue",
             [](EventDispatcher& eventDispatcher)
             {
                 eventDispatcher.ClearQueue();
