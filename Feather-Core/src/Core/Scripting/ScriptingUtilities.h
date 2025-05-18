@@ -81,4 +81,9 @@ namespace Feather {
 		return tbl;
 	}
 
+	struct ScriptingHelpers
+	{
+		static void CreateLuaHelpers(sol::state& lua);
+	};
+
 }

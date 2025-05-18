@@ -37,21 +37,21 @@ namespace Feather {
 			ImGui::PushItemWidth(120.0f);
 
 			ImGui::InlineLabel("position");
-			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::ColoredLabel("x" "##pos_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			ImGui::InputFloat("##position_x", &transform.position.x, 1.0f, 10.0f, "%.2f");
 			ImGui::SameLine();
-			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::ColoredLabel("y" "##pos_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			ImGui::InputFloat("##position_y", &transform.position.y, 1.0f, 10.0f, "%.2f");
 
-			ImGui::InlineLabel("scale");
+			ImGui::InlineLabel("scale" "##scl_x");
 			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 0.1f, 1.0f, "%.2f"))
 				transform.scale.x = glm::clamp(transform.scale.x, 0.1f, 500.0f);
 			ImGui::SameLine();
-			ImGui::ColoredLabel("y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::ColoredLabel("y" "##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 0.1f, 1.0f, "%.2f"))
 				transform.scale.y = glm::clamp(transform.scale.y, 0.1f, 500.0f);

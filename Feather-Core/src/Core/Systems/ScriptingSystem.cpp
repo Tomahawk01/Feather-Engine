@@ -12,6 +12,7 @@
 #include "Core/Scripting/UserDataBindings.h"
 #include "Core/Scripting/ContactListenerBindings.h"
 #include "Core/Scripting/LuaFilesystemBindings.h"
+#include "Core/Scripting/ScriptingUtilities.h"
 
 #include "Core/Resources/AssetManager.h"
 
@@ -350,7 +351,8 @@ namespace Feather {
 		RendererBinder::CreateRenderingBind(lua, registry);
 		UserDataBinder::CreateLuaUserData(lua);
 		ContactListenerBinder::CreateLuaContactListener(lua, registry.GetRegistry());
-		LuaFilesystem::CreateLuaFileSytemBind(lua);
+		LuaFilesystem::CreateLuaFileSystemBind(lua);
+		ScriptingHelpers::CreateLuaHelpers(lua);
 
 		FollowCamera::CreateLuaFollowCamera(lua, registry);
 		Character::CreateCharacterLuaBind(lua, registry);

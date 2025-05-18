@@ -6,7 +6,7 @@ namespace Feather {
 
 	struct LuaFilesystem
 	{
-		static void CreateLuaFileSytemBind(sol::state& lua);
+		static void CreateLuaFileSystemBind(sol::state& lua);
 	};
 
 }

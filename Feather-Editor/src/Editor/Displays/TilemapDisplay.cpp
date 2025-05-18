@@ -450,7 +450,7 @@ namespace Feather {
 		const ToolType activeToolType = toolManager.GetActiveToolType();
 		const GizmoType activeGizmoType = toolManager.GetActiveGizmoType();
 
-		ImGui::DisabledButton(ICON_FA_TOOLS, TOOL_BUTTON_SIZE);
+		ImGui::DisabledButton(ICON_FA_TOOLS "##1", TOOL_BUTTON_SIZE);
 
 		ImGui::SameLine();
 
@@ -535,7 +535,7 @@ namespace Feather {
 
 		ImGui::SameLine();
 
-		ImGui::DisabledButton(ICON_FA_TOOLS, TOOL_BUTTON_SIZE);
+		ImGui::DisabledButton(ICON_FA_TOOLS "##2", TOOL_BUTTON_SIZE);
 
 		ImGui::PopStyleVar(2);
 

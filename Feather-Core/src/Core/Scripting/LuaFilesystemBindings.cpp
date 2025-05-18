@@ -7,7 +7,7 @@
 
 namespace Feather {
 
-	void LuaFilesystem::CreateLuaFileSytemBind(sol::state& lua)
+	void LuaFilesystem::CreateLuaFileSystemBind(sol::state& lua)
 	{
         lua.new_usertype<LuaFilesystem>(
             "Filesystem",
