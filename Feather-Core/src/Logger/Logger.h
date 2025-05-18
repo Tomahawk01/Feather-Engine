@@ -52,12 +52,13 @@ namespace Feather {
 
 		inline void ClearLogs() { m_LogEntries.clear(); }
 		inline const std::vector<LogEntry>& GetLogs() { return m_LogEntries; }
-		inline void ResetLogAdded() { m_LogAdded = false; }
-		inline const bool LogAdded() const { return m_LogAdded; }
 
 	private:
 		std::vector<LogEntry> m_LogEntries;
-		bool m_LogAdded{ false }, m_Initialized{ false }, m_ConsoleLog{ true }, m_RetainLogs{ true };
+
+		bool m_Initialized{ false };
+		bool m_ConsoleLog{ true };
+		bool m_RetainLogs{ true };
 
 		Log() = default;
 
@@ -89,8 +90,6 @@ namespace Feather {
 #define F_ASSERT(x) assert(x)
 
 #define F_INIT_LOGS(console, retain)	Feather::Log::GetInstance().Init(console, retain)
-#define F_LOG_ADDED()					Feather::Log::GetInstance().LogAdded()
-#define F_RESET_ADDED()					Feather::Log::GetInstance().ResetLogAdded()
 #define F_GET_LOGS()					Feather::Log::GetInstance().GetLogs()
 #define F_CLEAR_LOGS()					Feather::Log::GetInstance().ClearLogs()
 

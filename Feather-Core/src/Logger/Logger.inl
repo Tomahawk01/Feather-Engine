@@ -40,7 +40,6 @@ namespace Feather {
 		if (m_RetainLogs)
 		{
 			m_LogEntries.emplace_back(LogEntry::LogType::TRACE, ss.str());
-			m_LogAdded = true;
 		}
 	}
 
@@ -69,7 +68,6 @@ namespace Feather {
 		if (m_RetainLogs)
 		{
 			m_LogEntries.emplace_back(LogEntry::LogType::INFO, ss.str());
-			m_LogAdded = true;
 		}
 	}
 
@@ -98,7 +96,6 @@ namespace Feather {
 		if (m_RetainLogs)
 		{
 			m_LogEntries.emplace_back(LogEntry::LogType::WARN, ss.str());
-			m_LogAdded = true;
 		}
 	}
 
@@ -127,7 +124,6 @@ namespace Feather {
 		if (m_RetainLogs)
 		{
 			m_LogEntries.emplace_back(LogEntry::LogType::ERR, ss.str());
-			m_LogAdded = true;
 		}
 	}
 
@@ -156,7 +152,6 @@ namespace Feather {
 		if (m_RetainLogs)
 		{
 			m_LogEntries.emplace_back(LogEntry::LogType::CRITICAL, ss.str());
-			m_LogAdded = true;
 		}
 	}
 

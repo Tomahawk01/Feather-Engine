@@ -25,7 +25,7 @@ namespace Feather {
 			if (!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1"))
 				F_ERROR("Failed to enable V-Sync!");
 		}
-		F_INFO("Window created successfully!");
+		F_TRACE("Window created successfully!");
 	}
 
 	void Window::SetPosition(int x, int y)
