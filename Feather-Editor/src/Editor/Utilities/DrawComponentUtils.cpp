@@ -295,7 +295,7 @@ namespace Feather {
 			ImGui::AddSpaces(2);
 
 			PhysicsAttributes& physicsAttributes = physics.GetChangableAttributes();
-			static std::string selectedBodyType{ "" };
+			std::string selectedBodyType{ GetRigidBodyTypeString(physicsAttributes.eType) };
 			ImGui::InlineLabel("body type");
 			ImGui::ItemToolTip("The body type: static, kinematic, or dynamic");
 			if (ImGui::BeginCombo("##body_type", selectedBodyType.c_str()))
@@ -314,7 +314,7 @@ namespace Feather {
 				ImGui::EndCombo();
 			}
 
-			static std::string selectedCategoryType{ "" };
+			std::string selectedCategoryType{ GetFilterCategoryString(static_cast<FilterCategory>(physicsAttributes.filterCategory)) };
 			ImGui::InlineLabel("category type");
 			ImGui::ItemToolTip("The collision category bits. Bodies will usually only use one category type");
 			if (ImGui::BeginCombo("##category_type", selectedCategoryType.c_str()))
@@ -334,8 +334,9 @@ namespace Feather {
 			ImGui::Separator();
 			ImGui::AddSpaces(2);
 
-			static std::string selectedMaskBit{ "" };
-			static FilterCategory maskCategory{ FilterCategory::NO_CATEGORY };
+			std::string selectedMaskBit{ "" };
+			FilterCategory maskCategory{ FilterCategory::NO_CATEGORY };
+
 			ImGui::InlineLabel("masks");
 			ImGui::ItemToolTip("The collision mask bits. This states the categories that this shape would accept for collision");
 			if (ImGui::BeginCombo("##mask_bits", selectedMaskBit.c_str()))
@@ -349,13 +350,7 @@ namespace Feather {
 					}
 				}
 
-				ImGui::EndCombo();
-			}
-
-			if (!selectedMaskBit.empty() && maskCategory != FilterCategory::NO_CATEGORY)
-			{
-				ImGui::SetCursorPosX(128.0f);
-				if (ImGui::Button("apply mask"))
+				if (!selectedMaskBit.empty() && maskCategory != FilterCategory::NO_CATEGORY)
 				{
 					uint16_t filterCat = static_cast<uint16_t>(maskCategory);
 					if (!(IsBitSet(physicsAttributes.filterMask, filterCat)))
@@ -369,6 +364,8 @@ namespace Feather {
 						F_ERROR("Masks already contain '{}'", selectedMaskBit);
 					}
 				}
+
+				ImGui::EndCombo();
 			}
 
 			if (physicsAttributes.filterMask > 0)
