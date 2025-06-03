@@ -444,7 +444,10 @@ namespace Feather {
 				switch (m_Event.window.event)
 				{
 				case SDL_WINDOWEVENT_SIZE_CHANGED:
-					m_Window->SetSize(m_Event.window.data1, m_Event.window.data2);
+					if (SDL_GetWindowID(m_Window->GetWindow().get()) == m_Event.window.windowID)
+					{
+						m_Window->SetSize(m_Event.window.data1, m_Event.window.data2);
+					}
 					break;
 				default:
 					break;

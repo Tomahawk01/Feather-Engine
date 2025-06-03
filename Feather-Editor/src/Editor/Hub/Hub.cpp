@@ -87,15 +87,13 @@ namespace Feather {
 
 	void Hub::DrawGui()
 	{
-		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
 		if (!ImGui::Begin("##_HudDisplay", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDecoration))
 		{
 			ImGui::End();
 			return;
 		}
 
+		ImGui::SetWindowPos(ImGui::GetMainViewport()->Pos);
 		ImGui::SetWindowSize(ImVec2{ m_Width, m_Height });
 
 		// Draw the Feather logo
