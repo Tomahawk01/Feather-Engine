@@ -186,18 +186,17 @@ namespace Feather {
 		const auto& mouseWorldPos = GetMouseWorldCoords();
 		auto& transform = m_MouseTile->transform;
 
-		const float cameraScale = m_Camera->GetScale();
 		bool isOffset{ true };
 
 		if (m_GridSnap)
 		{
 			if (m_CurrentScene->GetMapType() == EMapType::Grid)
 			{
-				glm::vec2 mouseGrid{ mouseWorldPos.x / (m_MouseRect.x * transform.scale.x) * cameraScale,
-									 mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) * cameraScale };
+				glm::vec2 mouseGrid{ mouseWorldPos.x / (m_MouseRect.x * transform.scale.x),
+									 mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) };
 
-				float scaledGridToCamX = std::floor(mouseGrid.x / cameraScale);
-				float scaledGridToCamY = std::floor(mouseGrid.y / cameraScale);
+				float scaledGridToCamX = std::floor(mouseGrid.x);
+				float scaledGridToCamY = std::floor(mouseGrid.y);
 
 				transform.position.x = scaledGridToCamX * m_MouseRect.x * transform.scale.x;
 				transform.position.y = scaledGridToCamY * m_MouseRect.y * transform.scale.y;
