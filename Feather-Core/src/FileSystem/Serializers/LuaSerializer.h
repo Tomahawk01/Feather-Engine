@@ -42,7 +42,7 @@ namespace Feather {
 		LuaSerializer& EndTable(bool newLine = true);
 
 		template <Streamable TValue>
-		LuaSerializer& AddValue(const TValue& value, bool newLine = true, bool finalValue = false, bool indent = false);
+		LuaSerializer& AddValue(const TValue& value, bool newLine = true, bool finalValue = false, bool indent = false, bool quote = false);
 
 		template <Streamable TKey, Streamable TValue>
 		LuaSerializer& AddKeyValuePair(TKey key, const TValue& value, bool addNewLine = true, bool finalValue = false, bool quoteKey = false, bool quoteValue = false);

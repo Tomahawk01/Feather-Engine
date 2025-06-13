@@ -3,10 +3,10 @@
 namespace Feather {
 
 	template<Streamable TValue>
-	inline LuaSerializer& LuaSerializer::AddValue(const TValue& value, bool newLine, bool finalValue, bool indent)
+	inline LuaSerializer& LuaSerializer::AddValue(const TValue& value, bool newLine, bool finalValue, bool indent, bool quote)
 	{
 		SeparateValues(newLine);
-		Stream(value);
+		Stream(quote ? AddQuotes(to_string(value)) : value);
 
 		if (indent)
 			++m_NumIndents;

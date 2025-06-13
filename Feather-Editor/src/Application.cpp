@@ -21,6 +21,7 @@
 // Displays
 #include "Editor/Displays/MenuDisplay.h"
 #include "Editor/Displays/SceneDisplay.h"
+#include "Editor/Displays/ScriptDisplay.h"
 #include "Editor/Displays/SceneHierarchyDisplay.h"
 #include "Editor/Displays/AssetDisplay.h"
 #include "Editor/Displays/TileDetailsDisplay.h"
@@ -586,6 +587,13 @@ namespace Feather {
 			return false;
 		}
 
+		auto scriptDisplay = std::make_unique<ScriptDisplay>();
+		if (!scriptDisplay)
+		{
+			F_ERROR("Failed to create a Script Display");
+			return false;
+		}
+
 		displayHolder->displays.push_back(std::move(menuDisplay));
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(sceneHierarchyDisplay));
@@ -595,6 +603,7 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(tilemapDisplay));
 		displayHolder->displays.push_back(std::move(assetDisplay));
 		displayHolder->displays.push_back(std::move(contentDisplay));
+		displayHolder->displays.push_back(std::move(scriptDisplay));
 
 		return true;
 	}
@@ -622,6 +631,7 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Tile Layers", tileLayerId);
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
+			ImGui::DockBuilderDockWindow("Script List", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
 			ImGui::DockBuilderDockWindow("Assets", logNodeId);
