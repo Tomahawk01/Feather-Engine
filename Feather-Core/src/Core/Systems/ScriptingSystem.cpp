@@ -467,6 +467,11 @@ namespace Feather {
 		lua.set_function("F_EnableCollisionRendering", [&] { engine.EnableColliderRender(); });
 		lua.set_function("F_CollisionRenderingEnabled", [&] { return engine.RenderCollidersEnabled(); });
 
+		// Animation Enable functions
+		lua.set_function("F_DisableAnimationRendering", [&] { engine.DisableAnimationRender(); });
+		lua.set_function("F_EnableAnimationRendering", [&] { engine.EnableAnimationRender(); });
+		lua.set_function("F_AnimationRenderingEnabled", [&] { return engine.AnimationRenderEnabled(); });
+
 		lua.set_function("F_GetProjecPath", [&] { return engine.GetProjectPath(); });
 
 		lua.new_usertype<RandomIntGenerator>(

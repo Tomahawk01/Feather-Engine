@@ -40,6 +40,10 @@ namespace Feather {
 		inline void DisableColliderRender() { m_RenderColliders = false; }
 		inline bool RenderCollidersEnabled() const { return m_RenderColliders; }
 
+		inline void EnableAnimationRender() { m_RenderAnimations = true; }
+		inline void DisableAnimationRender() { m_RenderAnimations = false; }
+		inline bool AnimationRenderEnabled() const { return m_RenderAnimations; }
+
 		inline float ScaledWidth() const { return m_ScaledWidth; }
 		inline float ScaledHeight() const { return m_ScaledHeight; }
 
@@ -92,6 +96,7 @@ namespace Feather {
 		bool m_PhysicsEnabled;
 		bool m_PhysicsPaused;
 		bool m_RenderColliders;
+		bool m_RenderAnimations;
 
 		std::string m_ProjectPath;
 

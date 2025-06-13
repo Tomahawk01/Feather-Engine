@@ -81,6 +81,15 @@ namespace Feather {
 						coreGlobals.DisableColliderRender();
 				}
 
+				static bool showAnimations{ true };
+				if (ImGui::Checkbox("Show Animations", &showAnimations))
+				{
+					if (showAnimations)
+						coreGlobals.EnableAnimationRender();
+					else
+						coreGlobals.DisableAnimationRender();
+				}
+
 				if (ImGui::TreeNode("Project Settings"))
 				{
 					// TODO: Add specific Project settings

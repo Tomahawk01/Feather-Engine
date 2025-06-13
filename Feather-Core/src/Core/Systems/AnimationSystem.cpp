@@ -3,6 +3,7 @@
 #include "Logger/Logger.h"
 #include "Core/ECS/Registry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/CoreUtils/CoreEngineData.h"
 
 #include <SDL.h>
 
@@ -10,6 +11,9 @@ namespace Feather {
 
 	void AnimationSystem::Update(Registry& registry, Camera2D& camera)
 	{
+		if (!CORE_GLOBALS().AnimationRenderEnabled())
+			return;
+
 		auto view = registry.GetRegistry().view<AnimationComponent, SpriteComponent, TransformComponent>();
 		if (view.size_hint() < 1)
 			return;
