@@ -283,14 +283,14 @@ namespace Feather {
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto& assetManager = mainRegistry.GetAssetManager();
 
-		if (!assetManager.AddTextureFromMemory("play_button", play_button, sizeof(play_button) / sizeof(play_button[0])))
+		if (!assetManager.AddTextureFromMemory("play_button", g_PlayButton, g_PlayButtonSize))
 		{
 			F_ERROR("Failed to load texture 'play_button' from memory");
 			return false;
 		}
 		assetManager.GetTexture("play_button")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("stop_button", stop_button, sizeof(stop_button) / sizeof(stop_button[0])))
+		if (!assetManager.AddTextureFromMemory("stop_button", g_StopButton, g_StopButtonSize))
 		{
 			F_ERROR("Failed to load texture 'stop_button' from memory");
 			return false;
@@ -298,35 +298,35 @@ namespace Feather {
 		assetManager.GetTexture("stop_button")->SetIsEditorTexture(true);
 
 		// ============= Gizmo Textures =============
-		if (!assetManager.AddTextureFromMemory("x_axis_translate", x_axis_arrow, x_axis_arrow_size))
+		if (!assetManager.AddTextureFromMemory("x_axis_translate", g_XAxisArrow, g_XAxisArrowSize))
 		{
 			F_ERROR("Failed to load texture 'x_axis_translate' from memory");
 			return false;
 		}
 		assetManager.GetTexture("x_axis_translate")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("y_axis_translate", y_axis_arrow, y_axis_arrow_size))
+		if (!assetManager.AddTextureFromMemory("y_axis_translate", g_YAxisArrow, g_YAxisArrowSize))
 		{
 			F_ERROR("Failed to load texture 'y_axis_translate' from memory");
 			return false;
 		}
 		assetManager.GetTexture("y_axis_translate")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("x_axis_scale", x_axis_scale, x_axis_scale_size))
+		if (!assetManager.AddTextureFromMemory("x_axis_scale", g_XAxisScale, g_XAxisScaleSize))
 		{
 			F_ERROR("Failed to load texture 'x_axis_scale' from memory");
 			return false;
 		}
 		assetManager.GetTexture("x_axis_scale")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("y_axis_scale", y_axis_scale, y_axis_scale_size))
+		if (!assetManager.AddTextureFromMemory("y_axis_scale", g_YAxisScale, g_YAxisScaleSize))
 		{
 			F_ERROR("Failed to load texture 'y_axis_scale' from memory");
 			return false;
 		}
 		assetManager.GetTexture("y_axis_scale")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("rotate_tool", rotate_tool, rotate_tool_size))
+		if (!assetManager.AddTextureFromMemory("rotate_tool", g_RotateTool, g_RotateToolSize))
 		{
 			F_ERROR("Failed to load texture 'rotate_tool' from memory");
 			return false;
@@ -334,55 +334,61 @@ namespace Feather {
 		assetManager.GetTexture("rotate_tool")->SetIsEditorTexture(true);
 
 		// ============= Content Display Textures =============
-		if (!assetManager.AddTextureFromMemory("file_icon", file_icon, sizeof(file_icon) / sizeof(file_icon[0])))
+		if (!assetManager.AddTextureFromMemory("file_icon", g_FileIcon, g_FileIconSize))
 		{
 			F_ERROR("Failed to load texture 'file_icon' from memory");
 			return false;
 		}
 		assetManager.GetTexture("file_icon")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("folder_icon", folder_icon, sizeof(folder_icon) / sizeof(folder_icon[0])))
+		if (!assetManager.AddTextureFromMemory("folder_icon", g_FolderIcon, g_FolderIconSize))
 		{
 			F_ERROR("Failed to load texture 'folder_icon' from memory");
 			return false;
 		}
 		assetManager.GetTexture("folder_icon")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("music_icon", music_icon, sizeof(music_icon) / sizeof(music_icon[0])))
+		if (!assetManager.AddTextureFromMemory("music_icon", g_MusicIcon, g_MusicIconSize))
 		{
 			F_ERROR("Failed to load texture 'music_icon' from memory");
 			return false;
 		}
 		assetManager.GetTexture("music_icon")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("image_icon", image_icon, sizeof(image_icon) / sizeof(image_icon[0])))
+		if (!assetManager.AddTextureFromMemory("image_icon", g_ImageIcon, g_ImageIconSize))
 		{
 			F_ERROR("Failed to load texture 'image_icon' from memory");
 			return false;
 		}
 		assetManager.GetTexture("image_icon")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("scene_icon", scene_icon, sizeof(scene_icon) / sizeof(scene_icon[0])))
+		if (!assetManager.AddTextureFromMemory("scene_icon", g_SceneIcon, g_SceneIconSize))
 		{
 			F_ERROR("Failed to load texture 'scene_icon' from memory");
 			return false;
 		}
 		assetManager.GetTexture("scene_icon")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("feather_logo", feather_logo, feather_logo_size))
+		if (!assetManager.AddTextureFromMemory("feather_logo", g_FeatherLogo, g_FeatherLogoSize))
 		{
 			F_ERROR("Failed to load texture 'feather_logo' from memory");
 			return false;
 		}
 		assetManager.GetTexture("feather_logo")->SetIsEditorTexture(true);
 
-		if (!assetManager.AddTextureFromMemory("ZZ_F_PlayerStart", ZZ_F_PlayerStart, ZZ_F_PlayerStart_size))
+		if (!assetManager.AddTextureFromMemory("ZZ_F_PlayerStart", g_PlayerStart, g_PlayerStartSize))
 		{
 			F_ERROR("Failed to load texture 'ZZ_F_PlayerStart' from memory");
 			return false;
 		}
-
 		assetManager.GetTexture("ZZ_F_PlayerStart")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddTextureFromMemory("ZZ_F_default_player", g_DefaultPlayer, g_DefaultPlayerSize))
+		{
+			F_ERROR("Failed to load texture 'ZZ_F_default_player' from memory");
+			return false;
+		}
+		assetManager.GetTexture("ZZ_F_default_player")->SetIsEditorTexture(true);
 
 		return true;
 	}

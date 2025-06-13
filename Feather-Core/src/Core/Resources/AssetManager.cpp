@@ -36,9 +36,15 @@ namespace Feather {
 
     bool AssetManager::CreateDefaultFonts()
     {
-        if (!AddFontFromMemory("defaultFont", pixel_font))
+        if (!AddFontFromMemory("defaultFont", g_PixelFont))
         {
             F_ERROR("Failed to create default pixel font");
+            return false;
+        }
+
+        if (!AddFontFromMemory("roboto-bold-32", g_PixelFont))
+        {
+            F_ERROR("Failed to create roboto font");
             return false;
         }
 

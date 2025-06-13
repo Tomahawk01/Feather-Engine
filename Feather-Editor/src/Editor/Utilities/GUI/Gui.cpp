@@ -49,7 +49,7 @@ namespace Feather {
 		icons_config.PixelSnapH = true;
 		icons_config.GlyphMinAdvanceX = iconFontSize;
 		icons_config.GlyphOffset = ImVec2{ 0.0f, 2.0f };
-		io.Fonts->AddFontFromMemoryTTF(fa_solid_900, fa_solid_900_size, baseFontSize, &icons_config, icons_ranges);
+		io.Fonts->AddFontFromMemoryTTF(g_FaSolid900, g_FaSolid900Size, baseFontSize, &icons_config, icons_ranges);
 
 		if (!ImGui_ImplSDL2_InitForOpenGL(window->GetWindow().get(), window->GetGLContext()))
 		{
