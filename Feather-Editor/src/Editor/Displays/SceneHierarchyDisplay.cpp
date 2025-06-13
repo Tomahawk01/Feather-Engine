@@ -243,6 +243,8 @@ namespace Feather {
 						const auto addComponent = InvokeMetaFunction(id_type, "add_component_default"_hs, entity);
 						if (addComponent)
 						{
+							EVENT_DISPATCHER().EmitEvent(AddComponentEvent{ .entity = &entity, .type = GetComponentTypeFromStr(componentStr) });
+
 							*addComponent = false;
 							ImGui::CloseCurrentPopup();
 						}
@@ -258,6 +260,9 @@ namespace Feather {
 					else
 					{
 						storage->push(entity.GetEntity());
+
+						EVENT_DISPATCHER().EmitEvent(AddComponentEvent{ .entity = &entity, .type = GetComponentTypeFromStr(componentStr) });
+
 						*addComponent = false;
 						ImGui::CloseCurrentPopup();
 					}

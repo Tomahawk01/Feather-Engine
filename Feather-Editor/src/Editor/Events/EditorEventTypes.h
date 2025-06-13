@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 
 namespace Feather {
@@ -54,5 +55,30 @@ namespace Feather {
 		std::string newName{ "" };
 		Entity* entity{ nullptr };
 	};
+
+	enum class ComponentType
+	{
+		Transform,
+		Sprite,
+		Physics,
+		Text,
+		BoxCollider,
+		CircleCollider,
+		RigidBody,
+		Animation,
+		Tile,
+		UI,
+
+		NoType
+	};
+
+	struct AddComponentEvent
+	{
+		Entity* entity{ nullptr };
+		ComponentType type{ ComponentType::NoType };
+	};
+
+	ComponentType GetComponentTypeFromStr(const std::string& componentStr);
+	std::string GetComponentStrFromType(ComponentType type);
 
 }

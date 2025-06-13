@@ -11,6 +11,7 @@ namespace Feather {
 	class SpriteBatchRenderer;
 	class EventDispatcher;
 	struct GizmoAxisParams;
+	struct AddComponentEvent;
 
 	class Gizmo : public AbstractTool
 	{
@@ -20,7 +21,7 @@ namespace Feather {
 		virtual ~Gizmo();
 
 		virtual void Update(Canvas& canvas) override;
-		virtual void Draw() = 0;
+		virtual void Draw(Camera2D* camera) = 0;
 
 		void SetSelectedEntity(entt::entity entity);
 		void Hide();
@@ -54,6 +55,10 @@ namespace Feather {
 		bool m_HoldingY;
 		bool m_Hidden;
 		bool m_OnlyOneAxis;
+		bool m_UIComponent;
+
+	private:
+		void OnAddComponent(const AddComponentEvent& addCompEvent);
 	};
 
 }

@@ -284,7 +284,7 @@ namespace Feather {
 				GameType gameType{ coreGlobals.GetGameType() };
 
 				ImGui::InlineLabel(ICON_FA_GAMEPAD " Game Type:");
-				ImGui::SetCursorPosX(250.f);
+				ImGui::SetCursorPosX(250.0f);
 				ImGui::ItemToolTip("The type of game this is going to be");
 
 				if (ImGui::BeginCombo("##DefaultMusic", sGameType.c_str()))

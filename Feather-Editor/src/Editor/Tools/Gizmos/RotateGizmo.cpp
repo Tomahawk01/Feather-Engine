@@ -38,7 +38,7 @@ namespace Feather {
 		auto& selectedTransform = selectedEntity.GetComponent<TransformComponent>();
 
 		float deltaX{ GetDeltaX() };
-		if (deltaX > 0.0f)
+		if (deltaX != 0.0f)
 		{
 			selectedTransform.rotation += deltaX;
 
@@ -60,7 +60,7 @@ namespace Feather {
 		ExamineMousePosition();
 	}
 
-	void RotateGizmo::Draw()
+	void RotateGizmo::Draw(Camera2D* camera)
 	{
 		if (m_Hidden)
 			return;
@@ -70,7 +70,15 @@ namespace Feather {
 			return;
 
 		shader->Enable();
-		auto camMat = m_Camera->GetCameraMatrix();
+		glm::mat4 camMat{ 1.0f };
+		if (m_UIComponent && camera)
+		{
+			camMat = camera->GetCameraMatrix();
+		}
+		else
+		{
+			camMat = m_Camera->GetCameraMatrix();
+		}
 		shader->SetUniformMat4("uProjection", camMat);
 
 		m_BatchRenderer->Begin();

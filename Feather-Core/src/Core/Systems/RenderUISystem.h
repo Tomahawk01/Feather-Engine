@@ -17,6 +17,7 @@ namespace Feather {
 		~RenderUISystem();
 
 		void Update(Registry& registry);
+		inline Camera2D* GetCamera() { return m_Camera2D.get(); }
 
 		static void CreateRenderUISystemLuaBind(sol::state& lua);
 

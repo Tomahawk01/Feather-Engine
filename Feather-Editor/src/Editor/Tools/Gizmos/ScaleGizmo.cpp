@@ -38,7 +38,7 @@ namespace Feather {
 
 		float deltaX{ GetDeltaX() * SCALING_FACTOR };
 		float deltaY{ GetDeltaY() * SCALING_FACTOR };
-		if (deltaX > 0.0f || deltaY > 0.0f)
+		if (deltaX != 0.0f || deltaY != 0.0f)
 		{
 			selectedTransform.scale.x += deltaX;
 			selectedTransform.scale.y += deltaY;
@@ -50,7 +50,7 @@ namespace Feather {
 		ExamineMousePosition();
 	}
 
-	void ScaleGizmo::Draw()
+	void ScaleGizmo::Draw(Camera2D* camera)
 	{
 		if (m_Hidden)
 			return;
@@ -60,7 +60,15 @@ namespace Feather {
 			return;
 
 		shader->Enable();
-		auto camMat = m_Camera->GetCameraMatrix();
+		glm::mat4 camMat{ 1.0f };
+		if (m_UIComponent && camera)
+		{
+			camMat = camera->GetCameraMatrix();
+		}
+		else
+		{
+			camMat = m_Camera->GetCameraMatrix();
+		}
 		shader->SetUniformMat4("uProjection", camMat);
 
 		m_BatchRenderer->Begin();

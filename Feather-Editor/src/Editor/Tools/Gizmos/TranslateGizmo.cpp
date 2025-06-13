@@ -70,7 +70,7 @@ namespace Feather {
 		ExamineMousePosition();
 	}
 
-	void TranslateGizmo::Draw()
+	void TranslateGizmo::Draw(Camera2D* camera)
 	{
 		if (m_Hidden)
 			return;
@@ -80,7 +80,15 @@ namespace Feather {
 			return;
 
 		shader->Enable();
-		auto camMat = m_Camera->GetCameraMatrix();
+		glm::mat4 camMat{ 1.0f };
+		if (m_UIComponent && camera)
+		{
+			camMat = camera->GetCameraMatrix();
+		}
+		else
+		{
+			camMat = m_Camera->GetCameraMatrix();
+		}
 		shader->SetUniformMat4("uProjection", camMat);
 
 		m_BatchRenderer->Begin();

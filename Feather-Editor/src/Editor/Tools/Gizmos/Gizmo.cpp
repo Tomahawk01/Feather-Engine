@@ -6,6 +6,7 @@
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Essentials/Vertex.h"
@@ -41,7 +42,10 @@ namespace Feather {
 		, m_HoldingY{ false }
 		, m_Hidden{ false }
 		, m_OnlyOneAxis{ oneAxis }
+		, m_UIComponent{ false }
 	{
+		ADD_EVENT_HANDLER(AddComponentEvent, &Gizmo::OnAddComponent, *this)
+
 		m_XAxisParams = std::make_unique<GizmoAxisParams>(xAxisParams);
 
 		if (m_OnlyOneAxis)
@@ -67,6 +71,7 @@ namespace Feather {
 			Entity ent{ *m_Registry, entity };
 			SetGizmoPosition(ent);
 			GetDispatcher().EmitEvent(SwitchEntityEvent{ .entity = &ent });
+			m_UIComponent = ent.HasComponent<UIComponent>();
 		}
 	}
 
@@ -131,7 +136,23 @@ namespace Feather {
 
 	void Gizmo::ExamineMousePosition()
 	{
-		const auto& mousePos = GetMouseWorldCoords();
+		glm::vec2 mousePos{ 0.0f };
+		if (m_UIComponent)
+		{
+			mousePos = GetMouseScreenCoords();
+			const auto& guiWindowSize = GetWindowSize();
+			auto& coreGlobals = CORE_GLOBALS();
+			const int windowWidth = coreGlobals.WindowWidth();
+			const int windowHeight = coreGlobals.WindowHeight();
+			const float ratioX = windowWidth / guiWindowSize.x;
+			const float ratioY = windowHeight / guiWindowSize.y;
+			mousePos.x *= ratioX;
+			mousePos.y *= ratioY;
+		}
+		else
+		{
+			mousePos = GetMouseWorldCoords();
+		}
 
 		const auto& xAxisTransform = m_XAxisParams->transform;
 		auto& xAxisSprite = m_XAxisParams->sprite;
@@ -201,7 +222,22 @@ namespace Feather {
 		if (MouseButtonPressed(AbstractTool::MouseButton::LEFT) && MouseMoving())
 		{
 			m_HoldingX = true;
-			return std::ceil((GetMouseScreenCoords().x - m_LastMousePos.x) / m_Camera->GetScale());
+			if (m_UIComponent)
+			{
+				float mousePosX = GetMouseScreenCoords().x;
+				const auto& guiWindowSize = GetWindowSize();
+				auto& coreGlobals = CORE_GLOBALS();
+				const int windowWidth = coreGlobals.WindowWidth();
+				const float ratioX = windowWidth / guiWindowSize.x;
+				mousePosX *= ratioX;
+				m_LastMousePos.x *= ratioX;
+
+				return glm::ceil(mousePosX - m_LastMousePos.x);
+			}
+			else
+			{
+				return glm::ceil((GetMouseScreenCoords().x - m_LastMousePos.x) / m_Camera->GetScale());
+			}
 		}
 
 		if (MouseButtonJustReleased(AbstractTool::MouseButton::LEFT))
@@ -222,7 +258,22 @@ namespace Feather {
 		if (MouseButtonPressed(AbstractTool::MouseButton::LEFT) && MouseMoving())
 		{
 			m_HoldingY = true;
-			return std::ceil((GetMouseScreenCoords().y - m_LastMousePos.y) / m_Camera->GetScale());
+			if (m_UIComponent)
+			{
+				float mousePosY = GetMouseScreenCoords().y;
+				const auto& guiWindowSize = GetWindowSize();
+				auto& coreGlobals = CORE_GLOBALS();
+				const int windowHeight = coreGlobals.WindowHeight();
+				const float ratioY = windowHeight / guiWindowSize.y;
+				mousePosY *= ratioY;
+				m_LastMousePos.y *= ratioY;
+
+				return glm::ceil(mousePosY - m_LastMousePos.y);
+			}
+			else
+			{
+				return glm::ceil((GetMouseScreenCoords().y - m_LastMousePos.y) / m_Camera->GetScale());
+			}
 		}
 
 		if (MouseButtonJustReleased(AbstractTool::MouseButton::LEFT))
@@ -269,6 +320,14 @@ namespace Feather {
 					(spriteWidth * selectedTransform.scale.x * 0.5f) - (m_XAxisParams->sprite.width * m_XAxisParams->transform.scale.x * 0.5f),
 					(spriteHeight * selectedTransform.scale.y * 0.5f) - (m_XAxisParams->sprite.height * m_XAxisParams->transform.scale.y * 0.5f)
 				};
+		}
+	}
+
+	void Gizmo::OnAddComponent(const AddComponentEvent& addCompEvent)
+	{
+		if (addCompEvent.type == ComponentType::UI)
+		{
+			m_UIComponent = true;
 		}
 	}
 

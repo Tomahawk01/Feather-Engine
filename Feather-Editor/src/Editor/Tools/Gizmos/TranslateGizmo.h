@@ -9,7 +9,7 @@ namespace Feather {
 		TranslateGizmo();
 
 		virtual void Update(Canvas& canvas) override;
-		virtual void Draw() override;
+		virtual void Draw(Camera2D* camera) override;
 	};
 
 }

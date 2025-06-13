@@ -249,7 +249,7 @@ namespace Feather {
 			activeTool->Draw();
 
 		if (activeGizmo)
-			activeGizmo->Draw();
+			activeGizmo->Draw(renderUISystem.GetCamera());
 
 		fb->Unbind();
 		fb->CheckResize();

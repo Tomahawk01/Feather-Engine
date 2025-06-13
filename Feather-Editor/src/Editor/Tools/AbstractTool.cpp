@@ -15,7 +15,7 @@ namespace Feather {
 		m_GUICursorCoords{ 0.0f }, m_GUIRelativeCoords{ 0.0f },
 		m_WindowPos{ 0.0f }, m_WindowSize{ 0.0f },
 		m_Activated{ false }, m_OutOfBounds{ false }, m_OverTileMapWindow{ false }
-		, m_GridCoords{ 0.f }
+		, m_GridCoords{ 0.0f }
 	{}
 
 	void AbstractTool::Update(Canvas& canvas)

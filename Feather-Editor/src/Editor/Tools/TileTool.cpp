@@ -195,8 +195,8 @@ namespace Feather {
 				glm::vec2 mouseGrid{ mouseWorldPos.x / (m_MouseRect.x * transform.scale.x),
 									 mouseWorldPos.y / (m_MouseRect.y * transform.scale.y) };
 
-				float scaledGridToCamX = std::floor(mouseGrid.x);
-				float scaledGridToCamY = std::floor(mouseGrid.y);
+				float scaledGridToCamX = glm::floor(mouseGrid.x);
+				float scaledGridToCamY = glm::floor(mouseGrid.y);
 
 				transform.position.x = scaledGridToCamX * m_MouseRect.x * transform.scale.x;
 				transform.position.y = scaledGridToCamY * m_MouseRect.y * transform.scale.y;
