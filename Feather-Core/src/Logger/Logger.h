@@ -1,9 +1,11 @@
 #pragma once
+
 #include <string>
 #include <string_view>
 #include <source_location>
 #include <vector>
 #include <cassert>
+#include <mutex>
 
 namespace Feather {
 
@@ -54,6 +56,7 @@ namespace Feather {
 		inline const std::vector<LogEntry>& GetLogs() { return m_LogEntries; }
 
 	private:
+		std::mutex m_Mutex;
 		std::vector<LogEntry> m_LogEntries;
 
 		bool m_Initialized{ false };

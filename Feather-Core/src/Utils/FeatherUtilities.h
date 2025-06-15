@@ -127,7 +127,7 @@ namespace Feather {
 		return 0 != (x & y);
 	}
 
-	std::string_view GetSubstring(const std::string_view& str, const std::string& find);
+	std::string GetSubstring(std::string_view str, std::string_view find);
 
 	std::string ConvertWideToANSI(const std::wstring& wstr);
 	std::wstring ConvertAnsiToWide(const std::string& str);

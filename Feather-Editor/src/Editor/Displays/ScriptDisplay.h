@@ -4,8 +4,11 @@
 
 #include <vector>
 #include <string>
+#include <filesystem>
 
 namespace Feather {
+
+	class DirectoryWatcher;
 
 	class ScriptDisplay : public IDisplay
 	{
@@ -19,6 +22,7 @@ namespace Feather {
 	private:
 		void GenerateScriptList();
 		void WriteScriptListToFile();
+		void OnFileChanged(const std::filesystem::path& path, bool modified);
 
 	private:
 		std::vector<std::string> m_ScriptList;
@@ -26,6 +30,10 @@ namespace Feather {
 		std::string m_ScriptsDirectory;
 		int m_Selected;
 		bool m_ScriptsChanged;
+		bool m_ListScripts;
+
+		std::unique_ptr<DirectoryWatcher> m_DirWatcher;
+		std::atomic_bool m_FilesChanged;
 	};
 
 }

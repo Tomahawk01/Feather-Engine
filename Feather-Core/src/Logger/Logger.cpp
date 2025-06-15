@@ -39,6 +39,7 @@ namespace Feather {
 
 	void Log::LuaTrace(const std::string_view message)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -66,6 +67,7 @@ namespace Feather {
 
 	void Log::LuaInfo(const std::string_view message)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -93,6 +95,7 @@ namespace Feather {
 
 	void Log::LuaWarn(const std::string_view message)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -120,6 +123,7 @@ namespace Feather {
 
 	void Log::LuaError(const std::string_view message)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)

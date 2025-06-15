@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Logger/Logger.h"
 
 #include <chrono>
@@ -8,6 +9,7 @@
 #include <sstream>
 
 #include <Windows.h>
+
 constexpr WORD GREEN = 2;
 constexpr WORD RED = 4;
 constexpr WORD YELLOW = 6;
@@ -18,6 +20,7 @@ namespace Feather {
 	template <typename... Args>
 	void Log::Trace(const std::string_view message, Args&&... args)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -46,6 +49,7 @@ namespace Feather {
 	template <typename... Args>
 	void Log::Info(const std::string_view message, Args&&... args)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -74,6 +78,7 @@ namespace Feather {
 	template <typename... Args>
 	void Log::Warn(const std::string_view message, Args&&... args)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -102,6 +107,7 @@ namespace Feather {
 	template <typename... Args>
 	void Log::Error(const std::string_view message, Args&&... args)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)
@@ -130,6 +136,7 @@ namespace Feather {
 	template <typename... Args>
 	void Log::Critical(std::source_location location, const std::string_view message, Args&&... args)
 	{
+		std::scoped_lock lock{ m_Mutex };
 		assert(m_Initialized && "Logger must be initialized before it is used!");
 
 		if (!m_Initialized)

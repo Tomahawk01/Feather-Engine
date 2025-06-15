@@ -4,6 +4,7 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/SaveProject.h"
 #include "FileSystem/Serializers/LuaSerializer.h"
+#include "FileSystem/Utilities/DirectoryWatcher.h"
 #include "Utils/HelperUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
@@ -21,6 +22,9 @@ namespace Feather {
 		: m_ScriptsDirectory{ std::format("{}{}{}{}", MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath, "content", PATH_SEPARATOR, "scripts") }
 		, m_Selected { -1 }
 		, m_ScriptsChanged{ false }
+		, m_ListScripts{ false }
+		, m_DirWatcher{ nullptr }
+		, m_FilesChanged{ false }
 	{
 		F_ASSERT(fs::exists(fs::path{ m_ScriptsDirectory }) && "Scripts directory must exist");
 		const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
@@ -39,6 +43,11 @@ namespace Feather {
 		}
 
 		GenerateScriptList();
+
+		m_DirWatcher = std::make_unique<DirectoryWatcher>(
+			fs::path{ m_ScriptsDirectory },
+			[this](const fs::path& file, bool modified) { OnFileChanged(file, modified); }
+		);
 	}
 
 	ScriptDisplay::~ScriptDisplay() = default;
@@ -132,47 +141,93 @@ namespace Feather {
 
 	void ScriptDisplay::Update()
 	{
-		// TODO: Handle directory changes
+		if (m_FilesChanged.exchange(false, std::memory_order_acquire))
+		{
+			m_ListScripts = true;
+			F_TRACE("File was changed or added to scripts directory");
+		}
+
+		if (m_ListScripts)
+		{
+			m_Scripts.clear();
+			for (const auto& dirEntry : fs::recursive_directory_iterator(fs::path{ m_ScriptsDirectory }))
+			{
+				if (fs::is_directory(dirEntry) ||
+					dirEntry.path().extension() != ".lua" ||
+					dirEntry.path().filename().string() == "main.lua" ||
+					dirEntry.path().filename().string() == "script_list.lua")
+				{
+					continue;
+				}
+
+				auto foundScript = GET_SUBSTRING(dirEntry.path().relative_path().string(), "scripts");
+				if (!foundScript.empty())
+				{
+					m_Scripts.push_back(std::string{ foundScript });
+				}
+			}
+
+			std::unordered_set<std::string> lookupSet{ m_Scripts.begin(), m_Scripts.end() };
+
+			auto removeRange = 
+				std::ranges::remove_if(m_ScriptList,
+				[&lookupSet](const std::string& item)
+				{
+					return !lookupSet.contains(item);
+				});
+
+			if (removeRange.begin() != removeRange.end())
+			{
+				m_ScriptList.erase(removeRange.begin(), removeRange.end());
+				m_ScriptsChanged = true;
+			}
+
+			for (const auto& script : m_Scripts)
+			{
+				if (std::ranges::find(m_ScriptList, script) == m_ScriptList.end())
+				{
+					m_ScriptList.push_back(script);
+					m_ScriptsChanged = true;
+				}
+			}
+
+			m_ListScripts = false;
+		}
 	}
 
 	void ScriptDisplay::GenerateScriptList()
 	{
 		if (m_ScriptList.empty())
 		{
-			// TODO: Delete this test data!!!
-			m_ScriptList.push_back("scripts\\character.lua");
-			m_ScriptList.push_back("scripts\\states\\move_state.lua");
-			m_ScriptList.push_back("scripts\\states\\damage_state.lua");
+			const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
+			if (fs::exists(fs::path{ scriptListPath }))
+			{
+				sol::state lua{};
+				auto result = lua.safe_script_file(scriptListPath);
+				if (!result.valid())
+				{
+					sol::error err = result;
+					F_ERROR("Failed to load script list. {}", err.what());
+					return;
+				}
 
-			//const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
-			//if (fs::exists(fs::path{ scriptListPath }))
-			//{
-			//	sol::state lua{};
-			//	auto result = lua.safe_script_file(scriptListPath);
-			//	if (!result.valid())
-			//	{
-			//		sol::error err = result;
-			//		F_ERROR("Failed to load script list. {}", err.what());
-			//		return;
-			//	}
+				sol::optional<sol::table> scriptList = lua["ScriptList"];
+				if (!scriptList)
+				{
+					F_ERROR("Failed to load script list. Missing \"ScriptList\" table");
+					return;
+				}
 
-			//	sol::optional<sol::table> scriptList = lua["ScriptList"];
-			//	if (!scriptList)
-			//	{
-			//		F_ERROR("Failed to load script list. Missing \"ScriptList\" table");
-			//		return;
-			//	}
-
-			//	std::string path{ m_ScriptsDirectory.substr(0, m_ScriptsDirectory.find("scripts")) };
-			//	for (const auto& [_, script] : *scriptList)
-			//	{
-			//		std::string newScript{ script.as<std::string>() };
-			//		if (fs::exists(fs::path{ path + newScript }))
-			//		{
-			//			m_ScriptList.push_back(newScript);
-			//		}
-			//	}
-			//}
+				std::string path{ m_ScriptsDirectory.substr(0, m_ScriptsDirectory.find("scripts")) };
+				for (const auto& [_, script] : *scriptList)
+				{
+					std::string newScript{ script.as<std::string>() };
+					if (fs::exists(fs::path{ path + newScript }))
+					{
+						m_ScriptList.push_back(newScript);
+					}
+				}
+			}
 		}
 	}
 
@@ -209,6 +264,11 @@ namespace Feather {
 
 		serializer->EndTable().FinishStream();
 		m_ScriptsChanged = false;
+	}
+
+	void ScriptDisplay::OnFileChanged(const std::filesystem::path& path, bool modified)
+	{
+		m_FilesChanged.store(true, std::memory_order_relaxed);
 	}
 
 }
