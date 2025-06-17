@@ -117,7 +117,7 @@ namespace Feather {
 
 	void Hub::DrawDefault()
 	{
-		ImGui::SetCursorPos(ImVec2{ m_Width * 0.5f - BUTTON_SIZE.x, 300.0f });
+		ImGui::SetCursorPos(ImVec2{ m_Width * 0.5f - BUTTON_SIZE.x, 450.0f });
 		if (ImGui::Button("New Project", BUTTON_SIZE))
 		{
 			m_State = HubState::NewProject;
@@ -139,7 +139,7 @@ namespace Feather {
 
 	void Hub::DrawNewProject()
 	{
-		ImGui::SetCursorPosY(300.0f);
+		ImGui::SetCursorPosY(450.0f);
 		ImGui::OffsetTextX("New Project", 32.0f);
 		ImGui::SameLine();
 
@@ -216,7 +216,7 @@ namespace Feather {
 
 	void Hub::DrawOpenProject()
 	{
-		ImGui::SetCursorPos(ImVec2{ 200.0f, 300.0f });
+		ImGui::SetCursorPos(ImVec2{ 200.0f, 450.0f });
 		ImGui::Text("Project");
 		ImGui::SameLine();
 		char prevProjectBuffer[256]{ 0 };
@@ -251,7 +251,7 @@ namespace Feather {
 
 		if (!m_PrevProjectPath.empty() && std::filesystem::exists(std::filesystem::path{ m_PrevProjectPath }))
 		{
-			ImGui::SetCursorPos(ImVec2{ 300.0f, 432.0f });
+			ImGui::SetCursorPos(ImVec2{ 300.0f, 482.0f });
 			if (ImGui::Button("Load Project", BUTTON_SIZE))
 			{
 				// Create the project
