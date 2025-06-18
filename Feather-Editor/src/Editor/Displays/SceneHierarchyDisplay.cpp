@@ -49,29 +49,7 @@ namespace Feather {
 
 		m_WindowActive = ImGui::IsWindowFocused();
 
-		if (ImGui::BeginPopupContextWindow())
-		{
-			if (ImGui::Selectable("Add New GameObject"))
-			{
-				if (!currentScene->AddGameObject())
-				{
-					F_ERROR("Failed to add new game object to scene '{}'", currentScene->GetSceneName());
-				}
-			}
-
-			// Uneditable entities cannot be made into prefabs
-			if (m_SelectedEntity && !m_SelectedEntity->HasComponent<UneditableComponent>())
-			{
-				if (ImGui::Selectable("Create Prefab"))
-				{
-					auto newPrefab = PrefabCreator::CreatePrefab(EPrefabType::Character, *m_SelectedEntity);
-
-					ASSET_MANAGER().AddPrefab(m_SelectedEntity->GetName() + "_pfab", std::move(newPrefab));
-				}
-			}
-
-			ImGui::EndPopup();
-		}
+		OpenContext(currentScene);
 
 		ImGui::Separator();
 		ImGui::AddSpaces(1);
@@ -471,6 +449,67 @@ namespace Feather {
 				}
 			}
 
+		}
+	}
+
+	void SceneHierarchyDisplay::OpenContext(SceneObject* currentScene)
+	{
+		if (!currentScene)
+			return;
+
+		if (m_SelectedEntity)
+		{
+			if (ImGui::BeginPopupContextWindow())
+			{
+				// Uneditable entities cannot be made into prefabs
+				if (!m_SelectedEntity->HasComponent<UneditableComponent>())
+				{
+					if (ImGui::Selectable("Create Prefab"))
+					{
+						auto newPrefab = Feather::PrefabCreator::CreatePrefab(EPrefabType::Character, *m_SelectedEntity);
+						ASSET_MANAGER().AddPrefab(m_SelectedEntity->GetName() + "_pfab", std::move(newPrefab));
+					}
+				}
+
+				if (ImGui::Selectable("Delete"))
+				{
+					if (!DeleteSelectedEntity())
+					{
+						F_ERROR("Failed to delete the selected entity");
+					}
+				}
+
+				if (ImGui::Selectable("Duplicate"))
+				{
+					if (!DuplicateSelectedEntity())
+					{
+						F_ERROR("Failed to duplicated the selected entity");
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+		else
+		{
+			if (ImGui::BeginPopupContextWindow("##SceneHierarchyContext"))
+			{
+				if (ImGui::Selectable("Add New GameObject"))
+				{
+					if (!currentScene->AddGameObject())
+					{
+						F_ERROR("Failed to add new game object to scene '{}'", currentScene->GetSceneName());
+					}
+				}
+
+				ImGui::EndPopup();
+			}
+		}
+
+		if (m_WindowActive && !ImGui::IsAnyItemHovered() &&
+			(ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
+		{
+			m_SelectedEntity = nullptr;
 		}
 	}
 

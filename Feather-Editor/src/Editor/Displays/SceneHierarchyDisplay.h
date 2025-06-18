@@ -1,4 +1,5 @@
 #pragma once
+
 #include "IDisplay.h"
 
 #include <imgui.h>
@@ -20,6 +21,7 @@ namespace Feather {
 
 	private:
 		bool OpenTreeNode(Entity& entity);
+
 		void AddComponent(Entity& entity, bool* addComponent);
 		void DrawGameObjectDetails();
 		void DrawUneditableTypes();
@@ -30,6 +32,8 @@ namespace Feather {
 
 		void OnEntityChanged(SwitchEntityEvent& swEntEvent);
 		void OnKeyPressed(KeyEvent& keyEvent);
+
+		void OpenContext(class SceneObject* currentScene);
 
 	private:
 		std::shared_ptr<Entity> m_SelectedEntity{ nullptr };
