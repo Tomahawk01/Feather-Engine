@@ -506,7 +506,7 @@ namespace Feather {
 			}
 		}
 
-		if (m_WindowActive && !ImGui::IsAnyItemHovered() &&
+		if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemHovered() &&
 			(ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
 		{
 			m_SelectedEntity = nullptr;
