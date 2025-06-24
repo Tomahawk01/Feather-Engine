@@ -152,7 +152,7 @@ namespace Feather {
 	{
 		if (!CheckLayerName(layerName))
 		{
-			F_ERROR("Failed to add layer '{}': Already exists", layerName);
+			// F_ERROR("Failed to add layer '{}': Already exists", layerName);
 			return static_cast<int>(m_LayerParams.size());
 		}
 
