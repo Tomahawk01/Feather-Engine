@@ -75,6 +75,7 @@ namespace Feather {
 		inline Canvas& GetCanvas() { return m_Canvas; }
 		inline Registry& GetRegistry() { return m_Registry; }
 		inline Registry* GetRegistryPtr() { return &m_Registry; }
+		inline const std::string& GetSceneName() const { return m_SceneName; }
 		inline const std::string& GetSceneDataPath() { return m_SceneDataPath; }
 		inline EMapType GetMapType() const { return m_MapType; }
 		inline bool IsLoaded() const { return m_SceneLoaded; }

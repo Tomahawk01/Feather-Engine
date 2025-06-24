@@ -227,7 +227,6 @@ namespace Feather {
 					scene->LoadScene();
 				}
 
-				// TODO: Check to see if this is valid
 				auto sceneObject = dynamic_cast<SceneObject*>(scene);
 				F_ASSERT(sceneObject && "Scene must be a valid SceneObject if run in the editor!");
 				if (!sceneObject)
@@ -254,6 +253,10 @@ namespace Feather {
 					return currentScene->GetDefaultMusicName();
 
 				return std::string{ "" };
+			},
+			"getCurrentSceneName", [&]
+			{
+				return sceneManager.GetCurrentSceneName();
 			}
 		);
 	}

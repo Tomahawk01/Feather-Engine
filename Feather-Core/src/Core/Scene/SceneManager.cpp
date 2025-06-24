@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 
 #include "Core/Scene/Scene.h"
+#include "Core/ECS/Components/AllComponents.h"
 #include "Utils/FeatherUtilities.h"
 
 namespace Feather {
@@ -62,9 +63,9 @@ namespace Feather {
 
 	bool SceneManager::LoadCurrentScene()
 	{
-		if (auto pCurrentScene = GetCurrentScene())
+		if (auto currentScene = GetCurrentScene())
 		{
-			return pCurrentScene->LoadScene();
+			return currentScene->LoadScene();
 		}
 
 		return false;
@@ -72,9 +73,9 @@ namespace Feather {
 
 	bool SceneManager::UnloadCurrentScene()
 	{
-		if (auto pCurrentScene = GetCurrentScene())
+		if (auto currentScene = GetCurrentScene())
 		{
-			return pCurrentScene->UnloadScene();
+			return currentScene->UnloadScene();
 		}
 
 		return false;
@@ -88,6 +89,67 @@ namespace Feather {
 	bool SceneManager::ChangeSceneName(const std::string& sOldName, const std::string& sNewName)
 	{
 		return KeyChange(m_mapScenes, sOldName, sNewName);
+	}
+
+	void SceneManager::CreateLuaBind(sol::state& lua, SceneManager& sceneManager)
+	{
+		lua.new_usertype<SceneManager>(
+			"SceneManager",
+			sol::no_constructor,
+			"changeScene",
+			// TODO: This will still need testing once the runtime has been created
+			[&](const std::string& sceneName)
+			{
+				auto currentScene = sceneManager.GetCurrentScene();
+				if (!currentScene)
+				{
+					F_ERROR("Failed to change to scene '{}': Current scene is invalid", sceneName);
+					return false;
+				}
+
+				if (currentScene->GetSceneName() == sceneName)
+				{
+					F_ERROR("Failed to load scene '{}': Scene has already been loaded", sceneName);
+					return false;
+				}
+
+				auto pScene = sceneManager.GetScene(sceneName);
+				if (!pScene)
+				{
+					F_ERROR("Failed to change to scene '{}': Scene is invalid", sceneName);
+					return false;
+				}
+
+				currentScene->GetRegistry().DestroyEntities<ScriptComponent>();
+				currentScene->UnloadScene();
+
+				if (!pScene->IsLoaded())
+				{
+					pScene->LoadScene();
+				}
+
+				sceneManager.SetCurrentScene(sceneName);
+
+				return true;
+			},
+			"getCanvas", // Returns the canvas of the current scene or an empty canvas object
+			[&]
+			{
+				if (auto currentScene = sceneManager.GetCurrentScene())
+					return currentScene->GetCanvas();
+
+				return Canvas{};
+			},
+			"getDefaultMusic",
+			[&]
+			{
+				if (auto currentScene = sceneManager.GetCurrentScene())
+					return currentScene->GetDefaultMusicName();
+
+				return std::string{ "" };
+			},
+			"getCurrentSceneName", [&] { return sceneManager.GetCurrentSceneName(); }
+		);
 	}
 
 }

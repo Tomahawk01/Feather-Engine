@@ -35,6 +35,7 @@ namespace Feather {
 		: m_RuntimeRegistry{}
 		, m_CurrentLayer{ 0 }
 	{
+		m_SceneName = sceneName;
 		m_SceneDataPath = sceneData;
 
 		// We need to load the scene data from the json file!
@@ -47,12 +48,12 @@ namespace Feather {
 		// Verify that the tilemap and objectmap files exist
 		if (!std::filesystem::exists(std::filesystem::path{ m_TilemapPath }))
 		{
-			// Log some error
+			F_WARN("Tilemap file '{}' does not exist", m_TilemapPath);
 		}
 
 		if (!std::filesystem::exists(std::filesystem::path{ m_ObjectPath }))
 		{
-			// Log some error
+			F_WARN("Object file '{}' does not exist", m_ObjectPath);
 		}
 
 		ADD_EVENT_HANDLER(NameChangeEvent, &SceneObject::OnEntityNameChanges, *this);
@@ -89,7 +90,7 @@ namespace Feather {
 		auto& registry = sceneToCopy.GetRegistry();
 		auto& registryToCopy = registry.GetRegistry();
 
-		for (auto entityToCopy : registryToCopy.view<entt::entity>(entt::exclude<ScriptComponent>))
+		for (auto entityToCopy : registryToCopy.view<entt::entity>(entt::exclude<ScriptComponent, UneditableComponent>))
 		{
 			entt::entity newEntity = m_RuntimeRegistry.CreateEntity();
 
@@ -103,8 +104,20 @@ namespace Feather {
 			}
 		}
 
-		if (m_UsePlayerStart)
-			m_PlayerStart.CreatePlayer(m_RuntimeRegistry);
+		// Copy the player start from the new scene
+		if (sceneToCopy.IsPlayerStartEnabled())
+			sceneToCopy.CopyPlayerStartToRuntimeRegistry(m_RuntimeRegistry);
+	}
+
+	void SceneObject::CopyPlayerStartToRuntimeRegistry(Registry& runtimeRegistry)
+	{
+		if (!m_UsePlayerStart)
+		{
+			F_ERROR("Failed to copy player to runtime. Not enabled");
+			return;
+		}
+
+		m_PlayerStart.CreatePlayer(runtimeRegistry);
 	}
 
 	void SceneObject::ClearRuntimeScene()

@@ -17,6 +17,7 @@ namespace Feather {
 
 		void CopySceneToRuntime();
 		void CopySceneToRuntime(SceneObject& sceneToCopy);
+		void CopyPlayerStartToRuntimeRegistry(Registry& runtimeRegistry);
 		void ClearRuntimeScene();
 
 		void AddNewLayer();
