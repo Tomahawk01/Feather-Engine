@@ -413,11 +413,11 @@ namespace Feather {
 		auto stopTextureID = (ImTextureID)(intptr_t)stopTexture->GetID();
 		if (!m_PlayScene && !m_SceneLoaded)
 		{
-			ImGui::ActiveImageButton("##playButton", stopTextureID);
+			ImGui::ActiveImageButton("##stopButton", stopTextureID);
 		}
 		else
 		{
-			if (ImGui::ImageButton("##playButton", stopTextureID, TOOL_BUTTON_SIZE))
+			if (ImGui::ImageButton("##stopButton", stopTextureID, TOOL_BUTTON_SIZE))
 			{
 				UnloadScene();
 			}
