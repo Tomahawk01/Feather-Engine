@@ -208,7 +208,9 @@ namespace Feather {
 					return false;
 				}
 
-				if (currentScene->GetRuntimeName() == sceneName)
+				auto* runtimeData = currentScene->GetRuntimeData();
+				F_ASSERT(runtimeData && "Runtime Data was not initialized");
+				if (runtimeData->sceneName == sceneName)
 				{
 					F_ERROR("Failed to load scene '{}': Scene has already been loaded", sceneName);
 					return false;
@@ -233,30 +235,42 @@ namespace Feather {
 				{
 					F_ERROR("Failed to load scene '{}': Scene is not a valid SceneObject", sceneName);
 
-					return scene->UnloadScene();
+					return scene->UnloadScene(false);
 				}
 
 				currentScene->CopySceneToRuntime(*sceneObject);
 
-				return scene->UnloadScene();
+				return scene->UnloadScene(false);
 			},
 			"getCanvas", [&]
 			{
-				if (auto currentScene = sceneManager.GetCurrentScene())
-					return currentScene->GetCanvas();
+				if (auto currentScene = sceneManager.GetCurrentSceneObject())
+				{
+					auto* runtimeData = currentScene->GetRuntimeData();
+					return runtimeData ? runtimeData->canvas : Canvas{};
+				}
 
 				return Canvas{};
 			},
 			"getDefaultMusic", [&]
 			{
-				if (auto currentScene = sceneManager.GetCurrentScene())
-					return currentScene->GetDefaultMusicName();
+				if (auto currentScene = sceneManager.GetCurrentSceneObject())
+				{
+					auto* runtimeData = currentScene->GetRuntimeData();
+					return runtimeData ? runtimeData->defaultMusic : "";
+				}
 
 				return std::string{ "" };
 			},
 			"getCurrentSceneName", [&]
 			{
-				return sceneManager.GetCurrentSceneName();
+				if (auto currentScene = sceneManager.GetCurrentSceneObject())
+				{
+					auto* runtimeData = currentScene->GetRuntimeData();
+					return runtimeData ? runtimeData->sceneName : "";
+				}
+
+				return std::string{ "" };
 			}
 		);
 	}

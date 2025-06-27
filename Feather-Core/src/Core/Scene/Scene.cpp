@@ -145,7 +145,7 @@ namespace Feather {
 		m_Registry.ClearRegistry();
 		m_SceneLoaded = false;
 
-		return false;
+		return true;
 	}
 
 	int Scene::AddLayer(const std::string& layerName, bool visible)

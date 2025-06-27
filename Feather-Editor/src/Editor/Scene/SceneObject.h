@@ -8,6 +8,13 @@ namespace Feather {
 
 	struct NameChangeEvent;
 
+	struct SceneRuntimeData
+	{
+		std::string sceneName;
+		std::string defaultMusic;
+		Canvas canvas;
+	};
+
 	class SceneObject : public Scene
 	{
 	public:
@@ -34,7 +41,7 @@ namespace Feather {
 		bool CheckTagName(const std::string& tagName);
 
 		inline const std::string& GetSceneName() { return m_SceneName; }
-		inline const std::string& GetRuntimeName() { return m_RuntimeSceneName; }
+		inline SceneRuntimeData* GetRuntimeData() { return m_RuntimeData.get(); }
 		inline Registry& GetRuntimeRegistry() { return m_RuntimeRegistry; }
 
 	private:
@@ -43,8 +50,7 @@ namespace Feather {
 	private:
 		Registry m_RuntimeRegistry;
 
-		std::string m_RuntimeSceneName;
-
+		std::unique_ptr<SceneRuntimeData> m_RuntimeData;
 		std::map<std::string, entt::entity> m_mapTagToEntity;
 		int m_CurrentLayer;
 	};

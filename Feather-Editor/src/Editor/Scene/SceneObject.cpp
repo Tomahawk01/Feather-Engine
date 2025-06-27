@@ -25,7 +25,7 @@ namespace Feather {
 	SceneObject::SceneObject(const std::string& sceneName, EMapType type)
 		: Scene(sceneName, type)
 		, m_RuntimeRegistry{}
-		, m_RuntimeSceneName{ "" }
+		, m_RuntimeData{ nullptr }
 		, m_CurrentLayer{ 0 }
 	{
 		ADD_EVENT_HANDLER(NameChangeEvent, &SceneObject::OnEntityNameChanges, *this);
@@ -61,7 +61,15 @@ namespace Feather {
 
 	void SceneObject::CopySceneToRuntime()
 	{
-		m_RuntimeSceneName = m_SceneName;
+		if (!m_RuntimeData)
+		{
+			m_RuntimeData = std::make_unique<SceneRuntimeData>();
+		}
+
+		// Setup runtime data
+		m_RuntimeData->canvas = m_Canvas;
+		m_RuntimeData->defaultMusic = m_DefaultMusic;
+		m_RuntimeData->sceneName = m_SceneName;
 
 		auto& registryToCopy = m_Registry.GetRegistry();
 
@@ -85,7 +93,15 @@ namespace Feather {
 
 	void SceneObject::CopySceneToRuntime(SceneObject& sceneToCopy)
 	{
-		m_RuntimeSceneName = sceneToCopy.GetSceneName();
+		if (!m_RuntimeData)
+		{
+			m_RuntimeData = std::make_unique<SceneRuntimeData>();
+		}
+
+		// Setup runtime data
+		m_RuntimeData->canvas = sceneToCopy.GetCanvas();
+		m_RuntimeData->defaultMusic = sceneToCopy.GetDefaultMusicName();
+		m_RuntimeData->sceneName = sceneToCopy.GetSceneName();
 
 		auto& registry = sceneToCopy.GetRegistry();
 		auto& registryToCopy = registry.GetRegistry();
@@ -123,7 +139,7 @@ namespace Feather {
 	void SceneObject::ClearRuntimeScene()
 	{
 		m_RuntimeRegistry.ClearRegistry();
-		m_RuntimeSceneName.clear();
+		m_RuntimeData.reset();
 	}
 
 	void SceneObject::AddNewLayer()
