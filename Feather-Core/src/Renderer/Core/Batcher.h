@@ -37,9 +37,15 @@ namespace Feather {
 
 		virtual void GenerateBatches() = 0;
 
+		template <typename TVertex>
+		void Flush(std::vector<TVertex>& vertices);
+
 	protected:
 		std::vector<std::shared_ptr<TGlyph>> m_Glyphs;
 		std::vector<std::shared_ptr<TBatch>> m_Batches;
+		int m_CurrentObject;
+		int m_CurrentVertex;
+		GLuint m_Offset;
 
 	private:
 		void Initialize();
@@ -57,8 +63,16 @@ namespace Feather {
 	{}
 
 	template<typename TBatch, typename TGlyph>
-	inline Batcher<TBatch, TGlyph>::Batcher(bool UseIBO)
-		: m_VAO{ 0 }, m_VBO{ 0 }, m_IBO{ 0 }, m_Glyphs{}, m_Batches{}, m_UseIBO{ UseIBO }
+	inline Batcher<TBatch, TGlyph>::Batcher(bool useIBO)
+		: m_Glyphs{}
+		, m_Batches{}
+		, m_CurrentObject{ 0 }
+		, m_CurrentVertex{ 0 }
+		, m_Offset{ 0 }
+		, m_VAO{ 0 }
+		, m_VBO{ 0 }
+		, m_IBO{ 0 }
+		, m_UseIBO{ useIBO }
 	{
 		Initialize();
 	}
@@ -76,6 +90,9 @@ namespace Feather {
 	{
 		m_Glyphs.clear();
 		m_Batches.clear();
+		m_CurrentObject = 0;
+		m_CurrentVertex = 0;
+		m_Offset = 0;
 	}
 
 	template<typename TBatch, typename TGlyph>
@@ -129,6 +146,24 @@ namespace Feather {
 		glVertexAttribIPointer(layoutPosition, numComponents, type, stride, offset);
 		glEnableVertexAttribArray(layoutPosition);
 		glBindVertexArray(0);
+	}
+
+	template <typename TBatch, typename TGlyph>
+	template <typename TVertex>
+	inline void Batcher<TBatch, TGlyph>::Flush(std::vector<TVertex>& vertices)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, GetVBO());
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(TVertex), nullptr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(TVertex), vertices.data());
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		Render();
+		m_Batches.clear();
+		vertices.clear();
+		vertices.resize(MAX_SPRITES * NUM_SPRITE_VERTICES);
+		m_CurrentObject = 0;
+		m_CurrentVertex = 0;
+		m_Offset = 0;
 	}
 
 }
