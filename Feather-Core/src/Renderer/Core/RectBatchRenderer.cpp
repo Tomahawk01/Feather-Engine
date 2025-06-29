@@ -31,59 +31,80 @@ namespace Feather {
 
 	void RectBatchRenderer::AddRect(const glm::vec4& destRect, int layer, const Color& color, glm::mat4 model)
 	{
-		std::shared_ptr<RectGlyph> newGlyph = std::make_shared<RectGlyph>();
-
-		newGlyph->topLeft.color = color;
-		newGlyph->topLeft.position = model * glm::vec4{ destRect.x, destRect.y + destRect.w, 0.0f, 1.0f };
-
-		newGlyph->bottomLeft.color = color;
-		newGlyph->bottomLeft.position = model * glm::vec4{ destRect.x, destRect.y, 0.0f, 1.0f };
-
-		newGlyph->bottomRight.color = color;
-		newGlyph->bottomRight.position = model * glm::vec4{ destRect.x + destRect.z, destRect.y, 0.0f, 1.0f };
-
-		newGlyph->topRight.color = color;
-		newGlyph->topRight.position = model * glm::vec4{ destRect.x + destRect.z, destRect.y + destRect.w, 0.0f, 1.0f };
-
-		m_Glyphs.push_back(std::move(newGlyph));
+		m_Glyphs.emplace_back(
+			std::make_unique<RectGlyph>(
+				RectGlyph{
+					.topLeft = Vertex {
+						.position = model * glm::vec4{ destRect.x, destRect.y + destRect.w, 0.0f, 1.0f },
+						.color = color,
+					},
+					.bottomLeft = Vertex {
+						.position = model * glm::vec4{ destRect.x, destRect.y, 0.0f, 1.0f },
+						.color = color
+					},
+					.topRight = Vertex {
+						.position = model * glm::vec4{ destRect.x + destRect.z, destRect.y + destRect.w, 0.0f, 1.0f },
+						.color = color
+					},
+					.bottomRight = Vertex {
+						.position = model * glm::vec4{ destRect.x + destRect.z, destRect.y, 0.0f, 1.0f },
+						.color = color
+					}
+				}
+			)
+		);
 	}
 
 	void RectBatchRenderer::AddRect(const Rect& rect, glm::mat4 model)
 	{
-		std::shared_ptr<RectGlyph> newGlyph = std::make_shared<RectGlyph>();
-
-		newGlyph->topLeft.color = rect.color;
-		newGlyph->topLeft.position = model * glm::vec4{ rect.position.x, rect.position.y + rect.height, 0.0f, 1.0f };
-
-		newGlyph->bottomLeft.color = rect.color;
-		newGlyph->bottomLeft.position = model * glm::vec4{ rect.position.x, rect.position.y, 0.0f, 1.0f };
-
-		newGlyph->bottomRight.color = rect.color;
-		newGlyph->bottomRight.position = model * glm::vec4{ rect.position.x + rect.width, rect.position.y, 0.0f, 1.0f };
-
-		newGlyph->topRight.color = rect.color;
-		newGlyph->topRight.position = model * glm::vec4{ rect.position.x + rect.width, rect.position.y + rect.height, 0.0f, 1.0f };
-
-		m_Glyphs.push_back(std::move(newGlyph));
+		m_Glyphs.emplace_back(
+			std::make_unique<RectGlyph>(
+				RectGlyph{
+					.topLeft = Vertex {
+						.position = model * glm::vec4{ rect.position.x, rect.position.y + rect.height, 0.0f, 1.0f },
+						.color = rect.color,
+					},
+					.bottomLeft = Vertex {
+						.position = model * glm::vec4{ rect.position.x, rect.position.y, 0.0f, 1.0f },
+						.color = rect.color
+					},
+					.topRight = Vertex {
+						.position = model * glm::vec4{ rect.position.x + rect.width, rect.position.y + rect.height, 0.0f, 1.0f },
+						.color = rect.color
+					},
+					.bottomRight = Vertex {
+						.position = model * glm::vec4{ rect.position.x + rect.width, rect.position.y, 0.0f, 1.0f },
+						.color = rect.color
+					}
+				}
+			)
+		);
 	}
 
 	void RectBatchRenderer::AddIsoRect(const Rect& rect, glm::mat4 model)
 	{
-		std::shared_ptr<RectGlyph> newGlyph = std::make_shared<RectGlyph>();
-
-		newGlyph->topLeft.color = rect.color;
-		newGlyph->topLeft.position = model * glm::vec4{ rect.position.x, rect.position.y, 0.0f, 1.0f };
-
-		newGlyph->bottomLeft.color = rect.color;
-		newGlyph->bottomLeft.position = model * glm::vec4{ rect.position.x - rect.width / 2, rect.position.y + rect.height / 2, 0.0f, 1.0f };
-
-		newGlyph->bottomRight.color = rect.color;
-		newGlyph->bottomRight.position = model * glm::vec4{ rect.position.x, rect.position.y + rect.height, 0.0f, 1.0f };
-
-		newGlyph->topRight.color = rect.color;
-		newGlyph->topRight.position = model * glm::vec4{ rect.position.x + rect.width / 2, rect.position.y + rect.height / 2, 0.0f, 1.0f };
-
-		m_Glyphs.push_back(std::move(newGlyph));
+		m_Glyphs.emplace_back(
+			std::make_unique<RectGlyph>(
+				RectGlyph{
+					.topLeft = Vertex {
+						.position = model * glm::vec4{ rect.position.x, rect.position.y, 0.0f, 1.0f },
+						.color = rect.color,
+					},
+					.bottomLeft = Vertex {
+						.position = model * glm::vec4{ rect.position.x - rect.width / 2, rect.position.y + rect.height / 2, 0.0f, 1.0f },
+						.color = rect.color
+					},
+					.topRight = Vertex {
+						.position = model * glm::vec4{ rect.position.x + rect.width / 2, rect.position.y + rect.height / 2, 0.0f, 1.0f  },
+						.color = rect.color
+					},
+					.bottomRight = Vertex {
+						.position = model * glm::vec4{ rect.position.x, rect.position.y + rect.height, 0.0f, 1.0f },
+						.color = rect.color
+					}
+				}
+			)
+		);
 	}
 
 	void RectBatchRenderer::GenerateBatches()
@@ -95,7 +116,7 @@ namespace Feather {
 		{
 			if (m_CurrentObject == 0)
 			{
-				m_Batches.push_back(std::make_shared<RectBatch>(RectBatch{ .numIndices = NUM_SPRITE_INDICES, .offset = 0 }));
+				m_Batches.push_back(std::make_unique<RectBatch>(RectBatch{ .numIndices = NUM_SPRITE_INDICES, .offset = 0 }));
 			}
 			else
 			{
