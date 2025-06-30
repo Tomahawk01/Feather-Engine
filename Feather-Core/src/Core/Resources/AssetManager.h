@@ -69,6 +69,7 @@ namespace Feather {
 		bool ChangeAssetName(const std::string& oldName, const std::string& newName, AssetType assetType);
 		bool HasAsset(const std::string& assetName, AssetType assetType);
 		bool DeleteAsset(const std::string& assetName, AssetType assetType);
+		bool DeleteAssetFromPath(const std::string& assetPath);
 
 		static void CreateLuaAssetManager(sol::state& lua);
 

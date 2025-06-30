@@ -357,35 +357,67 @@ namespace Feather {
 
 		switch (fileEvent.eAction)
 		{
-		case FileAction::Delete:
-		{
-			std::filesystem::path path{ fileEvent.sFilepath };
-			if (std::filesystem::is_directory(path))
-				std::filesystem::remove_all(path);
-			else if (std::filesystem::is_regular_file(path))
-				std::filesystem::remove(path);
-			break;
-		}
-		case FileAction::Paste:
-		{
-			if (std::filesystem::is_directory(m_CurrentDir))
+			case FileAction::Delete:
 			{
-				MoveFolderOrFile(m_FilepathToAction, m_CurrentDir);
-				m_ItemCut = false;
-				m_FilepathToAction.clear();
-			}
-			break;
-		}
-		case FileAction::FileDropped:
-		{
-			if (!m_WindowHovered || fileEvent.sFilepath.empty())
+				std::filesystem::path path{ fileEvent.sFilepath };
+				if (std::filesystem::is_directory(path))
+				{
+					std::unordered_set<std::string> filesToCheck;
+					// Collect all regular file paths inside the directory before deleting it
+					for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+					{
+						if (entry.is_regular_file())
+						{
+							filesToCheck.insert(entry.path().string());
+						}
+					}
+
+					// Recursively delete the directory and its contents
+					std::filesystem::remove_all(path);
+
+					// Remove each file from the asset manager
+					for (const auto& filepath : filesToCheck)
+					{
+						if (!ASSET_MANAGER().DeleteAssetFromPath(filepath))
+						{
+							F_ERROR("Failed to remove asset from asset manager. '{}'", filepath);
+						}
+					}
+				}
+				else if (std::filesystem::is_regular_file(path))
+				{
+					// Remove the file from disk
+					if (std::filesystem::remove(path))
+					{
+						// Remove the file from the asset manager
+						if (!ASSET_MANAGER().DeleteAssetFromPath(path.string()))
+						{
+							F_ERROR("Failed to remove asset from asset manager. '{}'", path.string());
+						}
+					}
+				}
 				break;
+			}
+			case FileAction::Paste:
+			{
+				if (std::filesystem::is_directory(m_CurrentDir))
+				{
+					MoveFolderOrFile(m_FilepathToAction, m_CurrentDir);
+					m_ItemCut = false;
+					m_FilepathToAction.clear();
+				}
+				break;
+			}
+			case FileAction::FileDropped:
+			{
+				if (!m_WindowHovered || fileEvent.sFilepath.empty())
+					break;
 
-			CopyDroppedFile(fileEvent.sFilepath, m_CurrentDir);
+				CopyDroppedFile(fileEvent.sFilepath, m_CurrentDir);
 
-			F_TRACE("Dropped file: {}", fileEvent.sFilepath);
-			break;
-		}
+				F_TRACE("Dropped file: {}", fileEvent.sFilepath);
+				break;
+			}
 		}
 	}
 
@@ -396,7 +428,7 @@ namespace Feather {
 
 		switch (createEvent.eAction)
 		{
-		case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
+			case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
 		}
 	}
 
@@ -406,7 +438,7 @@ namespace Feather {
 		{
 			switch (m_FileAction)
 			{
-			case FileAction::Delete: OpenDeletePopup(); break;
+				case FileAction::Delete: OpenDeletePopup(); break;
 			}
 		}
 
@@ -414,10 +446,10 @@ namespace Feather {
 		{
 			switch (m_CreateAction)
 			{
-			case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
-			case ContentCreateAction::LuaClass: OpenCreateLuaClassPopup(); break;
-			case ContentCreateAction::LuaTable: OpenCreateLuaTablePopup(); break;
-			case ContentCreateAction::EmptyLuaFile: OpenCreateEmptyLuaFilePopup(); break;
+				case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
+				case ContentCreateAction::LuaClass: OpenCreateLuaClassPopup(); break;
+				case ContentCreateAction::LuaTable: OpenCreateLuaTablePopup(); break;
+				case ContentCreateAction::EmptyLuaFile: OpenCreateEmptyLuaFilePopup(); break;
 			}
 		}
 	}

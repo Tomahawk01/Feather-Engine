@@ -532,7 +532,41 @@ namespace Feather {
             }
         }
 
+        if (isSuccess)
+        {
+            F_TRACE("Deleted asset '{}'", assetName);
+        }
+
         return isSuccess;
+    }
+
+    bool AssetManager::DeleteAssetFromPath(const std::string& assetPath)
+    {
+        auto textureItr = std::ranges::find_if(m_mapTextures, [&](const auto& pair) { return pair.second->GetPath() == assetPath; });
+
+        if (textureItr != m_mapTextures.end())
+        {
+            std::string sTextureName{ textureItr->first };
+            return DeleteAsset(sTextureName, AssetType::TEXTURE);
+        }
+
+        auto musicItr = std::ranges::find_if(m_mapMusic, [&](const auto& pair) { return pair.second->GetFilename() == assetPath; });
+
+        if (musicItr != m_mapMusic.end())
+        {
+            std::string sMusicName{ musicItr->first };
+            return DeleteAsset(sMusicName, AssetType::MUSIC);
+        }
+
+        auto soundItr = std::ranges::find_if(m_mapSoundFX, [&](const auto& pair) { return pair.second->GetFilename() == assetPath; });
+
+        if (soundItr != m_mapSoundFX.end())
+        {
+            std::string sSoundName{ soundItr->first };
+            return DeleteAsset(sSoundName, AssetType::SOUNDFX);
+        }
+
+        return true;
     }
 
     void AssetManager::CreateLuaAssetManager(sol::state& lua)
@@ -599,6 +633,9 @@ namespace Feather {
             {
                 std::shared_lock sharedLock{ m_AssetMutex };
                 fs::path path{ fileParam.filepath };
+                if (!fs::exists(path))
+                    continue;
+
                 if (fileParam.lastWrite != fs::last_write_time(path))
                 {
                     sharedLock.unlock();
