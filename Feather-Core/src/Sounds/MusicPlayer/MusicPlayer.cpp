@@ -14,6 +14,11 @@ namespace Feather {
 			return;
 		}
 		F_TRACE("Channels allocated: '{0}'", Mix_AllocateChannels(16));
+
+		if ((Mix_Init(MIX_INIT_MP3) & MIX_INIT_MP3) == 0)
+		{
+			F_ERROR("MP3 support is not available: {}", Mix_GetError());
+		}
 	}
 
 	MusicPlayer::~MusicPlayer()
