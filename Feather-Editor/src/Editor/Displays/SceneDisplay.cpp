@@ -274,7 +274,7 @@ namespace Feather {
 
 		// Get the main script path
 		auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		if (!scriptSystem->LoadMainScript(saveProject->mainLuaScript, runtimeRegistry, *lua))
+		if (!scriptSystem->LoadMainScript(*saveProject, runtimeRegistry, *lua))
 		{
 			F_FATAL("Failed to load main lua script");
 			return;

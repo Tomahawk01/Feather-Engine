@@ -141,7 +141,7 @@ namespace Feather {
 		const rapidjson::Value& tilemap = doc["tilemap"];
 		if (!tilemap.IsArray() || tilemap.Size() < 1)
 		{
-			F_ERROR("Failed to load tilemap '{}': there needs to be at least 1 tile", tilemapFile);
+			F_WARN("Failed to load tilemap '{}': there needs to be at least 1 tile", tilemapFile);
 			return false;
 		}
 
@@ -353,7 +353,7 @@ namespace Feather {
 		const rapidjson::Value& gameObjects = doc["game_objects"];
 		if (!gameObjects.IsArray() || gameObjects.Size() < 1)
 		{
-			F_ERROR("Failed to load Game Objects: File '{}' - There needs to be at least 1 tile", objectMapFile);
+			F_WARN("Failed to load Game Objects: File '{}' - There needs to be at least 1 tile", objectMapFile);
 			return false;
 		}
 

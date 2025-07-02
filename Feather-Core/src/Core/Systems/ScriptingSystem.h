@@ -6,6 +6,7 @@
 namespace Feather {
 
 	class Registry;
+	class SaveProject;
 
 	class ScriptingSystem
 	{
@@ -14,6 +15,7 @@ namespace Feather {
 		~ScriptingSystem() = default;
 
 		bool LoadMainScript(const std::string& mainLuaFile, Registry& registry, sol::state& lua);
+		bool LoadMainScript(const SaveProject& save, Registry& registry, sol::state& lua);
 		void Update(Registry& registry);
 		void Render(Registry& registry);
 

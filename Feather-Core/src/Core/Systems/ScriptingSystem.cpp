@@ -18,6 +18,7 @@
 
 #include "Core/CoreUtils/FollowCamera.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Core/CoreUtils/SaveProject.h"
 
 #include "Core/States/State.h"
 #include "Core/States/StateStack.h"
@@ -93,6 +94,70 @@ namespace Feather {
 		m_MainLoaded = true;
 
 		return true;
+	}
+
+	bool ScriptingSystem::LoadMainScript(const SaveProject& save, Registry& registry, sol::state& lua)
+	{
+		std::error_code ec;
+		std::filesystem::path mainLuaPath = save.mainLuaScript;
+
+		if (!std::filesystem::exists(mainLuaPath, ec))
+		{
+			F_ERROR("Failed to load main lua script: {}", ec.message());
+			return false;
+		}
+
+		std::filesystem::path parentPath = mainLuaPath.parent_path();
+		std::filesystem::path scriptListPath = parentPath / "script_list.lua";
+		std::filesystem::path contentPath = std::filesystem::path{ save.projectPath } / "content";
+
+		// Try to load script list files
+		if (std::filesystem::exists(scriptListPath) && std::filesystem::exists(contentPath))
+		{
+			try
+			{
+				sol::state scriptLua;
+				auto result = scriptLua.safe_script_file(scriptListPath.string());
+				if (!result.valid())
+				{
+					sol::error err = result;
+					throw err;
+				}
+
+				sol::optional<sol::table> scriptList = scriptLua["ScriptList"];
+				if (!scriptList)
+				{
+					F_ERROR("Failed to load script list. Missing \"ScriptList\" table");
+					return false;
+				}
+
+				for (const auto& [_, script] : *scriptList)
+				{
+					try
+					{
+						std::filesystem::path scriptPath = contentPath / script.as<std::string>();
+						auto result = lua.safe_script_file(scriptPath.string());
+						if (!result.valid())
+						{
+							sol::error err = result;
+							throw err;
+						}
+					}
+					catch (const sol::error& error)
+					{
+						F_ERROR("Failed to load script {}. {}", script.as<std::string>(), error.what());
+						return false;
+					}
+				}
+			}
+			catch (const sol::error& error)
+			{
+				F_ERROR("Failed to load script_list.lua: {}", error.what());
+				return false;
+			}
+		}
+
+		return LoadMainScript(save.mainLuaScript, registry, lua);
 	}
 
 	void ScriptingSystem::Update(Registry& registry)
