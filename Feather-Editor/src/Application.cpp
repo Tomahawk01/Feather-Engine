@@ -30,6 +30,7 @@
 #include "Editor/Displays/TilesetDisplay.h"
 #include "Editor/Displays/TilemapDisplay.h"
 #include "Editor/Displays/ContentDisplay.h"
+#include "Editor/Displays/PackageDisplay.h"
 
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
@@ -594,6 +595,13 @@ namespace Feather {
 			return false;
 		}
 
+		auto packageDisplay = std::make_unique<PackageGameDisplay>();
+		if (!packageDisplay)
+		{
+			F_ERROR("Failed to create a Package Game Display");
+			return false;
+		}
+
 		displayHolder->displays.push_back(std::move(menuDisplay));
 		displayHolder->displays.push_back(std::move(sceneDisplay));
 		displayHolder->displays.push_back(std::move(sceneHierarchyDisplay));
@@ -604,6 +612,7 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(assetDisplay));
 		displayHolder->displays.push_back(std::move(contentDisplay));
 		displayHolder->displays.push_back(std::move(scriptDisplay));
+		displayHolder->displays.push_back(std::move(packageDisplay));
 
 		return true;
 	}
@@ -632,6 +641,7 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Scene Hierarchy", leftNodeId);
 			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow("Script List", centerNodeId);
+			ImGui::DockBuilderDockWindow("Package Game", centerNodeId);
 			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow("Logs", logNodeId);
 			ImGui::DockBuilderDockWindow("Assets", logNodeId);
