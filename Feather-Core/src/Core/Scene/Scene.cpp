@@ -92,13 +92,11 @@ namespace Feather {
 		F_ASSERT(sceneData.is_open() && "File should have been created and opened");
 		sceneData.close();
 
-		SaveSceneData();
+		SaveSceneData(true);
 	}
 
 	bool Scene::LoadScene()
 	{
-		F_TRACE("LOADED SCENE");
-
 		if (m_SceneLoaded)
 		{
 			F_ERROR("Scene '{}' has already been loaded", m_SceneName);
@@ -123,6 +121,7 @@ namespace Feather {
 		}
 
 		m_SceneLoaded = true;
+		F_TRACE("Loaded Scene: {}", m_SceneName);
 		return true;
 	}
 
@@ -301,11 +300,11 @@ namespace Feather {
 		return true;
 	}
 
-	bool Scene::SaveSceneData()
+	bool Scene::SaveSceneData(bool override)
 	{
 		/* Scenes that have not been loaded do not need to be re-saved. They would have been
 		   saved when unloading the scene previously. Only save loaded scenes */
-		if (!m_SceneLoaded)
+		if (!m_SceneLoaded && !override)
 		{
 			return true;
 		}

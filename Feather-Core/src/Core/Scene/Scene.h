@@ -94,7 +94,7 @@ namespace Feather {
 
 	protected:
 		bool LoadSceneData();
-		bool SaveSceneData();
+		bool SaveSceneData(bool override = false);
 		void SetCanvasOffset();
 
 	protected:

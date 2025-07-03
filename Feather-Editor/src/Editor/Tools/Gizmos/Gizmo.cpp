@@ -157,7 +157,7 @@ namespace Feather {
 		const auto& xAxisTransform = m_XAxisParams->transform;
 		auto& xAxisSprite = m_XAxisParams->sprite;
 
-		if (mousePos.x >= xAxisTransform.position.x &&
+		if (!m_HoldingY && mousePos.x >= xAxisTransform.position.x &&
 			mousePos.x <= (xAxisTransform.position.x + (xAxisSprite.width * xAxisTransform.scale.x)) &&
 			mousePos.y >= xAxisTransform.position.y &&
 			mousePos.y <= (xAxisTransform.position.y + (xAxisSprite.height * xAxisTransform.scale.y)))
@@ -187,7 +187,7 @@ namespace Feather {
 		const auto& yAxisTransform = m_YAxisParams->transform;
 		auto& yAxisSprite = m_YAxisParams->sprite;
 
-		if (mousePos.x >= yAxisTransform.position.x &&
+		if (!m_HoldingX && mousePos.x >= yAxisTransform.position.x &&
 			mousePos.x <= (yAxisTransform.position.x + (yAxisSprite.width * yAxisTransform.scale.x)) &&
 			mousePos.y >= yAxisTransform.position.y &&
 			mousePos.y <= (yAxisTransform.position.y + (yAxisSprite.height * yAxisTransform.scale.y)))
@@ -214,7 +214,7 @@ namespace Feather {
 
 	float Gizmo::GetDeltaX()
 	{
-		if (!IsOverTilemapWindow() || OutOfBounds())
+		if (!IsOverTilemapWindow() || m_HoldingY)
 			return 0.0f;
 		if (!m_OverXAxis && !m_HoldingX)
 			return 0.0f;
@@ -232,11 +232,11 @@ namespace Feather {
 				mousePosX *= ratioX;
 				m_LastMousePos.x *= ratioX;
 
-				return glm::ceil(mousePosX - m_LastMousePos.x);
+				return mousePosX - m_LastMousePos.x;
 			}
 			else
 			{
-				return glm::ceil((GetMouseScreenCoords().x - m_LastMousePos.x) / m_Camera->GetScale());
+				return (GetMouseScreenCoords().x - m_LastMousePos.x) / m_Camera->GetScale();
 			}
 		}
 
@@ -250,7 +250,7 @@ namespace Feather {
 
 	float Gizmo::GetDeltaY()
 	{
-		if (!IsOverTilemapWindow() || OutOfBounds() || m_OnlyOneAxis)
+		if (!IsOverTilemapWindow() || m_OnlyOneAxis || m_HoldingX)
 			return 0.0f;
 		if (!m_OverYAxis && !m_HoldingY)
 			return 0.0f;
@@ -268,11 +268,11 @@ namespace Feather {
 				mousePosY *= ratioY;
 				m_LastMousePos.y *= ratioY;
 
-				return glm::ceil(mousePosY - m_LastMousePos.y);
+				return mousePosY - m_LastMousePos.y;
 			}
 			else
 			{
-				return glm::ceil((GetMouseScreenCoords().y - m_LastMousePos.y) / m_Camera->GetScale());
+				return (GetMouseScreenCoords().y - m_LastMousePos.y) / m_Camera->GetScale();
 			}
 		}
 

@@ -11,7 +11,7 @@
 #include "Editor/Utilities/EditorUtilities.h"
 
 // TODO: Add scaling factor for all gizmos
-constexpr float SCALING_FACTOR = 0.01f;
+constexpr float SCALING_FACTOR = 0.1f;
 
 namespace Feather {
 
@@ -41,7 +41,7 @@ namespace Feather {
 		if (deltaX != 0.0f || deltaY != 0.0f)
 		{
 			selectedTransform.scale.x += deltaX;
-			selectedTransform.scale.y += deltaY;
+			selectedTransform.scale.y -= deltaY;
 			selectedTransform.isDirty = true;
 		}
 
