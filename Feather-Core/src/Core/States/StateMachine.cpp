@@ -8,7 +8,9 @@ namespace Feather {
 	{}
 
 	StateMachine::StateMachine(const sol::table& stateFuncs)
-		: m_mapStates{}, m_CurrentState{""}, m_StateTable{stateFuncs}
+		: m_mapStates{}
+		, m_CurrentState{}
+		, m_StateTable{stateFuncs}
 	{}
 
 	void StateMachine::ChangeState(const std::string& stateName, bool removeState, const sol::object& enterParams)

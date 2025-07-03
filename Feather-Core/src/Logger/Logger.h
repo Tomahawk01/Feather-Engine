@@ -21,7 +21,7 @@ namespace Feather {
 			NONE
 		};
 		LogType type{ LogType::TRACE };
-		std::string log{ "" };
+		std::string log{};
 	};
 
 	class Log

@@ -6,7 +6,7 @@ namespace Feather {
 
 	struct State
 	{
-		std::string name{ "" };
+		std::string name{};
 		sol::protected_function on_render{ sol::lua_nil };
 		sol::protected_function on_update{ sol::lua_nil };
 		sol::protected_function on_enter{ sol::lua_nil };

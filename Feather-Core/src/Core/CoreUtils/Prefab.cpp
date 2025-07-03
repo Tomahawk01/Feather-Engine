@@ -28,16 +28,16 @@ namespace Feather {
 		: m_Type{ EPrefabType::GameObject }
 		, m_Entity{}
 		, m_RelatedPrefabs{}
-		, m_Name{ "" }
-		, m_PrefabPath{ "" }
+		, m_Name{}
+		, m_PrefabPath{}
 	{}
 
 	Prefab::Prefab(EPrefabType eType, const PrefabbedEntity& prefabbed)
 		: m_Type{ eType }
 		, m_Entity{ prefabbed }
 		, m_RelatedPrefabs{}
-		, m_Name{ "" }
-		, m_PrefabPath{ "" }
+		, m_Name{}
+		, m_PrefabPath{}
 	{
 		F_ASSERT(prefabbed.id && "Must have an ID Component");
 		F_ASSERT(!prefabbed.id->name.empty() && "All prefabs must have unique names!");
@@ -63,7 +63,7 @@ namespace Feather {
 		: m_Type{ EPrefabType::GameObject }
 		, m_Entity{}
 		, m_RelatedPrefabs{}
-		, m_Name{ "" }
+		, m_Name{}
 		, m_PrefabPath{ prefabPath }
 	{
 		if (!Load(prefabPath))

@@ -116,7 +116,7 @@ namespace Feather {
 		// Calculate Text boxSize
 		int numRows{ 0 };
 		glm::vec2 pos{ transform.position }, temp_pos{ pos };
-		std::string text_holder{ "" };
+		std::string text_holder{};
 
 		float wrap{ textComp.wrap };
 

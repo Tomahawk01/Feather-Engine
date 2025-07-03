@@ -7,21 +7,23 @@ namespace Feather {
 	struct SaveProject
 	{
 		/* The name of the project */
-		std::string projectName{ "" };
+		std::string projectName{};
 		/* The active path of the project */
-		std::string projectPath{ "" };
+		std::string projectPath{};
 		/* The active project file path */
-		std::string projectFilePath{ "" };
+		std::string projectFilePath{};
 		/* The main lua script path of the project */
-		std::string mainLuaScript{ "" };
+		std::string mainLuaScript{};
 		/* Game exe file icon path */
-		std::string fileIconPath{ "" };
+		std::string fileIconPath{};
+		/* The path to the script_list.lua file */
+		std::string scriptListPath{};
 	};
 
 	struct GameConfig
 	{
-		std::string gameName{ "" };
-		std::string startupScene{ "" };
+		std::string gameName{};
+		std::string startupScene{};
 
 		int windowWidth{ 640 };
 		int windowHeight{ 480 };

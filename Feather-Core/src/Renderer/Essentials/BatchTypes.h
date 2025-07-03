@@ -70,7 +70,7 @@ namespace Feather {
 
 	struct TextGlyph
 	{
-		std::string textStr{ "" };
+		std::string textStr{};
 		glm::vec2 position{ 0.0f };
 		Color color{ 255, 255, 255, 255 };
 		glm::mat4 model{ 1.0f };

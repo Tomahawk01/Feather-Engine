@@ -13,26 +13,10 @@
 #include <imgui.h>
 #include <filesystem>
 
-#define IMAGE_FILTERS                                                                                                  \
-	std::vector<const char*>                                                                                           \
-	{                                                                                                                  \
-		"*.png", "*.bmp", "*.jpg"                                                                                      \
-	}
-#define FONT_FILTERS                                                                                                   \
-	std::vector<const char*>                                                                                           \
-	{                                                                                                                  \
-		"*.ttf" /* add more font types */                                                                              \
-	}
-#define MUSIC_FILTERS                                                                                                  \
-	std::vector<const char*>                                                                                           \
-	{                                                                                                                  \
-		"*.mp3", "*.wav", "*.ogg"                                                                                      \
-	}
-#define SOUNDFX_FILTERS                                                                                                \
-	std::vector<const char*>                                                                                           \
-	{                                                                                                                  \
-		"*.mp3", "*.wav", "*.ogg"                                                                                      \
-	}
+#define IMAGE_FILTERS std::vector<const char*>{ "*.png", "*.bmp", "*.jpg" }
+#define FONT_FILTERS std::vector<const char*>{ "*.ttf" /* add more font types */ }
+#define MUSIC_FILTERS std::vector<const char*>{ "*.mp3", "*.wav", "*.ogg" }
+#define SOUNDFX_FILTERS std::vector<const char*>{ "*.mp3", "*.wav", "*.ogg" }
 
 static const std::map<std::string, Feather::EMapType> g_mapStringToMapTypes{
 	{ "Grid", Feather::EMapType::Grid },
@@ -62,7 +46,7 @@ namespace {
 
 		std::string CheckForAsset(const std::string& assetName, Feather::AssetType assetType)
 		{
-			std::string error{ "" };
+			std::string error{};
 			if (assetName.empty())
 			{
 				error = "Asset name cannot be empty!";
@@ -89,7 +73,7 @@ namespace {
 			if (ImGui::BeginPopupModal("Add New Scene"))
 			{
 				ImGui::InlineLabel("Name");
-				static std::string assetName{ "" };
+				static std::string assetName{};
 				ImGui::InputText("##assetName", assetName.data(), 255);
 
 				static std::vector<std::string> mapTypes{ "Grid", "IsoGrid" };
@@ -164,8 +148,8 @@ namespace {
 
 			if (ImGui::BeginPopupModal(sAssetType.c_str()))
 			{
-				static std::string assetName{ "" };
-				static std::string filepath{ "" };
+				static std::string assetName{};
+				static std::string filepath{};
 				static bool isTileset{ false };
 				static bool isPixelArt{ false };
 				static float fontSize{ 32.0f };

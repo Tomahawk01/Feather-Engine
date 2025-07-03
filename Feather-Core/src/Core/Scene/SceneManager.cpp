@@ -8,8 +8,8 @@ namespace Feather {
 
 	SceneManager::SceneManager()
 		: m_mapScenes{}
-		, m_CurrentScene{ "" }
-		, m_CurrentTileset{ "" }
+		, m_CurrentScene{}
+		, m_CurrentTileset{}
 	{}
 
 	bool SceneManager::AddScene(const std::string& sceneName, EMapType type)
@@ -146,7 +146,7 @@ namespace Feather {
 				if (auto currentScene = sceneManager.GetCurrentScene())
 					return currentScene->GetDefaultMusicName();
 
-				return std::string{ "" };
+				return std::string{};
 			},
 			"getCurrentSceneName", [&] { return sceneManager.GetCurrentSceneName(); }
 		);

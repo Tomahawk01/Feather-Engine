@@ -8,7 +8,7 @@
 namespace Feather {
 
 	LogDisplay::LogDisplay()
-		: m_SearchQuery{ "" }
+		: m_SearchQuery{}
 		, m_AutoScroll{ true }
 		, m_ShowTrace{ true }
 		, m_ShowInfo{ true }

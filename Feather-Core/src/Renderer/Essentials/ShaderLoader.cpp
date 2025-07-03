@@ -67,7 +67,7 @@ namespace Feather {
             return 0;
         }
 
-        std::string contents{ "" };
+        std::string contents{};
         std::string line;
 
         while (std::getline(ifs, line))

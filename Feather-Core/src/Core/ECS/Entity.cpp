@@ -23,7 +23,7 @@ namespace Feather {
 	}
 
 	Entity::Entity(Registry& registry, const entt::entity& entity)
-		: m_Registry(registry), m_Entity(entity), m_Name{ "" }, m_Group{ "" }
+		: m_Registry(registry), m_Entity(entity), m_Name{}, m_Group{}
 	{
 		if (HasComponent<Identification>())
 		{

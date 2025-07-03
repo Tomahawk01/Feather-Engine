@@ -23,7 +23,7 @@ namespace Feather {
 	ContentDisplay::ContentDisplay()
 		: m_FileDispatcher{ std::make_unique<EventDispatcher>() }
 		, m_CurrentDir{ MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath + "content" }
-		, m_FilepathToAction{ "" }
+		, m_FilepathToAction{}
 		, m_Selected{ -1 }
 		, m_FileAction{ FileAction::NoAction }
 		, m_CreateAction{ ContentCreateAction::NoAction }
@@ -268,7 +268,7 @@ namespace Feather {
 			ImGui::PushStyleColor(ImGuiCol_Button, BLACK_TRANSPARENT);
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BLACK_TRANSPARENT);
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, BLACK_TRANSPARENT);
-			ImGui::Button(ICON_FA_ANGLE_RIGHT, { 16.0f, 18.0f });
+			ImGui::Button(std::format("{}##{}", ICON_FA_ANGLE_RIGHT, i).c_str(), {16.0f, 18.0f});
 			ImGui::PopStyleColor(3);
 
 			if (i < dir.size() - 1)
@@ -487,7 +487,7 @@ namespace Feather {
 
 		if (ImGui::BeginPopupModal("Create Folder"))
 		{
-			static std::string newFolderStr{ "" };
+			static std::string newFolderStr{};
 			char temp[256];
 			memset(temp, 0, sizeof(temp));
 			strcpy_s(temp, newFolderStr.c_str());
@@ -509,7 +509,7 @@ namespace Feather {
 				bExit = true;
 			}
 
-			static std::string errorText{ "" };
+			static std::string errorText{};
 			if (bNameEntered && !newFolderStr.empty())
 			{
 				std::string folderPathStr = m_CurrentDir.string() + PATH_SEPARATOR + newFolderStr;
@@ -557,7 +557,7 @@ namespace Feather {
 		if (ImGui::BeginPopupModal("Create Lua Class"))
 		{
 			char buffer[256];
-			static std::string className{ "" };
+			static std::string className{};
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, className.c_str());
 			bool bNameEntered{ false }, bExit{ false };
@@ -577,7 +577,7 @@ namespace Feather {
 				bExit = true;
 			}
 
-			static std::string errorText{ "" };
+			static std::string errorText{};
 
 			if (bNameEntered && !className.empty())
 			{
@@ -636,7 +636,7 @@ namespace Feather {
 		if (ImGui::BeginPopupModal("Create Lua Table"))
 		{
 			char buffer[256];
-			static std::string tableName{ "" };
+			static std::string tableName{};
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, tableName.c_str());
 			bool bNameEntered{ false }, bExit{ false };
@@ -656,7 +656,7 @@ namespace Feather {
 				bExit = true;
 			}
 
-			static std::string errorText{ "" };
+			static std::string errorText{};
 
 			if (bNameEntered && !tableName.empty())
 			{
@@ -709,7 +709,7 @@ namespace Feather {
 		if (ImGui::BeginPopupModal("Create Lua File"))
 		{
 			char buffer[256];
-			static std::string tableName{ "" };
+			static std::string tableName{};
 			memset(buffer, 0, sizeof(buffer));
 			strcpy_s(buffer, tableName.c_str());
 			bool bNameEntered{ false }, bExit{ false };
@@ -729,7 +729,7 @@ namespace Feather {
 				bExit = true;
 			}
 
-			static std::string errorText{ "" };
+			static std::string errorText{};
 
 			if (bNameEntered && !tableName.empty())
 			{

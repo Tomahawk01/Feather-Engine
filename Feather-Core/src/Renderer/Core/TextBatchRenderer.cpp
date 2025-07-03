@@ -82,7 +82,7 @@ namespace Feather {
 		for (const auto& textGlyph : m_Glyphs)
 		{
 			std::vector<std::string> textChunks{};
-			std::string text_holder{ "" };
+			std::string text_holder{};
 			glm::vec2 temp_pos = textGlyph->position;
 			auto fontSize = textGlyph->font->GetFontSize();
 			int infiniteLoopCheck{ 0 };

@@ -30,10 +30,10 @@ namespace Feather {
 	struct SaveRelationship
 	{
 		//entt::entity Self{ entt::null };
-		std::string Parent{ "" };
-		std::string NextSibling{ "" };
-		std::string PrevSibling{ "" };
-		std::string FirstChild{ "" };
+		std::string Parent{};
+		std::string NextSibling{};
+		std::string PrevSibling{};
+		std::string FirstChild{};
 	};
 
 }

@@ -20,9 +20,9 @@ namespace Feather {
 
 	PackageGameDisplay::PackageGameDisplay()
 		: m_GameConfig{ std::make_unique<GameConfig>() }
-		, m_DestinationPath{ "" }
-		, m_ScriptListPath{ "" }
-		, m_FileIconPath{ "" }
+		, m_DestinationPath{}
+		, m_ScriptListPath{}
+		, m_FileIconPath{}
 		, m_Resizable{ false }
 		, m_Borderless{ false }
 		, m_FullScreen{ false }

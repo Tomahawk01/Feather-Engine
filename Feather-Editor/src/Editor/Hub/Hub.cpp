@@ -32,10 +32,10 @@ namespace Feather {
 		, m_State{ HubState::Default }
 		, m_Width{ static_cast<float>(m_Window.GetWidth()) }
 		, m_Height{ static_cast<float>(m_Window.GetHeight()) }
-		, m_NewProjectName{ "" }
+		, m_NewProjectName{}
 		, m_NewProjectPath{ DEFAULT_PROJECT_PATH }
-		, m_PrevProjectPath{ "" }
-		, m_PrevProjectName{ "" }
+		, m_PrevProjectPath{}
+		, m_PrevProjectName{}
 	{
 		std::filesystem::path projectPath{ m_NewProjectPath };
 		if (!std::filesystem::exists(projectPath))

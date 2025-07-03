@@ -9,7 +9,7 @@ namespace Feather {
 	struct TextComponent
 	{
 		std::string fontName{ "testFont" };
-		std::string textStr{ "" };
+		std::string textStr{};
 		int padding{ 0 };
 		float wrap{ -1.0f };
 		float textBoxWidth{ -1.0f };

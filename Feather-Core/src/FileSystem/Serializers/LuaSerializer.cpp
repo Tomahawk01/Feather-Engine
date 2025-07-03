@@ -122,7 +122,7 @@ namespace Feather {
 
 	void LuaSerializer::AddIndents()
 	{
-		std::string indent{ "" };
+		std::string indent{};
 		for (int i = 0; i < m_NumIndents; i++)
 		{
 			indent += INDENT;

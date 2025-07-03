@@ -17,8 +17,8 @@ namespace Feather {
 
 	struct ObjectData
 	{
-		std::string tag{ "" };
-		std::string group{ "" };
+		std::string tag{};
+		std::string group{};
 		bool isCollider{ false };
 		bool isTrigger{ false };
 		bool isFriendly{ false };

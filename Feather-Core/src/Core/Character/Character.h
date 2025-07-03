@@ -16,8 +16,8 @@ namespace Feather {
 
 	struct CharacterParams
 	{
-		std::string name{ "" };
-		std::string group{ "" };
+		std::string name{};
+		std::string group{};
 
 		std::optional<std::unique_ptr<AnimationComponent>> animation{ std::nullopt };
 		std::optional<std::unique_ptr<SpriteComponent>> sprite{ std::nullopt };

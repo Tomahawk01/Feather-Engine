@@ -80,8 +80,8 @@ namespace Feather {
 
 		struct AssetWatchParams
 		{
-			std::string assetName{ "" };
-			std::string filepath{ "" };
+			std::string assetName{};
+			std::string filepath{};
 			std::filesystem::file_time_type lastWrite;
 			AssetType type{};
 			bool isDirty{ false };

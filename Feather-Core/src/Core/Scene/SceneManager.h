@@ -61,8 +61,8 @@ namespace Feather {
 
 	protected:
 		std::map<std::string, std::shared_ptr<Scene>> m_mapScenes;
-		std::string m_CurrentScene{ "" };
-		std::string m_CurrentTileset{ "" };
+		std::string m_CurrentScene{};
+		std::string m_CurrentTileset{};
 	};
 
 }

@@ -21,7 +21,9 @@
 namespace Feather {
 
 	TileDetailsDisplay::TileDetailsDisplay()
-		: m_SelectedLayer{ -1 }, m_RenameLayerBuff{ "" }, m_Renaming{ false }
+		: m_SelectedLayer{ -1 }
+		, m_RenameLayerBuff{}
+		, m_Renaming{ false }
 	{}
 
 	TileDetailsDisplay::~TileDetailsDisplay()
@@ -212,7 +214,7 @@ namespace Feather {
 			ImGui::InlineLabel("texture: ");
 			ImGui::TextColored(ImVec4{ 0.0f, 1.0f, 0.0f, 1.0f }, sprite.textureName.c_str());
 
-			std::string layer{ "" };
+			std::string layer{};
 
 			// Set layer description
 			if (sprite.layer >= 0 && sprite.layer < scene->GetLayerParams().size())

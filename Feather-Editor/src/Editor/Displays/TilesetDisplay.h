@@ -20,7 +20,7 @@ namespace Feather {
 		virtual void DrawToolbar() override;
 
 	private:
-		std::string m_Tileset{ "" };
+		std::string m_Tileset{};
 
 		struct TableSelection
 		{

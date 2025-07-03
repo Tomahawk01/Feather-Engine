@@ -275,7 +275,7 @@ namespace Feather {
 				}
 				else
 				{
-					serializer->AddKeyValuePair("parent", std::string{ "" });
+					serializer->AddKeyValuePair("parent", std::string{});
 				}
 
 				if (relations->nextSibling != entt::null)
@@ -285,7 +285,7 @@ namespace Feather {
 				}
 				else
 				{
-					serializer->AddKeyValuePair("nextSibling", std::string{ "" });
+					serializer->AddKeyValuePair("nextSibling", std::string{});
 				}
 
 				if (relations->prevSibling != entt::null)
@@ -295,7 +295,7 @@ namespace Feather {
 				}
 				else
 				{
-					serializer->AddKeyValuePair("prevSibling", std::string{ "" });
+					serializer->AddKeyValuePair("prevSibling", std::string{});
 				}
 
 				if (relations->firstChild != entt::null)
@@ -305,7 +305,7 @@ namespace Feather {
 				}
 				else
 				{
-					serializer->AddKeyValuePair("firstChild", std::string{ "" });
+					serializer->AddKeyValuePair("firstChild", std::string{});
 				}
 				serializer->EndObject(); // Relationship Object
 			}

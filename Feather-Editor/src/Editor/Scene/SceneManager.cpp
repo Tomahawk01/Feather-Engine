@@ -260,7 +260,7 @@ namespace Feather {
 					return runtimeData ? runtimeData->defaultMusic : "";
 				}
 
-				return std::string{ "" };
+				return std::string{};
 			},
 			"getCurrentSceneName", [&]
 			{
@@ -270,7 +270,7 @@ namespace Feather {
 					return runtimeData ? runtimeData->sceneName : "";
 				}
 
-				return std::string{ "" };
+				return std::string{};
 			}
 		);
 	}

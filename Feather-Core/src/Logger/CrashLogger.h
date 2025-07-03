@@ -124,9 +124,9 @@ namespace Feather {
 		/* Flag to determine if the logger was initialized */
 		bool m_Initialized{ false };
 		/* The specified project path. Used to keep logs with separate projects */
-		std::string m_ProjectPath{ "" };
+		std::string m_ProjectPath{};
 		/* Stores the filename to where the crash occurred */
-		static inline std::string s_CrashFile{ "" };
+		static inline std::string s_CrashFile{};
 		/* Stores the line number where the crash occurred */
 		static inline int s_CrashLine{ -1 };
 	};

@@ -17,7 +17,7 @@ namespace Feather {
 
 	struct SpriteComponent
 	{
-		std::string textureName{ "" };
+		std::string textureName{};
 		float width{ 16.0f };
 		float height{ 16.0f };
 		UVs uvs{ .u = 0.0f, .v = 0.0f, .uv_width = 0.0f, .uv_height = 0.0f };

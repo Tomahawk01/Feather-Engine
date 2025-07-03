@@ -163,8 +163,8 @@ namespace Feather {
 				componentMap[id] = std::string{ name };
 			}
 
-			static std::string componentStr{ "" };
-			static std::string componentStrPrev{ "" };
+			static std::string componentStr{};
+			static std::string componentStrPrev{};
 			static entt::id_type id_type{ 0 };
 			static bool error{ false };
 

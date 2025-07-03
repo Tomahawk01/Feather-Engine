@@ -24,11 +24,11 @@ namespace Feather {
 
 	Scene::Scene()
 		: m_Registry{}
-		, m_SceneName{ "" }
-		, m_TilemapPath{ "" }
-		, m_ObjectPath{ "" }
-		, m_SceneDataPath{ "" }
-		, m_DefaultMusic{ "" }
+		, m_SceneName{}
+		, m_TilemapPath{}
+		, m_ObjectPath{}
+		, m_SceneDataPath{}
+		, m_DefaultMusic{}
 		, m_SceneLoaded{ false }
 		, m_UsePlayerStart{ false }
 		, m_Canvas{}
@@ -41,10 +41,10 @@ namespace Feather {
 	Scene::Scene(const std::string& sceneName, EMapType type)
 		: m_Registry{}
 		, m_SceneName{ sceneName }
-		, m_TilemapPath{ "" }
-		, m_ObjectPath{ "" }
-		, m_SceneDataPath{ "" }
-		, m_DefaultMusic{ "" }
+		, m_TilemapPath{}
+		, m_ObjectPath{}
+		, m_SceneDataPath{}
+		, m_DefaultMusic{}
 		, m_SceneLoaded{ false }
 		, m_UsePlayerStart{ false }
 		, m_Canvas{}

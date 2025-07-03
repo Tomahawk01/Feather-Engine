@@ -37,16 +37,16 @@ namespace Feather {
 			ImGui::PushItemWidth(120.0f);
 
 			ImGui::InlineLabel("position");
-			ImGui::ColoredLabel("x" "##pos_x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::ColoredLabel("x##pos_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			ImGui::InputFloat("##position_x", &transform.position.x, 1.0f, 10.0f, "%.2f");
 			ImGui::SameLine();
-			ImGui::ColoredLabel("y" "##pos_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::ColoredLabel("y##pos_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			ImGui::InputFloat("##position_y", &transform.position.y, 1.0f, 10.0f, "%.2f");
 
-			ImGui::InlineLabel("scale" "##scl_x");
-			ImGui::ColoredLabel("x", LABEL_SINGLE_SIZE, LABEL_RED);
+			ImGui::InlineLabel("scale");
+			ImGui::ColoredLabel("x##scl_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 0.1f, 1.0f, "%.2f"))
 			{
@@ -54,7 +54,7 @@ namespace Feather {
 				transform.isDirty = true;
 			}
 			ImGui::SameLine();
-			ImGui::ColoredLabel("y" "##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
+			ImGui::ColoredLabel("y##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
 			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 0.1f, 1.0f, "%.2f"))
 			{
@@ -334,7 +334,7 @@ namespace Feather {
 			ImGui::Separator();
 			ImGui::AddSpaces(2);
 
-			std::string selectedMaskBit{ "" };
+			std::string selectedMaskBit{};
 			FilterCategory maskCategory{ FilterCategory::NO_CATEGORY };
 
 			ImGui::InlineLabel("masks");
@@ -700,7 +700,7 @@ namespace Feather {
 		ImGui::PushID(entt::type_hash<Identification>::value());
 		if (ImGui::TreeNodeEx("", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			std::string error{ "" };
+			std::string error{};
 			std::string nameBuffer{ identification.name };
 			bool nameError{ false };
 

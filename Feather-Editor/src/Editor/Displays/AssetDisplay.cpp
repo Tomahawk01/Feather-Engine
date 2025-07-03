@@ -28,10 +28,10 @@ namespace Feather {
 		m_WindowSelected{ false },
 		m_WindowHovered{ false },
 		m_OpenAddAssetModal{ false },
-		m_SelectedAssetName{ "" },
+		m_SelectedAssetName{},
 		m_SelectedType{ "Textures" },
-		m_DragSource{ "" },
-		m_RenameBuf{ "" },
+		m_DragSource{},
+		m_RenameBuf{},
 		m_eSelectedType{ AssetType::TEXTURE },
 		m_AssetSize{ DEFAULT_ASSET_SIZE },
 		m_SelectedID{ -1 }

@@ -322,8 +322,8 @@ namespace Feather {
 				[](const sol::table& objectData)
 				{
 					return ObjectData{
-						objectData["tag"].get_or(std::string{""}),
-						objectData["group"].get_or(std::string{""}),
+						objectData["tag"].get_or(std::string{}),
+						objectData["group"].get_or(std::string{}),
 						objectData["isCollider"].get_or(false),
 						objectData["isTrigger"].get_or(false),
 						objectData["isFriendly"].get_or(false),
@@ -387,8 +387,8 @@ namespace Feather {
 						.filterCategory = physAttr["filterCategory"].get_or((uint16_t)0),
 						.filterMask = physAttr["filterMask"].get_or((uint16_t)0),
 						.objectData = ObjectData {
-							physAttr["objectData"]["tag"].get_or(std::string{""}),
-							physAttr["objectData"]["group"].get_or(std::string{""}),
+							physAttr["objectData"]["tag"].get_or(std::string{}),
+							physAttr["objectData"]["group"].get_or(std::string{}),
 							physAttr["objectData"]["isCollider"].get_or(false),
 							physAttr["objectData"]["isTrigger"].get_or(false),
 							physAttr["objectData"]["isFriendly"].get_or(false),

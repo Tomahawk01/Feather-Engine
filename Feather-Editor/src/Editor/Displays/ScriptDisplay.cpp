@@ -19,13 +19,16 @@ namespace fs = std::filesystem;
 namespace Feather {
 
 	ScriptDisplay::ScriptDisplay()
-		: m_ScriptsDirectory{ std::format("{}{}{}{}", MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath, "content", PATH_SEPARATOR, "scripts") }
+		: m_ScriptsDirectory{}
 		, m_Selected { -1 }
 		, m_ScriptsChanged{ false }
 		, m_ListScripts{ false }
 		, m_DirWatcher{ nullptr }
 		, m_FilesChanged{ false }
 	{
+		auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
+		m_ScriptsDirectory = std::format("{}{}{}{}", saveProject->projectPath, "content", PATH_SEPARATOR, "scripts");
+
 		F_ASSERT(fs::exists(fs::path{ m_ScriptsDirectory }) && "Scripts directory must exist");
 		const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
 
@@ -40,6 +43,12 @@ namespace Feather {
 				F_ERROR("Failed to create script list file at path: {}", m_ScriptsDirectory);
 				return;
 			}
+		}
+
+		// Set the script list path if not already set
+		if (saveProject->scriptListPath.empty())
+		{
+			saveProject->scriptListPath = scriptListPath;
 		}
 
 		GenerateScriptList();
