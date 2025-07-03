@@ -26,14 +26,12 @@ namespace Feather {
 		: Scene(sceneName, type)
 		, m_RuntimeRegistry{}
 		, m_RuntimeData{ nullptr }
-		, m_CurrentLayer{ 0 }
 	{
 		ADD_EVENT_HANDLER(NameChangeEvent, &SceneObject::OnEntityNameChanges, *this);
 	}
 
 	SceneObject::SceneObject(const std::string& sceneName, const std::string& sceneData)
 		: m_RuntimeRegistry{}
-		, m_CurrentLayer{ 0 }
 	{
 		m_SceneName = sceneName;
 		m_SceneDataPath = sceneData;
@@ -144,7 +142,27 @@ namespace Feather {
 
 	void SceneObject::AddNewLayer()
 	{
-		m_LayerParams.emplace_back(SpriteLayerParams{ .layerName = std::format("NewLayer_{}", m_CurrentLayer++) });
+		bool checkLayer{ true };
+		size_t currentLayer{ 0 };
+		while (checkLayer)
+		{
+			auto hasLayerItr = std::ranges::find_if(m_LayerParams,
+			[&](const auto& layerParam)
+			{
+				return layerParam.layerName == std::format("NewLayer_{}", currentLayer);
+			});
+
+			if (hasLayerItr != m_LayerParams.end())
+			{
+				++currentLayer;
+			}
+			else
+			{
+				checkLayer = false;
+			}
+		}
+
+		m_LayerParams.emplace_back(SpriteLayerParams{ .layerName = std::format("NewLayer_{}", currentLayer) });
 	}
 
 	bool SceneObject::AddGameObject()

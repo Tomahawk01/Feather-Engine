@@ -52,7 +52,6 @@ namespace Feather {
 
 		std::unique_ptr<SceneRuntimeData> m_RuntimeData;
 		std::map<std::string, entt::entity> m_mapTagToEntity;
-		int m_CurrentLayer;
 	};
 
 }
