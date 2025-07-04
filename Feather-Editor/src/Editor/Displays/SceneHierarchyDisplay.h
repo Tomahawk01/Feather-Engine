@@ -7,6 +7,7 @@
 namespace Feather {
 
 	struct SwitchEntityEvent;
+	struct AddComponentEvent;
 	struct KeyEvent;
 	class Entity;
 
@@ -32,6 +33,7 @@ namespace Feather {
 
 		void OnEntityChanged(SwitchEntityEvent& swEntEvent);
 		void OnKeyPressed(KeyEvent& keyEvent);
+		void OnAddComponent(AddComponentEvent& addCompEvent);
 
 		void OpenContext(class SceneObject* currentScene);
 

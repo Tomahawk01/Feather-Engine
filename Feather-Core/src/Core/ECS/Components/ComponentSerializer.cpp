@@ -164,6 +164,15 @@ namespace Feather {
 			.EndObject();
 	}
 
+	void ComponentSerializer::SerializeComponent(JSONSerializer& serializer, const UIComponent& ui)
+	{
+		serializer.StartNewObject("ui")
+			.EndObject();
+		// TODO: Add more members as needed
+
+		// NOTE: The UI Component is currently only used as a flag for UI Rendering
+	}
+
 	// ======================= Deserialization =======================
 
 	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, TransformComponent& transform)
@@ -291,6 +300,14 @@ namespace Feather {
 	{
 		id.name = jsonValue["name"].GetString();
 		id.group = jsonValue["group"].GetString();
+	}
+
+	void ComponentSerializer::DeserializeComponent(const rapidjson::Value& jsonValue, UIComponent& ui)
+	{
+		ui.type = UIObjectType::NO_TYPE;
+		// TODO: Add more members as needed
+
+		// NOTE: The UI Component is currently only used as a flag for UI Rendering
 	}
 
 }

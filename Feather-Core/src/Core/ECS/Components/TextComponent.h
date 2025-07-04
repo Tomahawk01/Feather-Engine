@@ -8,7 +8,7 @@ namespace Feather {
 
 	struct TextComponent
 	{
-		std::string fontName{ "testFont" };
+		std::string fontName{ "pixelFont-32" };
 		std::string textStr{};
 		int padding{ 0 };
 		float wrap{ -1.0f };

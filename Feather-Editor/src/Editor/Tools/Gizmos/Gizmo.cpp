@@ -325,7 +325,7 @@ namespace Feather {
 
 	void Gizmo::OnAddComponent(const AddComponentEvent& addCompEvent)
 	{
-		if (addCompEvent.type == ComponentType::UI)
+		if (addCompEvent.type == ComponentType::UI || addCompEvent.type == ComponentType::Text)
 		{
 			m_UIComponent = true;
 		}

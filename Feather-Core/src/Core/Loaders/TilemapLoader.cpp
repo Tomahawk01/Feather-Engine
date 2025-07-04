@@ -264,6 +264,11 @@ namespace Feather {
 				const auto& text = objectEnt.GetComponent<TextComponent>();
 				SERIALIZE_COMPONENT(*serializer, text);
 			}
+			if (objectEnt.HasComponent<UIComponent>())
+			{
+				const auto& ui = objectEnt.GetComponent<UIComponent>();
+				SERIALIZE_COMPONENT(*serializer, ui);
+			}
 
 			if (auto* relations = objectEnt.TryGetComponent<Relationship>())
 			{
@@ -412,6 +417,12 @@ namespace Feather {
 				const auto& jsonText = components["text"];
 				auto& text = gameObject.AddComponent<TextComponent>();
 				DESERIALIZE_COMPONENT(jsonText, text);
+			}
+			if (components.HasMember("ui"))
+			{
+				const auto& jsonUI = components["ui"];
+				auto& ui = gameObject.AddComponent<UIComponent>();
+				DESERIALIZE_COMPONENT(jsonUI, ui);
 			}
 
 			if (components.HasMember("relationship"))

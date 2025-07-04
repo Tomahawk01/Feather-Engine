@@ -29,10 +29,10 @@ namespace Feather {
 	{
 		ADD_SWE_HANDLER(SwitchEntityEvent, &SceneHierarchyDisplay::OnEntityChanged, *this);
 		ADD_EVENT_HANDLER(KeyEvent, &SceneHierarchyDisplay::OnKeyPressed, *this);
+		ADD_EVENT_HANDLER(AddComponentEvent, &SceneHierarchyDisplay::OnAddComponent, *this);
 	}
 
-	SceneHierarchyDisplay::~SceneHierarchyDisplay()
-	{}
+	SceneHierarchyDisplay::~SceneHierarchyDisplay() = default;
 
 	void SceneHierarchyDisplay::Update()
 	{
@@ -452,6 +452,17 @@ namespace Feather {
 		}
 	}
 
+	void SceneHierarchyDisplay::OnAddComponent(AddComponentEvent& addCompEvent)
+	{
+		if (addCompEvent.entity && addCompEvent.type == ComponentType::Text)
+		{
+			if (!addCompEvent.entity->HasComponent<UIComponent>())
+			{
+				addCompEvent.entity->AddComponent<UIComponent>();
+			}
+		}
+	}
+
 	void SceneHierarchyDisplay::OpenContext(SceneObject* currentScene)
 	{
 		if (!currentScene)
@@ -506,7 +517,7 @@ namespace Feather {
 			}
 		}
 
-		if (ImGui::IsWindowFocused() && !ImGui::IsAnyItemHovered() &&
+		if (m_WindowActive && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered() &&
 			(ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
 		{
 			m_SelectedEntity = nullptr;
