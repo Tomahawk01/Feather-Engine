@@ -258,10 +258,22 @@ namespace Feather {
 		auto dir = SplitStr(pathToSplit, PATH_SEPARATOR);
 		for (size_t i = 0; i < dir.size(); i++)
 		{
-			if (ImGui::Button(dir[i].c_str()))
+			// NOTE: Folders can have the same name if they are not in the same folder.
+			// This will cause an ImGui issue because a button has the same ID.
+			// Append the index to the folder name
+			std::string folderName{ std::format("{}##_{}", dir[i], i) };
+			if (ImGui::Button(folderName.c_str()))
 			{
-				std::string pathChange = pathStr.substr(0, pathStr.find(dir[i]) + dir[i].size());
-				m_CurrentDir = std::filesystem::path{ pathChange };
+				std::filesystem::path rebuildPath;
+				for (size_t j = 0; j <= i; j++)
+				{
+					rebuildPath /= dir[j];
+				}
+
+				std::filesystem::path finalPath{ savedPath };
+				finalPath /= rebuildPath;
+
+				m_CurrentDir = finalPath;
 			}
 
 			ImGui::SameLine();
@@ -272,7 +284,9 @@ namespace Feather {
 			ImGui::PopStyleColor(3);
 
 			if (i < dir.size() - 1)
+			{
 				ImGui::SameLine();
+			}
 		}
 
 		ImGui::Separator();
