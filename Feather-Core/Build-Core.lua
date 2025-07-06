@@ -30,7 +30,7 @@ project "Feather-Core"
         "%{wks.location}/vendor/stb_truetype",
         "%{wks.location}/vendor/glm",
         "%{wks.location}/vendor/entt/include",
-        "%{wks.location}/vendor/lua_53/include",
+        "%{wks.location}/vendor/lua_5.4.2/include",
         "%{wks.location}/vendor/sol3",
         "%{wks.location}/vendor/box2d/include",
         "%{wks.location}/vendor/tinyfiledialogs/include",
@@ -40,7 +40,7 @@ project "Feather-Core"
     libdirs
     {
         "%{wks.location}/vendor/SDL/lib",
-        "%{wks.location}/vendor/lua_53/lib",
+        "%{wks.location}/vendor/lua_5.4.2/lib",
         "%{wks.location}/vendor/box2d/lib",
         "%{wks.location}/vendor/tinyfiledialogs/lib"
     }
@@ -50,7 +50,7 @@ project "Feather-Core"
         "Glad",
         "SDL2.lib",
         "SDL2_mixer.lib",
-        "lua53.lib",
+        "lua54.lib",
         "tinyfiledialogs64.lib",
         "Box2D",
         "SOIL"

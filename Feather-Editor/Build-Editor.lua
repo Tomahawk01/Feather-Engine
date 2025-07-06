@@ -22,7 +22,7 @@ project "Feather-Editor"
         "%{wks.location}/vendor/Glad/src/include",
         "%{wks.location}/vendor/glm",
         "%{wks.location}/vendor/entt/include",
-        "%{wks.location}/vendor/lua_53/include",
+        "%{wks.location}/vendor/lua_5.4.2/include",
         "%{wks.location}/vendor/sol3",
         "%{wks.location}/vendor/box2d/include",
         "%{wks.location}/vendor/ImGui/src",
@@ -32,7 +32,7 @@ project "Feather-Editor"
     libdirs
     {
         "%{wks.location}/vendor/SDL/lib",
-        "%{wks.location}/vendor/lua_53/lib"
+        "%{wks.location}/vendor/lua_5.4.2/lib"
     }
 
     links
@@ -41,7 +41,7 @@ project "Feather-Editor"
         "SDL2.lib",
         "SDL2_mixer.lib",
         "opengl32.lib",
-        "lua53.lib",
+        "lua54.lib",
         "Glad",
         "Box2D",
         "ImGui",
