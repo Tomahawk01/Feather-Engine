@@ -7,6 +7,7 @@
 #include "Core/Scene/Scene.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
+#include "Renderer/Essentials/Texture.h"
 
 constexpr const char* PlayerStartTag = "F_PlayerStart";
 

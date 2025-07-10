@@ -6,6 +6,8 @@
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Resources/AssetManager.h"
 #include "Renderer/Essentials/Font.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Core/TextBatchRenderer.h"
 #include "Renderer/Core/Camera2D.h"

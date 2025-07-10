@@ -10,6 +10,7 @@
 #include "Renderer/Core/RectBatchRenderer.h"
 #include "Renderer/Core/CircleBatchRenderer.h"
 #include "Renderer/Essentials/Primitives.h"
+#include "Renderer/Essentials/Shader.h"
 
 #include "Utils/MathUtilities.h"
 

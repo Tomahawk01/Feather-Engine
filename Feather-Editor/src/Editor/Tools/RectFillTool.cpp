@@ -4,6 +4,8 @@
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Essentials/Primitives.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Logger/Logger.h"

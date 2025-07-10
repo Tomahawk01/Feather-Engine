@@ -7,9 +7,8 @@
 #include "Core/CoreUtils/SaveProject.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Scene/Scene.h"
-
 #include "Core/Resources/AssetManager.h"
-
+#include "Renderer/Essentials/Texture.h"
 #include "FileSystem/Serializers/JSONSerializer.h"
 #include "Utils/FeatherUtilities.h"
 #include "Utils/HelperUtilities.h"

@@ -5,6 +5,8 @@
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Essentials/Primitives.h"
 #include "Renderer/Essentials/Vertex.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
 
 #include "Editor/Scene/SceneObject.h"
 

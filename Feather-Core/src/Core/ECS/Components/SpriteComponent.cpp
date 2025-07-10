@@ -4,6 +4,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Renderer/Essentials/Texture.h"
 
 std::string Feather::SpriteComponent::to_string() const
 {

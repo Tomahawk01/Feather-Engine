@@ -4,7 +4,13 @@
 #include "Renderer/Essentials/TextureLoader.h"
 #include "Renderer/Essentials/ShaderLoader.h"
 #include "Renderer/Essentials/FontLoader.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
+#include "Renderer/Essentials/Font.h"
+#include "Sounds/Essentials/Music.h"
+#include "Sounds/Essentials/SoundFX.h"
 #include "Core/ECS/MainRegistry.h"
+#include "Core/ECS/Registry.h"
 #include "Core/CoreUtils/Prefab.h"
 
 #include "Core/Resources/fonts/default_fonts.h"

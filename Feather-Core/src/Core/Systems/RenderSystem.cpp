@@ -8,6 +8,7 @@
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Utils/HelperUtilities.h"
 
 #include <ranges>

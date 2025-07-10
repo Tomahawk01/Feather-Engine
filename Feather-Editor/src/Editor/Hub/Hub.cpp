@@ -6,6 +6,7 @@
 #include "Filesystem/Dialogs/FileDialog.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
+#include "Renderer/Essentials/Texture.h"
 
 #include "Editor/Utilities/GUI/Gui.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"

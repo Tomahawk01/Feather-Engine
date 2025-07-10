@@ -4,6 +4,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/CoreUtils/CoreUtilities.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Scene/SceneObject.h"
@@ -16,6 +17,8 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+
+#include <algorithm>
 
 namespace Feather {
 

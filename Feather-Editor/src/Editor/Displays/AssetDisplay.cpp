@@ -7,6 +7,11 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/Prefab.h"
 #include "Core/CoreUtils/SaveProject.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
+#include "Renderer/Essentials/Font.h"
+#include "Sounds/Essentials/Music.h"
+#include "Sounds/Essentials/SoundFX.h"
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"

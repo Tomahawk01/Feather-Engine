@@ -6,6 +6,11 @@
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/SaveProject.h"
 #include "Core/CoreUtils/Prefab.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
+#include "Renderer/Essentials/Font.h"
+#include "Sounds/Essentials/Music.h"
+#include "Sounds/Essentials/SoundFX.h"
 #include "Filesystem/Serializers/JSONSerializer.h"
 #include "Filesystem/Serializers/LuaSerializer.h"
 

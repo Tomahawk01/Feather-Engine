@@ -34,6 +34,10 @@
 #include "Core/Scene/Scene.h"
 #include "Core/Character/Character.h"
 
+#include "Renderer/Essentials/Texture.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Font.h"
+
 #include "Utils/Timer.h"
 #include "Utils/RandomGenerator.h"
 #include "Utils/HelperUtilities.h"

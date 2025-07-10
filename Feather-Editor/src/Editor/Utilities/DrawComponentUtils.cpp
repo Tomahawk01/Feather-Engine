@@ -5,6 +5,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Events/EventDispatcher.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Physics/PhysicsUtilities.h"
 #include "Utils/FeatherUtilities.h"
 

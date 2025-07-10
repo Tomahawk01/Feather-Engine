@@ -9,6 +9,8 @@
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/PickingBatchRenderer.h"
+#include "Renderer/Essentials/Texture.h"
+#include "Renderer/Essentials/Shader.h"
 
 namespace Feather {
 

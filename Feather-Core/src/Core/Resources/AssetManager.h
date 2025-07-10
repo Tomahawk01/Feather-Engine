@@ -1,12 +1,5 @@
 #pragma once
 
-#include "Renderer/Essentials/Shader.h"
-#include "Renderer/Essentials/Texture.h"
-#include "Renderer/Essentials/Font.h"
-#include "Core/ECS/Registry.h"
-#include "Sounds/Essentials/Music.h"
-#include "Sounds/Essentials/SoundFX.h"
-
 #include <map>
 #include <unordered_map>
 #include <filesystem>
@@ -24,6 +17,11 @@ namespace Feather {
 	enum class AssetType;
 
 	class Prefab;
+	class Texture;
+	class Shader;
+	class Font;
+	class Music;
+	class SoundFX;
 
 	class AssetManager
 	{

@@ -4,6 +4,7 @@
 #include "Core/Scene/Scene.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/Registry.h"
+#include "Renderer/Essentials/Font.h"
 #include "Utils/MathUtilities.h"
 
 namespace Feather {

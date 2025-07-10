@@ -7,6 +7,7 @@
 #include "Core/ECS/MetaUtilities.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
+#include "Renderer/Essentials/Texture.h"
 
 using namespace entt::literals;
 

@@ -5,6 +5,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/CoreUtils/SaveProject.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Utils/FeatherUtilities.h"
 #include "Utils/HelperUtilities.h"
 #include "FileSystem/Dialogs/FileDialog.h"

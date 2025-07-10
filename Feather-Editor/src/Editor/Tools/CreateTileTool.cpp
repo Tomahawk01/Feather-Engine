@@ -3,6 +3,8 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Renderer/Core/Camera2D.h"
+#include "Renderer/Essentials/Shader.h"
+#include "Renderer/Essentials/Texture.h"
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"

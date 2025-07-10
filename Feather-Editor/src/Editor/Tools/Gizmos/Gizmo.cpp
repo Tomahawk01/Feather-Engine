@@ -10,6 +10,7 @@
 #include "Core/Events/EventDispatcher.h"
 #include "Renderer/Core/BatchRenderer.h"
 #include "Renderer/Essentials/Vertex.h"
+#include "Renderer/Essentials/Texture.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Events/EditorEventTypes.h"
