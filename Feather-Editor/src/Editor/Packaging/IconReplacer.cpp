@@ -93,35 +93,27 @@ namespace Feather {
 		if (!file)
 		{
 			F_ERROR("Failed to replace icon: Icon file could not be opened");
-			if (file.fail())
-				F_ERROR("Failed to replace icon: Stream failbit set (invalid format or operation)");
-			if (file.bad())
-				F_ERROR("Failed to replace icon: Stream badbit set (irrecoverable error, e.g. hardware I/O failure)");
-			if (!file.good())
-				F_ERROR("Failed to replace icon: General stream if not good");
-
 			return false;
 		}
 
 		ICONDIR iconDir;
 		file.read(reinterpret_cast<char*>(&iconDir), sizeof(ICONDIR));
-		if (iconDir.count != 1)
+
+		if (iconDir.count == 0)
 		{
-			F_ERROR("Failed to replace icon: Image count is not 1 for {}\n"
-					"Icons with multiple images are not supported",
-					m_IconFile);
+			F_ERROR("Failed to replace icon: No images found in icon file");
 			return false;
 		}
 
-		ICONDIRENTRY entry;
-		file.read(reinterpret_cast<char*>(&entry), sizeof(ICONDIRENTRY));
+		std::vector<ICONDIRENTRY> entries(iconDir.count);
+		for (int i = 0; i < iconDir.count; ++i)
+		{
+			file.read(reinterpret_cast<char*>(&entries[i]), sizeof(ICONDIRENTRY));
+		}
 
-		std::vector<char> image(entry.bytesInRes);
-		file.seekg(entry.imageOffset, std::ios::beg);
-		file.read(image.data(), entry.bytesInRes);
-
-		GRPICONDIR grpDir{ 0, 1, 1 };
-		GRPICONDIRENTRY grpEntry{ entry.width, entry.height, entry.colorCount, entry.reserved, entry.planes, entry.bitCount, entry.bytesInRes, 1 };
+		GRPICONDIR grpDir{ 0, 1, iconDir.count };
+		std::vector<char> groupResource(sizeof(GRPICONDIR) + sizeof(GRPICONDIRENTRY) * iconDir.count);
+		memcpy(groupResource.data(), &grpDir, sizeof(GRPICONDIR));
 
 		HANDLE update = BeginUpdateResourceA(m_ExeFile.c_str(), FALSE);
 		if (!update)
@@ -130,16 +122,32 @@ namespace Feather {
 			return false;
 		}
 
-		if (!UpdateResourceA(update, (LPCSTR)RT_ICON, MAKEINTRESOURCEA(1), 0, image.data(), entry.bytesInRes))
+		for (int i = 0; i < iconDir.count; ++i)
 		{
-			EndUpdateResourceA(update, TRUE);
-			F_ERROR("Failed to update RT_ICON");
-			return false;
-		}
+			std::vector<char> image(entries[i].bytesInRes);
+			file.seekg(entries[i].imageOffset, std::ios::beg);
+			file.read(image.data(), entries[i].bytesInRes);
 
-		std::vector<char> groupResource(sizeof(GRPICONDIR) + sizeof(GRPICONDIRENTRY));
-		memcpy(groupResource.data(), &grpDir, sizeof(GRPICONDIR));
-		memcpy(groupResource.data() + sizeof(GRPICONDIR), &grpEntry, sizeof(GRPICONDIRENTRY));
+			if (!UpdateResourceA(update, (LPCSTR)RT_ICON, MAKEINTRESOURCEA(i + 1), 0, image.data(), entries[i].bytesInRes))
+			{
+				EndUpdateResourceA(update, TRUE);
+				F_ERROR("Failed to update RT_ICON for image {}", i + 1);
+				return false;
+			}
+
+			GRPICONDIRENTRY grpEntry{
+				entries[i].width,
+				entries[i].height,
+				entries[i].colorCount,
+				entries[i].reserved,
+				entries[i].planes,
+				entries[i].bitCount,
+				entries[i].bytesInRes,
+				static_cast<WORD>(i + 1)
+			};
+
+			memcpy(groupResource.data() + sizeof(GRPICONDIR) + sizeof(GRPICONDIRENTRY) * i, &grpEntry, sizeof(GRPICONDIRENTRY));
+		}
 
 		if (!UpdateResourceA(update, (LPCSTR)RT_GROUP_ICON, MAKEINTRESOURCEA(1), 0, groupResource.data(), groupResource.size()))
 		{
