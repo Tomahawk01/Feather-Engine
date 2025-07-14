@@ -10,7 +10,7 @@
 #include <Core/CoreUtils/CoreUtilities.h>
 #include <Core/CoreUtils/CoreEngineData.h>
 #include <Core/CoreUtils/EngineShaders.h>
-#include <Core/CoreUtils/SaveProject.h>
+#include <Core/CoreUtils/ProjectInfo.h>
 #include <Core/Events/EventDispatcher.h>
 #include <Core/Events/EngineEventTypes.h>
 #include <Core/Scripting/InputManager.h>
@@ -31,6 +31,7 @@
 #include "Editor/Displays/TilemapDisplay.h"
 #include "Editor/Displays/ContentDisplay.h"
 #include "Editor/Displays/PackageDisplay.h"
+#include "Editor/Displays/ProjectSettingsDisplay.h"
 
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
@@ -174,7 +175,7 @@ namespace Feather {
 			return false;
 		}
 
-		mainRegistry.AddToContext<std::shared_ptr<SaveProject>>(std::make_shared<SaveProject>());
+		mainRegistry.AddToContext<ProjectInfoPtr>(std::make_shared<ProjectInfo>());
 		m_Hub = std::make_unique<Hub>(*m_Window);
 
 		return true;
@@ -241,7 +242,8 @@ namespace Feather {
 
 		// Set the Crash Logger path to the running project
 		const auto& projectPath = CORE_GLOBALS().GetProjectPath();
-		FEATHER_CRASH_LOGGER().SetProjectPath(projectPath);
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		FEATHER_CRASH_LOGGER().SetProjectPath(projectInfo->GetProjectPath().string());
 
 		return true;
     }
@@ -613,6 +615,7 @@ namespace Feather {
 		displayHolder->displays.push_back(std::move(contentDisplay));
 		displayHolder->displays.push_back(std::move(scriptDisplay));
 		displayHolder->displays.push_back(std::move(packageDisplay));
+		displayHolder->displays.push_back(std::make_unique<ProjectSettingsDisplay>());
 
 		return true;
 	}

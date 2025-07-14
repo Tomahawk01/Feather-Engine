@@ -18,7 +18,7 @@
 
 #include "Core/CoreUtils/FollowCamera.h"
 #include "Core/CoreUtils/CoreUtilities.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 
 #include "Core/States/State.h"
 #include "Core/States/StateStack.h"
@@ -100,28 +100,20 @@ namespace Feather {
 		return true;
 	}
 
-	bool ScriptingSystem::LoadMainScript(const SaveProject& save, Registry& registry, sol::state& lua)
+	bool ScriptingSystem::LoadMainScript(ProjectInfo& projectInfo, Registry& registry, sol::state& lua)
 	{
-		std::error_code ec;
-		std::filesystem::path mainLuaPath = save.mainLuaScript;
-
-		if (!std::filesystem::exists(mainLuaPath, ec))
-		{
-			F_ERROR("Failed to load main lua script: {}", ec.message());
-			return false;
-		}
-
-		std::filesystem::path parentPath = mainLuaPath.parent_path();
-		std::filesystem::path scriptListPath = parentPath / "script_list.lua";
-		std::filesystem::path contentPath = std::filesystem::path{ save.projectPath } / "content";
+		auto optScriptListPath = projectInfo.GetScriptListPath();
+		F_ASSERT(optScriptListPath && "Script List path not setup correctly in project info");
+		auto optContentPath = projectInfo.TryGetFolderPath(EProjectFolderType::Content);
+		F_ASSERT(optContentPath && "Content path not setup correctly in project info");
 
 		// Try to load script list files
-		if (std::filesystem::exists(scriptListPath) && std::filesystem::exists(contentPath))
+		if (std::filesystem::exists(*optScriptListPath) && std::filesystem::exists(*optContentPath))
 		{
 			try
 			{
 				sol::state scriptLua;
-				auto result = scriptLua.safe_script_file(scriptListPath.string());
+				auto result = scriptLua.safe_script_file(optScriptListPath->string());
 				if (!result.valid())
 				{
 					sol::error err = result;
@@ -139,7 +131,7 @@ namespace Feather {
 				{
 					try
 					{
-						std::filesystem::path scriptPath = contentPath / script.as<std::string>();
+						std::filesystem::path scriptPath = *optContentPath / script.as<std::string>();
 						auto result = lua.safe_script_file(scriptPath.string());
 						if (!result.valid())
 						{
@@ -161,7 +153,10 @@ namespace Feather {
 			}
 		}
 
-		return LoadMainScript(save.mainLuaScript, registry, lua);
+		auto optMainLuaScript = projectInfo.GetMainLuaScriptPath();
+		F_ASSERT(optMainLuaScript && "Main lua script has not been set correctly in project info");
+
+		return LoadMainScript(optMainLuaScript->string(), registry, lua);
 	}
 
 	void ScriptingSystem::Update(Registry& registry)

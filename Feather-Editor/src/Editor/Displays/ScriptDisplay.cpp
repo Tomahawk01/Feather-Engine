@@ -2,7 +2,7 @@
 
 #include "Logger/Logger.h"
 #include "Core/ECS/MainRegistry.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "FileSystem/Serializers/LuaSerializer.h"
 #include "FileSystem/Utilities/DirectoryWatcher.h"
 #include "Utils/HelperUtilities.h"
@@ -26,29 +26,27 @@ namespace Feather {
 		, m_DirWatcher{ nullptr }
 		, m_FilesChanged{ false }
 	{
-		auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		m_ScriptsDirectory = std::format("{}{}{}{}", saveProject->projectPath, "content", PATH_SEPARATOR, "scripts");
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto optScriptsPath = projectInfo->TryGetFolderPath(EProjectFolderType::Scripts);
+		F_ASSERT(optScriptsPath && "Scipts Directory was not set correctly");
+		F_ASSERT(fs::exists(*optScriptsPath) && "Scripts directory must exist");
 
-		F_ASSERT(fs::exists(fs::path{ m_ScriptsDirectory }) && "Scripts directory must exist");
-		const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
+		m_ScriptsDirectory = optScriptsPath->string();
 
-		if (!fs::exists(fs::path{ scriptListPath }))
+		auto optScriptListPath = projectInfo->GetScriptListPath();
+		F_ASSERT(optScriptListPath && "Script list path not set correctly in project info");
+
+		if (!fs::exists(*optScriptListPath))
 		{
-			std::ofstream file{ scriptListPath };
+			std::ofstream file{ optScriptListPath->string() };
 			file.close();
 
-			if (!fs::exists(fs::path{ scriptListPath }))
+			if (!fs::exists(*optScriptListPath))
 			{
 				F_ASSERT(false && "Failed to create script file");
-				F_ERROR("Failed to create script list file at path: {}", m_ScriptsDirectory);
+				F_ERROR("Failed to create script list file at path: '{}'", optScriptListPath->parent_path().string());
 				return;
 			}
-		}
-
-		// Set the script list path if not already set
-		if (saveProject->scriptListPath.empty())
-		{
-			saveProject->scriptListPath = scriptListPath;
 		}
 
 		GenerateScriptList();
@@ -208,11 +206,18 @@ namespace Feather {
 	{
 		if (m_ScriptList.empty())
 		{
-			const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
-			if (fs::exists(fs::path{ scriptListPath }))
+			auto optScriptListPath = MAIN_REGISTRY().GetContext<ProjectInfoPtr>()->GetScriptListPath();
+			F_ASSERT(optScriptListPath && "ScriptList Path not set correctly in project info");
+
+			if (!optScriptListPath)
+			{
+				F_ERROR("Failed to load script list. Not set correctly in project info");
+				return;
+			}
+			if (fs::exists(*optScriptListPath))
 			{
 				sol::state lua{};
-				auto result = lua.safe_script_file(scriptListPath);
+				auto result = lua.safe_script_file(optScriptListPath->string());
 				if (!result.valid())
 				{
 					sol::error err = result;
@@ -242,17 +247,21 @@ namespace Feather {
 
 	void ScriptDisplay::WriteScriptListToFile()
 	{
-		const std::string scriptListPath = m_ScriptsDirectory + PATH_SEPARATOR + "script_list.lua";
-		if (!fs::exists(fs::path{ scriptListPath }))
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		F_ASSERT(projectInfo && "Project info must exist");
+		auto optScriptListPath = projectInfo->GetScriptListPath();
+		F_ASSERT(optScriptListPath && "Script list path not setup correctly in project info");
+
+		if (!fs::exists(*optScriptListPath))
 		{
-			F_ERROR("Failed to write script list. File '{}' does not exist", scriptListPath);
+			F_ERROR("Failed to write script list. File '{}' does not exist", optScriptListPath->string());
 			return;
 		}
 
 		std::unique_ptr<LuaSerializer> serializer{ nullptr };
 		try
 		{
-			serializer = std::make_unique<LuaSerializer>(scriptListPath);
+			serializer = std::make_unique<LuaSerializer>(optScriptListPath->string());
 		}
 		catch (const std::exception& ex)
 		{

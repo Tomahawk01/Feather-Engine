@@ -4,7 +4,7 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/Events/EventDispatcher.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Renderer/Essentials/Texture.h"
 #include "Utils/FeatherUtilities.h"
 #include "Utils/HelperUtilities.h"
@@ -23,7 +23,7 @@ namespace Feather {
 
 	ContentDisplay::ContentDisplay()
 		: m_FileDispatcher{ std::make_unique<EventDispatcher>() }
-		, m_CurrentDir{ MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath + "content" }
+		, m_CurrentDir{ *MAIN_REGISTRY().GetContext<ProjectInfoPtr>()->TryGetFolderPath(EProjectFolderType::Content) }
 		, m_FilepathToAction{}
 		, m_Selected{ -1 }
 		, m_FileAction{ FileAction::NoAction }
@@ -35,8 +35,7 @@ namespace Feather {
 		m_FileDispatcher->AddHandler<FileEvent, &ContentDisplay::HandleFileEvent>(*this);
 	}
 
-	ContentDisplay::~ContentDisplay()
-	{}
+	ContentDisplay::~ContentDisplay() = default;
 
 	void ContentDisplay::Update()
 	{
@@ -253,9 +252,13 @@ namespace Feather {
 		ImGui::ItemToolTip("Create Folder");
 		ImGui::SameLine(0.0f, 16.0f);
 
-		const auto& savedPath = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->projectPath;
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto optContentPath = projectInfo->TryGetFolderPath(EProjectFolderType::Content);
+		F_ASSERT(optContentPath && "Content path has not be setup correctly in project info");
+
+		const auto& savedPath = optContentPath->string();
 		std::string pathStr{ m_CurrentDir.string() };
-		std::string pathToSplit = pathStr.substr(pathStr.find(savedPath) + savedPath.size());
+		std::string pathToSplit = pathStr.substr(pathStr.find(savedPath) + savedPath.size() - CONTENT_FOLDER.size());
 		auto dir = SplitStr(pathToSplit, PATH_SEPARATOR);
 		for (size_t i = 0; i < dir.size(); i++)
 		{
@@ -268,11 +271,20 @@ namespace Feather {
 				std::filesystem::path rebuildPath;
 				for (size_t j = 0; j <= i; j++)
 				{
+					// We don't want to add the content folder to the path
+					if (rebuildPath.empty() && dir[j] == CONTENT_FOLDER)
+					{
+						continue;
+					}
+
 					rebuildPath /= dir[j];
 				}
 
 				std::filesystem::path finalPath{ savedPath };
-				finalPath /= rebuildPath;
+				if (!rebuildPath.empty())
+				{
+					finalPath /= rebuildPath;
+				}
 
 				m_CurrentDir = finalPath;
 			}
@@ -370,11 +382,21 @@ namespace Feather {
 		if (fileEvent.sFilepath.empty() || fileEvent.eAction == FileAction::NoAction)
 			return;
 
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		if (!projectInfo)
+			return;
+
 		switch (fileEvent.eAction)
 		{
 			case FileAction::Delete:
 			{
 				std::filesystem::path path{ fileEvent.sFilepath };
+				if (IsDefaultProjectPathOrFile(path, *projectInfo))
+				{
+					F_ERROR("Failed to delete '{}' - This is a reserved default project folder or file", path.string());
+					return;
+				}
+
 				if (std::filesystem::is_directory(path))
 				{
 					std::unordered_set<std::string> filesToCheck;

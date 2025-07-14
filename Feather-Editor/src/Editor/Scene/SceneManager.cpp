@@ -6,7 +6,7 @@
 #include "Core/Events/EventDispatcher.h"
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/ECS/MainRegistry.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
@@ -92,15 +92,17 @@ namespace Feather {
 
 		if (m_mapScenes.erase(sceneName) > 0)
 		{
-			auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-			F_ASSERT(pSaveProject && "Save Project must exist!");
+			auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+			F_ASSERT(projectInfo && "Project Info must exist!");
 			// Save entire project
 			ProjectLoader pl{};
-			if (!pl.SaveLoadedProject(*pSaveProject))
+			if (!pl.SaveLoadedProject(*projectInfo))
 			{
+				auto optProjectFilePath = projectInfo->GetProjectFilePath();
+				F_ASSERT(optProjectFilePath && "Project file path not set correctly in project info");
 				F_ERROR("Failed to save project '{}' at file '{}' after deleting scene. Please ensure the scene files have been removed",
-					pSaveProject->projectName,
-					pSaveProject->projectFilePath);
+						projectInfo->GetProjectName(),
+						optProjectFilePath->string());
 
 				return false;
 			}

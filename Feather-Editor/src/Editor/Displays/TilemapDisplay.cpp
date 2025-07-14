@@ -91,7 +91,7 @@ namespace Feather {
 			// Accept scene drop target
 			if (ImGui::BeginDragDropTarget())
 			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_SCENE_SRC))
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string{ DROP_SCENE_SRC }.c_str()))
 				{
 					SCENE_MANAGER().UnloadCurrentScene();
 					SCENE_MANAGER().SetCurrentScene(std::string{ (const char*)payload->Data });
@@ -99,7 +99,7 @@ namespace Feather {
 					LoadNewScene();
 					m_TilemapCam->Reset();
 				}
-				else if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DROP_PREFAB_SRC))
+				else if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(std::string{ DROP_PREFAB_SRC }.c_str()))
 				{
 					if (auto prefab = ASSET_MANAGER().GetPrefab(std::string{ (const char*)payload->Data }))
 					{
@@ -314,16 +314,18 @@ namespace Feather {
 			isOffsetChanged = true;
 		}
 
-		scale = std::clamp(scale, 1.0f, 10.0f);
-
 		if (isScaleChanged)
+		{
+			scale = std::clamp(scale, 1.0f, 10.0f);
 			m_TilemapCam->SetScale(scale);
+		}
 
-		glm::vec2 afterMovePos = m_TilemapCam->ScreenCoordsToWorld(mousePos);
-
-		screenOffset += (afterMovePos - currentWorldPos);
 		if (isOffsetChanged)
+		{
+			glm::vec2 afterMovePos = m_TilemapCam->ScreenCoordsToWorld(mousePos);
+			screenOffset += (afterMovePos - currentWorldPos);
 			m_TilemapCam->SetScreenOffset(screenOffset);
+		}
 
 		startPosition = mousePos;
 	}

@@ -17,8 +17,10 @@ constexpr char PATH_SEPARATOR = '/';
 
 #define SCRIPTS "scripts"
 #define ASSETS "assets"
+#define CONTENT "content"
 
-constexpr const char* FEATHER_PRJ_FILE_EXT = ".fprj";
+constexpr const std::string_view CONTENT_FOLDER = "content";
+constexpr const std::string_view FEATHER_PRJ_FILE_EXT = ".fprj";
 
 namespace Feather {
 

@@ -9,7 +9,7 @@
 #include "Core/Resources/AssetManager.h"
 #include "Renderer/Essentials/Texture.h"
 
-constexpr const char* PlayerStartTag = "F_PlayerStart";
+constexpr const std::string_view PlayerStartTag = "F_PlayerStart";
 
 namespace Feather {
 
@@ -156,7 +156,7 @@ namespace Feather {
 
 		if (!m_VisualEntity)
 		{
-			m_VisualEntity = std::make_shared<Entity>(Entity{ m_SceneRef.GetRegistry(), PlayerStartTag, "" });
+			m_VisualEntity = std::make_shared<Entity>(Entity{ m_SceneRef.GetRegistry(), std::string{ PlayerStartTag }, "" });
 		}
 
 		m_VisualEntity->AddComponent<TransformComponent>(TransformComponent{});

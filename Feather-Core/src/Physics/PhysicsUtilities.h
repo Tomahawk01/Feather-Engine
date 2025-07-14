@@ -1,7 +1,9 @@
 #pragma once
+
 #include <cstdint>
 #include <string>
 #include <map>
+#include <vector>
 
 namespace Feather {
 
@@ -64,6 +66,8 @@ namespace Feather {
 	* @brief Returns a map for the filter catergories and their visual representation
 	*/
 	const std::map<FilterCategory, std::string> GetFilterCategoryToStringMap();
+
+	std::vector<std::string> GetFilterStrings();
 
 	std::string GetRigidBodyTypeString(RigidBodyType rigidType);
 	RigidBodyType GetRigidBodyTypeByString(const std::string rigidType);

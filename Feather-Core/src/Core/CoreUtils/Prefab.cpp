@@ -4,7 +4,7 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/ECS/Entity.h"
 #include "Core/ECS/Components/ComponentSerializer.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "Core/Scene/Scene.h"
 #include "Core/Resources/AssetManager.h"
@@ -44,16 +44,21 @@ namespace Feather {
 		m_Name = prefabbed.id->name + "_pfab";
 		m_Entity.id->name = m_Name;
 
-		auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		F_ASSERT(pSaveProject && "SaveProject must exists here!");
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		F_ASSERT(projectInfo && "Project Info must exists!");
 
-		m_PrefabPath = std::format("{}content{}assets{}prefabs{}{}", pSaveProject->projectPath, PATH_SEPARATOR, PATH_SEPARATOR, PATH_SEPARATOR, m_Name + ".json");
+		auto optPrefabPath = projectInfo->TryGetFolderPath(EProjectFolderType::Prefabs);
+		F_ASSERT(optPrefabPath && "Prefab folder path not set correctly");
 
-		if (fs::exists(m_PrefabPath))
+		fs::path prefabPath = *optPrefabPath / fs::path{ m_Name + ".json" };
+
+		if (fs::exists(prefabPath))
 		{
 			F_ERROR("Failed to create prefab. '{}' Already exists!", m_Name);
 			throw std::runtime_error(std::format("Failed to create prefab. '{}' Already exists!", m_Name).c_str());
 		}
+
+		m_PrefabPath = prefabPath.string();
 
 		Save();
 	}
@@ -327,12 +332,11 @@ namespace Feather {
 			SERIALIZE_COMPONENT(*pSerializer, textComp);
 		}
 
-		// TODO: Create serialize UI component
-		/*if (m_Entity.uiComp)
+		if (m_Entity.uiComp)
 		{
 			const auto& ui = m_Entity.uiComp.value();
 			SERIALIZE_COMPONENT( *pSerializer, ui );
-		}*/
+		}
 
 		pSerializer->EndObject(); // End Components
 		pSerializer->EndObject(); // End Prefab

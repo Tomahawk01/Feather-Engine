@@ -118,6 +118,19 @@ namespace Feather {
 		return filteredMap;
 	}
 
+	std::vector<std::string> GetFilterStrings()
+	{
+		const auto& filterMap = GetFilterCategoryToStringMap();
+		std::vector<std::string> filters{};
+		filters.reserve(filterMap.size());
+
+		std::ranges::transform(filterMap, std::back_inserter(filters),
+							   [](const auto& pair) -> const std::string& { return pair.second; }
+		);
+
+		return filters;
+	}
+
 	std::string GetRigidBodyTypeString(RigidBodyType rigidType)
 	{
 		auto rigidItr = RigidBodyTypeToString.find(rigidType);

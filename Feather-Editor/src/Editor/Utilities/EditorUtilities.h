@@ -1,17 +1,21 @@
 #pragma once
+
 #include "Core/ECS/Components/AllComponents.h"
 #include "Physics/UserData.h"
+
+#include <filesystem>
 
 namespace Feather {
 
 	class Texture;
+	class ProjectInfo;
 
-	constexpr const char* DROP_TEXTURE_SRC = "DropTextureSource";
-	constexpr const char* DROP_FONT_SRC = "DropFontSource";
-	constexpr const char* DROP_MUSIC_SRC = "DropMusicSource";
-	constexpr const char* DROP_SOUNDFX_SRC = "DropSoundFXSource";
-	constexpr const char* DROP_SCENE_SRC = "DropSceneSource";
-	constexpr const char* DROP_PREFAB_SRC = "DropPrefabSource";
+	constexpr const std::string_view DROP_TEXTURE_SRC = "DropTextureSource";
+	constexpr const std::string_view DROP_FONT_SRC = "DropFontSource";
+	constexpr const std::string_view DROP_MUSIC_SRC = "DropMusicSource";
+	constexpr const std::string_view DROP_SOUNDFX_SRC = "DropSoundFXSource";
+	constexpr const std::string_view DROP_SCENE_SRC = "DropSceneSource";
+	constexpr const std::string_view DROP_PREFAB_SRC = "DropPrefabSource";
 
 	struct Tile
 	{
@@ -64,5 +68,7 @@ namespace Feather {
 
 	std::vector<std::string> SplitStr(const std::string& str, char delimiter);
 	Texture* GetIconTexture(const std::string& sPath);
+	bool IsReservedPathOrFile(const std::filesystem::path& path);
+	bool IsDefaultProjectPathOrFile(const std::filesystem::path& path, const ProjectInfo& projectInfo);
 
 }

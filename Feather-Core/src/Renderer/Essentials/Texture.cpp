@@ -20,4 +20,9 @@ namespace Feather {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	void Texture::Destroy()
+	{
+		glDeleteTextures(1, &m_TextureID);
+	}
+
 }

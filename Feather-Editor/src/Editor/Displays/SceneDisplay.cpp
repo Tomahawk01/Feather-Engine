@@ -13,7 +13,7 @@
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/Scripting/CrashLoggerTestBindings.h"
 #include "Core/CoreUtils/CoreEngineData.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/Events/EngineEventTypes.h"
@@ -273,8 +273,8 @@ namespace Feather {
 		}
 
 		// Get the main script path
-		auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		if (!scriptSystem->LoadMainScript(*saveProject, runtimeRegistry, *lua))
+		auto& pProjectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		if (!scriptSystem->LoadMainScript(*pProjectInfo, runtimeRegistry, *lua))
 		{
 			F_FATAL("Failed to load main lua script");
 			return;

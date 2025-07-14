@@ -1,12 +1,14 @@
 #include "PackageDisplay.h"
 
 #include "Logger/Logger.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/ECS/MainRegistry.h"
+#include "FileSystem/Dialogs/FileDialog.h"
 #include "Utils/HelperUtilities.h"
 
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
+#include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Scene/SceneManager.h"
 
 #include <imgui.h>
@@ -29,10 +31,12 @@ namespace Feather {
 		, m_Titlebar{ false }
 		, m_ScriptListExist{ false }
 	{
-		const auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		m_ScriptListPath = std::format("{0}{1}{2}{3}{2}{4}", saveProject->projectPath, "content", PATH_SEPARATOR, "scripts", "script_list.lua");
+		const auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto optScriptListPath = projectInfo->GetScriptListPath();
+		F_ASSERT(optScriptListPath && "Script List path not set correctly in project info");
 
-		m_ScriptListExist = fs::exists(fs::path{ m_ScriptListPath });
+		m_ScriptListPath = optScriptListPath->string();
+		m_ScriptListExist = fs::exists(*optScriptListPath);
 	}
 
 	PackageGameDisplay::~PackageGameDisplay() = default;
@@ -50,6 +54,8 @@ namespace Feather {
 			return;
 		}
 
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+
 		ImGui::SeparatorText("Package and Export Game");
 		ImGui::NewLine();
 
@@ -58,25 +64,40 @@ namespace Feather {
 			ImGui::SeparatorText("File Information");
 			ImGui::PushItemWidth(256.0f);
 			ImGui::InlineLabel("Game Title");
-			ImGui::InputText("##gameTitle", &m_GameConfig->gameName);
+			std::string projectName{ projectInfo->GetProjectName() };
+			ImGui::InputTextReadOnly("##gameTitle", &projectName);
 
+			static bool destinationError{ false };
 			ImGui::InlineLabel("Destination");
-			ImGui::InputText("##destination", &m_DestinationPath);
+			ImGui::InputTextReadOnly("##destination", &m_DestinationPath);
 			ImGui::PopItemWidth();
 			ImGui::SameLine();
 			if (ImGui::Button("...""##dest"))
 			{
-				// TODO: Open file dialog and set destination path
+				FileDialog fd{};
+				const auto filepath = fd.SelectFolderDialog("Choose Destination Folder", BASE_PATH);
+				if (!filepath.empty())
+				{
+					if (!IsReservedPathOrFile(fs::path{ filepath }))
+					{
+						m_DestinationPath = filepath;
+						destinationError = false;
+					}
+					else
+					{
+						F_ERROR("Failed to set destination. Destination '{}' is a reserved path. Please select a different path", filepath);
+						destinationError = true;
+					}
+				}
+				else
+				{
+					destinationError = false;
+				}
 			}
 
-			ImGui::InlineLabel("Icon");
-			ImGui::PushItemWidth(256.0f);
-			ImGui::InputText("##icon", &m_FileIconPath);
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
-			if (ImGui::Button("...""##iconpath"))
+			if (destinationError)
 			{
-				// TODO: Open file dialog and set file icon path
+				ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, "Invalid Destination. Destinations cannot be reserved paths");
 			}
 
 			ImGui::InlineLabel("Package Assets");
@@ -178,7 +199,6 @@ namespace Feather {
 
 		if (ImGui::Button("Package Game"))
 		{
-			F_TRACE("PACKED THE GAME");
 		}
 
 		ImGui::End();

@@ -14,6 +14,7 @@ namespace Feather {
 			PIXEL = 0,
 			BLENDED,
 			FRAMEBUFFER,
+			ICON,
 
 			NONE
 		};
@@ -35,6 +36,8 @@ namespace Feather {
 
 		void Bind();
 		void Unbind();
+
+		void Destroy();
 
 	private:
 		GLuint m_TextureID;

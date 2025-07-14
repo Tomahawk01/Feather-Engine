@@ -5,7 +5,7 @@
 #include "Core/Loaders/TilemapLoader.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/Prefab.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Events/EventDispatcher.h"
@@ -45,13 +45,16 @@ namespace Feather {
 				ImGui::InlineLabel(ICON_FA_SAVE, 32.0f);
 				if (ImGui::MenuItem("Save", "Ctrl + S"))
 				{
-					auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-					F_ASSERT(saveProject && "Save Project must exist!");
+					auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+					F_ASSERT(projectInfo && "Project Info must exist!");
+
 					// Save entire project
 					ProjectLoader pl{};
-					if (!pl.SaveLoadedProject(*saveProject))
+					if (!pl.SaveLoadedProject(*projectInfo))
 					{
-						F_ERROR("Failed to save project '{}' at file '{}'", saveProject->projectName, saveProject->projectFilePath);
+						auto optProjectFilePath = projectInfo->GetProjectFilePath();
+						F_ASSERT(optProjectFilePath && "Project file path not setup correctly");
+						F_ERROR("Failed to save project '{}' at file '{}'", projectInfo->GetProjectName(), optProjectFilePath->string());
 					}
 				}
 
@@ -72,7 +75,7 @@ namespace Feather {
 				if (ImGui::Checkbox("Enable Gridsnap", &gridSnap))
 					SCENE_MANAGER().GetToolManager().EnableGridSnap(gridSnap);
 
-				static bool showCollision{ false };
+				static bool showCollision{ coreGlobals.RenderCollidersEnabled() };
 				if (ImGui::Checkbox("Show Collision", &showCollision))
 				{
 					if (showCollision)
@@ -81,25 +84,13 @@ namespace Feather {
 						coreGlobals.DisableColliderRender();
 				}
 
-				static bool showAnimations{ true };
+				static bool showAnimations{ coreGlobals.AnimationRenderEnabled() };
 				if (ImGui::Checkbox("Show Animations", &showAnimations))
 				{
 					if (showAnimations)
 						coreGlobals.EnableAnimationRender();
 					else
 						coreGlobals.DisableAnimationRender();
-				}
-
-				if (ImGui::TreeNode("Project Settings"))
-				{
-					// TODO: Add specific Project settings
-					/*
-					* Desired Settings
-					* - Window Size
-					* - Window Position
-					* - Window flags
-					*/
-					ImGui::TreePop();
 				}
 
 				ImGui::EndMenu();
@@ -118,7 +109,7 @@ namespace Feather {
 				{
 					ImGui::Text("Current Scene");
 					ImGui::Separator();
-					if (ImGui::TreeNode("Canvas"))
+					if (ImGui::TreeNode(ICON_FA_FILE_IMAGE " Canvas"))
 					{
 						auto& canvas = pCurrentScene->GetCanvas();
 
@@ -155,7 +146,7 @@ namespace Feather {
 						ImGui::TreePop();
 					}
 					ImGui::Separator();
-					if (ImGui::TreeNode("Settings"))
+					if (ImGui::TreeNode(ICON_FA_COG " Settings"))
 					{
 						bool isChanged{ false };
 						bool isPlayerStartEnabled{ pCurrentScene->IsPlayerStartEnabled() };
@@ -242,78 +233,6 @@ namespace Feather {
 
 						ImGui::TreePop();
 					}
-				}
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu(ICON_FA_COG " Settings"))
-			{
-				if (ImGui::TreeNode("Physics"))
-				{
-					ImGui::Separator();
-					auto& coreGlobals = CORE_GLOBALS();
-					bool enablePhysics = coreGlobals.IsPhysicsEnabled();
-
-					ImGui::InlineLabel("Enable Physics", 176.0f);
-					if (ImGui::Checkbox("##enable_physics", &enablePhysics))
-					{
-						if (enablePhysics)
-							coreGlobals.EnablePhysics();
-						else
-							coreGlobals.DisablePhysics();
-					}
-
-					int32 velocityIterations = coreGlobals.GetVelocityIterations();
-					int32 positionIterations = coreGlobals.GetPositionIterations();
-					float gravity = coreGlobals.GetGravity();
-					ImGui::InlineLabel("Gravity", 176.0f);
-					if (ImGui::InputFloat("##Gravity", &gravity, 0.1f, 0.1f, "%.1f"))
-					{
-						coreGlobals.SetGravity(gravity);
-					}
-
-					ImGui::InlineLabel("Velocity Iterations", 176.0f);
-					if (ImGui::InputInt("##VelocityIterations", &velocityIterations, 1, 1))
-					{
-						coreGlobals.SetVelocityIterations(velocityIterations);
-					}
-
-					ImGui::InlineLabel("Position Iterations", 176.0f);
-					if (ImGui::InputInt("##PositionIterations", &positionIterations, 1, 1))
-					{
-						coreGlobals.SetPositionIterations(positionIterations);
-					}
-					ImGui::TreePop();
-				}
-
-				auto& coreGlobals = CORE_GLOBALS();
-				bool bChanged{ false };
-				std::string sGameType{ coreGlobals.GetGameTypeStr(coreGlobals.GetGameType()) };
-				GameType gameType{ coreGlobals.GetGameType() };
-
-				ImGui::InlineLabel(ICON_FA_GAMEPAD " Game Type:");
-				ImGui::SetCursorPosX(250.0f);
-				ImGui::ItemToolTip("The type of game this is going to be");
-
-				if (ImGui::BeginCombo("##DefaultMusic", sGameType.c_str()))
-				{
-					for (const auto& [eType, sTypeStr] : coreGlobals.GetGameTypesMap())
-					{
-						if (ImGui::Selectable(sTypeStr.c_str(), sTypeStr == sGameType))
-						{
-							sGameType = sTypeStr;
-							gameType = eType;
-							bChanged = true;
-						}
-					}
-
-					ImGui::EndCombo();
-				}
-
-				if (bChanged)
-				{
-					coreGlobals.SetGameType(gameType);
 				}
 
 				ImGui::EndMenu();

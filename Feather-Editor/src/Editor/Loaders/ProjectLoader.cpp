@@ -4,7 +4,7 @@
 #include "Core/ECS/MainRegistry.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/CoreUtils/Prefab.h"
 #include "Renderer/Essentials/Shader.h"
 #include "Renderer/Essentials/Texture.h"
@@ -23,45 +23,58 @@
 
 #include <filesystem>
 
+static const std::map<Feather::EProjectFolderType, std::string> mapProjectDirs = {
+		{ Feather::EProjectFolderType::Content,		"content" },
+		{ Feather::EProjectFolderType::Scripts,		"content/scripts" },
+		// Asset Folders
+		{ Feather::EProjectFolderType::Assets,		"content/assets" },
+		{ Feather::EProjectFolderType::SoundFx,		"content/assets/soundfx" },
+		{ Feather::EProjectFolderType::Music,		"content/assets/music" },
+		{ Feather::EProjectFolderType::Textures,	"content/assets/textures" },
+		{ Feather::EProjectFolderType::Shaders,		"content/assets/shaders" },
+		{ Feather::EProjectFolderType::Fonts,		"content/assets/fonts" },
+		{ Feather::EProjectFolderType::Prefabs,		"content/assets/prefabs" },
+		{ Feather::EProjectFolderType::Scenes,		"content/assets/scenes" },
+		// Config Folders
+		{ Feather::EProjectFolderType::Config,		"config"},
+		{ Feather::EProjectFolderType::GameConfig,	"config/game"},
+		{ Feather::EProjectFolderType::EditorConfig,"config/editor"},
+};
+
 namespace Feather {
 
 	bool ProjectLoader::CreateNewProject(const std::string& projectName, const std::string& filepath)
 	{
-		auto& saveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		F_ASSERT(saveProject && "Save project must exist");
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		F_ASSERT(projectInfo && "Project Info must exist");
 
 		// Create the game filepath
-		std::string gameFilepath = std::format("{}{}{}{}{}", filepath, PATH_SEPARATOR, projectName, PATH_SEPARATOR, "Feather");
+		fs::path gameFilepath{ std::format("{}{}{}{}{}", filepath, PATH_SEPARATOR, projectName, PATH_SEPARATOR, "Feather") };
 
-		if (std::filesystem::is_directory(gameFilepath))
+		if (fs::is_directory(gameFilepath))
 		{
 			F_ERROR("Project '{}' at '{}' already exists", projectName, filepath);
 			return false;
 		}
 
-		char sep{ PATH_SEPARATOR };
-		gameFilepath += sep;
 		std::error_code ec;
-		if (!std::filesystem::create_directories(gameFilepath + "content", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "scripts", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "soundfx", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "music", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "textures", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "shaders", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "fonts", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "prefabs", ec) ||
-			!std::filesystem::create_directories(gameFilepath + "content" + sep + "assets" + sep + "scenes", ec))
+		for (const auto& [eFolderType, sSubDir] : mapProjectDirs)
 		{
-			F_ERROR("Failed to create directories - {}", ec.message());
-			// TODO: Delete any created directories?
-			return false;
+			fs::path fullpath{ gameFilepath / fs::path{ sSubDir } };
+
+			if (!fs::create_directories(fullpath, ec))
+			{
+				F_ERROR("Failed to create directories: '{}' - {}", fullpath.string(), ec.message());
+				return false;
+			}
+
+			projectInfo->AddFolderPath(eFolderType, fullpath);
 		}
 
-		saveProject->projectName = projectName;
-		saveProject->projectPath = gameFilepath;
+		projectInfo->SetProjectName(projectName);
+		projectInfo->SetProjectPath(gameFilepath);
 
-		return CreateProjectFile(saveProject->projectName, saveProject->projectPath);
+		return CreateProjectFile(projectName, gameFilepath.string());
 	}
 
 	bool ProjectLoader::LoadProject(const std::string& filepath)
@@ -100,17 +113,16 @@ namespace Feather {
 		}
 
 		auto& mainRegistry = MAIN_REGISTRY();
-		auto& saveProject = mainRegistry.GetContext<std::shared_ptr<SaveProject>>();
-
-		F_ASSERT(saveProject && "Save Project must be valid!");
+		auto& projectInfo = mainRegistry.GetContext<ProjectInfoPtr>();
+		F_ASSERT(projectInfo && "Project Info must be valid!");
 
 		// We need the project filepath saved
-		saveProject->projectFilePath = filepath;
+		projectInfo->SetProjectFilePath(filepath);
 
 		const rapidjson::Value& projectData = doc["project_data"];
 
 		// Set the project name. The actual project name might be different to the project files name
-		saveProject->projectName = projectData["project_name"].GetString();
+		projectInfo->SetProjectName(projectData["project_name"].GetString());
 
 		// We need to load all the assets
 		if (!projectData.HasMember("assets"))
@@ -121,25 +133,120 @@ namespace Feather {
 
 		// Get Content Path
 		std::filesystem::path filePath{ filepath };
-		std::string contentPath = filePath.parent_path().string();
+		fs::path projectPath{ filePath.parent_path() };
+		projectInfo->SetProjectPath(projectPath);
+
+		// Setup Project Folders
+		std::error_code ec;
+		for (const auto& [eFolderType, subDir] : mapProjectDirs)
+		{
+			fs::path fullPath{ projectPath / subDir };
+			if (!fs::exists(fullPath, ec))
+			{
+				F_ERROR("Failed to load project: Failed to setup project folders. {}", ec.message());
+				return false;
+			}
+
+			if (!projectInfo->AddFolderPath(eFolderType, fullPath))
+			{
+				F_ERROR("Failed to setup project folder '{}'", fullPath.string());
+				return false;
+			}
+		}
+
+		// Setup Project Files
+		if (auto optScriptPath = projectInfo->TryGetFolderPath(EProjectFolderType::Scripts))
+		{
+			fs::path mainScriptPath = *optScriptPath / "main.lua";
+			if (!fs::exists(mainScriptPath))
+			{
+				F_ERROR("Failed to load project: main.lua file was not found at '{}'", mainScriptPath.string());
+				return false;
+			}
+		}
+
+		// Setup Project Files
+		if (auto optGameConfigPath = projectInfo->TryGetFolderPath(EProjectFolderType::GameConfig))
+		{
+			fs::path scriptListPath = *optGameConfigPath / "script_list.lua";
+			if (!fs::exists(scriptListPath))
+			{
+				F_ERROR("Failed to load project: script_list.lua file was not found at '{}'", scriptListPath.string());
+				return false;
+			}
+		}
 
 		// Get the project path before we adjust it to the content path
-		saveProject->projectPath = contentPath + PATH_SEPARATOR;
-		CORE_GLOBALS().SetProjectPath(saveProject->projectPath);
+		CORE_GLOBALS().SetProjectPath(projectPath.string());
 
-		contentPath += PATH_SEPARATOR;
-		contentPath += "content";
-		contentPath += PATH_SEPARATOR;
+		auto optContentFolderPath = projectInfo->TryGetFolderPath(EProjectFolderType::Content);
+		F_ASSERT(optContentFolderPath && "Content folder not set correctly in project info");
 
 		// Check to see if there is a main lua path
 		if (projectData.HasMember("main_lua_script"))
-			saveProject->mainLuaScript = contentPath + projectData["main_lua_script"].GetString();
+		{
+			auto mainLuaScript = *optContentFolderPath / projectData["main_lua_script"].GetString();
+			if (!fs::exists(mainLuaScript))
+			{
+				F_ERROR("Failed to set main lua script path: '{}' does not exist", mainLuaScript.string());
+				return false;
+			}
+
+			projectInfo->SetMainLuaScriptPath(mainLuaScript);
+		}
+
+		// Check to see if there is a file icon and load it
+		if (projectData.HasMember("file_icon"))
+		{
+			std::string sFileIcon = projectData["file_icon"].GetString();
+			if (!sFileIcon.empty())
+			{
+				auto fileIconPath = *optContentFolderPath / sFileIcon;
+				if (!fs::exists(fileIconPath))
+				{
+					F_ERROR("Failed to set game file icon path: '{}' does not exist", fileIconPath.string());
+					return false;
+				}
+
+				projectInfo->SetFileIconPath(fileIconPath);
+			}
+		}
+
+		auto optGameConfigPath = projectInfo->TryGetFolderPath(EProjectFolderType::GameConfig);
+		F_ASSERT(optGameConfigPath && "Game Config folder path has not been setup correctly in project info");
+
+		fs::path scriptListPath = *optGameConfigPath / "script_list.lua";
+		if (!fs::exists(scriptListPath))
+		{
+			F_ERROR("Failed to load project. ScriptList was not found at path [{}]", scriptListPath.string());
+			return false;
+		}
+
+		projectInfo->SetScriptListPath(scriptListPath);
 
 		auto& coreGlobals = CORE_GLOBALS();
 
 		if (projectData.HasMember("game_type"))
 		{
 			coreGlobals.SetGameType(coreGlobals.GetGameTypeFromStr(projectData["game_type"].GetString()));
+		}
+
+		if (projectData.HasMember("copyright"))
+		{
+			std::string sCopyRight = projectData["copyright"].GetString();
+			projectInfo->SetCopyRightNotice(sCopyRight);
+		}
+
+		if (projectData.HasMember("version"))
+		{
+			std::string sVersion = projectData["version"].GetString();
+			projectInfo->SetProjectVersion(sVersion);
+		}
+
+		if (projectData.HasMember("description"))
+		{
+			std::string sDescription = projectData["description"].GetString();
+			projectInfo->SetProjectDescription(sDescription);
 		}
 
 		const rapidjson::Value& assets = projectData["assets"];
@@ -160,11 +267,12 @@ namespace Feather {
 			{
 				// Assets path's should be saved as follows "assets/[asset_type]/[extra_folders opt]/file"
 				std::string textureName{ jsonTexture["name"].GetString() };
-				std::string texturePath{ contentPath + jsonTexture["path"].GetString() };
+				std::string jsonTexturePath = jsonTexture["path"].GetString();
+				fs::path texturePath = *optContentFolderPath / jsonTexturePath;
 
-				if (!assetManager.AddTexture(textureName, texturePath, jsonTexture["isPixelArt"].GetBool(), jsonTexture["isTileset"].GetBool()))
+				if (!assetManager.AddTexture(textureName, texturePath.string(), jsonTexture["isPixelArt"].GetBool(), jsonTexture["isTileset"].GetBool()))
 				{
-					F_ERROR("Failed to load texture '{}' at path '{}'", textureName, texturePath);
+					F_ERROR("Failed to load texture '{}' at path '{}'", textureName, texturePath.string());
 					// Should we stop loading or finish?
 				}
 			}
@@ -184,11 +292,12 @@ namespace Feather {
 			for (const auto& jsonSoundFx : soundfx.GetArray())
 			{
 				std::string soundFxName{ jsonSoundFx["name"].GetString() };
-				std::string soundFxPath{ contentPath + jsonSoundFx["path"].GetString() };
+				std::string jsonSoundFxPath = jsonSoundFx["path"].GetString();
+				fs::path soundFxPath = *optContentFolderPath / jsonSoundFxPath;
 
-				if (!assetManager.AddSoundFx(soundFxName, soundFxPath))
+				if (!assetManager.AddSoundFx(soundFxName, soundFxPath.string()))
 				{
-					F_ERROR("Failed to load soundfx '{}' at path '{}'", soundFxName, soundFxPath);
+					F_ERROR("Failed to load soundfx '{}' at path '{}'", soundFxName, soundFxPath.string());
 					// Should we stop loading or finish?
 				}
 			}
@@ -208,11 +317,12 @@ namespace Feather {
 			for (const auto& jsonMusic : music.GetArray())
 			{
 				std::string musicName{ jsonMusic["name"].GetString() };
-				std::string musicPath{ contentPath + jsonMusic["path"].GetString() };
+				std::string jsonMusicPath = jsonMusic["path"].GetString();
+				fs::path musicPath = *optContentFolderPath / jsonMusicPath;
 
-				if (!assetManager.AddMusic(musicName, musicPath))
+				if (!assetManager.AddMusic(musicName, musicPath.string()))
 				{
-					F_ERROR("Failed to load music '{}' at path '{}'", musicName, musicPath);
+					F_ERROR("Failed to load music '{}' at path '{}'", musicName, musicPath.string());
 					// Should we stop loading or finish?
 				}
 			}
@@ -232,11 +342,12 @@ namespace Feather {
 			for (const auto& jsonFonts : fonts.GetArray())
 			{
 				std::string fontName{ jsonFonts["name"].GetString() };
-				std::string fontPath{ contentPath + jsonFonts["path"].GetString() };
+				std::string jsonFontPath = jsonFonts["path"].GetString();
+				fs::path fontPath = *optContentFolderPath / jsonFontPath;
 
-				if (!assetManager.AddFont(fontName, fontPath, jsonFonts["fontSize"].GetFloat()))
+				if (!assetManager.AddFont(fontName, fontPath.string(), jsonFonts["fontSize"].GetFloat()))
 				{
-					F_ERROR("Failed to load fonts '{}' at path '{}'", fontName, fontPath);
+					F_ERROR("Failed to load fonts '{}' at path '{}'", fontName, fontPath.string());
 					// Should we stop loading or finish?
 				}
 			}
@@ -257,11 +368,12 @@ namespace Feather {
 			for (const auto& jsonScenes : scenes.GetArray())
 			{
 				std::string sceneName{ jsonScenes["name"].GetString() };
-				std::string sceneDataPath{ contentPath + jsonScenes["sceneData"].GetString() };
+				std::string jsonScenePath = jsonScenes["sceneData"].GetString();
+				fs::path scenePath = *optContentFolderPath / jsonScenePath;
 
-				if (!sceneManager.AddSceneObject(sceneName, sceneDataPath))
+				if (!sceneManager.AddSceneObject(sceneName, scenePath.string()))
 				{
-					F_ERROR("Failed to load scene: {}", sceneName);
+					F_ERROR("Failed to load scene '{}' at path '{}'", sceneName, scenePath.string());
 				}
 			}
 		}
@@ -280,18 +392,19 @@ namespace Feather {
 			for (const auto& jsonPrefab : prefabs.GetArray())
 			{
 				std::string sName{ jsonPrefab["name"].GetString() };
-				std::string sFilepath{ contentPath + jsonPrefab["path"].GetString() };
+				std::string jsonPrefabPath = jsonPrefab["path"].GetString();
+				fs::path prefabPath = *optContentFolderPath / jsonPrefabPath;
 
-				if (auto pPrefab = PrefabCreator::CreatePrefab(sFilepath))
+				if (auto prefab = PrefabCreator::CreatePrefab(prefabPath.string()))
 				{
-					if (!assetManager.AddPrefab(sName, std::move(pPrefab)))
+					if (!assetManager.AddPrefab(sName, std::move(prefab)))
 					{
 						F_ERROR("Failed to load scene: {}", sName);
 					}
 				}
 				else
 				{
-					F_ERROR("Failed to load prefab '{}' from path '{}'", sName, sFilepath);
+					F_ERROR("Failed to load prefab '{}' from path '{}'", sName, prefabPath.string());
 				}
 			}
 		}
@@ -317,11 +430,14 @@ namespace Feather {
 		return true;
 	}
 
-	bool ProjectLoader::SaveLoadedProject(SaveProject& save)
+	bool ProjectLoader::SaveLoadedProject(const ProjectInfo& projectInfo)
 	{
-		if (!std::filesystem::exists(save.projectFilePath))
+		auto optProjectFilePath = projectInfo.GetProjectFilePath();
+		F_ASSERT(optProjectFilePath && "Project file path not set correctly");
+
+		if (!fs::exists(*optProjectFilePath))
 		{
-			F_ERROR("Failed to save project file for '{}' at path '{}'", save.projectName, save.projectFilePath);
+			F_ERROR("Failed to save project file for '{}' at path '{}'", projectInfo.GetProjectName(), optProjectFilePath->string());
 			return false;
 		}
 
@@ -329,11 +445,11 @@ namespace Feather {
 
 		try
 		{
-			serializer = std::make_unique<JSONSerializer>(save.projectFilePath);
+			serializer = std::make_unique<JSONSerializer>(optProjectFilePath->string());
 		}
 		catch (const std::exception& ex)
 		{
-			F_ERROR("Failed to save tilemap '{}' - '{}'", save.projectFilePath, ex.what());
+			F_ERROR("Failed to save tilemap '{}' - '{}'", optProjectFilePath->string(), ex.what());
 			return false;
 		}
 
@@ -350,10 +466,26 @@ namespace Feather {
 			.AddKeyValuePair("warning", std::string{ "DO NOT CHANGE unless you know what you are doing" });
 		serializer->EndObject(); // Warnings
 
+		auto optMainLuaScript = projectInfo.GetMainLuaScriptPath();
+		F_ASSERT(optMainLuaScript && "Main Lua script not setup correctly in project info");
+		std::string mainLuaScript = optMainLuaScript->string();
+
+		std::string fileIconPath{};
+		auto optGameFileIcon = projectInfo.GetFileIconPath();
+		if (optGameFileIcon)
+		{
+			std::string gameFileIcon{ optGameFileIcon->string() };
+			fileIconPath = gameFileIcon.substr(gameFileIcon.find(CONTENT_FOLDER) + CONTENT_FOLDER.size() + 1);
+		}
+
 		serializer->StartNewObject("project_data")
-			.AddKeyValuePair("project_name", save.projectName)
-			.AddKeyValuePair("main_lua_script", save.mainLuaScript.substr(save.mainLuaScript.find(SCRIPTS)))
+			.AddKeyValuePair("project_name", projectInfo.GetProjectName())
+			.AddKeyValuePair("main_lua_script", mainLuaScript.substr(mainLuaScript.find(SCRIPTS)))
+			.AddKeyValuePair("file_icon", fileIconPath)
 			.AddKeyValuePair("game_type", coreGlobals.GetGameTypeStr(coreGlobals.GetGameType()))
+			.AddKeyValuePair("copyright", projectInfo.GetCopyRightNotice())
+			.AddKeyValuePair("version", projectInfo.GetProjectVersion())
+			.AddKeyValuePair("description", projectInfo.GetProjectDescription())
 			.StartNewObject("assets");
 
 		serializer->StartNewArray("textures");
@@ -445,7 +577,13 @@ namespace Feather {
 			return false;
 		}
 
-		std::string projectFile{ filepath + projectName + FEATHER_PRJ_FILE_EXT };
+		if (!CreateScriptListFile())
+		{
+			F_ERROR("Failed to create Script List");
+			false;
+		}
+
+		std::string projectFile{ filepath + PATH_SEPARATOR + projectName + std::string{ FEATHER_PRJ_FILE_EXT } };
 		std::unique_ptr<JSONSerializer> serializer{ nullptr };
 
 		try
@@ -459,8 +597,12 @@ namespace Feather {
 		}
 
 		// We want to grab the project file path
-		auto& saveFile = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		saveFile->projectFilePath = projectFile;
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		projectInfo->SetProjectFilePath(fs::path{ projectFile });
+
+		auto optMainLuaScript = projectInfo->GetMainLuaScriptPath();
+		F_ASSERT(optMainLuaScript && "Main lua script not setup in project info");
+		std::string mainLuaScript = optMainLuaScript->string();
 
 		serializer->StartDocument();
 		serializer->StartNewObject("warnings");
@@ -470,8 +612,7 @@ namespace Feather {
 
 		serializer->StartNewObject("project_data")
 			.AddKeyValuePair("project_name", projectName)
-			.AddKeyValuePair("main_lua_file",
-				saveFile->mainLuaScript.substr(saveFile->mainLuaScript.find(SCRIPTS)))
+			.AddKeyValuePair("main_lua_file", mainLuaScript.substr(mainLuaScript.find(SCRIPTS)))
 			.AddKeyValuePair("game_type", std::string{ "No Type" })
 			.StartNewObject("assets")
 			.StartNewArray("textures")
@@ -496,13 +637,16 @@ namespace Feather {
 
 	bool ProjectLoader::CreateMainLuaScript(const std::string& projectName, const std::string& filepath)
 	{
-		std::string mainLuaFile = std::format("{}{}{}{}{}main.lua", filepath, "content", PATH_SEPARATOR, "scripts", PATH_SEPARATOR);
+		fs::path mainLuaFilePath{ filepath };
+		mainLuaFilePath /= "content";
+		mainLuaFilePath /= "scripts";
+		mainLuaFilePath /= "main.lua";
 
-		auto luaSerializer = std::make_unique<LuaSerializer>(mainLuaFile);
+		auto luaSerializer = std::make_unique<LuaSerializer>(mainLuaFilePath.string());
 		F_ASSERT(luaSerializer);
 
 		// Save the main lua file path
-		MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>()->mainLuaScript = mainLuaFile;
+		MAIN_REGISTRY().GetContext<ProjectInfoPtr>()->SetMainLuaScriptPath(mainLuaFilePath);
 
 		luaSerializer->AddBlockComment("\tMain Lua script. This is needed to run all scripts in the editor."
 									   "\n\tGenerated by the engine on project creation."
@@ -521,6 +665,37 @@ namespace Feather {
 			.EndTable();
 
 		return luaSerializer->FinishStream();
+	}
+
+	bool ProjectLoader::CreateScriptListFile()
+	{
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+
+		auto optPath = projectInfo->TryGetFolderPath(EProjectFolderType::GameConfig);
+		if (!optPath)
+		{
+			F_ERROR("Failed to create script list file. Game Config path does not exist");
+			return false;
+		}
+
+		fs::path scriptListPath = *optPath / "script_list.lua";
+
+		if (!fs::exists(scriptListPath))
+		{
+			std::ofstream file{ scriptListPath.string() };
+			file.close();
+		}
+
+		std::error_code ec;
+		if (!fs::exists(scriptListPath, ec))
+		{
+			F_ERROR("Failed to create script list: {}", ec.message());
+			return false;
+		}
+
+		projectInfo->SetScriptListPath(scriptListPath);
+
+		return true;
 	}
 
 }

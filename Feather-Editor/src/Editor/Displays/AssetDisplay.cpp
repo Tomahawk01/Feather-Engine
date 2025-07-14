@@ -6,7 +6,7 @@
 #include "Core/Scripting/InputManager.h"
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/Prefab.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Renderer/Essentials/Shader.h"
 #include "Renderer/Essentials/Texture.h"
 #include "Renderer/Essentials/Font.h"
@@ -179,9 +179,6 @@ namespace Feather {
 					GLuint textureID{ GetTextureID(*assetItr) };
 					std::string checkName{ m_RenameBuf.data() };
 
-					if (textureID == 0)
-						break;
-
 					std::string assetBtn = "##asset" + std::to_string(id);
 
 					if (m_eSelectedType == AssetType::PREFAB)
@@ -198,10 +195,20 @@ namespace Feather {
 												   ImVec2{ sprite->uvs.u, sprite->uvs.v },
 												   ImVec2{ sprite->uvs.uv_width, sprite->uvs.uv_height });
 							}
+							else
+							{
+								ImGui::Button(assetBtn.c_str(), ImVec2{ m_AssetSize, m_AssetSize });
+							}
 						}
 					}
 					else
 					{
+						if (textureID == 0)
+						{
+							ImGui::PopID();
+							break;
+						}
+
 						ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
 					}
 
@@ -404,15 +411,18 @@ namespace Feather {
 			// There should be some sort of message to the user before deleting??
 			if (isSuccess)
 			{
-				auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-				F_ASSERT(pSaveProject && "Save Project must exist!");
+				auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+				F_ASSERT(projectInfo && "Project Info must exist!");
 				// Save entire project
 				ProjectLoader pl{};
-				if (!pl.SaveLoadedProject(*pSaveProject))
+				if (!pl.SaveLoadedProject(*projectInfo))
 				{
+					auto optProjectFilePath = projectInfo->GetProjectFilePath();
+					F_ASSERT(optProjectFilePath && "Project file path not set correctly in project info");
+
 					F_ERROR("Failed to save project '{}' at file '{}' after deleting asset '{}'",
-							pSaveProject->projectName,
-							pSaveProject->projectFilePath,
+							projectInfo->GetProjectName(),
+							optProjectFilePath->string(),
 							assetName);
 				}
 			}

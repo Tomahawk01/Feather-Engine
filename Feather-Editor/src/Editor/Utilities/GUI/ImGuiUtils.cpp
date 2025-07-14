@@ -4,6 +4,7 @@
 
 #include <Windows.h>
 #include <shellapi.h>
+#include <imgui_stdlib.h>
 
 namespace ImGui {
 
@@ -132,6 +133,19 @@ namespace ImGui {
 			ImGui::SetItemTooltip(disabledMsg.c_str());
 		
 		ImGui::EndDisabled();
+	}
+
+	void InputTextReadOnly(const std::string& label, std::string* inputText)
+	{
+		ImVec4 textDisabled = ImGui::GetStyle().Colors[ImGuiCol_TextDisabled];
+		ImVec4 bgHovered = ImGui::GetStyle().Colors[ImGuiCol_FrameBgHovered];
+		ImVec4 dimmedBg = ImVec4(bgHovered.x, bgHovered.y, bgHovered.z, bgHovered.w * 0.5f);
+
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, dimmedBg);
+		ImGui::PushStyleColor(ImGuiCol_Text, textDisabled);
+		ImGui::InputText(label.c_str(), inputText, ImGuiInputTextFlags_ReadOnly);
+
+		ImGui::PopStyleColor(2);
 	}
 
 	void TextLinkOpenURL(const char* label, const char* url)

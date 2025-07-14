@@ -34,6 +34,8 @@ namespace ImGui {
 	void ActiveImageButton(const char* buttonId, ImTextureID textureID, ImVec2 size = TOOL_BUTTON_SIZE);
 	void DisabledImageButton(const char* buttonId, ImTextureID textureID, ImVec2 size = TOOL_BUTTON_SIZE, const std::string& disabledMsg = "");
 
+	void InputTextReadOnly(const std::string& label, std::string* inputText);
+
 	void TextLinkOpenURL(const char* label, const char* url);
 
 	template <typename... Args>

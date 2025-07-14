@@ -4,7 +4,7 @@
 
 #include "Utils/FeatherUtilities.h"
 #include "FileSystem/Serializers/JSONSerializer.h"
-#include "Core/CoreUtils/SaveProject.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/ECS/Components/AllComponents.h"
 #include "Core/ECS/MetaUtilities.h"
 #include "Core/ECS/MainRegistry.h"
@@ -51,30 +51,30 @@ namespace Feather {
 		, m_MapType{ type }
 		, m_PlayerStart{ m_Registry, *this }
 	{
-		auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		F_ASSERT(pSaveProject && "SaveProject must exists here!");
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto optScenesPath = projectInfo->TryGetFolderPath(EProjectFolderType::Scenes);
 
-		std::string sScenePath = std::format("{}content{}assets{}scenes{}{}",
-			pSaveProject->projectPath,
-			PATH_SEPARATOR,
-			PATH_SEPARATOR,
-			PATH_SEPARATOR,
-			m_SceneName);
+		F_ASSERT(optScenesPath && "Scenes folder path not set correctly");
 
-		if (fs::exists(sScenePath))
+		fs::path scenePath = *optScenesPath /= m_SceneName;
+
+		if (fs::exists(scenePath))
 		{
 			F_ERROR("SCENE ALREADY EXISTS!");
 		}
 
 		std::error_code ec;
-		if (!fs::create_directory(fs::path{ sScenePath }, ec))
+		if (!fs::create_directory(scenePath, ec))
 		{
 			F_ERROR("Failed to create scene directory: {}", ec.message());
 		}
 
-		m_TilemapPath = sScenePath + PATH_SEPARATOR + m_SceneName + "_tilemap.json";
-		m_ObjectPath = sScenePath + PATH_SEPARATOR + m_SceneName + "_objects.json";
-		m_SceneDataPath = sScenePath + PATH_SEPARATOR + m_SceneName + "_scene_data.json";
+		auto tilemapPath = scenePath / fs::path{ m_SceneName + "_tilemap.json" };
+		m_TilemapPath = tilemapPath.string();
+		auto objectPath = scenePath / fs::path{ m_SceneName + "_objects.json" };
+		m_ObjectPath = objectPath.string();
+		auto sceneDataPath = scenePath / fs::path{ m_SceneName + "_scene_data.json" };
+		m_SceneDataPath = sceneDataPath.string();
 
 		// Create the files
 		std::fstream tilemap{};
@@ -213,19 +213,33 @@ namespace Feather {
 
 		const rapidjson::Value& sceneData = doc["scene_data"];
 
-		auto& pSaveProject = MAIN_REGISTRY().GetContext<std::shared_ptr<SaveProject>>();
-		F_ASSERT(pSaveProject && "SaveProject must exists here!");
-
-		std::string sScenePath = std::format("{}content{}", pSaveProject->projectPath, PATH_SEPARATOR);
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto optScenesPath = projectInfo->TryGetFolderPath(EProjectFolderType::Scenes);
+		F_ASSERT(optScenesPath && "Scenes folder path must exist");
 
 		if (m_TilemapPath.empty())
 		{
-			m_TilemapPath = sScenePath + sceneData["tilemapPath"].GetString();
+			const std::string relativeTilemap = sceneData["tilemapPath"].GetString();
+			fs::path tilemapPath = *optScenesPath / relativeTilemap;
+			if (!fs::exists(tilemapPath))
+			{
+				F_ERROR("Failed to set tilemap path: '{}' does not exist", tilemapPath.string());
+				return false;
+			}
+
+			m_TilemapPath = tilemapPath.string();
 		}
 
 		if (m_ObjectPath.empty())
 		{
-			m_ObjectPath = sScenePath + sceneData["objectmapPath"].GetString();
+			const std::string sRelativeObjectPath = sceneData["objectmapPath"].GetString();
+			fs::path objectPath = *optScenesPath / sRelativeObjectPath;
+			if (!fs::exists(objectPath))
+			{
+				F_ERROR("Failed to set tilemap path: '{}' does not exist", objectPath.string());
+				return false;
+			}
+			m_ObjectPath = objectPath.string();
 		}
 
 		if (sceneData.HasMember("canvas"))
@@ -269,7 +283,8 @@ namespace Feather {
 			{
 				m_PlayerStart.Load(sPlayerStartPrefab);
 			}
-			else if (m_UsePlayerStart && !m_PlayerStart.IsPlayerStartCreated())
+
+			if (m_UsePlayerStart && !m_PlayerStart.IsPlayerStartCreated())
 			{
 				m_PlayerStart.LoadVisualEntity();
 			}
@@ -332,8 +347,8 @@ namespace Feather {
 		pSerializer->StartDocument();
 		pSerializer->StartNewObject("scene_data");
 
-		std::string sTilemapPath = m_TilemapPath.substr(m_TilemapPath.find(ASSETS));
-		std::string sObjectPath = m_ObjectPath.substr(m_ObjectPath.find(ASSETS));
+		std::string sTilemapPath = m_TilemapPath.substr(m_TilemapPath.find(m_SceneName));
+		std::string sObjectPath = m_ObjectPath.substr(m_ObjectPath.find(m_SceneName));
 
 		glm::vec2 playerStartPosition = m_UsePlayerStart ? m_PlayerStart.GetPosition() : glm::vec2{ 0.0f };
 

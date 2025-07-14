@@ -188,19 +188,26 @@ namespace Feather {
 
 			if (std::filesystem::exists(projectPath))
 			{
-				ImGui::SetCursorPosX(128.f);
-				if (ImGui::Button("Create", BUTTON_SIZE))
+				if (IsReservedPathOrFile(std::filesystem::path{ m_NewProjectPath }))
 				{
-					// Create the project
-					ProjectLoader pl{};
-					if (!pl.CreateNewProject(m_NewProjectName, m_NewProjectPath))
+					ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, "Path '%s' is a reserved path. Please change paths.", m_NewProjectPath.c_str());
+				}
+				else
+				{
+					ImGui::SetCursorPosX(128.0f);
+					if (ImGui::Button("Create", BUTTON_SIZE))
 					{
-						// TODO: show an error
-					}
-					else
-					{
-						m_Running = false;
-						m_State = HubState::CreateNew;
+						// Create the project
+						ProjectLoader pl{};
+						if (!pl.CreateNewProject(m_NewProjectName, m_NewProjectPath))
+						{
+							// TODO: show an error
+						}
+						else
+						{
+							m_Running = false;
+							m_State = HubState::CreateNew;
+						}
 					}
 				}
 			}
