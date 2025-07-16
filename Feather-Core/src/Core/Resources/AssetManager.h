@@ -11,6 +11,7 @@
 #include <thread>
 
 #include <sol/sol.hpp>
+#include <SDL_mixer.h>
 
 namespace Feather {
 	
@@ -46,9 +47,13 @@ namespace Feather {
 		std::shared_ptr<Shader> GetShader(const std::string& shaderName);
 
 		bool AddMusic(const std::string& musicName, const std::string& filepath);
+		bool AddMusicFromMemory(const std::string& musicName, const unsigned char* musicData, size_t dataSize);
 		std::shared_ptr<Music> GetMusic(const std::string& musicName);
 
+		Mix_MusicType DetectAudioFormat(const unsigned char* audioData, size_t dataSize);
+
 		bool AddSoundFx(const std::string& soundFxName, const std::string& filepath);
+		bool AddSoundFxFromMemory(const std::string& soundFxName, const unsigned char* soundFxData, size_t dataSize);
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
 		
 		bool AddPrefab(const std::string& prefabName, std::shared_ptr<Prefab> prefab);

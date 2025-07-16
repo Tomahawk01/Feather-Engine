@@ -327,6 +327,44 @@ namespace Feather {
         return isSuccess;
     }
 
+    bool AssetManager::AddMusicFromMemory(const std::string& musicName, const unsigned char* musicData, size_t dataSize)
+    {
+        if (m_mapMusic.contains(musicName))
+        {
+            F_ERROR("Failed to add music '{0}': Already exist!", musicName);
+            return false;
+        }
+
+        SDL_RWops* rw = SDL_RWFromMem((void*)musicData, static_cast<int>(dataSize));
+        Mix_MusicType type = DetectAudioFormat(musicData, dataSize);
+
+        if (type == MUS_NONE)
+        {
+            F_ERROR("Failed to add music '{}' from memory. Unable to determine musc type", musicName);
+            return false;
+        }
+
+        auto music = Mix_LoadMUSType_RW(rw, type, 1);
+        if (!music)
+        {
+            F_ERROR("Failed to add music '{}' from memory", musicName);
+            return false;
+        }
+
+        SoundParams params{ .name = musicName, .filename = "From Data", .duration = Mix_MusicDuration(music)};
+
+        auto musicPtr = std::make_shared<Music>(params, MusicPtr{ music });
+        if (!musicPtr)
+        {
+            F_ERROR("Failed to create music ptr for '{0}'", musicName);
+            return false;
+        }
+
+        auto [itr, isSuccess] = m_mapMusic.emplace(musicName, std::move(musicPtr));
+
+        return isSuccess;
+    }
+
     std::shared_ptr<Music> AssetManager::GetMusic(const std::string& musicName)
     {
         auto musicItr = m_mapMusic.find(musicName);
@@ -337,6 +375,52 @@ namespace Feather {
         }
 
         return musicItr->second;
+    }
+
+    Mix_MusicType AssetManager::DetectAudioFormat(const unsigned char* audioData, size_t dataSize)
+    {
+        if (!audioData || dataSize < 12)
+        {
+            F_ERROR("Failed to detect the audio format. Data or size is invalid");
+            return MUS_NONE;
+        }
+
+        // WAV Format
+        if (std::memcmp(audioData, "RIFF", 4) == 0 &&
+            std::memcmp(audioData + 8, "WAVE", 4) == 0)
+        {
+            return MUS_WAV;
+        }
+
+        // MP3 Format
+        if (std::memcmp(audioData, "ID3", 3) == 0 ||
+            audioData[0] == 0xFF && (audioData[1] & 0xE0) == 0xE0)
+        {
+            return MUS_MP3;
+        }
+
+        // OGG Format
+        if (std::memcmp(audioData, "OggS", 4) == 0)
+        {
+            return MUS_OGG;
+        }
+
+        // Flac Format
+        if (std::memcmp(audioData, "fLaC", 4) == 0)
+        {
+            return MUS_FLAC;
+        }
+
+        // Opus Format
+        if (dataSize >= 36 &&
+            std::memcmp(audioData + 28, "OpusHead", 8) == 0)
+        {
+            return MUS_OPUS;
+        }
+
+        F_ERROR("Failed to detect audio type: Unknown or unupported format (supported formats: WAVE, MP3, OGG, Flac, Opus)");
+
+        return MUS_NONE;
     }
 
     bool AssetManager::AddSoundFx(const std::string& soundFxName, const std::string& filepath)
@@ -374,6 +458,30 @@ namespace Feather {
                                       .type = AssetType::SOUNDFX });
             }
         }
+
+        return isSuccess;
+    }
+
+    bool AssetManager::AddSoundFxFromMemory(const std::string& soundFxName, const unsigned char* soundFxData, size_t dataSize)
+    {
+        if (m_mapSoundFX.contains(soundFxName))
+        {
+            F_ERROR("Failed to add sound effect '{0}': Already exist!", soundFxName);
+            return false;
+        }
+
+        SDL_RWops* rw = SDL_RWFromMem((void*)soundFxData, static_cast<int>(dataSize));
+        auto chunk = Mix_LoadWAV_RW(rw, 1);
+        if (!chunk)
+        {
+            F_ERROR("Failed to add soundFx '{}' from memory", soundFxName);
+            return false;
+        }
+
+        SoundParams params{ .name = soundFxName, .filename = "From Data", .duration = chunk->alen / 179.4};
+
+        auto soundFx = std::make_shared<SoundFX>(params, SoundFXPtr{ chunk });
+        auto [itr, isSuccess] = m_mapSoundFX.emplace(soundFxName, std::move(soundFx));
 
         return isSuccess;
     }
