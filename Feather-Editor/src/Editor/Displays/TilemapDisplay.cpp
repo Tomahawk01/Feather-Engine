@@ -150,9 +150,12 @@ namespace Feather {
 			activeGizmo->Update(currentScene->GetCanvas());
 		}
 
-		auto& mainRegistry = MAIN_REGISTRY();
-		auto& animationSystem = mainRegistry.GetAnimationSystem();
-		animationSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
+		if (CORE_GLOBALS().AnimationRenderEnabled())
+		{
+			auto& mainRegistry = MAIN_REGISTRY();
+			auto& animationSystem = mainRegistry.GetAnimationSystem();
+			animationSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
+		}
 
 		m_TilemapCam->Update();
 
