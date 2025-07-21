@@ -18,6 +18,8 @@
 #include <Windowing/Window/Window.h>
 #include <Physics/ContactListener.h>
 
+#include <Utils/ThreadPool.h>
+
 // Displays
 #include "Editor/Displays/MenuDisplay.h"
 #include "Editor/Displays/SceneDisplay.h"
@@ -244,6 +246,8 @@ namespace Feather {
 		const auto& projectPath = CORE_GLOBALS().GetProjectPath();
 		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
 		FEATHER_CRASH_LOGGER().SetProjectPath(projectInfo->GetProjectPath().string());
+
+		MAIN_REGISTRY().AddToContext<SharedThreadPool>(std::make_shared<ThreadPool>(6));
 
 		return true;
     }
