@@ -8,6 +8,8 @@
 #include "Utils/HelperUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+
 #include <imgui.h>
 
 #include <format>
@@ -61,7 +63,7 @@ namespace Feather {
 
 	void ScriptDisplay::Draw()
 	{
-		if (!ImGui::Begin("Script List"))
+		if (!ImGui::Begin(ICON_FA_CODE " Script List"))
 		{
 			ImGui::End();
 			return;

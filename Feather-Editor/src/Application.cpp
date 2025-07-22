@@ -38,6 +38,7 @@
 #include "Editor/Utilities/editor_textures.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include "Editor/Systems/GridSystem.h"
 #include "Editor/Scene/SceneManager.h"
@@ -644,15 +645,15 @@ namespace Feather {
 			ImGui::DockBuilderDockWindow("Object Details", rightNodeId);
 			ImGui::DockBuilderDockWindow("Tileset", rightNodeId);
 			ImGui::DockBuilderDockWindow("Tile Details", rightNodeId);
-			ImGui::DockBuilderDockWindow("Tile Layers", tileLayerId);
-			ImGui::DockBuilderDockWindow("Scene Hierarchy", leftNodeId);
-			ImGui::DockBuilderDockWindow("Scene", centerNodeId);
-			ImGui::DockBuilderDockWindow("Script List", centerNodeId);
-			ImGui::DockBuilderDockWindow("Package Game", centerNodeId);
-			ImGui::DockBuilderDockWindow("Tilemap Editor", centerNodeId);
-			ImGui::DockBuilderDockWindow("Logs", logNodeId);
-			ImGui::DockBuilderDockWindow("Assets", logNodeId);
-			ImGui::DockBuilderDockWindow("Content Browser", logNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_LAYER_GROUP " Tile Layers", tileLayerId);
+			ImGui::DockBuilderDockWindow(ICON_FA_SITEMAP " Scene Hierarchy", leftNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_IMAGE " Scene", centerNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_CODE " Script List", centerNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_ARCHIVE " Package Game", centerNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_MAP " Tilemap Editor", centerNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_TERMINAL " Logs", logNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_FILE_ALT " Assets", logNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_FOLDER " Content Browser", logNodeId);
 
 			ImGui::DockBuilderFinish(dockSpaceId);
 		}

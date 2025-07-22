@@ -9,6 +9,7 @@
 
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
 
 #include <imgui.h>
@@ -48,7 +49,7 @@ namespace Feather {
 
 	void PackageGameDisplay::Draw()
 	{
-		if (!ImGui::Begin("Package Game"))
+		if (!ImGui::Begin(ICON_FA_ARCHIVE " Package Game"))
 		{
 			ImGui::End();
 			return;

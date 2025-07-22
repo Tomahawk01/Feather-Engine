@@ -46,7 +46,7 @@ namespace Feather {
 
 	void AssetDisplay::Draw()
 	{
-		if (!ImGui::Begin("Assets"))
+		if (!ImGui::Begin(ICON_FA_FILE_ALT " Assets"))
 		{
 			ImGui::End();
 			return;

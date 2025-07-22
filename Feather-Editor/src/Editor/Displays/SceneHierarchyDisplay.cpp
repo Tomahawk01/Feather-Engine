@@ -41,7 +41,7 @@ namespace Feather {
 	void SceneHierarchyDisplay::Draw()
 	{
 		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();
-		if (!ImGui::Begin("Scene Hierarchy") || !currentScene)
+		if (!ImGui::Begin(ICON_FA_SITEMAP " Scene Hierarchy") || !currentScene)
 		{
 			ImGui::End();
 			return;

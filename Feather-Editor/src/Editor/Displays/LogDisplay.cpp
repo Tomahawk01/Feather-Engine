@@ -1,5 +1,8 @@
 #include "LogDisplay.h"
+
 #include "Logger/Logger.h"
+
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <ranges>
 
@@ -26,7 +29,7 @@ namespace Feather {
 
 	void LogDisplay::Draw()
 	{
-		if (!ImGui::Begin("Logs"))
+		if (!ImGui::Begin(ICON_FA_TERMINAL " Logs"))
 		{
 			ImGui::End();
 			return;

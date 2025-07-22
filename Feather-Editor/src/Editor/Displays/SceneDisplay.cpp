@@ -28,6 +28,7 @@
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
+#include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scripting/EditorCoreLuaWrappers.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
@@ -51,7 +52,7 @@ namespace Feather {
 	void SceneDisplay::Draw()
 	{
 		static bool isOpen{ true };
-		if (!ImGui::Begin("Scene", &isOpen))
+		if (!ImGui::Begin(ICON_FA_IMAGE " Scene", &isOpen))
 		{
 			ImGui::End();
 			return;
