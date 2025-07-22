@@ -417,8 +417,15 @@ namespace Feather {
 		);
 
 		auto& physicsWorld = registry.ctx().get<PhysicsWorld>();
+		F_ASSERT(physicsWorld && "Physics World was not setup properly");
+
 		if (!physicsWorld)
+		{
+			F_ERROR("Failed to create Physics Component Lua bind. Physics World was not set properly");
 			return;
+		}
+
+		auto& coreGlobals = CORE_GLOBALS();
 
 		lua.new_usertype<PhysicsComponent>(
 			"PhysicsComponent",
@@ -428,7 +435,7 @@ namespace Feather {
 				[&](const PhysicsAttributes& attrs)
 				{
 					PhysicsComponent pc{ attrs };
-					pc.Init(physicsWorld, 640, 480); // TODO: Change based on window values
+					pc.Init(physicsWorld, coreGlobals.WindowWidth(), coreGlobals.WindowHeight());
 					return pc;
 				}
 			),
@@ -498,6 +505,17 @@ namespace Feather {
 				}
 
 				return body->GetAngularVelocity();
+			},
+			"applyForceToCenter", [](PhysicsComponent& pc, const glm::vec2& force)
+			{
+				auto body = pc.GetBody();
+				if (!body)
+				{
+					// TODO: error
+					return;
+				}
+
+				body->ApplyForceToCenter(b2Vec2{ force.x, force.y }, true);
 			},
 			"setGravityScale", [](PhysicsComponent& pc, float gravityScale)
 			{
