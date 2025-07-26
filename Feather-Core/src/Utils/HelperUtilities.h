@@ -28,6 +28,12 @@ namespace Feather {
 	{
 		std::string layerName{ "NewLayer" };
 		bool isVisible{ true };
+		int layer{ -1 };
+
+		friend bool operator==(const SpriteLayerParams& a, const SpriteLayerParams& b)
+		{
+			return a.layerName == b.layerName && a.isVisible == b.isVisible && a.layer == b.layer;
+		}
 	};
 
 }

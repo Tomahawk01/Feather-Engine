@@ -13,6 +13,8 @@
 #include <sol/sol.hpp>
 #include <SDL_mixer.h>
 
+using Cursor = std::shared_ptr<struct SDL_Cursor>;
+
 namespace Feather {
 	
 	enum class AssetType;
@@ -60,6 +62,13 @@ namespace Feather {
 
 		std::shared_ptr<Prefab> GetPrefab(const std::string& prefabName);
 
+#ifdef IN_FEATHER_EDITOR
+		bool AddCursor(const std::string& cursorName, const std::string& cursorPath);
+		bool AddCursorFromMemory(const std::string& cursorName, unsigned char* cursorData, size_t dataSize);
+
+		SDL_Cursor* GetCursor(const std::string& cursorName);
+#endif
+
 		inline const std::map<std::string, std::shared_ptr<Texture>>& GetAllTextures() const { return m_mapTextures; }
 		inline const std::map<std::string, std::shared_ptr<SoundFX>>& GetAllSoundFx() const { return m_mapSoundFX; }
 		inline const std::map<std::string, std::shared_ptr<Shader>>& GetAllShaders() const { return m_mapShaders; }
@@ -106,6 +115,10 @@ namespace Feather {
 		std::map<std::string, std::shared_ptr<Music>> m_mapMusic{};
 		std::map<std::string, std::shared_ptr<SoundFX>> m_mapSoundFX{};
 		std::map<std::string, std::shared_ptr<Prefab>> m_mapPrefabs{};
+
+#ifdef IN_FEATHER_EDITOR
+		std::map<std::string, Cursor> m_mapCursors;
+#endif
 
 		std::vector<AssetWatchParams> m_FilewatchParams;
 

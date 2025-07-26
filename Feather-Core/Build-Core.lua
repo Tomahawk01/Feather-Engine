@@ -50,6 +50,7 @@ project "Feather-Core"
         "Glad",
         "SDL2.lib",
         "SDL2_mixer.lib",
+        "SDL2_image.lib",
         "lua54.lib",
         "tinyfiledialogs64.lib",
         "Box2D",

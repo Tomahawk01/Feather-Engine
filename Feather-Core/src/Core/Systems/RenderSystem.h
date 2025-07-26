@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/ECS/Registry.h"
+#include <sol/sol.hpp>
 
 namespace Feather {
 
-	struct SpriteLayerParams;
+	class Registry;
 	class Camera2D;
 	class SpriteBatchRenderer;
 
@@ -12,14 +12,13 @@ namespace Feather {
 	{
 	public:
 		RenderSystem();
-		~RenderSystem() = default;
+		~RenderSystem();
 
-		void Update(Feather::Registry& registry, Camera2D& camera, const std::vector<SpriteLayerParams>& layerFilters = {});
-
+		void Update(Registry& registry, Camera2D& camera);
 		static void CreateRenderSystemLuaBind(sol::state& lua, Registry& registry);
 
 	private:
-		std::unique_ptr<Feather::SpriteBatchRenderer> m_BatchRenderer;
+		std::unique_ptr<SpriteBatchRenderer> m_BatchRenderer;
 	};
 
 }

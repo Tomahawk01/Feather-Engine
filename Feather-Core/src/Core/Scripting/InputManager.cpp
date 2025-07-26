@@ -148,8 +148,7 @@ namespace Feather {
         std::shared_ptr<Gamepad> gamepad{ nullptr };
         try
         {
-            gamepad = std::make_shared<Gamepad>(
-                std::move(make_shared_controller(SDL_GameControllerOpen(gamepadID))));
+            gamepad = std::make_shared<Gamepad>(std::move(MakeSharedFromSDLType<Controller>(SDL_GameControllerOpen(gamepadID))));
         }
         catch (...)
         {

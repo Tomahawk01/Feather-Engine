@@ -28,6 +28,7 @@ namespace Feather {
 		void ClearRuntimeScene();
 
 		void AddNewLayer();
+		bool DeleteLayer(int layer);
 		
 		bool AddGameObject();
 		bool AddGameObjectByTag(const std::string& tag, entt::entity entity);

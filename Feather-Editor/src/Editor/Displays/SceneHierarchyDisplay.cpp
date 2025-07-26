@@ -99,7 +99,7 @@ namespace Feather {
 			nodeFlags |= ImGuiTreeNodeFlags_Selected;
 
 		bool treeNodeOpen{ false };
-		treeNodeOpen = ImGui::TreeNodeEx(name.c_str(), nodeFlags);
+		treeNodeOpen = ImGui::TreeNodeEx(std::format("{} {}", ICON_FA_CUBE, name).c_str(), nodeFlags);
 		auto currentScene = SCENE_MANAGER().GetCurrentScene();
 
 		if (ImGui::IsItemClicked())

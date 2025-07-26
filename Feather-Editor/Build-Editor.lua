@@ -11,6 +11,15 @@ project "Feather-Editor"
         "**.inl"
     }
 
+    defines
+    {
+        "_CRT_SECURE_NO_WARNINGS",
+        "NOMINMAX",
+
+        -- NOTE: Custom defines for the Feather Engine
+        "IN_FEATHER_EDITOR"
+    }
+
     includedirs
     {
         "src",
@@ -40,6 +49,7 @@ project "Feather-Editor"
         "Feather-Core",
         "SDL2.lib",
         "SDL2_mixer.lib",
+        "SDL2_image.lib",
         "opengl32.lib",
         "lua54.lib",
         "Glad",

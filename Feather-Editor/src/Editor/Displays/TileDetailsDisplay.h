@@ -21,8 +21,10 @@ namespace Feather {
 
 	private:
 		int m_SelectedLayer;
+		int m_DeleteLayer;
 		std::string m_RenameLayerBuff;
 		bool m_Renaming;
+		bool m_bDeleteLayer;
 	};
 
 }

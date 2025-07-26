@@ -47,4 +47,7 @@ namespace Feather {
 	extern unsigned char* g_DefaultPlayer;
 	extern const size_t g_DefaultPlayerSize;
 
+	extern unsigned char* g_PanningCursor;
+	extern const size_t g_PanningCursorSize;
+
 }

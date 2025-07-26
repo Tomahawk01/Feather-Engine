@@ -54,6 +54,8 @@ namespace Feather {
 		 */
 		int AddLayer(const std::string& layerName, bool visible);
 
+		int AddLayer(const SpriteLayerParams& layerParam);
+
 		/*
 		 * @brief Checks to see if the layer already exists in the scene.
 		 * To be used when trying to adjust the name of the layer to prevent layers with duplicate names.

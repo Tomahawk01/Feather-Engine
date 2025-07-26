@@ -7,6 +7,7 @@
 #include "Editor/Scene/SceneObject.h"
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Tools/TileTool.h"
+#include "Editor/Commands/CommandManager.h"
 
 #include "Core/ECS/MainRegistry.h"
 #include "Core/ECS/Components/AllComponents.h"
@@ -25,6 +26,7 @@ namespace Feather {
 		: m_SelectedLayer{ -1 }
 		, m_RenameLayerBuff{}
 		, m_Renaming{ false }
+		, m_bDeleteLayer{ false }
 	{}
 
 	TileDetailsDisplay::~TileDetailsDisplay()
@@ -112,7 +114,9 @@ namespace Feather {
 			ImGui::Separator();
 			ImGui::AddSpaces(2);
 
-			float itemWidth{ ImGui::GetWindowWidth() - 64.0f };
+			float itemWidth{ ImGui::GetWindowWidth() - 96.0f };
+			F_ASSERT(itemWidth > 0 && "Item width must not be less than zero");
+
 			auto reverseView = spriteLayers | std::ranges::views::reverse;
 
 			for (auto rit = reverseView.begin(); rit < reverseView.end(); rit++)
@@ -129,6 +133,10 @@ namespace Feather {
 					int nNext = n + (ImGui::GetMouseDragDelta(0).y < 0.0f ? 1 : -1);
 					if (nNext >= 0 && nNext < reverseView.size())
 					{
+						const int nextLayer = spriteLayers[n].layer;
+						spriteLayers[n].layer = spriteLayers[nNext].layer;
+						spriteLayers[nNext].layer = nextLayer;
+
 						std::swap(spriteLayers[n], spriteLayers[nNext]);
 
 						auto spriteView = currentScene->GetRegistry().GetRegistry().view<SpriteComponent, TileComponent>();
@@ -145,6 +153,9 @@ namespace Feather {
 
 						m_SelectedLayer = nNext;
 						tileData.sprite.layer = nNext;
+
+						auto moveTileLayerCmd = UndoableCommands{ MoveTileLayerCmd{.sceneObject = currentScene, .from = n, .to = nNext} };
+						COMMAND_MANAGER().Execute(moveTileLayerCmd);
 
 						ImGui::ResetMouseDragDelta();
 					}
@@ -173,6 +184,15 @@ namespace Feather {
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, BLACK_TRANSPARENT);
 				if (ImGui::Button(spriteLayer.isVisible ? ICON_FA_EYE : ICON_FA_EYE_SLASH, { 24.0f, 24.0f }))
 					spriteLayer.isVisible= !spriteLayer.isVisible;
+
+				ImGui::SameLine();
+
+				if (ImGui::Button(ICON_FA_TRASH, { 24.0f, 24.0f }))
+				{
+					m_bDeleteLayer = true;
+					m_DeleteLayer = n;
+				}
+
 				ImGui::PopStyleColor(2);
 
 				if (m_Renaming && isSelected)
@@ -180,9 +200,14 @@ namespace Feather {
 					ImGui::SetKeyboardFocusHere();
 					if (ImGui::InputText("##rename", m_RenameLayerBuff.data(), 255, ImGuiInputTextFlags_EnterReturnsTrue) && checkPassed)
 					{
+						ChangeTileLayerNameCmd changeNameCmd{ .sceneObject = currentScene, .oldName = spriteLayer.layerName, .newName = checkName };
+
 						spriteLayer.layerName = checkName;
 						m_RenameLayerBuff.clear();
 						m_Renaming = false;
+
+						auto changeLayerNameCmd = UndoableCommands{ changeNameCmd };
+						COMMAND_MANAGER().Execute(changeLayerNameCmd);
 					}
 					else if (m_Renaming && ImGui::IsKeyPressed(ImGuiKey_Escape))
 					{
@@ -196,6 +221,42 @@ namespace Feather {
 					ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, std::format("{} - Already exists", checkName).c_str());
 
 				ImGui::PopID();
+			}
+
+			if (m_bDeleteLayer)
+			{
+				ImGui::OpenPopup("Delete Layer");
+			}
+
+			if (ImGui::BeginPopupModal("Delete Layer"))
+			{
+				ImGui::TextColored(ImVec4{ 1.0f, 1.0f, 0.0f, 1.0f }, "Are you sure?\nThis will delete all tiles at this layer");
+
+				if (ImGui::Button("Ok"))
+				{
+					if (m_DeleteLayer >= 0)
+					{
+						if (!currentScene->DeleteLayer(m_DeleteLayer))
+						{
+							F_WARN("Failed to delete layer: '{}'", m_DeleteLayer);
+						}
+
+						m_bDeleteLayer = false;
+						m_DeleteLayer = -1;
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Cancel"))
+				{
+					m_bDeleteLayer = false;
+					m_DeleteLayer = -1;
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
 			}
 
 			ImGui::End();

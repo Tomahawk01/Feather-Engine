@@ -1,8 +1,9 @@
 #pragma once
 
-#include <memory>
 #include <SDL.h>
 #include <SDL_mixer.h>
+
+#include <memory>
 
 namespace Feather {
 
@@ -17,16 +18,15 @@ namespace Feather {
 
 }
 
-typedef std::shared_ptr<SDL_GameController> Controller;
-static Controller make_shared_controller(SDL_GameController* controller)
+// Useful aliases
+using Controller = std::shared_ptr<SDL_GameController>;
+using Cursor = std::shared_ptr<SDL_Cursor>;
+using WindowPtr = std::unique_ptr<SDL_Window, Feather::SDL_Destroyer>;
+using SoundFXPtr = std::unique_ptr<Mix_Chunk, Feather::SDL_Destroyer>;
+using MusicPtr = std::unique_ptr<Mix_Music, Feather::SDL_Destroyer>;
+
+template <typename RPtr, typename TSDLType>
+inline RPtr MakeSharedFromSDLType(TSDLType* SDLType)
 {
-	return std::shared_ptr<SDL_GameController>(controller, Feather::SDL_Destroyer{});
+	return std::shared_ptr<TSDLType>(SDLType, Feather::SDL_Destroyer{});
 }
-
-typedef std::shared_ptr<SDL_Cursor> Cursor;
-static Cursor make_shared_cursor(SDL_Cursor* cursor);
-
-typedef std::unique_ptr<SDL_Window, Feather::SDL_Destroyer> WindowPtr;
-
-typedef std::unique_ptr<Mix_Chunk, Feather::SDL_Destroyer> SoundFXPtr;
-typedef std::unique_ptr<Mix_Music, Feather::SDL_Destroyer> MusicPtr;

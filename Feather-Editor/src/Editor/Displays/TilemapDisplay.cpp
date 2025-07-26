@@ -20,6 +20,7 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Systems/GridSystem.h"
+#include "Editor/Systems/EditorRenderSystem.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
@@ -177,7 +178,7 @@ namespace Feather {
 		auto& editorFramebuffers = mainRegistry.GetContext<std::shared_ptr<EditorFramebuffers>>();
 		auto& renderer = mainRegistry.GetContext<std::shared_ptr<Renderer>>();
 
-		auto& renderSystem = mainRegistry.GetRenderSystem();
+		auto& renderSystem = mainRegistry.GetContext<EditorRenderSystemPtr>();
 		auto& renderUISystem = mainRegistry.GetRenderUISystem();
 		auto& renderShapeSystem = mainRegistry.GetRenderShapeSystem();
 
@@ -242,7 +243,7 @@ namespace Feather {
 		auto& gridSystem = mainRegistry.GetContext<std::shared_ptr<GridSystem>>();
 		gridSystem->Update(*currentScene, *m_TilemapCam);
 
-		renderSystem.Update(currentScene->GetRegistry(), *m_TilemapCam, currentScene->GetLayerParams());
+		renderSystem->Update(currentScene->GetRegistry(), *m_TilemapCam, currentScene->GetLayerParams());
 		if (CORE_GLOBALS().RenderCollidersEnabled())
 			renderShapeSystem.Update(currentScene->GetRegistry(), *m_TilemapCam);
 		renderUISystem.Update(currentScene->GetRegistry());
@@ -286,7 +287,16 @@ namespace Feather {
 
 		auto& mouse = INPUT_MANAGER().GetMouse();
 		if (!mouse.IsButtonJustPressed(F_MOUSE_MIDDLE) && !mouse.IsButtonPressed(F_MOUSE_MIDDLE) && mouse.GetMouseWheelY() == 0)
+		{
+			if (auto* cursor = ASSET_MANAGER().GetCursor("default"))
+			{
+				if (SDL_GetCursor() != cursor)
+				{
+					SDL_SetCursor(cursor);
+				}
+			}
 			return;
+		}
 
 		static glm::vec2 startPosition{ 0.0f };
 		auto screenOffset = m_TilemapCam->GetScreenOffset();
@@ -299,6 +309,11 @@ namespace Feather {
 		{
 			screenOffset += (mousePos - startPosition);
 			isOffsetChanged = true;
+
+			if (auto* cursor = ASSET_MANAGER().GetCursor("ZZ_F_PanningCursor"))
+			{
+				SDL_SetCursor(cursor);
+			}
 		}
 
 		glm::vec2 currentWorldPos = m_TilemapCam->ScreenCoordsToWorld(mousePos);

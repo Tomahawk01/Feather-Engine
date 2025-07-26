@@ -4,6 +4,8 @@
 
 #include <Windows.h>
 #include <shellapi.h>
+#include <unordered_map>
+
 #include <imgui_stdlib.h>
 
 namespace ImGui {
@@ -179,6 +181,78 @@ namespace ImGui {
 		{
 			ShellExecuteA(NULL, "open", url, NULL, NULL, SW_SHOWNORMAL);
 		}
+	}
+
+	static std::unordered_map<std::string, ImFont*> g_mapImGuiFonts;
+
+	ImFont* GetFont(const std::string& fontName)
+	{
+		auto fontItr = g_mapImGuiFonts.find(fontName);
+		if (fontItr == g_mapImGuiFonts.end())
+		{
+			F_ERROR("Failed to get font '{}': Does not exist");
+			ImFont* font = ImGui::GetIO().Fonts->Fonts[0];
+			return font;
+		}
+
+		return fontItr->second;
+	}
+
+	bool AddFont(const std::string& fontName, ImFont* font, float fontSize)
+	{
+		if (g_mapImGuiFonts.contains(fontName))
+		{
+			F_ERROR("Failed to add font '{}' to imgui fonts: Already exists", fontName);
+			return false;
+		}
+
+		if (!font)
+		{
+			F_ERROR("Failed to add font '{}' to imgui fonts", fontName);
+			return false;
+		}
+
+		return g_mapImGuiFonts.emplace(fontName, font).second;
+	}
+
+	bool AddFontFromFile(const std::string fontName, const std::string& fontFile, float fontSize)
+	{
+		if (g_mapImGuiFonts.contains(fontName))
+		{
+			F_ERROR("Failed to add font '{}' to imgui fonts: Already exists", fontName);
+			return false;
+		}
+
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* font = io.Fonts->AddFontFromFileTTF(fontFile.c_str(), fontSize, nullptr, io.Fonts->GetGlyphRangesDefault());
+
+		if (!font)
+		{
+			F_ERROR("Failed to add font '{}' to imgui fonts", fontName);
+			return false;
+		}
+
+		return g_mapImGuiFonts.emplace(fontName, font).second;
+	}
+
+	bool AddFontFromMemory(const std::string& fontName, void* fontData, float dataSize, float fontSize)
+	{
+		if (g_mapImGuiFonts.contains(fontName))
+		{
+			F_ERROR("Failed to add font '{}' to imgui fonts: Already exists", fontName);
+			return false;
+		}
+
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* font = io.Fonts->AddFontFromMemoryTTF(fontData, dataSize, fontSize, nullptr, io.Fonts->GetGlyphRangesDefault());
+
+		if (!font)
+		{
+			F_ERROR("Failed to add font '{}' to imgui fonts", fontName);
+			return false;
+		}
+
+		return g_mapImGuiFonts.emplace(fontName, font).second;
 	}
 
 }

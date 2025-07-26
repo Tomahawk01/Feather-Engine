@@ -2,6 +2,7 @@
 
 #include "Logger/Logger.h"
 #include "Windowing/Window/Window.h"
+#include "Core/Resources/fonts/default_fonts.h"
 
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Utilities/Fonts/editor_fonts.h"
@@ -38,7 +39,9 @@ namespace Feather {
 
 		io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-		io.Fonts->AddFontDefault();
+		ImFont* defaultFont = io.Fonts->AddFontDefault();
+		ImGui::AddFont("default", defaultFont, 13.0f);
+
 		float baseFontSize = 16.0f;
 		float iconFontSize = baseFontSize * 2.0f / 3.0f;
 
@@ -50,6 +53,10 @@ namespace Feather {
 		icons_config.GlyphMinAdvanceX = iconFontSize;
 		icons_config.GlyphOffset = ImVec2{ 0.0f, 2.0f };
 		io.Fonts->AddFontFromMemoryTTF(g_FaSolid900, g_FaSolid900Size, baseFontSize, &icons_config, icons_ranges);
+
+		ImGui::AddFontFromMemory("roboto-bold-14", g_RobotoBoldFont, g_RobotoBoldFontSize, 14.0f);
+
+		ImGui::AddFontFromMemory("roboto-bold-24", g_RobotoBoldFont, g_RobotoBoldFontSize, 24.0f);
 
 		if (!ImGui_ImplSDL2_InitForOpenGL(window->GetWindow().get(), window->GetGLContext()))
 		{

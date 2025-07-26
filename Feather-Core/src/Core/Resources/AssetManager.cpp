@@ -16,6 +16,9 @@
 #include "Core/Resources/fonts/default_fonts.h"
 
 #include "Utils/FeatherUtilities.h"
+#include "Utils/SDL_Wrappers.h"
+
+#include <SDL_image.h>
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
@@ -29,6 +32,11 @@ namespace Feather {
         {
             m_WatchThread = std::jthread(&AssetManager::FileWatcher, this);
         }
+
+#ifdef IN_FEATHER_EDITOR
+        IMG_Init(IMG_INIT_PNG);
+        m_mapCursors.emplace("default", MakeSharedFromSDLType<Cursor>(SDL_GetDefaultCursor()));
+#endif
     }
 
     AssetManager::~AssetManager()
@@ -521,6 +529,63 @@ namespace Feather {
 
         return prefabItr->second;
     }
+
+#ifdef IN_FEATHER_EDITOR
+
+    bool AssetManager::AddCursor(const std::string& cursorName, const std::string& cursorPath)
+    {
+        F_FATAL("Not yet implemented");
+        return false;
+    }
+
+    bool AssetManager::AddCursorFromMemory(const std::string& cursorName, unsigned char* cursorData, size_t dataSize)
+    {
+        if (m_mapCursors.contains(cursorName))
+        {
+            F_ERROR("Failed to add Cursor '{}': Already exists", cursorName);
+            return false;
+        }
+
+        SDL_RWops* rw = SDL_RWFromConstMem(cursorData, static_cast<int>(dataSize));
+        if (!rw)
+        {
+            F_ERROR("Failed to add cursor: {}", SDL_GetError());
+            return false;
+        }
+
+        SDL_Surface* surface = IMG_Load_RW(rw, 1); // 1 = Automatically closes RWops
+        if (!surface)
+        {
+            F_ERROR("Failed to add cursor: {}", IMG_GetError());
+            return false;
+        }
+
+        SDL_Cursor* cursor = SDL_CreateColorCursor(surface, surface->w / 2, surface->h / 2);
+
+        if (!cursor)
+        {
+            F_ERROR("Failed to add cursor. '{}'", SDL_GetError());
+            return false;
+        }
+
+        SDL_FreeSurface(surface);
+
+        return m_mapCursors.emplace(cursorName, MakeSharedFromSDLType<Cursor>(cursor)).second;
+    }
+
+    SDL_Cursor* AssetManager::GetCursor(const std::string& cursorName)
+    {
+        auto cursorItr = m_mapCursors.find(cursorName);
+        if (cursorItr == m_mapCursors.end())
+        {
+            F_ERROR("Failed to get cursor '{}': Does not exist", cursorName);
+            return nullptr;
+        }
+
+        return cursorItr->second.get();
+    }
+
+#endif
 
     std::vector<std::string> AssetManager::GetAssetKeyNames(AssetType assetType) const
     {

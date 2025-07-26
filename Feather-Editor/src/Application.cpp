@@ -19,6 +19,7 @@
 #include <Physics/ContactListener.h>
 
 #include <Utils/ThreadPool.h>
+#include <Utils/HelperUtilities.h>
 
 // Displays
 #include "Editor/Displays/MenuDisplay.h"
@@ -41,6 +42,7 @@
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include "Editor/Systems/GridSystem.h"
+#include "Editor/Systems/EditorRenderSystem.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Events/EditorEventTypes.h"
 #include "Editor/Hub/Hub.h"
@@ -225,6 +227,12 @@ namespace Feather {
 			return false;
 		}
 
+		if (!MAIN_REGISTRY().AddToContext<EditorRenderSystemPtr>(std::make_shared<EditorRenderSystem>()))
+		{
+			F_FATAL("Failed add the editor render system registry context");
+			return false;
+		}
+
 		auto pickingTexture = std::make_shared<PickingTexture>(640, 480);
 		if (!pickingTexture)
 		{
@@ -398,6 +406,11 @@ namespace Feather {
 			return false;
 		}
 		assetManager.GetTexture("ZZ_F_default_player")->SetIsEditorTexture(true);
+
+		if (!assetManager.AddCursorFromMemory("ZZ_F_PanningCursor", g_PanningCursor, g_PanningCursorSize))
+		{
+			return false;
+		}
 
 		return true;
 	}
