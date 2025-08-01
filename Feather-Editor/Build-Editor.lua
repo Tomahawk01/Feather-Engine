@@ -35,13 +35,15 @@ project "Feather-Editor"
         "%{wks.location}/vendor/sol3",
         "%{wks.location}/vendor/box2d/include",
         "%{wks.location}/vendor/ImGui/src",
-        "%{wks.location}/vendor/rapidjson/include"
+        "%{wks.location}/vendor/rapidjson/include",
+        "%{wks.location}/vendor/libzippp/include"
     }
 
     libdirs
     {
         "%{wks.location}/vendor/SDL/lib",
-        "%{wks.location}/vendor/lua_5.4.2/lib"
+        "%{wks.location}/vendor/lua_5.4.2/lib",
+        "%{wks.location}/vendor/libzippp/lib"
     }
 
     links
@@ -55,7 +57,8 @@ project "Feather-Editor"
         "Glad",
         "Box2D",
         "ImGui",
-        "SOIL"
+        "SOIL",
+        "libzippp.lib"
     }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
