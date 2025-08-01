@@ -127,6 +127,9 @@ namespace Feather {
 		return 0 != (x & y);
 	}
 
+	std::string AssetTypeToString(AssetType assetType);
+	AssetType StringToAssetType(const std::string& assetType);
+
 	std::string GetSubstring(std::string_view str, std::string_view find);
 
 	std::string ConvertWideToANSI(const std::wstring& wstr);

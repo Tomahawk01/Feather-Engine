@@ -7,6 +7,28 @@
 
 namespace Feather {
 
+	std::string AssetTypeToString(AssetType assetType)
+	{
+		switch (assetType)
+		{
+			case AssetType::TEXTURE: return "TEXTURE";
+			case AssetType::FONT: return "FONT";
+			case AssetType::SOUNDFX: return "SOUNDFX";
+			case AssetType::MUSIC: return "MUSIC";
+			case AssetType::SCENE: return "SCENE";
+			case AssetType::SHADER: return "SHADER";
+			case AssetType::PREFAB: return "PREFAB";
+			case AssetType::NO_TYPE: return "NO_TYPE";
+		}
+
+		return { "NO_TYPE" };
+	}
+
+	AssetType StringToAssetType(const std::string& assetType)
+	{
+		return AssetType();
+	}
+
 	std::string GetSubstring(std::string_view str, std::string_view find)
 	{
 		if (find.empty())
