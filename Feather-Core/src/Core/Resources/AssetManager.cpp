@@ -75,9 +75,9 @@ namespace Feather {
             return false;
         }
 
-        auto texture = std::move(TextureLoader::Create(
-                pixelArt ? Texture::TextureType::PIXEL : Texture::TextureType::BLENDED,
-                texturePath, isTileset));
+        auto texture = TextureLoader::Create(pixelArt ? Texture::TextureType::PIXEL : Texture::TextureType::BLENDED,
+                                             texturePath,
+                                             isTileset);
         if (!texture)
         {
             F_ERROR("Failed to load texture '{0}' at path '{1}'", textureName, texturePath);
