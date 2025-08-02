@@ -38,6 +38,7 @@ If you are using Visual Studio 2022 choose `Release` build and press `F5`.
 * [ImGui](https://github.com/ocornut/imgui) for editor GUI
 * [tinyfiledialogs](https://sourceforge.net/projects/tinyfiledialogs) for file dialogs
 * [rapidjson](https://github.com/Tencent/rapidjson) for json parsing
+* [libzippp](https://github.com/ctabin/libzippp) for handling zip archives
 
 ## Games made using Feather Engine
 To play any available game created by the developer of this engine check [Releases](https://github.com/Tomahawk01/Feather-Engine/releases) tab.
