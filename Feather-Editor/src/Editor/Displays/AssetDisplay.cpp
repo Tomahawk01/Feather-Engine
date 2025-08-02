@@ -280,7 +280,7 @@ namespace Feather {
 		}
 	}
 
-	unsigned int AssetDisplay::GetTextureID(const std::string& assetName)
+	unsigned int AssetDisplay::GetTextureID(const std::string& assetName) const
 	{
 		auto& assetManager = MAIN_REGISTRY().GetAssetManager();
 
@@ -335,7 +335,7 @@ namespace Feather {
 		return 0;
 	}
 
-	bool AssetDisplay::DoRenameAsset(const std::string& oldName, const std::string& newName)
+	bool AssetDisplay::DoRenameAsset(const std::string& oldName, const std::string& newName) const
 	{
 		if (newName.empty())
 			return false;
@@ -353,7 +353,7 @@ namespace Feather {
 		return false;
 	}
 
-	void AssetDisplay::CheckRename(const std::string& checkName)
+	void AssetDisplay::CheckRename(const std::string& checkName) const
 	{
 		if (checkName.empty())
 		{

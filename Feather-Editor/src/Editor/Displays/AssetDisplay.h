@@ -19,9 +19,9 @@ namespace Feather {
 	private:
 		void SetAssetType();
 		void DrawSelectedAssets();
-		unsigned int GetTextureID(const std::string& assetName);
-		bool DoRenameAsset(const std::string& oldName, const std::string& newName);
-		void CheckRename(const std::string& checkName);
+		unsigned int GetTextureID(const std::string& assetName) const;
+		bool DoRenameAsset(const std::string& oldName, const std::string& newName) const;
+		void CheckRename(const std::string& checkName) const;
 		void OpenAssetContext(const std::string& assetName);
 
 	protected:
