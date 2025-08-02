@@ -21,7 +21,7 @@ Run the `Win-GenProjects.bat` file. This will generate a Visual Studio solution 
 
 <ins>**3. Run the Engine:**</ins>
 
-If you are using Visual Studio 2022 press `F5` key.
+If you are using Visual Studio 2022 choose `Release` build and press `F5`.
 
 ## Technologies used
 * [SDL2](https://github.com/libsdl-org/SDL) for windowing and input functionality
