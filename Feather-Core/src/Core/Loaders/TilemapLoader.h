@@ -24,7 +24,13 @@ namespace Feather {
 		bool SaveObjectMapJSON(Registry& registry, const std::string& objectMapFile);
 		bool LoadObjectMapJSON(Registry& registry, const std::string& objectMapFile);
 
-		// TODO: Save and load functions for Lua serializer
+		// Save and load functions for Lua serializer
+		bool SaveTilemapLua(Registry& registry, const std::string& tilemapFile);
+		bool LoadTilemapLua(Registry& registry, const std::string& tilemapFile);
+
+		bool SaveObjectMapLua(Registry& registry, const std::string& objectMapFile);
+		bool LoadObjectMapLua(Registry& registry, const std::string& objectMapFile);
+
 	};
 
 	struct SaveRelationship

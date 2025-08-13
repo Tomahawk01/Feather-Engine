@@ -39,6 +39,8 @@ namespace Feather {
 		virtual bool LoadScene() override;
 		virtual bool UnloadScene(bool saveScene = true) override;
 
+		std::pair<std::string, std::string> ExportSceneToLua(const std::string& sceneName, const std::string& exportPath, Registry& registry);
+
 		bool CheckTagName(const std::string& tagName);
 
 		inline const std::string& GetSceneName() { return m_SceneName; }

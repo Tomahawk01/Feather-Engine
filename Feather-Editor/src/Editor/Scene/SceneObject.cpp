@@ -396,6 +396,125 @@ namespace Feather {
 		return success;
 	}
 
+	std::pair<std::string, std::string> SceneObject::ExportSceneToLua(const std::string& sceneName, const std::string& exportPath, Registry& registry)
+	{
+		if (!fs::exists(m_SceneDataPath))
+		{
+			F_ERROR("Failed to export scene. Scene data does not exist");
+			return {};
+		}
+
+		std::ifstream sceneDataFile;
+		sceneDataFile.open(m_SceneDataPath);
+
+		if (!sceneDataFile.is_open())
+		{
+			F_ERROR("Failed to open scene data file '{}'", m_SceneDataPath);
+			return {};
+		}
+
+		if (sceneDataFile.peek() == std::ifstream::traits_type::eof())
+		{
+			return {};
+		}
+
+		std::stringstream ss;
+		ss << sceneDataFile.rdbuf();
+		std::string contents = ss.str();
+
+		rapidjson::StringStream jsonStr{ contents.c_str() };
+
+		rapidjson::Document doc;
+		doc.ParseStream(jsonStr);
+
+		if (doc.HasParseError() || !doc.IsObject())
+		{
+			F_ERROR("Failed to export scene data. File '{}' is not a valid json. Error: {}, Offset: {}", m_SceneDataPath, rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
+			return {};
+		}
+
+		F_ASSERT(doc.HasMember("scene_data") && "scene_data member is necessary");
+
+		const rapidjson::Value& sceneData = doc["scene_data"];
+
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto optScenesPath = projectInfo->TryGetFolderPath(EProjectFolderType::Scenes);
+
+		F_ASSERT(optScenesPath && "Scene folder must exist");
+
+		if (m_TilemapPath.empty())
+		{
+			m_TilemapPath = fs::path{ *optScenesPath / sceneData["tilemapPath"].GetString() }.string();
+		}
+
+		if (m_ObjectPath.empty())
+		{
+			m_ObjectPath = fs::path{ *optScenesPath / sceneData["objectmapPath"].GetString() }.string();
+		}
+
+		if (sceneData.HasMember("canvas"))
+		{
+			const rapidjson::Value& canvas = sceneData["canvas"];
+			m_Canvas.width = canvas["width"].GetInt();
+			m_Canvas.height = canvas["height"].GetInt();
+			m_Canvas.tileWidth = canvas["tileWidth"].GetInt();
+			m_Canvas.tileHeight = canvas["tileHeight"].GetInt();
+		}
+
+		if (sceneData.HasMember("mapType"))
+		{
+			std::string mapType = sceneData["mapType"].GetString();
+			if (mapType == "grid")
+			{
+				m_MapType = EMapType::Grid;
+			}
+			else if (mapType == "iso")
+			{
+				m_MapType = EMapType::IsoGrid;
+			}
+		}
+
+		auto tilemapLoader = std::make_unique<TilemapLoader>();
+		if (!tilemapLoader->LoadTilemap(registry, m_TilemapPath, true))
+		{
+			F_ERROR("Failed to load tilemap '{}'", m_TilemapPath);
+			return {};
+		}
+
+		if (!tilemapLoader->LoadGameObjects(registry, m_ObjectPath, true))
+		{
+			F_ERROR("Failed to load game object map '{}'", m_ObjectPath);
+			return {};
+		}
+
+		fs::path exportPath_{ exportPath };
+		if (!fs::exists(exportPath_))
+		{
+			F_ERROR("Faield to export scene '{}' to lua. Export path '{}' does not exist", sceneName, exportPath);
+			return {};
+		}
+
+		fs::path tilemapLua{ exportPath_ };
+		tilemapLua /= sceneName + "_tilemap.lua";
+
+		if (!tilemapLoader->SaveTilemap(registry, tilemapLua.string(), false))
+		{
+			F_ERROR("Failed to export scene '{}' to lua", sceneName);
+			return {};
+		}
+
+		fs::path objectLua{ exportPath_ };
+		objectLua /= sceneName + "_objects.lua";
+
+		if (!tilemapLoader->SaveGameObjects(registry, objectLua.string(), false))
+		{
+			F_ERROR("Failed to export scene '{}' to lua", sceneName);
+			return {};
+		}
+
+		return std::make_pair(tilemapLua.string(), objectLua.string());
+	}
+
 	bool SceneObject::CheckTagName(const std::string& tagName)
 	{
 		return m_mapTagToEntity.contains(tagName);

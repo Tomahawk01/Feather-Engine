@@ -304,7 +304,42 @@ namespace Feather {
 
 	std::vector<std::string> Packager::CreateSceneFiles(const std::string& tempFilepath, const rapidjson::Value& scenes)
 	{
-		return std::vector<std::string>();
+		std::vector<std::string> sceneFiles;
+		if (!scenes.IsArray())
+		{
+			F_ERROR("Failed to create scene lua files. \"scenes\" was not a valid json array");
+			return sceneFiles;
+		}
+
+		auto optContentPath = m_PackageData->ProjectInfo->TryGetFolderPath(EProjectFolderType::Content);
+		F_ASSERT(optContentPath && "Content path was not set in project info");
+		if (!optContentPath)
+		{
+			F_ERROR("Failed to create scene lua files. Content path not set in project info");
+			return sceneFiles;
+		}
+
+		for (const auto& jsonScene : scenes.GetArray())
+		{
+			std::string sceneName{ jsonScene["name"].GetString() };
+			std::string sceneData{ jsonScene["sceneData"].GetString() };
+			fs::path sceneDataPath = *optContentPath / sceneData;
+
+			Registry registry;
+			auto pSceneObject = std::make_unique<SceneObject>(sceneName, sceneDataPath.string());
+			auto [tilemap, objectMap] = pSceneObject->ExportSceneToLua(sceneName, m_PackageData->TempDataPath, registry);
+
+			if (!fs::exists(fs::path{ tilemap }) || !fs::exists(fs::path{ objectMap }))
+			{
+				F_ERROR("Failed to create scene files for scene '{}'", sceneName);
+				return {};
+			}
+
+			sceneFiles.push_back(tilemap);
+			sceneFiles.push_back(objectMap);
+		}
+
+		return sceneFiles;
 	}
 
 	void Packager::CopyFilesToDestination()

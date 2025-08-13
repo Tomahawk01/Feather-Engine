@@ -2,6 +2,7 @@
 
 #include "Core/CoreUtils/CoreUtilities.h"
 #include "FileSystem/Serializers/JSONSerializer.h"
+#include "FileSystem/Serializers/LuaSerializer.h"
 #include "Physics/PhysicsUtilities.h"
 
 namespace Feather {
@@ -308,6 +309,299 @@ namespace Feather {
 		// TODO: Add more members as needed
 
 		// NOTE: The UI Component is currently only used as a flag for UI Rendering
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const TransformComponent& transform)
+	{
+		serializer.StartNewTable("transform")
+			.StartNewTable("position", true)
+			.AddKeyValuePair("x", transform.position.x, false)
+			.AddKeyValuePair("y", transform.position.y, false, true)
+			.EndTable(false)
+			.StartNewTable("scale")
+			.AddKeyValuePair("x", transform.scale.x, false)
+			.AddKeyValuePair("y", transform.scale.y, false, true)
+			.EndTable(false)
+			.AddKeyValuePair("rotation", transform.rotation, false, true)
+			.EndTable();
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const SpriteComponent& sprite)
+	{
+		serializer.StartNewTable("sprite")
+			.AddKeyValuePair("width", sprite.width, true)
+			.AddKeyValuePair("height", sprite.height, false)
+			.AddKeyValuePair("startX", sprite.start_x, false)
+			.AddKeyValuePair("startY", sprite.start_y, false)
+			.AddKeyValuePair("layer", sprite.layer, false)
+			.AddKeyValuePair("texture_name", sprite.textureName, true, false, false, true)
+			.StartNewTable("uvs")
+			.AddKeyValuePair("u", sprite.uvs.u, false)
+			.AddKeyValuePair("v", sprite.uvs.v, false)
+			.AddKeyValuePair("uv_width", sprite.uvs.uv_width, false)
+			.AddKeyValuePair("uv_height", sprite.uvs.uv_height, false, true)
+			.EndTable(false)
+			.StartNewTable("color")
+			.AddKeyValuePair("r", static_cast<int>(sprite.color.r), false)
+			.AddKeyValuePair("g", static_cast<int>(sprite.color.g), false)
+			.AddKeyValuePair("b", static_cast<int>(sprite.color.b), false)
+			.AddKeyValuePair("a", static_cast<int>(sprite.color.a), false, true)
+			.EndTable(false)
+			.AddKeyValuePair("isHidden", sprite.isHidden, true)
+			.AddKeyValuePair("isIsometric", sprite.isIsometric, false)
+			.AddKeyValuePair("isoCellX", sprite.isoCellX, false)
+			.AddKeyValuePair("isoCellY", sprite.isoCellY, false, true)
+			.EndTable();
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const AnimationComponent& animation)
+	{
+		serializer.StartNewTable("animation")
+			.AddKeyValuePair("numFrames", animation.numFrames, false)
+			.AddKeyValuePair("frameRate", animation.frameRate, false)
+			.AddKeyValuePair("frameOffset", animation.frameOffset, false)
+			.AddKeyValuePair("isVertical", animation.isVertical, false)
+			.AddKeyValuePair("isLooped", animation.isLooped, false, true)
+			.EndTable(false);
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const BoxColliderComponent& boxCollider)
+	{
+		serializer.StartNewTable("boxCollider")
+			.AddKeyValuePair("width", boxCollider.width, false)
+			.AddKeyValuePair("height", boxCollider.height, false)
+			.StartNewTable("offset", false)
+			.AddKeyValuePair("x", boxCollider.offset.x, false)
+			.AddKeyValuePair("y", boxCollider.offset.y, false, true)
+			.EndTable(false)
+			.EndTable(false);
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const CircleColliderComponent& circleCollider)
+	{
+		serializer.StartNewTable("circleCollider")
+			.AddKeyValuePair("radius", circleCollider.radius, false)
+			.StartNewTable("offset", false)
+			.AddKeyValuePair("x", circleCollider.offset.x, false)
+			.AddKeyValuePair("y", circleCollider.offset.y, false, true)
+			.EndTable(false)
+			.EndTable(false);
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const TextComponent& text)
+	{
+		serializer.StartNewTable("text")
+			.AddKeyValuePair("text", text.textStr, true, false, false, true)
+			.AddKeyValuePair("fontName", text.fontName, true, false, false, true)
+			.AddKeyValuePair("padding", text.padding)
+			.AddKeyValuePair("wrap", text.wrap)
+			.AddKeyValuePair("isHidden", text.isHidden)
+			.StartNewTable("color")
+			.AddKeyValuePair("r", static_cast<int>(text.color.r))
+			.AddKeyValuePair("g", static_cast<int>(text.color.g))
+			.AddKeyValuePair("b", static_cast<int>(text.color.b))
+			.AddKeyValuePair("a", static_cast<int>(text.color.a))
+			.EndTable();
+		serializer.EndTable();
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const PhysicsComponent& physics)
+	{
+		const auto& attributes = physics.GetAttributes();
+		serializer.StartNewTable("physics")
+			.StartNewTable("attributes")
+			.AddKeyValuePair("type", GetRigidBodyTypeString(attributes.eType), false, false, false, true)
+			.AddKeyValuePair("density", attributes.density, false)
+			.AddKeyValuePair("friction", attributes.friction, false)
+			.AddKeyValuePair("restitution", attributes.restitution, false)
+			.AddKeyValuePair("restitutionThreshold", attributes.restitutionThreshold, false)
+			.AddKeyValuePair("radius", attributes.radius, false)
+			.AddKeyValuePair("gravityScale", attributes.gravityScale, true)
+			.StartNewTable("position")
+			.AddKeyValuePair("x", attributes.position.x, false)
+			.AddKeyValuePair("y", attributes.position.y, false)
+			.EndTable(false)
+			.StartNewTable("scale")
+			.AddKeyValuePair("x", attributes.scale.x, false)
+			.AddKeyValuePair("y", attributes.scale.y, false, true)
+			.EndTable(false)
+			.StartNewTable("boxSize")
+			.AddKeyValuePair("x", attributes.boxSize.x, false)
+			.AddKeyValuePair("y", attributes.boxSize.y, false, true)
+			.EndTable(false)
+			.StartNewTable("offset")
+			.AddKeyValuePair("x", attributes.offset.x, false)
+			.AddKeyValuePair("y", attributes.offset.y, false, true)
+			.EndTable(false)
+			.AddKeyValuePair("isCircle", attributes.isCircle, false)
+			.AddKeyValuePair("isBoxShape", attributes.isBoxShape, false)
+			.AddKeyValuePair("isFixedRotation", attributes.isFixedRotation, false)
+			.AddKeyValuePair("isTrigger", attributes.isTrigger, false)
+			.AddKeyValuePair("filterCategory", static_cast<unsigned>(attributes.filterCategory, false))
+			.AddKeyValuePair("filterMask", static_cast<unsigned>(attributes.filterMask, false))
+			.AddKeyValuePair("groupIndex", static_cast<int>(attributes.groupIndex, false))
+			.StartNewTable("objectData")
+			.AddKeyValuePair("tag", attributes.objectData.tag, false, false, false, true)
+			.AddKeyValuePair("group", attributes.objectData.group, false, false, false, true)
+			.AddKeyValuePair("isCollider", attributes.objectData.isCollider, false)
+			.AddKeyValuePair("isTrigger", attributes.objectData.isTrigger, false)
+			.AddKeyValuePair("isFriendly", attributes.objectData.isFriendly, false, true)
+			.EndTable(false)
+			.EndTable()
+			.EndTable();
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const RigidBodyComponent& rigidBody)
+	{
+		serializer.StartNewTable("rigidBody")
+			.StartNewTable("maxVelocity")
+			.AddKeyValuePair("x", rigidBody.maxVelocity.x)
+			.AddKeyValuePair("y", rigidBody.maxVelocity.y)
+			.EndTable()
+			.EndTable();
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const Identification& id)
+	{
+		serializer.StartNewTable("id")
+			.AddKeyValuePair("name", id.name, true, false, false, true)
+			.AddKeyValuePair("group", id.group, true, true, false, true)
+			.EndTable();
+	}
+
+	void ComponentSerializer::SerializeComponent(LuaSerializer& serializer, const UIComponent& ui)
+	{
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, TransformComponent& transform)
+	{
+		transform.position = glm::vec2{
+				table["position"]["x"].get_or(0.0f),
+				table["position"]["y"].get_or(0.0f)
+		};
+		transform.scale = glm::vec2{
+				table["scale"]["x"].get_or(0.0f),
+				table["scale"]["y"].get_or(0.0f)
+		};
+		transform.rotation = table["rotation"].get_or(0.0f);
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, SpriteComponent& sprite)
+	{
+		sprite.width = table["width"].get_or(0.0f);
+		sprite.height = table["height"].get_or(0.0f);
+		sprite.uvs = UVs{
+			.u = table["uvs"]["u"].get_or(0.0f),
+			.v = table["uvs"]["v"].get_or(0.0f),
+			.uv_width = table["uvs"]["uv_width"].get_or(0.0f),
+			.uv_height = table["uvs"]["uv_height"].get_or(0.0f)
+		};
+		sprite.start_x = table["startX"].get_or(0);
+		sprite.start_y = table["startY"].get_or(0);
+		sprite.layer = table["layer"].get_or(0);
+		sprite.isHidden = table["isHidden"].get_or(false);
+		sprite.textureName = table["texture_name"].get_or(std::string{ "" });
+
+		// Check if sprite should be isometic
+		if (table["isIsometric"].valid())
+		{
+			sprite.isIsometric = table["isIsometric"].get_or(false);
+
+			if (table["isoCellX"].valid())
+			{
+				sprite.isoCellX = table["isoCellX"].get_or(0);
+			}
+			if (table["isoCellY"].valid())
+			{
+				sprite.isoCellY = table["isoCellY"].get_or(0);
+			}
+		}
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, AnimationComponent& animation)
+	{
+		animation.numFrames = table["numFrames"].get_or(0);
+		animation.frameRate = table["frameRate"].get_or(0);
+		animation.frameOffset = table["frameOffset"].get_or(0);
+		animation.isVertical = table["isVertical"].get_or(false);
+		animation.isLooped = table["isLooped"].get_or(false);
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, BoxColliderComponent& boxCollider)
+	{
+		boxCollider.width = table["width"].get_or(0);
+		boxCollider.height = table["height"].get_or(0);
+		boxCollider.offset = glm::vec2{ table["offset"]["x"].get_or(0.0f), table["offset"]["y"].get_or(0.0f) };
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, CircleColliderComponent& circleCollider)
+	{
+		circleCollider.radius = table["radius"].get_or(0.0f);
+		circleCollider.offset = glm::vec2{ table["offset"]["x"].get_or(0.0f), table["offset"]["y"].get_or(0.0f) };
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, TextComponent& text)
+	{
+		text.textStr = table["text"].get_or(std::string{ "" });
+		text.fontName = table["fontName"].get_or(std::string{ "" });
+		text.padding = table["padding"].get_or(0);
+		text.wrap = table["wrap"].get_or(0.0f);
+		text.isHidden = table["isHidden"].get_or(false);
+		text.color = Color{ .r = static_cast<GLubyte>(table["color"]["r"].get_or(255U)),
+							.g = static_cast<GLubyte>(table["color"]["g"].get_or(255U)),
+							.b = static_cast<GLubyte>(table["color"]["b"].get_or(255U)),
+							.a = static_cast<GLubyte>(table["color"]["a"].get_or(255U))
+		};
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, PhysicsComponent& physics)
+	{
+		if (table["attributes"].valid())
+		{
+			const sol::table attr = table["attributes"];
+			PhysicsAttributes attributes{
+				.eType = GetRigidBodyTypeByString(attr["type"].get_or(std::string{ "" })),
+				.density = attr["density"].get_or(0.0f),
+				.friction = attr["friction"].get_or(0.0f),
+				.restitution = attr["restitution"].get_or(0.0f),
+				.restitutionThreshold = attr["restitutionThreshold"].get_or(0.0f),
+				.radius = attr["radius"].get_or(0.0f),
+				.gravityScale = attr["gravityScale"].get_or(1.0f),
+				.position = glm::vec2{ attr["position"]["x"].get_or(0.0f), attr["position"]["y"].get_or(0.0f) },
+				.scale = glm::vec2{ attr["scale"]["x"].get_or(1.0f), attr["scale"]["y"].get_or(1.0f) },
+				.boxSize = glm::vec2{ attr["boxSize"]["x"].get_or(0.0f), attr["boxSize"]["y"].get_or(0.0f) },
+				.offset = glm::vec2{ attr["offset"]["x"].get_or(0.0f), attr["offset"]["y"].get_or(0.0f) },
+				.isCircle = attr["isCircle"].get_or(false),
+				.isBoxShape = attr["isBoxShape"].get_or(false),
+				.isFixedRotation = attr["isFixedRotation"].get_or(false),
+				.isTrigger = attr["isTrigger"].get_or(false),
+				.filterCategory = static_cast<uint16_t>(attr["filterCategory"].get_or(0U)),
+				.filterMask = static_cast<uint16_t>(attr["filterMask"].get_or(0U)),
+				.groupIndex = static_cast<int16_t>(attr["groupIndex"].get_or(0U)),
+				.objectData = ObjectData{ attr["objectData"]["tag"].get_or(std::string{ "" }),
+										  attr["objectData"]["group"].get_or(std::string{ "" }),
+										  attr["objectData"]["isCollider"].get_or(false),
+										  attr["objectData"]["isTrigger"].get_or(false),
+										  attr["objectData"]["isFriendly"].get_or(false) } };
+
+			physics.GetChangableAttributes() = attributes;
+		}
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, RigidBodyComponent& rigidBody)
+	{
+		rigidBody.maxVelocity.x = table["maxVelocity"]["x"].get_or(0.0f);
+		rigidBody.maxVelocity.y = table["maxVelocity"]["y"].get_or(0.0f);
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, Identification& id)
+	{
+		id.name = table["name"].get_or(std::string{ "" });
+		id.group = table["group"].get_or(std::string{ "" });
+	}
+
+	void ComponentSerializer::DeserializeComponent(const sol::table& table, UIComponent& ui)
+	{
 	}
 
 }

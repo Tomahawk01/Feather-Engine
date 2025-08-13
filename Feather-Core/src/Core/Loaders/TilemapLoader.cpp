@@ -1,11 +1,13 @@
 #include "TilemapLoader.h"
+
 #include "Core/ECS/Components/ComponentSerializer.h"
 #include "Core/ECS/Registry.h"
 #include "Core/ECS/Entity.h"
 #include "FileSystem/Serializers/JSONSerializer.h"
+#include "FileSystem/Serializers/LuaSerializer.h"
 #include "Logger/Logger.h"
 
-#include "rapidjson/error/en.h"
+#include <rapidjson/error/en.h>
 
 #include <filesystem>
 
@@ -13,34 +15,22 @@ namespace Feather {
 
 	bool TilemapLoader::SaveTilemap(Registry& registry, const std::string& tilemapFile, bool useJson)
 	{
-		if (useJson)
-			return SaveTilemapJSON(registry, tilemapFile);
-
-		return false;
+		return useJson ? SaveTilemapJSON(registry, tilemapFile) : SaveTilemapLua(registry, tilemapFile);
 	}
 
 	bool TilemapLoader::LoadTilemap(Registry& registry, const std::string& tilemapFile, bool useJson)
 	{
-		if (useJson)
-			return LoadTilemapJSON(registry, tilemapFile);
-
-		return false;
+		return useJson ? LoadTilemapJSON(registry, tilemapFile) : LoadTilemapLua(registry, tilemapFile);
 	}
 
 	bool TilemapLoader::LoadGameObjects(Registry& registry, const std::string& objectMapFile, bool useJSON)
 	{
-		if (useJSON)
-			return LoadObjectMapJSON(registry, objectMapFile);
-
-		return false;
+		return useJSON ? LoadObjectMapJSON(registry, objectMapFile) : LoadObjectMapLua(registry, objectMapFile);
 	}
 
 	bool TilemapLoader::SaveGameObjects(Registry& registry, const std::string& objectMapFile, bool useJSON)
 	{
-		if (useJSON)
-			return SaveObjectMapJSON(registry, objectMapFile);
-
-		return false;
+		return useJSON ? SaveObjectMapJSON(registry, objectMapFile) : SaveObjectMapLua(registry, objectMapFile);
 	}
 
 	bool TilemapLoader::SaveTilemapJSON(Registry& registry, const std::string& tilemapFile)
@@ -479,6 +469,436 @@ namespace Feather {
 		}
 
 		mapFile.close();
+		return true;
+	}
+
+	bool TilemapLoader::SaveTilemapLua(Registry& registry, const std::string& tilemapFile)
+	{
+		std::unique_ptr<LuaSerializer> serializer{ nullptr };
+
+		try
+		{
+			serializer = std::make_unique<LuaSerializer>(tilemapFile);
+		}
+		catch (const std::exception& ex)
+		{
+			F_ERROR("Failed to save tilemap '{}': {}", tilemapFile, ex.what());
+			return false;
+		}
+
+		std::filesystem::path tilemapPath{ tilemapFile };
+		if (!std::filesystem::exists(tilemapPath))
+		{
+			F_ERROR("Failed to save tilemap: Filepath does not exist '{}'", tilemapFile);
+			return false;
+		}
+
+		serializer->StartNewTable(tilemapPath.stem().string());
+		serializer->StartNewTable("tilemap");
+
+		auto tiles = registry.GetRegistry().view<TileComponent>();
+
+		for (auto tile : tiles)
+		{
+			serializer->StartNewTable();
+			serializer->StartNewTable("components");
+			auto tileEnt{ Entity{registry, tile} };
+
+			const auto& transform = tileEnt.GetComponent<TransformComponent>();
+			SERIALIZE_COMPONENT(*serializer, transform);
+
+			const auto& sprite = tileEnt.GetComponent<SpriteComponent>();
+			SERIALIZE_COMPONENT(*serializer, sprite);
+
+			if (tileEnt.HasComponent<BoxColliderComponent>())
+			{
+				const auto& boxCollider = tileEnt.GetComponent<BoxColliderComponent>();
+				SERIALIZE_COMPONENT(*serializer, boxCollider);
+			}
+
+			if (tileEnt.HasComponent<CircleColliderComponent>())
+			{
+				const auto& circleCollider = tileEnt.GetComponent<CircleColliderComponent>();
+				SERIALIZE_COMPONENT(*serializer, circleCollider);
+			}
+
+			if (tileEnt.HasComponent<AnimationComponent>())
+			{
+				const auto& animation = tileEnt.GetComponent<AnimationComponent>();
+				SERIALIZE_COMPONENT(*serializer, animation);
+			}
+
+			if (tileEnt.HasComponent<PhysicsComponent>())
+			{
+				const auto& physics = tileEnt.GetComponent<PhysicsComponent>();
+				SERIALIZE_COMPONENT(*serializer, physics);
+			}
+
+			serializer->EndTable();
+			serializer->EndTable();
+		}
+
+		serializer->EndTable();
+		serializer->EndTable();
+
+		return serializer->FinishStream();
+	}
+
+	bool TilemapLoader::LoadTilemapLua(Registry& registry, const std::string& tilemapFile)
+	{
+		sol::state lua;
+		try
+		{
+			lua.safe_script_file(tilemapFile);
+		}
+		catch (const sol::error& err)
+		{
+			F_ERROR("Failed to load tilemap file '{}': {}", tilemapFile, err.what());
+			return false;
+		}
+
+		sol::optional<sol::table> maybeTiles = lua["tilemap"];
+		if (!maybeTiles)
+		{
+			F_ERROR("Failed to load tilemap file. \"tilemap\" table is missing or invalid");
+			return false;
+		}
+
+		for (const auto& [key, value] : *maybeTiles)
+		{
+			Entity newTile{ registry, "", "" };
+			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
+
+			if (!components)
+			{
+				F_ERROR("Failed to load object map file. \"components\" table is missing or invalid");
+				return false;
+			}
+
+			// Transform
+			const sol::table luaTransform = (*components)["transform"];
+			auto& transform = newTile.AddComponent<TransformComponent>();
+			DESERIALIZE_COMPONENT(luaTransform, transform);
+
+			// Sprite
+			const sol::table luaSprite = (*components)["sprite"];
+			auto& sprite = newTile.AddComponent<SpriteComponent>();
+			DESERIALIZE_COMPONENT(luaTransform, sprite);
+
+			sol::optional<sol::table> luaBoxCollider = (*components)["boxCollider"];
+			if (luaBoxCollider)
+			{
+				auto& boxCollider = newTile.AddComponent<BoxColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaBoxCollider, boxCollider);
+			}
+
+			sol::optional<sol::table> luaCircleCollider = (*components)["circleCollider"];
+			if (luaCircleCollider)
+			{
+				auto& circleCollider = newTile.AddComponent<CircleColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaCircleCollider, circleCollider);
+			}
+
+			sol::optional<sol::table> luaAnimations = (*components)["animation"];
+			if (luaAnimations)
+			{
+				auto& animation = newTile.AddComponent<AnimationComponent>();
+				DESERIALIZE_COMPONENT(*luaAnimations, animation);
+			}
+
+			sol::optional<sol::table> luaPhysics = (*components)["physics"];
+			if (luaPhysics)
+			{
+				auto& physics = newTile.AddComponent<PhysicsComponent>();
+				DESERIALIZE_COMPONENT(*luaPhysics, physics);
+			}
+
+			newTile.AddComponent<TileComponent>(TileComponent{ .id = static_cast<uint32_t>(newTile.GetEntity()) });
+		}
+
+		return true;
+	}
+
+	bool TilemapLoader::SaveObjectMapLua(Registry& registry, const std::string& objectMapFile)
+	{
+		std::unique_ptr<LuaSerializer> serializer{ nullptr };
+
+		try
+		{
+			serializer = std::make_unique<LuaSerializer>(objectMapFile);
+		}
+		catch (const std::exception& ex)
+		{
+			F_ERROR("Failed to save game objects '{}': {}", objectMapFile, ex.what());
+			return false;
+		}
+
+		std::filesystem::path objectPath{ objectMapFile };
+		if (!std::filesystem::exists(objectPath))
+		{
+			F_ERROR("Failed to save game objects: Filepath does not exist '{}'", objectMapFile);
+			return false;
+		}
+
+		serializer->StartNewTable(objectPath.stem().string());
+		serializer->StartNewTable("game_objects");
+
+		auto gameObjects = registry.GetRegistry().view<entt::entity>(entt::exclude<TileComponent, UneditableComponent>);
+
+		for (auto object : gameObjects)
+		{
+			serializer->StartNewTable();
+			serializer->StartNewTable("components");
+			auto objectEnt{ Entity{ registry, object } };
+
+			if (const auto* id = objectEnt.TryGetComponent<Identification>())
+			{
+				SERIALIZE_COMPONENT(*serializer, *id);
+			}
+
+			if (const auto* transform = objectEnt.TryGetComponent<TransformComponent>())
+			{
+				SERIALIZE_COMPONENT(*serializer, *transform);
+			}
+
+			if (const auto* sprite = objectEnt.TryGetComponent<SpriteComponent>())
+			{
+				SERIALIZE_COMPONENT(*serializer, *sprite);
+			}
+
+			if (objectEnt.HasComponent<BoxColliderComponent>())
+			{
+				const auto& boxCollider = objectEnt.GetComponent<BoxColliderComponent>();
+				SERIALIZE_COMPONENT(*serializer, boxCollider);
+			}
+
+			if (objectEnt.HasComponent<CircleColliderComponent>())
+			{
+				const auto& circleCollider = objectEnt.GetComponent<CircleColliderComponent>();
+				SERIALIZE_COMPONENT(*serializer, circleCollider);
+			}
+
+			if (objectEnt.HasComponent<AnimationComponent>())
+			{
+				const auto& animation = objectEnt.GetComponent<AnimationComponent>();
+				SERIALIZE_COMPONENT(*serializer, animation);
+			}
+
+			if (objectEnt.HasComponent<PhysicsComponent>())
+			{
+				const auto& physics = objectEnt.GetComponent<PhysicsComponent>();
+				SERIALIZE_COMPONENT(*serializer, physics);
+			}
+
+			if (auto* ui = objectEnt.TryGetComponent<UIComponent>())
+			{
+				SERIALIZE_COMPONENT(*serializer, *ui);
+			}
+
+			if (auto* relations = objectEnt.TryGetComponent<Relationship>())
+			{
+				serializer->StartNewTable("relationship");
+				if (relations->parent != entt::null)
+				{
+					Entity parent{ registry, relations->parent };
+					serializer->AddKeyValuePair("parent", parent.GetName(), false, false, false, true);
+				}
+				else
+				{
+					serializer->AddKeyValuePair("parent", std::string{ "" }, false, false, false, true);
+				}
+
+				if (relations->nextSibling != entt::null)
+				{
+					Entity nextSibling{ registry, relations->nextSibling };
+					serializer->AddKeyValuePair("nextSibling", nextSibling.GetName(), false, false, false, true);
+				}
+				else
+				{
+					serializer->AddKeyValuePair("nextSibling", std::string{ "" }, false, false, false, true);
+				}
+
+				if (relations->prevSibling != entt::null)
+				{
+					Entity prevSibling{ registry, relations->prevSibling };
+					serializer->AddKeyValuePair("prevSibling", prevSibling.GetName(), false, false, false, true);
+				}
+				else
+				{
+					serializer->AddKeyValuePair("prevSibling", std::string{ "" }, false, false, false, true);
+				}
+
+				if (relations->firstChild != entt::null)
+				{
+					Entity firstChild{ registry, relations->firstChild };
+					serializer->AddKeyValuePair("firstChild", firstChild.GetName(), false, false, false, true);
+				}
+				else
+				{
+					serializer->AddKeyValuePair("firstChild", std::string{ "" }, false, true, false, true);
+				}
+				serializer->EndTable(); // Relationship Object
+			}
+
+			serializer->EndTable(); // Components object
+			serializer->EndTable(); // End GameObject object
+		}
+
+		serializer->EndTable(); // GameObjects array
+		serializer->EndTable(); // Main table
+
+		return serializer->FinishStream();
+	}
+
+	bool TilemapLoader::LoadObjectMapLua(Registry& registry, const std::string& objectMapFile)
+	{
+		sol::state lua;
+
+		try
+		{
+			lua.safe_script_file(objectMapFile);
+		}
+		catch (const sol::error& err)
+		{
+			F_ERROR("Failed to load object map file '{}': {}", objectMapFile, err.what());
+			return false;
+		}
+
+		// Map of entity to relationships
+		std::map<entt::entity, SaveRelationship> mapEntityToRelationship;
+
+		sol::optional<sol::table> maybeObjects = lua["game_objects"];
+		if (!maybeObjects)
+		{
+			F_ERROR("Failed to load object map file: \"game_objects\" table is missing or invalid");
+			return false;
+		}
+
+		for (const auto& [key, value] : *maybeObjects)
+		{
+			Entity gameObject{ registry, "", "" };
+			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
+
+			if (!components)
+			{
+				F_ERROR("Failed to load object map file: \"components\" table is missing or invalid");
+				return false;
+			}
+
+			// Transform
+			const sol::table luaTransform = (*components)["transform"];
+			auto& transform = gameObject.AddComponent<TransformComponent>();
+			DESERIALIZE_COMPONENT(luaTransform, transform);
+
+			// Sprite
+			const sol::optional<sol::table> luaSprite = (*components)["transform"];
+			if (luaSprite)
+			{
+				auto& sprite = gameObject.AddComponent<SpriteComponent>();
+				DESERIALIZE_COMPONENT(*luaSprite, sprite);
+			}
+
+			const sol::optional<sol::table> luaBoxCollider = (*components)["boxCollider"];
+			if (luaBoxCollider)
+			{
+				auto& boxCollider = gameObject.AddComponent<BoxColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaBoxCollider, boxCollider);
+			}
+
+			const sol::optional<sol::table> luaCircleCollider = (*components)["circleCollider"];
+			if (luaCircleCollider)
+			{
+				auto& circleCollider = gameObject.AddComponent<CircleColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaCircleCollider, circleCollider);
+			}
+
+			const sol::optional<sol::table> luaAnimation = (*components)["animation"];
+			if (luaAnimation)
+			{
+				auto& animation = gameObject.AddComponent<AnimationComponent>();
+				DESERIALIZE_COMPONENT(*luaAnimation, animation);
+			}
+
+			const sol::optional<sol::table> luaPhysics = (*components)["physics"];
+			if (luaPhysics)
+			{
+				auto& physics = gameObject.AddComponent<PhysicsComponent>();
+				DESERIALIZE_COMPONENT(*luaPhysics, physics);
+			}
+
+			const sol::optional<sol::table> luaID = (*components)["id"];
+			if (luaID)
+			{
+				auto& id = gameObject.GetComponent<Identification>();
+				DESERIALIZE_COMPONENT(*luaID, id);
+			}
+
+			const sol::optional<sol::table> luaUI = (*components)["ui"];
+			if (luaUI)
+			{
+				auto& ui = gameObject.AddComponent<UIComponent>();
+				DESERIALIZE_COMPONENT(*luaUI, ui);
+			}
+
+			const sol::optional<sol::table> luaRelations = (*components)["relationship"];
+			if (luaRelations)
+			{
+				SaveRelationship saveRelations{};
+				saveRelations.Parent = (*luaRelations)["parent"].get_or(std::string{ "" });
+				saveRelations.NextSibling = (*luaRelations)["nextSibling"].get_or(std::string{ "" });
+				saveRelations.PrevSibling = (*luaRelations)["prevSibling"].get_or(std::string{ "" });
+				saveRelations.FirstChild = (*luaRelations)["firstChild"].get_or(std::string{ "" });
+
+				mapEntityToRelationship.emplace(gameObject.GetEntity(), saveRelations);
+			}
+		}
+
+		auto ids = registry.GetRegistry().view<Identification>(entt::exclude<TileComponent>);
+
+		auto findTag = [&](const std::string& sTag) {
+				auto parItr = std::ranges::find_if(ids, [&](const auto& e) {
+					Entity en{ registry, e };
+					return en.GetName() == sTag;
+				});
+
+				if (parItr != ids.end())
+				{
+					return *parItr;
+				}
+
+				return entt::entity{ entt::null };
+		};
+
+		for (auto& [entity, saveRelations] : mapEntityToRelationship)
+		{
+			Entity ent{ registry, entity };
+			auto& relations = ent.GetComponent<Relationship>();
+
+			// Find the parent
+			if (!saveRelations.Parent.empty())
+			{
+				relations.parent = findTag(saveRelations.Parent);
+			}
+
+			// Find the nextSibling
+			if (!saveRelations.NextSibling.empty())
+			{
+				relations.nextSibling = findTag(saveRelations.NextSibling);
+			}
+
+			// Find the prevSibling
+			if (!saveRelations.PrevSibling.empty())
+			{
+				relations.prevSibling = findTag(saveRelations.PrevSibling);
+			}
+
+			// Find the firstChild
+			if (!saveRelations.FirstChild.empty())
+			{
+				relations.firstChild = findTag(saveRelations.FirstChild);
+			}
+		}
+
 		return true;
 	}
 
