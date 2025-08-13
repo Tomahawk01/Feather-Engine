@@ -28,7 +28,7 @@ namespace Feather {
 		void PackageAssets(const rapidjson::Value& assets);
 
 	private:
-		void ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const std::string& assetNum, const std::string& inAssetFile, AssetType type);
+		void ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const std::string& assetName, const std::string& inAssetFile, AssetType type);
 
 		void CreateLuaAssetFiles(const std::string& projectPath, const rapidjson::Value& assets);
 		bool CompileLuaAssetFiles();

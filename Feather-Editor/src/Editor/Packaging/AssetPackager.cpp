@@ -47,7 +47,7 @@ namespace Feather {
 		}
 	}
 
-	void AssetPackager::ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const std::string& assetNum, const std::string& inAssetFile, AssetType type)
+	void AssetPackager::ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const std::string& assetName, const std::string& inAssetFile, AssetType type)
 	{
 		std::fstream in{ inAssetFile, std::ios::in | std::ios::binary };
 		if (!in.is_open())
@@ -61,8 +61,8 @@ namespace Feather {
 
 		try
 		{
-			luaSerializer.StartNewTable(assetNum)
-				.AddKeyValuePair("assetName", assetPath.stem().string(), true, false, false, true)
+			luaSerializer.StartNewTable()
+				.AddKeyValuePair("assetName", assetName, true, false, false, true)
 				.AddKeyValuePair("assetExt", assetPath.extension().string(), true, false, false, true)
 				.AddKeyValuePair("assetType", AssetTypeToString(type), true, false, false, true);
 
@@ -89,7 +89,7 @@ namespace Feather {
 		}
 		catch (const std::exception& ex)
 		{
-			throw std::runtime_error(std::format("Failed to write '{}' at path '{}' to asset file: {}", assetNum, inAssetFile, ex.what()));
+			throw std::runtime_error(std::format("Failed to write '{}' at path '{}' to asset file {}", assetName, inAssetFile, ex.what()));
 		}
 	}
 
