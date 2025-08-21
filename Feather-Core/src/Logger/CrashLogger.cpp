@@ -23,6 +23,19 @@ namespace fs = std::filesystem;
 
 namespace Feather {
 
+#ifdef _WIN32
+	LONG CALLBACK VectoredCrashHandler(PEXCEPTION_POINTERS ExceptionInfo)
+	{
+		if (ExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT)
+		{
+			CrashLogger::CrashHandler(-1);
+			return EXCEPTION_EXECUTE_HANDLER;
+		}
+
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+#endif
+
 	CrashLogger& CrashLogger::GetInstance()
 	{
 		static CrashLogger instance;
@@ -40,6 +53,10 @@ namespace Feather {
 		std::signal(SIGSEGV, CrashHandler);
 		// Abnormal termination (abort)
 		std::signal(SIGABRT, CrashHandler);
+
+#ifdef _WIN32
+		AddVectoredExceptionHandler(1, VectoredCrashHandler);
+#endif
 
 		m_Initialized = true;
 
@@ -103,6 +120,43 @@ namespace Feather {
 		outFile << lua_tostring(m_LuaState, -1) << "\n";
 		outFile << "------------------------------------------------------------\n";
 		lua_pop(m_LuaState, 1);
+	}
+
+	void CrashLogger::LaunchCrashReporter(const std::string& filename)
+	{
+#ifdef _WIN32
+		// Launch crash reporter executable
+		char exePath[MAX_PATH];
+		GetModuleFileNameA(nullptr, exePath, MAX_PATH);
+		std::string exeDir = std::string(exePath).substr(0, std::string(exePath).find_last_of("\\/"));
+
+		// Try multiple possible locations
+		std::vector<std::string> paths = {
+		   exeDir + "\\Feather-CrashReporter.exe",								// Same directory
+		   exeDir + "\\..\\Feather-CrashReporter\\Feather-CrashReporter.exe",	// Development structure
+		};
+
+		std::string crashReporterPath;
+		for (const auto& path : paths)
+		{
+			if (GetFileAttributesA(path.c_str()) != INVALID_FILE_ATTRIBUTES)
+			{
+				crashReporterPath = path;
+				break;
+			}
+		}
+
+		if (!crashReporterPath.empty())
+		{
+			STARTUPINFOA si = { sizeof(si) };
+			PROCESS_INFORMATION pi;
+			CreateProcessA(crashReporterPath.c_str(),
+						   const_cast<char*>(std::format("\"{}\" \"{}\"", crashReporterPath, filename).c_str()),
+						   nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+		}
+#endif
 	}
 
 	std::string CrashLogger::GetCurrentTimestamp()
@@ -264,51 +318,59 @@ namespace Feather {
 
 	void CrashLogger::CrashHandler(int signal)
 	{
-		ExtractCrashLocation();
-		std::string sTimestamp{ GetCurrentTimestamp() };
+		std::string filename{ "" };
 
-		std::ostringstream ss;
-
-		ss << "\n============================================================\n";
-		ss << "[CRITICAL] Program crashed! Signal: " << signal << " (" << sTimestamp << ")" << "\n";
-		ss << "============================================================\n";
-		ss << "\nCrash Detected:\n------------------------------------------------------------\n";
-		ss << "File: " << s_CrashFile << "\n";
-		ss << "Line: " << s_CrashLine << "\n";
-
-		std::cerr << ss.str();
-
-		PrintHighlightedSourceLine(std::cerr);
-
-		auto& crashLogger = GetInstance();
-		std::unique_ptr<std::ofstream> pLogFile{ nullptr };
-		const std::string sProjectPath{ crashLogger.GetProjectPath() };
-		if (!sProjectPath.empty())
 		{
-			// We want to open the file as an append, so we add new logs
-			pLogFile = std::make_unique<std::ofstream>(sProjectPath + PATH_SEPARATOR + "crash_log.txt", std::ios::app);
-		}
-		else // Create the log in the program folder
-		{
-			pLogFile = std::make_unique<std::ofstream>("crash_log.txt", std::ios::app);
-		}
+			ExtractCrashLocation();
+			std::string sTimestamp{ GetCurrentTimestamp() };
 
-		F_ASSERT(pLogFile && "Log File was not successfully created and opened");
+			std::ostringstream ss;
 
-		// There is no file to log to, finish log write to console and exit
-		if (!pLogFile)
-		{
-			F_ERROR("Failed to write to crash log file");
+			ss << "\n============================================================\n";
+			ss << "[CRITICAL] Program crashed! Signal: " << signal << " (" << sTimestamp << ")" << "\n";
+			ss << "============================================================\n";
+			ss << "\nCrash Detected:\n------------------------------------------------------------\n";
+			ss << "File: " << s_CrashFile << "\n";
+			ss << "Line: " << s_CrashLine << "\n";
+
+			std::cerr << ss.str();
+
+			PrintHighlightedSourceLine(std::cerr);
+
+			auto& crashLogger = GetInstance();
+			std::unique_ptr<std::ofstream> logFile{ nullptr };
+			const std::string projectPath{ crashLogger.GetProjectPath() };
+			if (!projectPath.empty())
+			{
+				filename = projectPath + PATH_SEPARATOR + "crash_log.txt";
+				// We want to open the file as an append, so we add new logs
+				logFile = std::make_unique<std::ofstream>(filename, std::ios::app);
+			}
+			else // Create the log in the program folder
+			{
+				filename = "crash_log.txt";
+				logFile = std::make_unique<std::ofstream>(filename, std::ios::app);
+			}
+
+			F_ASSERT(logFile && "Log File was not successfully created and opened");
+
+			// There is no file to log to, finish log write to console and exit
+			if (!logFile)
+			{
+				F_ERROR("Failed to write to crash log file");
+				crashLogger.LogLuaStackTrace(std::cerr);
+				std::exit(signal);
+				return;
+			}
+
+			*logFile << ss.str();
+			PrintHighlightedSourceLine(*logFile);
+
 			crashLogger.LogLuaStackTrace(std::cerr);
-			std::exit(signal);
-			return;
+			crashLogger.LogLuaStackTrace(*logFile);
 		}
 
-		*pLogFile << ss.str();
-		PrintHighlightedSourceLine(*pLogFile);
-
-		crashLogger.LogLuaStackTrace(std::cerr);
-		crashLogger.LogLuaStackTrace(*pLogFile);
+		LaunchCrashReporter(filename);
 
 		std::exit(signal);
 	}

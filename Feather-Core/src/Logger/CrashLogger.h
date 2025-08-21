@@ -36,6 +36,16 @@ namespace Feather {
 		inline void SetLuaState(lua_State* luaState) { m_LuaState = luaState; }
 		inline void SetUserDefinedCrashHandler(std::function<void(int)> func) { m_UserCrashHandlerFunc = func; }
 
+		/**
+		* @brief Handles program crashes by logging relevant debug information.
+		*
+		* Extracts the crash location, prints details to `stderr`, and writes them
+		* to a crash log file. Also logs the Lua stack trace before exiting.
+		*
+		* @param signal The crash signal received.
+		*/
+		static void CrashHandler(int signal);
+
 	private:
 		/**
 		 * Private constructor to enforce Singleton pattern
@@ -63,6 +73,13 @@ namespace Feather {
 		 * @param outFile The output file stream to write the Lua stack trace to.
 		 */
 		void LogLuaStackTrace(std::ofstream& outFile);
+
+		/*
+		* @brief Launches a separate executable that will display the current or last log entry to the user.
+		*
+		* @param filename The filename to the crash logs to be loaded.
+		*/
+		static void LaunchCrashReporter(const std::string& filename);
 
 		static std::string GetCurrentTimestamp();
 
@@ -102,16 +119,6 @@ namespace Feather {
 		 * @param out The output file to write the highlighted source line to.
 		 */
 		static void PrintHighlightedSourceLine(std::ofstream& outFile);
-
-		/**
-		 * @brief Handles program crashes by logging relevant debug information.
-		 *
-		 * Extracts the crash location, prints details to `stderr`, and writes them
-		 * to a crash log file. Also logs the Lua stack trace before exiting.
-		 *
-		 * @param signal The crash signal received.
-		 */
-		static void CrashHandler(int signal);
 
 	private:
 		/* User-defined crash handler function */

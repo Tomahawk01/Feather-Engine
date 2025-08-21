@@ -32,3 +32,4 @@ group ""
 
 include "Feather-Core/Build-Core.lua"
 include "Feather-Editor/Build-Editor.lua"
+include "Feather-CrashReporter/Build-CrashReporter.lua"
