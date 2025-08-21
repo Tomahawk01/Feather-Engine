@@ -16,6 +16,8 @@
 #include <Core/Scripting/InputManager.h>
 
 #include <Windowing/Window/Window.h>
+#include <Windowing/Input/Mouse.h>
+#include <Windowing/Input/Keyboard.h>
 #include <Physics/ContactListener.h>
 
 #include <Utils/ThreadPool.h>

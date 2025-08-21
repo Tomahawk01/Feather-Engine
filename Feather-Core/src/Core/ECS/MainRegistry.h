@@ -1,7 +1,6 @@
 #pragma once
-#include "Registry.h"
 
-#include <memory>
+#include "Registry.h"
 
 #define MAIN_REGISTRY() Feather::MainRegistry::GetInstance()
 #define ASSET_MANAGER() MAIN_REGISTRY().GetAssetManager()

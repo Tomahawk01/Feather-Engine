@@ -4,6 +4,10 @@ project "Feather-Core"
     cppdialect "C++20"
     staticruntime "off"
 
+    pchheader "CorePCH.h"
+    pchsource "src/CorePCH.cpp"
+    forceincludes { "CorePCH.h" }
+
     files
     {
         "**.h",

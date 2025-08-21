@@ -9,6 +9,8 @@
 #include "Core/Scripting/InputManager.h"
 #include "Core/CoreUtils/Prefab.h"
 #include "Core/Resources/AssetManager.h"
+#include "Windowing/Input/Mouse.h"
+#include "Windowing/Input/Keyboard.h"
 
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"

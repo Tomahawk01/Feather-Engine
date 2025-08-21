@@ -17,6 +17,7 @@
 #include "Renderer/Core/Renderer.h"
 #include "Renderer/Essentials/PickingTexture.h"
 #include "Windowing/Input/Mouse.h"
+#include "Windowing/Input/Keyboard.h"
 #include "Logger/Logger.h"
 
 #include "Editor/Systems/GridSystem.h"

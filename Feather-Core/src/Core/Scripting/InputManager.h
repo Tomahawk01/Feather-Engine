@@ -1,18 +1,19 @@
 #pragma once
 
-#include <memory>
-#include <sol/sol.hpp>
-
-#include "Windowing/Input/Keyboard.h"
-#include "Windowing/Input/Mouse.h"
-#include "Windowing/Input/Gamepad.h"
 #include "Core/ECS/Registry.h"
+
+#include <sol/sol.hpp>
+#include <SDL.h>
 
 constexpr int MAX_CONTROLLERS = 4;
 
 #define INPUT_MANAGER() Feather::InputManager::GetInstance()
 
 namespace Feather {
+
+	class Gamepad;
+	class Keyboard;
+	class Mouse;
 
 	class InputManager
 	{

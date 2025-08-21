@@ -1,5 +1,7 @@
 #include "UserDataBindings.h"
 
+#include "Physics/UserData.h"
+
 #include <entt.hpp>
 
 namespace Feather {

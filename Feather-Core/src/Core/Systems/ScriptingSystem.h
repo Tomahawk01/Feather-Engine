@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <sol/sol.hpp>
 
 namespace Feather {

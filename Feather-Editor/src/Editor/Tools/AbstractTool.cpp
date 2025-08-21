@@ -4,6 +4,7 @@
 #include "Core/Scripting/InputManager.h"
 #include "Core/ECS/Registry.h"
 #include "Renderer/Core/Camera2D.h"
+#include "Windowing/Input/Mouse.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
 #include "Editor/Scene/SceneObject.h"

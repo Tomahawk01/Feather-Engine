@@ -4,6 +4,10 @@ project "Feather-Editor"
     cppdialect "C++20"
     staticruntime "off"
 
+    pchheader "EditorPCH.h"
+    pchsource "src/EditorPCH.cpp"
+    forceincludes { "EditorPCH.h" }
+
     files
     {
         "**.h",
@@ -22,8 +26,8 @@ project "Feather-Editor"
 
     includedirs
     {
+        "%{wks.location}/Feather-Core/src", -- Should be first for PCH
         "src",
-        "%{wks.location}/Feather-Core/src",
         "%{wks.location}/vendor/SDL/include",
         "%{wks.location}/vendor/soil/include",
         "%{wks.location}/vendor/stb_image",
@@ -60,6 +64,8 @@ project "Feather-Editor"
         "SOIL",
         "libzippp.lib"
     }
+
+    dependson { "Feather-Core" }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")

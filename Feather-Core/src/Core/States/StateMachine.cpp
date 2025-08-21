@@ -1,5 +1,7 @@
 #include "StateMachine.h"
+
 #include "Logger/Logger.h"
+#include "Core/States/State.h"
 
 namespace Feather {
 

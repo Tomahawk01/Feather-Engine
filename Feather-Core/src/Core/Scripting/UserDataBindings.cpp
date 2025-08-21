@@ -1,5 +1,7 @@
 #include "UserDataBindings.h"
+
 #include "Logger/Logger.h"
+#include "Physics/UserData.h"
 #include "Core/ECS/MetaUtilities.h"
 
 namespace Feather {

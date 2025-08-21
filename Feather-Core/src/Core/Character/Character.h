@@ -2,8 +2,6 @@
 
 #include "Core/ECS/Entity.h"
 
-#include <optional>
-
 namespace Feather {
 
 	struct PhysicsAttributes;

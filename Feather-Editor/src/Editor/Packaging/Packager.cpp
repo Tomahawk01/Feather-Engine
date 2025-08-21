@@ -13,8 +13,6 @@
 
 #include <rapidjson/error/en.h>
 
-#include <ranges>
-
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 

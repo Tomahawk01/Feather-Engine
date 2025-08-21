@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 namespace Feather {
 
 	class Camera2D;

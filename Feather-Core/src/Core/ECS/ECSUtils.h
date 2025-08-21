@@ -2,8 +2,6 @@
 
 #include <entt.hpp>
 
-#include <string>
-
 namespace Feather {
 
 	class Registry;

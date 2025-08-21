@@ -1,6 +1,9 @@
 #include "InputManager.h"
 
 #include "Logger/Logger.h"
+#include "Windowing/Input/Keyboard.h"
+#include "Windowing/Input/Mouse.h"
+#include "Windowing/Input/Gamepad.h"
 #include "Renderer/Core/Camera2D.h"
 
 #include <glm/glm.hpp>

@@ -2,8 +2,6 @@
 
 #include "Utils/HelperUtilities.h"
 
-#include <vector>
-
 namespace Feather {
 
 	struct Tile;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Physics/UserData.h"
-
 #include <sol/sol.hpp>
 
 namespace Feather {
+
+	struct UserData;
 
 	struct UserDataBinder
 	{

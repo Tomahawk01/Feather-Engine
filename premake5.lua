@@ -14,6 +14,10 @@ workspace "Feather-Engine"
         "MultiProcessorCompile"
     }
 
+    filter { "files:%{wks.location}/vendor/**.cpp", "files:%{wks.location}/vendor/**.c" }
+        flags { "NoPCH" }
+    filter {}
+
     filter "system:windows"
         buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
 

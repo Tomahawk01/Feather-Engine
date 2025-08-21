@@ -1,8 +1,5 @@
 #pragma once
 
-#include <chrono>
-#include <unordered_map>
-
 #define CORE_GLOBALS() Feather::CoreEngineData::GetInstance()
 
 namespace Feather {

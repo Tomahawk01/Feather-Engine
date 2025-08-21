@@ -2,11 +2,6 @@
 
 #include <sol/sol.hpp>
 
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
-
 namespace Feather {
 
 	enum class EMapType;

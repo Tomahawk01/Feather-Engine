@@ -3,9 +3,9 @@
 #include <sol/sol.hpp>
 #include <entt.hpp>
 
-#include "Physics/ContactListener.h"
-
 namespace Feather {
+
+	class ContactListener;
 
 	class ContactListenerBinder
 	{

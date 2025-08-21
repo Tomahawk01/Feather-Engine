@@ -1,9 +1,10 @@
 #pragma once
-#include "State.h"
 
-#include <map>
+#include <sol/sol.hpp>
 
 namespace Feather {
+
+	struct State;
 
 	class StateMachine
 	{
