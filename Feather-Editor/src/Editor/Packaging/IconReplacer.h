@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <memory>
-
 namespace Feather {
 
 	class IconReplacer

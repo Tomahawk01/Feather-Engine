@@ -21,8 +21,6 @@
 
 #include <imgui.h>
 
-#include <format>
-
 using namespace entt::literals;
 
 namespace Feather {

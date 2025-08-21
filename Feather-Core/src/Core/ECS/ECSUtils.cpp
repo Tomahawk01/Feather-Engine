@@ -3,8 +3,6 @@
 #include "Components/AllComponents.h"
 #include "Entity.h"
 
-#include <ranges>
-
 namespace Feather {
 
 	entt::entity FindEntityByTag(Registry& registry, const std::string& tag)

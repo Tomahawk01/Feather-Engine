@@ -1,4 +1,5 @@
 #include "Window.h"
+
 #include "Logger/Logger.h"
 
 namespace Feather {

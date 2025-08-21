@@ -2,8 +2,6 @@
 
 #include "Utils/SDL_Wrappers.h"
 
-#include <string>
-
 namespace Feather {
 
 	class Window

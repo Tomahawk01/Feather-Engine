@@ -11,8 +11,6 @@
 #include "Renderer/Core/BatchRenderer.h"
 #include "Utils/HelperUtilities.h"
 
-#include <ranges>
-
 namespace Feather {
 
 	EditorRenderSystem::EditorRenderSystem()

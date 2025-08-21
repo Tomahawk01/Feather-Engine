@@ -18,8 +18,6 @@
 
 #include <imgui.h>
 
-#include <ranges>
-
 namespace Feather {
 
 	TileDetailsDisplay::TileDetailsDisplay()

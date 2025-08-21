@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Entity.h"
 #include "Logger/Logger.h"
 

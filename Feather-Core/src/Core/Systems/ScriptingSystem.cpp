@@ -43,8 +43,6 @@
 #include "Utils/HelperUtilities.h"
 #include "Utils/Tween.h"
 
-#include <filesystem>
-
 namespace Feather {
 
 	ScriptingSystem::ScriptingSystem()

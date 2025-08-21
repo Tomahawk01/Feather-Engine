@@ -1,11 +1,10 @@
 #include "FileProcessor.h"
+
 #include "Utils/FeatherUtilities.h"
 #include "Logger/Logger.h"
 
 #include <Windows.h>
 #include <shellapi.h>
-
-#include <format>
 
 namespace Feather {
 

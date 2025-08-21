@@ -3,10 +3,6 @@
 #include "Logger/Logger.h"
 #include "MathUtilities.h"
 
-#include <unordered_map>
-#include <functional>
-#include <cmath>
-
 namespace Feather {
 
 	/*

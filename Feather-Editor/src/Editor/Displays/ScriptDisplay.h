@@ -2,10 +2,6 @@
 
 #include "IDisplay.h"
 
-#include <vector>
-#include <string>
-#include <filesystem>
-
 namespace Feather {
 
 	class DirectoryWatcher;

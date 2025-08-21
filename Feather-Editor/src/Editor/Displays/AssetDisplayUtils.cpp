@@ -11,7 +11,6 @@
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 
 #include <imgui.h>
-#include <filesystem>
 
 #define IMAGE_FILTERS std::vector<const char*>{ "*.png", "*.bmp", "*.jpg" }
 #define FONT_FILTERS std::vector<const char*>{ "*.ttf" /* add more font types */ }

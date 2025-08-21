@@ -2,10 +2,6 @@
 
 #include "IDisplay.h"
 
-#include <string>
-#include <functional>
-#include <vector>
-
 namespace Feather {
 
 	class ProjectInfo;

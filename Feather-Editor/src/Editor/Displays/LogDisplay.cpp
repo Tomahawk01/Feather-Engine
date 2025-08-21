@@ -4,8 +4,6 @@
 
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
-#include <ranges>
-
 #include <imgui_stdlib.h>
 
 namespace Feather {

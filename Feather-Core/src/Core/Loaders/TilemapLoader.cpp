@@ -9,8 +9,6 @@
 
 #include <rapidjson/error/en.h>
 
-#include <filesystem>
-
 namespace Feather {
 
 	bool TilemapLoader::SaveTilemap(Registry& registry, const std::string& tilemapFile, bool useJson)

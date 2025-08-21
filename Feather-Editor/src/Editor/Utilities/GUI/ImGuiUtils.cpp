@@ -4,7 +4,6 @@
 
 #include <Windows.h>
 #include <shellapi.h>
-#include <unordered_map>
 
 #include <imgui_stdlib.h>
 #include <imgui_internal.h>

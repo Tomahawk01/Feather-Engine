@@ -1,10 +1,6 @@
 #include "Physics/PhysicsUtilities.h"
 #include "Utils/FeatherUtilities.h"
 
-#include <format>
-#include <map>
-#include <algorithm>
-
 namespace Feather {
 
 	static const std::map<std::string, RigidBodyType> StringToRigidBodyType{

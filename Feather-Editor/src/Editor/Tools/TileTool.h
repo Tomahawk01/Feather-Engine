@@ -1,4 +1,5 @@
 #pragma once
+
 #include "AbstractTool.h"
 #include "Core/ECS/Entity.h"
 

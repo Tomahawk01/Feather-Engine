@@ -7,10 +7,6 @@
 
 #include <sol/sol.hpp>
 
-#include <filesystem>
-#include <algorithm>
-#include <array>
-
 #ifdef _WIN32
 constexpr const std::string_view FIND_LUAC_COMMAND = "where luac";
 #else

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "IDisplay.h"
 
 namespace Feather {

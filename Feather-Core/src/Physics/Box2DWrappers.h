@@ -2,8 +2,6 @@
 
 #include <box2d/box2d.h>
 
-#include <memory>
-
 namespace Feather {
 
 	using PhysicsWorld = std::shared_ptr<b2World>;

@@ -2,8 +2,6 @@
 
 #include <box2d/box2d.h>
 
-#include <vector>
-
 namespace Feather {
 
     class BoxTraceCallback : public b2QueryCallback

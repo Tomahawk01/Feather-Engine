@@ -3,8 +3,6 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-#include <memory>
-
 namespace Feather {
 
 	struct SDL_Destroyer

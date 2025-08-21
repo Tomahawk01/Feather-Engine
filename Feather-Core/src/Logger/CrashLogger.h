@@ -1,8 +1,5 @@
 #pragma once
 
-#include <fstream>
-#include <functional>
-
 struct lua_State;
 
 #define FEATHER_CRASH_LOGGER() Feather::CrashLogger::GetInstance()

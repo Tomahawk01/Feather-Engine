@@ -1,8 +1,6 @@
 #include "FileSystemUtilities.h"
 
 #include <cstdio>
-#include <array>
-#include <memory>
 #include <stdexcept>
 
 namespace Feather {

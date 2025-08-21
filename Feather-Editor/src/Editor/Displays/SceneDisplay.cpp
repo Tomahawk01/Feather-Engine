@@ -34,7 +34,6 @@
 #include "Editor/Scene/SceneObject.h"
 
 #include <imgui.h>
-#include <thread>
 
 constexpr float TARGET_FRAME_TIME_F = 1.0f / 60.0f;
 constexpr double TARGET_FRAME_TIME = 1.0 / 60.0;

@@ -2,7 +2,6 @@
 
 #include <stdexcept>
 #include <initializer_list>
-#include <utility>
 
 #include <sol/sol.hpp>
 

@@ -4,8 +4,6 @@
 #include "Core/Resources/AssetManager.h"
 #include "Core/CoreUtils/ProjectInfo.h"
 
-#include <filesystem>
-
 #ifdef _WIN32
 static const std::unordered_set<std::string> g_setReservedSystemDirs
 {

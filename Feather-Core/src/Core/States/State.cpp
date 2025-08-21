@@ -1,4 +1,5 @@
 #include "State.h"
+
 #include "Logger/Logger.h"
 
 void Feather::State::CreateLuaStateBind(sol::state& lua)

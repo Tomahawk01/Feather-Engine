@@ -2,9 +2,6 @@
 
 #include "IDisplay.h"
 
-#include <string>
-#include <filesystem>
-
 namespace Feather {
 
 	enum class FileAction;

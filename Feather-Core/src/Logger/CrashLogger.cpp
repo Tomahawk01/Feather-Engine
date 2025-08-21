@@ -2,14 +2,10 @@
 
 #include "Logger/Logger.h"
 
-#include <iostream>
 #include <csignal> // For handling crash signals (SIGSEGV, SIGARBT)
-#include <chrono>
 #include <iomanip>
-#include <sstream>
 #include <sol/sol.hpp>
 #include <source_location>
-#include <filesystem>
 
 #ifdef _WIN32
 #include <windows.h>

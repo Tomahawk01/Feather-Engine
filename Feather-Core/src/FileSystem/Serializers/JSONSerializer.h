@@ -1,7 +1,6 @@
 #pragma once
-#include <rapidjson/prettywriter.h>
 
-#include <fstream>
+#include <rapidjson/prettywriter.h>
 
 namespace Feather {
 

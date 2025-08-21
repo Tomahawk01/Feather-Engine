@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 namespace Feather {
 
 	enum class AssetType;

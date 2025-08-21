@@ -1,7 +1,5 @@
 #pragma once
 
-#include <chrono>
-
 using namespace std::chrono;
 
 namespace Feather {

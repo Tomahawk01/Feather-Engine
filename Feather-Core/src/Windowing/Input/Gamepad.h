@@ -1,8 +1,5 @@
 #pragma once
 
-#include <map>
-#include <string>
-
 #include "Button.h"
 #include "GamepadButtons.h"
 #include "Utils/SDL_Wrappers.h"

@@ -2,9 +2,6 @@
 
 #include "Logger/Logger.h"
 
-#include <filesystem>
-#include <fstream>
-
 namespace Feather {
 
 	void LuaFilesystem::CreateLuaFileSystemBind(sol::state& lua)

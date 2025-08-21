@@ -1,9 +1,8 @@
 #pragma once
+
 #include "Editor/Tools/AbstractTool.h"
 
 #include <entt.hpp>
-
-#include <memory>
 
 namespace Feather {
 

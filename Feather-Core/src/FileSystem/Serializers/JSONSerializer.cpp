@@ -1,4 +1,5 @@
 #include "JSONSerializer.h"
+
 #include "Logger/Logger.h"
 
 constexpr int MAX_DECIMAL_PLACES = 5;

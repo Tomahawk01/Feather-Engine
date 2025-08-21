@@ -2,8 +2,6 @@
 
 #include "Logger/Logger.h"
 
-#include <thread>
-
 #ifdef _WIN32
 #include <Windows.h>
 #else

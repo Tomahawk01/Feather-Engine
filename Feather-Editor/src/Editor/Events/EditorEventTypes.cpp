@@ -1,7 +1,5 @@
 #include "EditorEventTypes.h"
 
-#include <map>
-
 namespace Feather {
 
 	static std::map<ComponentType, std::string> g_mapComponentToStr

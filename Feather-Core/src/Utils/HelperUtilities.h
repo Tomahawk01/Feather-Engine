@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 
 #define BASE_PATH          \
 	std::string            \

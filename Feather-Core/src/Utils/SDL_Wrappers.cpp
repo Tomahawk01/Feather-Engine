@@ -1,4 +1,5 @@
 #include "SDL_Wrappers.h"
+
 #include "Logger/Logger.h"
 
 void Feather::SDL_Destroyer::operator()(SDL_Window* window) const

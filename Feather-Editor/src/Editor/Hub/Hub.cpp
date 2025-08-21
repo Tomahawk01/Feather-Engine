@@ -19,8 +19,6 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <SDL_opengl.h>
 
-#include <filesystem>
-
 constexpr ImVec2 BUTTON_SIZE = ImVec2{ 100.0f, 20.0f };
 
 namespace Feather {

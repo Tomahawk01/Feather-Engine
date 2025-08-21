@@ -4,11 +4,6 @@
 
 #include <sol/sol.hpp>
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
 #define SCENE_MANAGER() Feather::EditorSceneManager::GetInstance()
 #define COMMAND_MANAGER() SCENE_MANAGER().GetCommandManager()
 #define TOOL_MANAGER() SCENE_MANAGER().GetToolManager()

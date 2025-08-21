@@ -2,9 +2,6 @@
 
 #include "IDisplay.h"
 
-#include <memory>
-#include <string>
-
 namespace Feather {
 
 	struct GameConfig;

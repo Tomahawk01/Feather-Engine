@@ -2,12 +2,6 @@
 
 #include <rapidjson/document.h>
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <thread>
-#include <shared_mutex>
-
 namespace Feather {
 
 	class ProjectInfo;

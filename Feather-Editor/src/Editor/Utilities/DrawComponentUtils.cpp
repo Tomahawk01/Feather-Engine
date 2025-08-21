@@ -14,8 +14,6 @@
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 
-#include <map>
-
 static constexpr std::string GetPhysicsBodyDescription(Feather::RigidBodyType type)
 {
 	switch (type)

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <variant>
 #include <stack>
 
 namespace Feather {

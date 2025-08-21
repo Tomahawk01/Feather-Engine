@@ -16,8 +16,6 @@
 #include "Editor/Commands/CommandManager.h"
 #include "Editor/Loaders/ProjectLoader.h"
 
-#include <filesystem>
-
 namespace Feather {
 
 	EditorSceneManager& EditorSceneManager::GetInstance()

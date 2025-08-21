@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <format>
-
 #include <imgui.h>
 
 constexpr ImVec4 LABEL_RED = ImVec4{ 0.92f, 0.18f, 0.05f, 1.0f };

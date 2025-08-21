@@ -9,7 +9,6 @@
 
 #include <glm/glm.hpp>
 #include <imgui.h>
-#include <cmath>
 
 namespace Feather {
 

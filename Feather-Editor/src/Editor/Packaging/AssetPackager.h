@@ -2,9 +2,6 @@
 
 #include <rapidjson/document.h>
 
-#include <string>
-#include <filesystem>
-
 namespace Feather {
 
 	enum class AssetType;

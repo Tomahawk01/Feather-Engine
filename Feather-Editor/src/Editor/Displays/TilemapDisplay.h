@@ -3,8 +3,6 @@
 
 #include "glm/glm.hpp"
 
-#include <string>
-
 namespace Feather {
 
 	struct KeyEvent;

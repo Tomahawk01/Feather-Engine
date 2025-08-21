@@ -1,8 +1,8 @@
 #include "Mouse.h"
 
-#include <SDL.h>
-
 #include "Logger/Logger.h"
+
+#include <SDL.h>
 
 namespace Feather {
 

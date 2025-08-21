@@ -2,9 +2,6 @@
 
 #include "Logger/Logger.h"
 
-#include <set>
-#include <algorithm>
-
 constexpr char SEPARATOR = ',';
 constexpr char INDENT = '\t';
 constexpr char NEW_LINE = '\n';

@@ -11,8 +11,6 @@
 #include "Renderer/Essentials/Texture.h"
 #include "Utils/HelperUtilities.h"
 
-#include <ranges>
-
 namespace Feather {
 
 	RenderSystem::RenderSystem()

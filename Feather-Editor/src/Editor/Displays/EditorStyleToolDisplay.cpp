@@ -1,6 +1,5 @@
 #include "EditorStyleToolDisplay.h"
 
-#include <algorithm>
 #include <imgui.h>
 
 namespace Feather {

@@ -21,8 +21,6 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-#include <filesystem>
-
 static const std::map<Feather::EProjectFolderType, std::string> mapProjectDirs = {
 		{ Feather::EProjectFolderType::Content,		"content" },
 		{ Feather::EProjectFolderType::Scripts,		"content/scripts" },
