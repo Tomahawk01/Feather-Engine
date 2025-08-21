@@ -62,7 +62,7 @@ namespace Feather {
 				return false;
 			}
 
-			const std::string contentPath = std::format("{}content{}", CORE_GLOBALS().GetProjectPath(), PATH_SEPARATOR);
+			const std::string contentPath = std::format("{}{}content{}", CORE_GLOBALS().GetProjectPath(), PATH_SEPARATOR, PATH_SEPARATOR);
 
 			for (const auto& [_, script] : *optScriptList)
 			{

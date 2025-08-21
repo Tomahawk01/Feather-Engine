@@ -13,8 +13,48 @@
 
 #include <rapidjson/error/en.h>
 
+#include <ranges>
+
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
+
+#ifdef DEBUG
+constexpr std::array<std::string_view, 16> CopyPackageFiles = {
+	"lua.dll",
+	//"ogg.dll",
+	//"Feather-CrashReporter.exe",
+	"Feather-Core.lib",
+	"SDL2_image.dll",
+	"SDL2_mixer.dll",
+	"SDL2.dll",
+	//"vorbis.dll",
+	//"vorbisfile.dll",
+	//"wavpackdll.dll",
+	"zlibd1.dll",
+	"bz2d.dll",
+	"zip.dll",
+	"libzippp.dll",
+	//"mpg123.dll"
+};
+#else
+constexpr std::array<std::string_view, 16> CopyPackageFiles = {		// TODO: Test this !!!
+	"lua.dll",
+	//"ogg.dll",
+	//"Feather-CrashReporter.exe",
+	"Feather-Core.lib",
+	"SDL2_image.dll",
+	"SDL2_mixer.dll",
+	"SDL2.dll",
+	//"vorbis.dll",
+	//"vorbisfile.dll",
+	//"wavpackdll.dll",
+	"zlib.dll",
+	"bz2.dll",
+	"zip.dll",
+	"libzippp.dll",
+	//"mpg123.dll"
+};
+#endif
 
 namespace Feather {
 
@@ -72,6 +112,281 @@ namespace Feather {
 
 	void Packager::RunPackager()
 	{
+		if (!m_PackageData)
+		{
+			F_ERROR("Failed to run packager");
+			return;
+		}
+
+		m_Packaging = true;
+
+		try
+		{
+			if (fs::exists(m_PackageData->TempDataPath))
+			{
+				auto numFiles = fs::remove_all(fs::path{ m_PackageData->TempDataPath });
+				if (numFiles > 0)
+				{
+					F_TRACE("Successfully deleted temp packaging files ({})", numFiles);
+				}
+			}
+		}
+		catch (const fs::filesystem_error& err)
+		{
+			F_ERROR("Failed to delete packaging temp data at path '{}': {}", m_PackageData->TempDataPath, err.what());
+			m_Packaging = false;
+			return;
+		}
+
+		try
+		{
+			UpdateProgress(0.0f, "Starting packaging");
+			if (fs::exists(fs::path{ m_PackageData->FinalDestination }))
+			{
+				F_ERROR("Failed to package game. '{}' directory already exists", m_PackageData->FinalDestination);
+				UpdateProgress(0.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			UpdateProgress(5.0f, "Creating package destination");
+			std::error_code ec;
+			if (!fs::create_directory(fs::path{ m_PackageData->FinalDestination }, ec))
+			{
+				F_ERROR("Failed to create directory '{}': {}", m_PackageData->FinalDestination, ec.message());
+				UpdateProgress(5.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			std::this_thread::sleep_for(1s);
+
+			UpdateProgress(10.0f, "Creating temp data");
+			if (!fs::exists(fs::path{ m_PackageData->TempDataPath }))
+			{
+				if (!fs::create_directory(m_PackageData->TempDataPath))
+				{
+					F_ERROR("Failed to create temporary data path at '{}'", m_PackageData->TempDataPath);
+					UpdateProgress(10.0f, "Packaging failed. Please see logs");
+					m_HasError = true;
+					return;
+				}
+			}
+
+			std::this_thread::sleep_for(1s);
+
+			UpdateProgress(25.0f, "Adding game lua scripts");
+			auto pScriptCompiler = std::make_unique<ScriptCompiler>();
+			auto optScriptListPath = m_PackageData->ProjectInfo->GetScriptListPath();
+			F_ASSERT(optScriptListPath && "Script List Path must be set");
+			if (!optScriptListPath)
+			{
+				F_ERROR("Failed to add scripts. Script list path was not set in the project info");
+				UpdateProgress(25.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			if (!pScriptCompiler->AddScripts(optScriptListPath->string()))
+			{
+				F_ERROR("Failed to add scripts");
+				UpdateProgress(25.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			UpdateProgress(50.0f, "Start asset copying");
+
+			auto optProjectFilePath = m_PackageData->ProjectInfo->GetProjectFilePath();
+			F_ASSERT(optProjectFilePath && "Project File path must be set in project info");
+			if (!optProjectFilePath)
+			{
+				F_ERROR("Failed to open project file. Project file path was not set in the project info");
+				UpdateProgress(50.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			// NOTE: Read in the files from the json project file
+			std::ifstream procFile;
+			procFile.open(optProjectFilePath->string());
+
+			if (!procFile.is_open())
+			{
+				F_ERROR("Failed to open project file '{}'", optProjectFilePath->string());
+				UpdateProgress(50.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			std::stringstream ss;
+			ss << procFile.rdbuf();
+			std::string contents = ss.str();
+			rapidjson::StringStream jsonStr{ contents.c_str() };
+
+			rapidjson::Document doc;
+			doc.ParseStream(jsonStr);
+
+			if (doc.HasParseError() || !doc.IsObject())
+			{
+				F_ERROR("Failed to load Project: file '{}' is not valid JSON, Error: {}, Offset: {}", optProjectFilePath->string(), rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
+				UpdateProgress(50.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			// NOTE: Get the project data
+			if (!doc.HasMember("project_data"))
+			{
+				F_ERROR("Failed to load project: file '{}'. Expecting \"project_data\" member in project file", optProjectFilePath->string());
+				UpdateProgress(50.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			const rapidjson::Value& projectData = doc["project_data"];
+
+			// NOTE: Load all assets
+			if (!projectData.HasMember("assets"))
+			{
+				F_ERROR("Failed to load project: file '{}'. Expecting \"assets\" member in project file", optProjectFilePath->string());
+				UpdateProgress(50.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			const rapidjson::Value& assets = projectData["assets"];
+
+			if (m_PackageData->GameConfig->packageAssets)
+			{
+				UpdateProgress(60.0f, "Starting packaging of assets");
+				AssetPackagerParams assetPackagerParams{
+					.TempFilePath = m_PackageData->TempDataPath,
+					.DestinationPath = m_PackageData->FinalDestination + PATH_SEPARATOR + "assets",
+					.ProjectPath = m_PackageData->ProjectInfo->GetProjectPath().string() };
+
+				AssetPackager assetPackager{ assetPackagerParams, m_ThreadPool };
+
+				assetPackager.PackageAssets(assets);
+			}
+			else
+			{
+				UpdateProgress(60.0f, "Creating asset defs luac file");
+				std::string sAssetDefsFile = CreateAssetDefsFile(m_PackageData->TempDataPath, assets);
+				if (!fs::exists(sAssetDefsFile))
+				{
+					F_ERROR("Failed to create asset defs file");
+					UpdateProgress(60.0f, "Packaging failed. Please see logs");
+					m_HasError = true;
+					return;
+				}
+
+				UpdateProgress(65.0f, "Adding asset defs file to script compiler");
+				if (!pScriptCompiler->AddScript(sAssetDefsFile))
+				{
+					F_ERROR("Failed to find the assetDefs.lua file at path '{}'", sAssetDefsFile);
+					UpdateProgress(65.0f, "Packaging failed. Please see logs");
+					m_HasError = true;
+					return;
+				}
+			}
+
+			UpdateProgress(70.0f, "Start packaging of all scenes");
+			// We need to load all the scenes
+			if (!assets.HasMember("scenes"))
+			{
+				F_ERROR("Failed to load project: file '{}'. Expecting \"scenes\" member in project file", optProjectFilePath->string());
+
+				UpdateProgress(70.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			UpdateProgress(75.0f, "Creating scene Files");
+			const rapidjson::Value& scenes = assets["scenes"];
+			auto sceneFiles = CreateSceneFiles(m_PackageData->TempDataPath, scenes);
+
+			if (sceneFiles.empty())
+			{
+				F_ERROR("Failed to create scene files or scene files are invalid");
+				UpdateProgress(75.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			for (const auto& sSceneFile : sceneFiles)
+			{
+				if (!pScriptCompiler->AddScript(sSceneFile))
+				{
+					F_ERROR("Failed to add scene file [{}] to scripts to be compiled", sSceneFile);
+					UpdateProgress(75.0f, "Packaging failed. Please see logs");
+					m_HasError = true;
+					return;
+				}
+			}
+
+			UpdateProgress(80.0f, "Adding main lua script");
+
+			auto optMainLuaScript = m_PackageData->ProjectInfo->GetMainLuaScriptPath();
+			F_ASSERT(optMainLuaScript && "Main Lua script not set in the project info");
+			if (!optMainLuaScript)
+			{
+				F_ERROR("Failed to add main.lua script. Path not set in the project info");
+				UpdateProgress(80.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			if (!fs::exists(*optMainLuaScript))
+			{
+				F_ERROR("Failed to find the main.lua file at path '{}'", optMainLuaScript->string());
+				UpdateProgress(80.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			if (!pScriptCompiler->AddScript(optMainLuaScript->string()))
+			{
+				F_ERROR("Failed to add main.lua script");
+				m_HasError = true;
+				return;
+			}
+
+			pScriptCompiler->SetOutputFileName(std::format("{}{}master.luac", m_PackageData->TempDataPath, PATH_SEPARATOR));
+
+			UpdateProgress(85.0f, "Compiling game lua scripts");
+			pScriptCompiler->Compile();
+
+			UpdateProgress(87.0f, "Creating config.lua file");
+			std::string sConfigFile = CreateConfigFile(m_PackageData->TempDataPath);
+
+			if (!fs::exists(sConfigFile))
+			{
+				F_ERROR("Failed to create config file while packaging");
+				UpdateProgress(87.0f, "Packaging failed. Please see logs");
+				m_HasError = true;
+				return;
+			}
+
+			pScriptCompiler->ClearScripts();
+			pScriptCompiler->AddScript(sConfigFile);
+			pScriptCompiler->SetOutputFileName(std::format("{}{}config.luac", m_PackageData->TempDataPath, PATH_SEPARATOR));
+			UpdateProgress(90.0f, "Compiling config file");
+			pScriptCompiler->Compile();
+		}
+		catch (const std::exception& ex)
+		{
+			F_ERROR("Failed to package game: {}", ex.what());
+			UpdateProgress(0.0f, "Packaging failed. Please see logs");
+			m_HasError = true;
+			return;
+		}
+
+		UpdateProgress(95.0f, "Copying necessary files to packaged game destination");
+		CopyFilesToDestination();
+
+		UpdateProgress(100.0f, "Packaging Complete");
+		m_Packaging = false;
 	}
 
 	void Packager::UpdateProgress(float percent, std::string_view message)

@@ -19,7 +19,11 @@ namespace Feather {
 		virtual void Draw() override;
 
 	private:
+		bool CanPackageGame() const;
+
+	private:
 		std::unique_ptr<GameConfig> m_GameConfig;
+		std::unique_ptr<class Packager> m_Packager;
 		std::string m_DestinationPath;
 		std::string m_ScriptListPath;
 		std::string m_FileIconPath;
@@ -30,6 +34,7 @@ namespace Feather {
 		bool m_Titlebar;
 
 		bool m_ScriptListExist;
+		bool m_PackageHasErrors;
 	};
 
 }
