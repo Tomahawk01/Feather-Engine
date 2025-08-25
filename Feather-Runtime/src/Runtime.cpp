@@ -487,7 +487,7 @@ namespace Feather {
 					{
 						if (!assetManager.AddFontFromMemory(fontAsset->name, fontAsset->assetData.data(), fontAsset->assetSize))
 						{
-							F_ERROR("Failed to add music '{}' from memory", fontAsset->name);
+							F_ERROR("Failed to add font '{}' from memory", fontAsset->name);
 						}
 					}
 					break;

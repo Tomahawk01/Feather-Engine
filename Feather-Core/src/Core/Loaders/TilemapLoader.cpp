@@ -63,9 +63,12 @@ namespace Feather {
 			DESERIALIZE_COMPONENT(luaTransform, transform);
 
 			// Sprite
-			const sol::table luaSprite = (*components)["sprite"];
-			auto& sprite = newTile.AddComponent<SpriteComponent>();
-			DESERIALIZE_COMPONENT(luaSprite, sprite);
+			sol::optional<sol::table> optLuaSprite = (*components)["sprite"];
+			if (optLuaSprite)
+			{
+				auto& sprite = newTile.AddComponent<SpriteComponent>();
+				DESERIALIZE_COMPONENT(*optLuaSprite, sprite);
+			}
 
 			sol::optional<sol::table> luaBoxCollider = (*components)["boxCollider"];
 			if (luaBoxCollider)
