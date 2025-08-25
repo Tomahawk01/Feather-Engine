@@ -149,6 +149,11 @@ namespace Feather {
 			throw std::runtime_error("Failed to initialize Main Registry");
 		}
 
+		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
+		{
+			throw std::runtime_error("Failed to create default fonts");
+		}
+
 		mainRegistry.AddToContext<std::shared_ptr<sol::state>>(std::move(luaState));
 
 		if (!LoadShaders())

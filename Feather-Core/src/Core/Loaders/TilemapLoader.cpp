@@ -175,6 +175,20 @@ namespace Feather {
 				auto& physics = newTile.AddComponent<PhysicsComponent>();
 				DESERIALIZE_COMPONENT(*luaPhysics, physics);
 			}
+
+			sol::optional<sol::table> optLuaText = (*components)["text"];
+			if (optLuaText)
+			{
+				auto& text = newTile.AddComponent<TextComponent>();
+				DESERIALIZE_COMPONENT(*optLuaText, text);
+			}
+
+			sol::optional<sol::table> optUI = (*components)["ui"];
+			if (optUI)
+			{
+				auto& ui = newTile.AddComponent<UIComponent>();
+				DESERIALIZE_COMPONENT(*optUI, ui);
+			}
 		}
 
 		return true;
@@ -844,6 +858,11 @@ namespace Feather {
 			if (auto* ui = objectEnt.TryGetComponent<UIComponent>())
 			{
 				SERIALIZE_COMPONENT(*serializer, *ui);
+			}
+
+			if (auto* text = objectEnt.TryGetComponent<TextComponent>())
+			{
+				SERIALIZE_COMPONENT(*serializer, *text);
 			}
 
 			if (auto* relations = objectEnt.TryGetComponent<Relationship>())
