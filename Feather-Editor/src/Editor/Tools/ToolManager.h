@@ -66,6 +66,7 @@ namespace Feather {
 
 		bool SetupTools(SceneObject* sceneObject, Camera2D* camera);
 
+		const bool IsGridSnapEnabled();
 		void EnableGridSnap(bool enable);
 
 		std::vector<EventDispatcher*> GetDispatchers();

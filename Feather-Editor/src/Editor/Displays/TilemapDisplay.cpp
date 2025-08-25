@@ -46,6 +46,9 @@ namespace Feather {
 		ADD_EVENT_HANDLER(KeyEvent, &TilemapDisplay::HandleKeyPressedEvent, *this);
 	}
 
+	TilemapDisplay::~TilemapDisplay()
+	{}
+
 	void TilemapDisplay::Draw()
 	{
 		if (!ImGui::Begin(ICON_FA_MAP " Tilemap Editor"))

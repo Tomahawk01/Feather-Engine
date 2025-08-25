@@ -10,6 +10,7 @@
 
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Loaders/ProjectLoader.h"
 #include "Editor/Packaging/Packager.h"
@@ -65,6 +66,14 @@ namespace Feather {
 
 	void PackageGameDisplay::Draw()
 	{
+		if (auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>())
+		{
+			if (!editorState->IsDisplayOpen(EDisplay::PackagerView))
+			{
+				return;
+			}
+		}
+
 		if (!ImGui::Begin(ICON_FA_ARCHIVE " Package Game"))
 		{
 			ImGui::End();

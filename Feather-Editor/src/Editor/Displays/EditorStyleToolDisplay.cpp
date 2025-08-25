@@ -4,6 +4,15 @@
 
 namespace Feather {
 
+	EditorStyleToolDisplay::EditorStyleToolDisplay()
+	{}
+
+	void EditorStyleToolDisplay::Draw()
+	{
+		DrawSizePicker();
+		DrawColorPicker();
+	}
+
 	void EditorStyleToolDisplay::DrawSizePicker()
 	{
 		if (!ImGui::Begin("Editor Size Styles"))
@@ -137,16 +146,6 @@ namespace Feather {
 
 		ImGui::PopItemWidth();
 		ImGui::End();
-	}
-
-	EditorStyleToolDisplay::EditorStyleToolDisplay()
-	{
-	}
-
-	void EditorStyleToolDisplay::Draw()
-	{
-		DrawSizePicker();
-		DrawColorPicker();
 	}
 
 }

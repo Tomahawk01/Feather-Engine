@@ -13,6 +13,7 @@
 #include "FileSystem/Serializers/LuaSerializer.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/fonts/IconsFontAwesome5.h"
 #include "Editor/Events/EditorEventTypes.h"
@@ -44,6 +45,14 @@ namespace Feather {
 
 	void ContentDisplay::Draw()
 	{
+		if (auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>())
+		{
+			if (!editorState->IsDisplayOpen(EDisplay::ContentBrowser))
+			{
+				return;
+			}
+		}
+
 		if (!ImGui::Begin(ICON_FA_FOLDER " Content Browser"))
 		{
 			ImGui::End();

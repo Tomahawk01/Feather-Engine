@@ -9,6 +9,7 @@
 #include "Utils/FeatherUtilities.h"
 
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Utilities/EditorState.h"
 
 #include <imgui.h>
 
@@ -59,6 +60,14 @@ namespace Feather {
 
 	void ScriptDisplay::Draw()
 	{
+		if (auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>())
+		{
+			if (!editorState->IsDisplayOpen(EDisplay::ScriptListView))
+			{
+				return;
+			}
+		}
+
 		if (!ImGui::Begin(ICON_FA_CODE " Script List"))
 		{
 			ImGui::End();

@@ -172,7 +172,7 @@ namespace Feather {
 
 		if (doc.HasParseError() || !doc.IsObject())
 		{
-			F_ERROR("Failed to load prefab file: '{}' is not valid JSON. - {} - {}", prefabPath, rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
+			F_ERROR("Failed to load prefab file: '{}' is not valid JSON, Error: {}, Offset: {}", prefabPath, rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
 			return false;
 		}
 

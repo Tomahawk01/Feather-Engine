@@ -31,6 +31,7 @@ namespace Feather {
 
 		inline void EnableGridSnap() { m_GridSnap = true; }
 		inline void DisableGridSnap() { m_GridSnap = false; }
+		inline const bool IsGridSnapEnabled() const { return m_GridSnap; }
 
 		inline Tile& GetTileData() { return *m_MouseTile; }
 

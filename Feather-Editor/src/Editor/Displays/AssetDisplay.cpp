@@ -15,6 +15,7 @@
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 #include "Editor/Scene/SceneManager.h"
@@ -46,6 +47,14 @@ namespace Feather {
 
 	void AssetDisplay::Draw()
 	{
+		if (auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>())
+		{
+			if (!editorState->IsDisplayOpen(EDisplay::AssetBrowser))
+			{
+				return;
+			}
+		}
+
 		if (!ImGui::Begin(ICON_FA_FILE_ALT " Assets"))
 		{
 			ImGui::End();

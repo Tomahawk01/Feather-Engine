@@ -31,6 +31,9 @@ namespace Feather {
 		void SetWindowName(const std::string& name);
 
 	private:
+		void CreateNewWindow(Uint32 flags);
+
+	private:
 		WindowPtr m_Window;
 		SDL_GLContext m_GLContext;
 		std::string m_Title;
@@ -39,8 +42,6 @@ namespace Feather {
 		int m_XPos;
 		int m_YPos;
 		Uint32 m_WindowFlags;
-	private:
-		void CreateNewWindow(Uint32 flags);
 	};
 
 }

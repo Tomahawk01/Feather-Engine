@@ -39,6 +39,7 @@
 #include "Editor/Displays/ProjectSettingsDisplay.h"
 
 #include "Editor/Utilities/editor_textures.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Utilities/EditorFramebuffers.h"
 #include "Editor/Utilities/DrawComponentUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
@@ -183,6 +184,7 @@ namespace Feather {
 		}
 
 		mainRegistry.AddToContext<ProjectInfoPtr>(std::make_shared<ProjectInfo>());
+		mainRegistry.AddToContext<EditorStatePtr>(std::make_shared<EditorState>());
 		m_Hub = std::make_unique<Hub>(*m_Window);
 
 		return true;
@@ -533,6 +535,14 @@ namespace Feather {
 
     void Application::CleanUp()
     {
+		// Save the editor state
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>();
+		editorState->Save(*projectInfo);
+
+		SDL_GL_DeleteContext(m_Window->GetGLContext());
+		SDL_DestroyWindow(m_Window->GetWindow().get());
+
 		SDL_Quit();
     }
 
@@ -657,14 +667,15 @@ namespace Feather {
 			const auto logNodeId = ImGui::DockBuilderSplitNode(centerNodeId, ImGuiDir_Down, 0.25f, nullptr, &centerNodeId);
 			auto tileLayerId = ImGui::DockBuilderSplitNode(rightNodeId, ImGuiDir_Down, 0.25f, nullptr, &rightNodeId);
 
-			ImGui::DockBuilderDockWindow("Object Details", rightNodeId);
-			ImGui::DockBuilderDockWindow("Tileset", rightNodeId);
-			ImGui::DockBuilderDockWindow("Tile Details", rightNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_LIST " Object Details", rightNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_TH " Tileset", rightNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_CLIPBOARD_LIST " Tile Details", rightNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_LAYER_GROUP " Tile Layers", tileLayerId);
 			ImGui::DockBuilderDockWindow(ICON_FA_SITEMAP " Scene Hierarchy", leftNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_IMAGE " Scene", centerNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_CODE " Script List", centerNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_ARCHIVE " Package Game", centerNodeId);
+			ImGui::DockBuilderDockWindow(ICON_FA_COG " Project Settings", centerNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_MAP " Tilemap Editor", centerNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_TERMINAL " Logs", logNodeId);
 			ImGui::DockBuilderDockWindow(ICON_FA_FILE_ALT " Assets", logNodeId);

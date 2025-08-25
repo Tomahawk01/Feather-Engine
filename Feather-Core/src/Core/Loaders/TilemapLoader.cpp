@@ -285,7 +285,7 @@ namespace Feather {
 
 		if (doc.HasParseError() || !doc.IsObject())
 		{
-			F_ERROR("Failed to load tilemap file. '{}' is not valid JSON: {} - {}", tilemapFile, rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
+			F_ERROR("Failed to load tilemap file. '{}' is not valid JSON, Error: {}, Offset: {}", tilemapFile, rapidjson::GetParseError_En(doc.GetParseError()), doc.GetErrorOffset());
 			return false;
 		}
 

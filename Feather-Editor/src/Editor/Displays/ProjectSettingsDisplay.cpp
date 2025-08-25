@@ -9,6 +9,7 @@
 #include "Renderer/Essentials/Texture.h"
 
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
 
 #include <imgui.h>
@@ -31,6 +32,14 @@ namespace Feather {
 
 	void ProjectSettingsDisplay::Draw()
 	{
+		if (auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>())
+		{
+			if (!editorState->IsDisplayOpen(EDisplay::GameSettingsView))
+			{
+				return;
+			}
+		}
+
 		ImGui::Begin(ICON_FA_COG " Project Settings");
 		const float leftWidth = 250.0f;
 

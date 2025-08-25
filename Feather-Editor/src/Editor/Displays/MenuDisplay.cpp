@@ -16,6 +16,7 @@
 #include "Editor/Tools/ToolManager.h"
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Loaders/ProjectLoader.h"
 #include "Editor/Events/EditorEventTypes.h"
 
@@ -70,27 +71,22 @@ namespace Feather {
 			if (ImGui::BeginMenu(ICON_FA_EDIT " Edit"))
 			{
 				auto& coreGlobals = CORE_GLOBALS();
+				auto& toolManager = TOOL_MANAGER();
 
-				static bool gridSnap{ true };
+				bool gridSnap{ toolManager.IsGridSnapEnabled() };
 				if (ImGui::Checkbox("Enable Gridsnap", &gridSnap))
-					SCENE_MANAGER().GetToolManager().EnableGridSnap(gridSnap);
+					toolManager.EnableGridSnap(gridSnap);
 
-				static bool showCollision{ coreGlobals.RenderCollidersEnabled() };
+				bool showCollision{ coreGlobals.RenderCollidersEnabled() };
 				if (ImGui::Checkbox("Show Collision", &showCollision))
 				{
-					if (showCollision)
-						coreGlobals.EnableColliderRender();
-					else
-						coreGlobals.DisableColliderRender();
+					showCollision ? coreGlobals.EnableColliderRender() : coreGlobals.DisableColliderRender();
 				}
 
-				static bool showAnimations{ coreGlobals.AnimationRenderEnabled() };
+				bool showAnimations{ coreGlobals.AnimationRenderEnabled() };
 				if (ImGui::Checkbox("Show Animations", &showAnimations))
 				{
-					if (showAnimations)
-						coreGlobals.EnableAnimationRender();
-					else
-						coreGlobals.DisableAnimationRender();
+					showAnimations ? coreGlobals.EnableAnimationRender() : coreGlobals.DisableAnimationRender();
 				}
 
 				ImGui::EndMenu();
@@ -98,7 +94,13 @@ namespace Feather {
 
 			if (ImGui::BeginMenu(ICON_FA_WINDOW_MAXIMIZE " Displays"))
 			{
-				// TODO: Open and close specific displays
+				auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>();
+				DrawDisplayItem(*editorState, ICON_FA_FILE_ALT " Asset Browser", EDisplay::AssetBrowser);
+				DrawDisplayItem(*editorState, ICON_FA_FOLDER " Content Browser", EDisplay::ContentBrowser);
+				DrawDisplayItem(*editorState, ICON_FA_CODE " Script List", EDisplay::ScriptListView);
+				DrawDisplayItem(*editorState, ICON_FA_ARCHIVE " Package Game", EDisplay::PackagerView);
+				DrawDisplayItem(*editorState, ICON_FA_TERMINAL " Console Logger", EDisplay::Console);
+				DrawDisplayItem(*editorState, ICON_FA_COG " Project Settings", EDisplay::GameSettingsView);
 
 				ImGui::EndMenu();
 			}
@@ -256,6 +258,23 @@ namespace Feather {
 			}
 
 			ImGui::EndMainMenuBar();
+		}
+	}
+
+	void MenuDisplay::DrawDisplayItem(EditorState& editorState, const std::string& displayName, const EDisplay display)
+	{
+		bool displayEnabled{ editorState.IsDisplayOpen(display) };
+		if (ImGui::Selectable(displayName.c_str(), false, ImGuiSelectableFlags_DontClosePopups))
+		{
+			displayEnabled = !displayEnabled;
+			editorState.SetDisplay(display, displayEnabled);
+		}
+
+		if (displayEnabled)
+		{
+			ImGui::SameLine();
+			ImGui::SetCursorPosX(150.0f);
+			ImGui::Text(ICON_FA_CHECK);
 		}
 	}
 

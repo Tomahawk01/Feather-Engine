@@ -15,6 +15,7 @@
 #include "Filesystem/Serializers/LuaSerializer.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
+#include "Editor/Utilities/EditorState.h"
 #include "Editor/Scene/SceneManager.h"
 #include "Editor/Scene/SceneObject.h"
 
@@ -423,6 +424,13 @@ namespace Feather {
 			coreGlobals.SetGravity(physics["gravityScale"].GetFloat());
 			coreGlobals.SetVelocityIterations(physics["velocityIterations"].GetInt());
 			coreGlobals.SetPositionIterations(physics["positionIterations"].GetInt());
+		}
+
+		auto& editorState = mainRegistry.GetContext<EditorStatePtr>();
+		if (!editorState->Load(*projectInfo))
+		{
+			F_ERROR("Failed to load editor state");
+			return false;
 		}
 
 		return true;

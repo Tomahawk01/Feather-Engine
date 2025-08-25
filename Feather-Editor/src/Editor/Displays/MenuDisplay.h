@@ -4,6 +4,9 @@
 
 namespace Feather {
 
+	class EditorState;
+	enum class EDisplay : uint64_t;
+
 	class MenuDisplay : public IDisplay
 	{
 	public:
@@ -13,6 +16,7 @@ namespace Feather {
 		virtual void Draw() override;
 
 	private:
+		void DrawDisplayItem(EditorState& editorState, const std::string& displayName, const EDisplay display);
 	};
 
 }

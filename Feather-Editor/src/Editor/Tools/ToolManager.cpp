@@ -158,6 +158,12 @@ namespace Feather {
 		return true;
 	}
 
+	const bool ToolManager::IsGridSnapEnabled()
+	{
+		const auto* tool = GetActiveTool();
+		return tool ? tool->IsGridSnapEnabled() : false;
+	}
+
 	void ToolManager::EnableGridSnap(bool enable)
 	{
 		for (auto& tool : m_mapTools)

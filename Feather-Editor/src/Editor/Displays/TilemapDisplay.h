@@ -14,7 +14,7 @@ namespace Feather {
 	{
 	public:
 		TilemapDisplay();
-		~TilemapDisplay() = default;
+		virtual ~TilemapDisplay();
 
 		virtual void Draw() override;
 		virtual void Update() override;

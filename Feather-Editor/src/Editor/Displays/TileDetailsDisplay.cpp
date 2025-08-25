@@ -39,7 +39,7 @@ namespace Feather {
 		if (!activeTool)
 			return;
 
-		if (!ImGui::Begin("Tile Details") || !currentScene)
+		if (!ImGui::Begin(ICON_FA_CLIPBOARD_LIST " Tile Details") || !currentScene)
 		{
 			ImGui::End();
 			return;
