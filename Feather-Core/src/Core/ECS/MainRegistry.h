@@ -13,6 +13,7 @@ namespace Feather {
 	class MusicPlayer;
 	class SoundFXPlayer;
 
+	class Renderer;
 	class RenderSystem;
 	class RenderUISystem;
 	class RenderShapeSystem;
@@ -30,6 +31,7 @@ namespace Feather {
 		AssetManager& GetAssetManager();
 		MusicPlayer& GetMusicPlayer();
 		SoundFXPlayer& GetSoundPlayer();
+		Renderer& GetRenderer();
 
 		template<typename TContext>
 		TContext AddToContext(TContext context)
@@ -48,6 +50,7 @@ namespace Feather {
 		RenderShapeSystem& GetRenderShapeSystem();
 		AnimationSystem& GetAnimationSystem();
 		PhysicsSystem& GetPhysicsSystem();
+		Registry* GetRegistry();
 
 		EventDispatcher& GetEventDispatcher();
 

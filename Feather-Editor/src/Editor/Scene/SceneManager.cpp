@@ -66,14 +66,14 @@ namespace Feather {
 		}
 
 		const std::string& sDataPath{ sceneItr->second->GetSceneDataPath() };
-		std::filesystem::path dataPath{ sDataPath };
+		fs::path dataPath{ sDataPath };
 
-		if (std::filesystem::exists(dataPath.parent_path()) && std::filesystem::is_directory(dataPath.parent_path()))
+		if (fs::exists(dataPath.parent_path()) && fs::is_directory(dataPath.parent_path()))
 		{
 			if (dataPath.parent_path().stem().string() == sceneName)
 			{
 				std::error_code ec;
-				if (!std::filesystem::remove_all(dataPath.parent_path(), ec))
+				if (!fs::remove_all(dataPath.parent_path(), ec))
 				{
 					F_ERROR("Failed to delete scene '{}' and remove files", sceneName, ec.message());
 					return false;
@@ -82,7 +82,7 @@ namespace Feather {
 		}
 
 		// Recheck if the path exists
-		if (std::filesystem::exists(dataPath.parent_path()))
+		if (fs::exists(dataPath.parent_path()))
 		{
 			F_ERROR("Failed to delete scene '{}' and remove files", sceneName);
 			return false;

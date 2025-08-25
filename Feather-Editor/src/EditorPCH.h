@@ -28,3 +28,5 @@
 #include <atomic>
 #include <mutex>
 #include <shared_mutex>
+
+namespace fs = std::filesystem;

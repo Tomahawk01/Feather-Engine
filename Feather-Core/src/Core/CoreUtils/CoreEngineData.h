@@ -36,14 +36,17 @@ namespace Feather {
 		inline void EnableColliderRender() { m_RenderColliders = true; }
 		inline void DisableColliderRender() { m_RenderColliders = false; }
 		inline bool RenderCollidersEnabled() const { return m_RenderColliders; }
+		inline void ToggleRenderCollisions() { m_RenderColliders = !m_RenderColliders; }
 
 		inline void EnableAnimationRender() { m_RenderAnimations = true; }
 		inline void DisableAnimationRender() { m_RenderAnimations = false; }
 		inline bool AnimationRenderEnabled() const { return m_RenderAnimations; }
+		inline void ToggleRenderAnimations() { m_RenderAnimations = !m_RenderAnimations; }
 
 		inline float ScaledWidth() const { return m_ScaledWidth; }
 		inline float ScaledHeight() const { return m_ScaledHeight; }
 
+		// Physics
 		inline int32_t GetVelocityIterations() const { return m_VelocityIterations; }
 		inline int32_t GetPositionIterations() const { return m_PositionIterations; }
 

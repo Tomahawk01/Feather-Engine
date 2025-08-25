@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Core/ECS/Registry.h"
-
 namespace Feather {
 
 	struct SpriteLayerParams;

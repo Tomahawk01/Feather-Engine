@@ -26,7 +26,22 @@ namespace Feather {
 
 	AssetType StringToAssetType(const std::string& assetType)
 	{
-		return AssetType();
+		if (assetType == "TEXTURE")
+			return AssetType::TEXTURE;
+		else if (assetType == "FONT")
+			return AssetType::FONT;
+		else if (assetType == "SOUNDFX")
+			return AssetType::SOUNDFX;
+		else if (assetType == "MUSIC")
+			return AssetType::MUSIC;
+		else if (assetType == "SCENE")
+			return AssetType::SCENE;
+		else if (assetType == "SHADER")
+			return AssetType::SHADER;
+		else if (assetType == "PREFAB")
+			return AssetType::PREFAB;
+
+		return AssetType::NO_TYPE;
 	}
 
 	std::string GetSubstring(std::string_view str, std::string_view find)

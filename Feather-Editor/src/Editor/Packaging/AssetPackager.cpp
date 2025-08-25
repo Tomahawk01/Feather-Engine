@@ -308,7 +308,7 @@ namespace Feather {
 				for (const auto& jsonValue : assetArray.GetArray())
 				{
 					std::string path{ contentPath + PATH_SEPARATOR + jsonValue["path"].GetString() };
-					ConvertAssetToLuaTable(*luaSerializer, {}, path, assetType);
+					ConvertAssetToLuaTable(*luaSerializer, jsonValue["name"].GetString(), path, assetType);
 				}
 			}
 			catch (const std::exception& ex)

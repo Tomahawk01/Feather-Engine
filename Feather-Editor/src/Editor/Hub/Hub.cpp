@@ -36,11 +36,11 @@ namespace Feather {
 		, m_PrevProjectPath{}
 		, m_PrevProjectName{}
 	{
-		std::filesystem::path projectPath{ m_NewProjectPath };
-		if (!std::filesystem::exists(projectPath))
+		fs::path projectPath{ m_NewProjectPath };
+		if (!fs::exists(projectPath))
 		{
 			std::error_code ec;
-			if (!std::filesystem::create_directories(projectPath, ec))
+			if (!fs::create_directories(projectPath, ec))
 			{
 				F_ERROR("HUB - Failed to create directories. Error: {}", ec.message());
 				m_State = HubState::Close;
@@ -182,11 +182,11 @@ namespace Feather {
 
 		if (!m_NewProjectName.empty() && !m_NewProjectPath.empty())
 		{
-			std::filesystem::path projectPath{ m_NewProjectPath };
+			fs::path projectPath{ m_NewProjectPath };
 
-			if (std::filesystem::exists(projectPath))
+			if (fs::exists(projectPath))
 			{
-				if (IsReservedPathOrFile(std::filesystem::path{ m_NewProjectPath }))
+				if (IsReservedPathOrFile(fs::path{ m_NewProjectPath }))
 				{
 					ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, "Path '%s' is a reserved path. Please change paths.", m_NewProjectPath.c_str());
 				}
@@ -250,12 +250,12 @@ namespace Feather {
 				strcpy(prevProjectBuffer, filepath.c_str());
 #endif
 				m_PrevProjectPath = filepath;
-				std::filesystem::path path{ filepath };
+				fs::path path{ filepath };
 				m_PrevProjectName = path.stem().string();
 			}
 		}
 
-		if (!m_PrevProjectPath.empty() && std::filesystem::exists(std::filesystem::path{ m_PrevProjectPath }))
+		if (!m_PrevProjectPath.empty() && fs::exists(fs::path{ m_PrevProjectPath }))
 		{
 			ImGui::SetCursorPos(ImVec2{ 300.0f, 482.0f });
 			if (ImGui::Button("Load Project", BUTTON_SIZE))

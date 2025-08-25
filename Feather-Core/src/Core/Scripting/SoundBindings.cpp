@@ -42,8 +42,8 @@ namespace Feather {
 			"stop", [&]() { musicPlayer.Stop(); },
 			"pause", [&]() { musicPlayer.Pause(); },
 			"resume", [&]() { musicPlayer.Resume(); },
-			"set_volume", [&](int volume) { musicPlayer.SetVolume(volume); },
-			"is_playing", [&]() { return musicPlayer.IsPlaying(); }
+			"setVolume", [&](int volume) { musicPlayer.SetVolume(volume); },
+			"isPlaying", [&]() { return musicPlayer.IsPlaying(); }
 		);
 
 		auto& soundFxPlayer = mainRegistry.GetSoundPlayer();
@@ -74,8 +74,8 @@ namespace Feather {
 				}
 			),
 			"stop", [&](int channel) { soundFxPlayer.Stop(channel); },
-			"set_volume", [&](int channel, int volume) { soundFxPlayer.SetVolume(channel, volume); },
-			"is_playing", [&](int channel) { return soundFxPlayer.IsPlaying(channel); }
+			"setVolume", [&](int channel, int volume) { soundFxPlayer.SetVolume(channel, volume); },
+			"isPlaying", [&](int channel) { return soundFxPlayer.IsPlaying(channel); }
 		);
 	}
 

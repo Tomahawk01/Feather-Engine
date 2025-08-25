@@ -13,8 +13,6 @@ constexpr const std::string_view FIND_LUAC_COMMAND = "where luac";
 constexpr const std::string_view FIND_LUAC_COMMAND = "which luac";
 #endif
 
-namespace fs = std::filesystem;
-
 namespace Feather {
 
 	ScriptCompiler::ScriptCompiler()

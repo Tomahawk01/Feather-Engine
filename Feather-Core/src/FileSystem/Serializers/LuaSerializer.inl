@@ -71,7 +71,16 @@ namespace Feather {
 	template<Streamable T>
 	inline void LuaSerializer::Stream(const T& val)
 	{
-		m_FileStream << val;
+		if constexpr (std::is_same_v<T, bool>)
+		{
+			auto flags = m_FileStream.flags(); // save stream state
+			m_FileStream << std::boolalpha << val;
+			m_FileStream.flags(flags); // restore
+		}
+		else
+		{
+			m_FileStream << val;
+		}
 	}
 
 }

@@ -20,8 +20,8 @@ using namespace std::chrono_literals;
 constexpr std::array<std::string_view, 16> CopyPackageFiles = {
 	"lua.dll",
 	//"ogg.dll",
-	//"Feather-CrashReporter.exe",
-	"Feather-Core.lib",
+	"Feather-CrashReporter.exe",
+	"Feather-Runtime.exe",
 	"SDL2_image.dll",
 	"SDL2_mixer.dll",
 	"SDL2.dll",
@@ -38,8 +38,8 @@ constexpr std::array<std::string_view, 16> CopyPackageFiles = {
 constexpr std::array<std::string_view, 16> CopyPackageFiles = {		// TODO: Test this !!!
 	"lua.dll",
 	//"ogg.dll",
-	//"Feather-CrashReporter.exe",
-	"Feather-Core.lib",
+	"Feather-CrashReporter.exe",
+	"Feather-Runtime.exe",
 	"SDL2_image.dll",
 	"SDL2_mixer.dll",
 	"SDL2.dll",

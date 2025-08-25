@@ -627,14 +627,21 @@ namespace Feather {
 				}
 				else
 				{
+					auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+					std::string copyrightNotice{};
+					if (projectInfo)
+					{
+						copyrightNotice = projectInfo->GetCopyRightNotice();
+					}
+
 					LuaSerializer lw{ filename };
 
-					lw.AddWords(className + " = {}")
-						.AddWords(className + ".__index = " + className, true)
-						.AddWords("function " + className + ":Create(params)", true)
-						.AddWords("local this = {}", true, true)
-						.AddWords("setmetatable(this, self)", true, true)
-						.AddWords("return this", true, true)
+					lw.AddBlockComment(!copyrightNotice.empty() ? copyrightNotice : "Add Copyright notice here.");
+					lw.AddWords(className + std::format(" = F_Class(\"{}\")", className))
+						.AddWords("function " + className + ":Init(params)", true)
+						.AddWords("params = params or {}", true, true)
+						.AddWords("-- TODO: Add necessary params", true, true)
+						.AddWords("-- EX: self.health = params.health or 10", true, true)
 						.AddWords("end", true);
 
 					errorText.clear();

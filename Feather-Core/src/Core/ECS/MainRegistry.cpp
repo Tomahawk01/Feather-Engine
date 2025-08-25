@@ -44,12 +44,14 @@ namespace Feather {
 
         // Enable alpha blending
         renderer->SetCapability(Renderer::GLCapability::BLEND, true);
-        renderer->SetCapability(Renderer::GLCapability::DEPTH_TEST, true);
         renderer->SetBlendCapability(
             Renderer::BlendingFactors::SRC_ALPHA,
             Renderer::BlendingFactors::ONE_MINUS_SRC_ALPHA
         );
-        renderer->SetLineWidth(4.0f);
+
+#ifdef IN_FEATHER_EDITOR
+        renderer->SetCapability(Renderer::GLCapability::DEPTH_TEST, true);
+#endif
 
         if (!AddToContext<std::shared_ptr<Renderer>>(renderer))
         {
@@ -129,6 +131,12 @@ namespace Feather {
         return *m_MainRegistry->GetContext<std::shared_ptr<SoundFXPlayer>>();
     }
 
+    Renderer& MainRegistry::GetRenderer()
+    {
+        F_ASSERT(m_Initialized && "Main Registry must be initialized before use");
+        return *m_MainRegistry->GetContext<std::shared_ptr<Renderer>>();
+    }
+
     RenderSystem& MainRegistry::GetRenderSystem()
     {
         F_ASSERT(m_Initialized && "Main Registry must be initialized before use");
@@ -157,6 +165,14 @@ namespace Feather {
     {
         F_ASSERT(m_Initialized && "Main Registry must be initialized before use");
         return *m_MainRegistry->GetContext<std::shared_ptr<PhysicsSystem>>();
+    }
+
+    Registry* MainRegistry::GetRegistry()
+    {
+        if (!m_MainRegistry)
+            m_MainRegistry = std::make_unique<Registry>();
+
+        return m_MainRegistry.get();
     }
 
     EventDispatcher& MainRegistry::GetEventDispatcher()

@@ -1,12 +1,12 @@
-project "Feather-Editor"
+project "Feather-Runtime"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++20"
     staticruntime "off"
 
-    pchheader "EditorPCH.h"
-    pchsource "src/EditorPCH.cpp"
-    forceincludes { "EditorPCH.h" }
+    pchheader "RuntimePCH.h"
+    pchsource "src/RuntimePCH.cpp"
+    forceincludes { "RuntimePCH.h" }
 
     files
     {
@@ -18,10 +18,7 @@ project "Feather-Editor"
     defines
     {
         "_CRT_SECURE_NO_WARNINGS",
-        "NOMINMAX",
-
-        -- NOTE: Custom defines for the Feather Engine
-        "IN_FEATHER_EDITOR"
+        "NOMINMAX"
     }
 
     includedirs
@@ -38,8 +35,6 @@ project "Feather-Editor"
         "%{wks.location}/vendor/lua_5.4.2/include",
         "%{wks.location}/vendor/sol3",
         "%{wks.location}/vendor/box2d/include",
-        "%{wks.location}/vendor/ImGui/src",
-        "%{wks.location}/vendor/rapidjson/include",
         "%{wks.location}/vendor/libzippp/include"
     }
 
@@ -60,12 +55,9 @@ project "Feather-Editor"
         "lua54.lib",
         "Glad",
         "Box2D",
-        "ImGui",
         "SOIL",
         "libzippp.lib"
     }
-
-    dependson { "Feather-Core" }
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
@@ -73,8 +65,6 @@ project "Feather-Editor"
     filter "system:windows"
         systemversion "latest"
         defines { "WINDOWS" }
-        files { "%{wks.location}/resources/feather.rc", "**.ico" }
-        vpaths { ["resources/*"] = { "*.rc", "**.ico" } }
 
     filter "configurations:Debug"
         defines { "DEBUG" }

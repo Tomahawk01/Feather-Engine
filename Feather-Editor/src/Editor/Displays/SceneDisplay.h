@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IDisplay.h"
-#include "Core/ECS/Registry.h"
 
 namespace Feather {
 

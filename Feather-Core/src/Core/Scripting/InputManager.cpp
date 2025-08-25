@@ -33,10 +33,10 @@ namespace Feather {
         lua.new_usertype<Keyboard>(
             "Keyboard",
             sol::no_constructor,
-            "just_pressed", [&](int key) { return keyboard.IsKeyJustPressed(key); },
-            "just_released", [&](int key) { return keyboard.IsKeyJustReleased(key); },
+            "justPressed", [&](int key) { return keyboard.IsKeyJustPressed(key); },
+            "justReleased", [&](int key) { return keyboard.IsKeyJustReleased(key); },
             "pressed", [&](int key) { return keyboard.IsKeyPressed(key); },
-            "pressed_keys", [&]()
+            "pressedKeys", [&]()
             {
                 std::vector<int> keys;
                 for (const auto& [key, button] : keyboard.GetButtonMap())
@@ -54,28 +54,28 @@ namespace Feather {
         lua.new_usertype<Mouse>(
             "Mouse",
             sol::no_constructor,
-            "just_pressed", [&](int btn) { return mouse.IsButtonJustPressed(btn); },
-            "just_released", [&](int btn) { return mouse.IsButtonJustReleased(btn); },
+            "justPressed", [&](int btn) { return mouse.IsButtonJustPressed(btn); },
+            "justReleased", [&](int btn) { return mouse.IsButtonJustReleased(btn); },
             "pressed", [&](int btn) { return mouse.IsButtonPressed(btn); },
-            "screen_position", [&]()
+            "screenPosition", [&]()
             {
                 auto [x, y] = mouse.GetMouseScreenPosition();
                 return glm::vec2{ x, y };
             },
-            "world_position", [&]()
+            "worldPosition", [&]()
             {
                 auto [x, y] = mouse.GetMouseScreenPosition();
                 return camera->ScreenCoordsToWorld(glm::vec2{ x, y });
             },
-            "wheel_x", [&]() { return mouse.GetMouseWheelX(); },
-            "wheel_y", [&]() { return mouse.GetMouseWheelY(); }
+            "wheelX", [&]() { return mouse.GetMouseWheelX(); },
+            "wheelY", [&]() { return mouse.GetMouseWheelY(); }
         );
 #endif
 
         lua.new_usertype<Gamepad>(
             "Gamepad",
             sol::no_constructor,
-            "just_pressed", [&](int index, int btn)
+            "justPressed", [&](int index, int btn)
             {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
@@ -85,7 +85,7 @@ namespace Feather {
                 }
                 return gamepad->IsButtonJustPressed(btn);
             },
-            "just_released", [&](int index, int btn)
+            "justReleased", [&](int index, int btn)
             {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
@@ -105,7 +105,7 @@ namespace Feather {
                 }
                 return gamepad->IsButtonPressed(btn);
             },
-            "get_axis_position", [&](int index, int axis)
+            "getAxisPosition", [&](int index, int axis)
             {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
@@ -115,7 +115,7 @@ namespace Feather {
                 }
                 return gamepad->GetAxisPosition(axis);
             },
-            "get_hat_value", [&](int index)
+            "getHatValue", [&](int index)
             {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
@@ -127,6 +127,13 @@ namespace Feather {
             }
         );
 	}
+
+    void InputManager::UpdateInputs()
+    {
+        m_Keyboard->Update();
+        m_Mouse->Update();
+        UpdateGamepads();
+    }
 
     std::shared_ptr<Gamepad> InputManager::GetController(int index)
     {

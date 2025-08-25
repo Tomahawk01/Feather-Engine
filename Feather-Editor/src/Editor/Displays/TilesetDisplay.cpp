@@ -116,6 +116,8 @@ namespace Feather {
 
 							tileData.sprite.width = (std::abs(maxCol - minCol) + 1) * tileWidth;
 							tileData.sprite.height = (std::abs(maxRow - minRow) + 1) * tileHeight;
+							tileData.sprite.start_x = minCol;
+							tileData.sprite.start_y = minRow;
 
 							GenerateUVsExt(tileData.sprite, textureWidth, textureHeight, minCol * tileWidth / textureWidth, minRow * tileHeight / textureHeight);
 						}

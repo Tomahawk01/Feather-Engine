@@ -72,7 +72,7 @@ namespace Feather {
 		std::optional<fs::path> m_IconFilePath{ std::nullopt };
 		std::optional<fs::path> m_ScriptListPath{ std::nullopt };
 		std::string m_ProjectName{};
-		std::string m_ProjectVersion{ "1.0.0" };
+		std::string m_ProjectVersion{ "1.0.0.0" };
 		std::string m_ProjectDescription{};
 		std::string m_CopyRightNotice{};
 		std::shared_ptr<Texture> m_IconTexture{ nullptr };

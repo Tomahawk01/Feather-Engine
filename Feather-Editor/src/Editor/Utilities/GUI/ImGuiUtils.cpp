@@ -220,7 +220,7 @@ namespace ImGui {
 		auto fontItr = g_mapImGuiFonts.find(fontName);
 		if (fontItr == g_mapImGuiFonts.end())
 		{
-			F_ERROR("Failed to get font '{}': Does not exist");
+			F_ERROR("Failed to get font '{}': Does not exist", fontName);
 			ImFont* font = ImGui::GetIO().Fonts->Fonts[0];
 			return font;
 		}

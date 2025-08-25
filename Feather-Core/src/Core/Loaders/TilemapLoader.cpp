@@ -31,6 +31,152 @@ namespace Feather {
 		return useJSON ? SaveObjectMapJSON(registry, objectMapFile) : SaveObjectMapLua(registry, objectMapFile);
 	}
 
+	bool TilemapLoader::LoadTilemapFromLuaTable(Registry& registry, const sol::table& tilemapTable)
+	{
+		if (!tilemapTable.valid() || tilemapTable.get_type() != sol::type::table)
+		{
+			F_ERROR("Failed to load tilemap map from table. Table is invalid");
+			return false;
+		}
+
+		sol::optional<sol::table> maybeTiles = tilemapTable["tilemap"];
+		if (!maybeTiles)
+		{
+			F_ERROR("Failed to load tilemap map file: \"tilemap\" table is missing or invalid");
+			return false;
+		}
+
+		for (const auto& [key, value] : *maybeTiles)
+		{
+			Entity newTile{ registry, "", "" };
+			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
+
+			if (!components)
+			{
+				F_ERROR("Failed to load object map file: \"components\" table is missing or invalid");
+				return false;
+			}
+
+			// Transform
+			const sol::table luaTransform = (*components)["transform"];
+			auto& transform = newTile.AddComponent<TransformComponent>();
+			DESERIALIZE_COMPONENT(luaTransform, transform);
+
+			// Sprite
+			const sol::table luaSprite = (*components)["sprite"];
+			auto& sprite = newTile.AddComponent<SpriteComponent>();
+			DESERIALIZE_COMPONENT(luaSprite, sprite);
+
+			sol::optional<sol::table> luaBoxCollider = (*components)["boxCollider"];
+			if (luaBoxCollider)
+			{
+				auto& boxCollider = newTile.AddComponent<BoxColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaBoxCollider, boxCollider);
+			}
+
+			sol::optional<sol::table> luaCircleCollider = (*components)["circleCollider"];
+			if (luaCircleCollider)
+			{
+				auto& circleCollider = newTile.AddComponent<CircleColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaCircleCollider, circleCollider);
+			}
+
+			sol::optional<sol::table> luaAnimations = (*components)["animation"];
+			if (luaAnimations)
+			{
+				auto& animation = newTile.AddComponent<AnimationComponent>();
+				DESERIALIZE_COMPONENT(*luaAnimations, animation);
+			}
+
+			sol::optional<sol::table> luaPhysics = (*components)["physics"];
+			if (luaPhysics)
+			{
+				auto& physics = newTile.AddComponent<PhysicsComponent>();
+				DESERIALIZE_COMPONENT(*luaPhysics, physics);
+			}
+
+			newTile.AddComponent<TileComponent>(TileComponent{ .id = static_cast<uint32_t>(newTile.GetEntity()) });
+		}
+
+		return true;
+	}
+
+	bool TilemapLoader::LoadGameObjectsFromLuaTable(Registry& registry, const sol::table& objectTable)
+	{
+		if (!objectTable.valid() || objectTable.get_type() != sol::type::table)
+		{
+			F_ERROR("Failed to load object map from table. Table is invalid");
+			return false;
+		}
+
+		sol::optional<sol::table> maybeObjects = objectTable["game_objects"];
+		if (!maybeObjects)
+		{
+			F_ERROR("Failed to load objects map file: \"game_objects\" table is missing or invalid");
+			return false;
+		}
+
+		for (const auto& [key, value] : *maybeObjects)
+		{
+			Entity newTile{ registry, "", "" };
+			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
+
+			if (!components)
+			{
+				F_ERROR("Failed to load object map file: \"components\" table is missing or invalid");
+				return false;
+			}
+
+			// Transform
+			const sol::table luaTransform = (*components)["transform"];
+			auto& transform = newTile.AddComponent<TransformComponent>();
+			DESERIALIZE_COMPONENT(luaTransform, transform);
+
+			// Sprite
+			const sol::table luaSprite = (*components)["sprite"];
+			auto& sprite = newTile.AddComponent<SpriteComponent>();
+			DESERIALIZE_COMPONENT(luaSprite, sprite);
+
+			sol::optional<sol::table> luaID = (*components)["id"];
+			if (luaID)
+			{
+				auto& id = newTile.GetComponent<Identification>();
+				DESERIALIZE_COMPONENT(*luaID, id);
+				newTile.ChangeName(id.name);
+			}
+
+			sol::optional<sol::table> luaBoxCollider = (*components)["boxCollider"];
+			if (luaBoxCollider)
+			{
+				auto& boxCollider = newTile.AddComponent<BoxColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaBoxCollider, boxCollider);
+			}
+
+			sol::optional<sol::table> luaCircleCollider = (*components)["circleCollider"];
+			if (luaCircleCollider)
+			{
+				auto& circleCollider = newTile.AddComponent<CircleColliderComponent>();
+				DESERIALIZE_COMPONENT(*luaCircleCollider, circleCollider);
+			}
+
+			sol::optional<sol::table> luaAnimations = (*components)["animation"];
+			if (luaAnimations)
+			{
+				auto& animation = newTile.AddComponent<AnimationComponent>();
+				DESERIALIZE_COMPONENT(*luaAnimations, animation);
+			}
+
+			sol::optional<sol::table> luaPhysics = (*components)["physics"];
+			if (luaPhysics)
+			{
+				auto& physics = newTile.AddComponent<PhysicsComponent>();
+				DESERIALIZE_COMPONENT(*luaPhysics, physics);
+			}
+		}
+
+		return true;
+	}
+
 	bool TilemapLoader::SaveTilemapJSON(Registry& registry, const std::string& tilemapFile)
 	{
 		std::unique_ptr<JSONSerializer> serializer{ nullptr };
@@ -146,6 +292,10 @@ namespace Feather {
 			auto& sprite = newTile.AddComponent<SpriteComponent>();
 			DESERIALIZE_COMPONENT(jsonSprite, sprite);
 
+			if (sprite.start_x != 0 || sprite.start_y != 0)
+			{
+				int x{};
+			}
 			if (components.HasMember("boxCollider"))
 			{
 				const auto& jsonBoxCollider = components["boxCollider"];

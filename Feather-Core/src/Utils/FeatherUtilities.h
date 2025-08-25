@@ -18,6 +18,23 @@ namespace Feather {
 		NO_TYPE
 	};
 
+	/* @brief Helper struct used for loading zipped or archived assets.
+	* Archived assets are the games assets that have been converted into luac files.
+	*/
+	struct FAsset
+	{
+		/* The name of the asset */
+		std::string name{ };
+		/* The size of the asset data. Based on a char array */
+		size_t assetSize{ 0 };
+		/* The end position of the asset data */
+		size_t assetEnd{ 0 };
+		/* The type of asset that the data represents */
+		AssetType type{ AssetType::NO_TYPE };
+		/* The underlying hex data of the asset */
+		std::vector<unsigned char> assetData;
+	};
+
 	/* Ensure the types that are passed in are associative map types */
 	template <typename T>
 	concept MapType = std::same_as<T, std::map<typename T::key_type, typename T::mapped_type, typename T::key_compare, typename T::allocator_type>> ||

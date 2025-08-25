@@ -130,7 +130,7 @@ namespace Feather {
 		}
 
 		// Get Content Path
-		std::filesystem::path filePath{ filepath };
+		fs::path filePath{ filepath };
 		fs::path projectPath{ filePath.parent_path() };
 		projectInfo->SetProjectPath(projectPath);
 
@@ -563,7 +563,7 @@ namespace Feather {
 
 	bool ProjectLoader::CreateProjectFile(const std::string& projectName, const std::string& filepath)
 	{
-		if (!std::filesystem::is_directory(filepath))
+		if (!fs::is_directory(filepath))
 		{
 			F_ERROR("Failed to create project file for '{}' at path '{}'", projectName, filepath);
 			return false;

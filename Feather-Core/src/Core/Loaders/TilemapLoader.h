@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sol/sol.hpp>
+
 namespace Feather {
 
 	class Registry;
@@ -15,6 +17,9 @@ namespace Feather {
 
 		bool LoadGameObjects(Registry& registry, const std::string& objectMapFile, bool useJSON = false);
 		bool SaveGameObjects(Registry& registry, const std::string& objectMapFile, bool useJSON = false);
+
+		bool LoadTilemapFromLuaTable(Registry& registry, const sol::table& tilemapTable);
+		bool LoadGameObjectsFromLuaTable(Registry& registry, const sol::table& objectTable);
 
 	private:
 		bool SaveTilemapJSON(Registry& registry, const std::string& tilemapFile);

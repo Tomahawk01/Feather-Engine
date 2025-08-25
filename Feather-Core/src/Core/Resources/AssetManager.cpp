@@ -114,7 +114,7 @@ namespace Feather {
             return false;
         }
 
-        auto texture = TextureLoader::CreateFromMemory(imageData, length, pixelArt, isTileset);
+        auto texture = TextureLoader::CreateFromMemory(imageData, length, !pixelArt, isTileset);
         // Load texture
         if (!texture)
         {
@@ -756,7 +756,7 @@ namespace Feather {
         lua.new_usertype<AssetManager>(
             "AssetManager",
             sol::no_constructor,
-            "add_texture",
+            "addTexture",
             sol::overload(
                 [&](const std::string& assetName, const std::string& filepath, bool pixel_art)
                 {
@@ -767,17 +767,17 @@ namespace Feather {
                     return asset_manager.AddTexture(assetName, filepath, pixel_art, isTileset);
                 }
             ),
-            "add_music",
+            "addMusic",
             [&](const std::string& musicName, const std::string& filepath)
             {
                 return asset_manager.AddMusic(musicName, filepath);
             },
-            "add_sound",
+            "addSound",
             [&](const std::string& soundFxName, const std::string& filepath)
             {
                 return asset_manager.AddSoundFx(soundFxName, filepath);
             },
-            "add_font",
+            "addFont",
             [&](const std::string& fontName, const std::string& fontPath, float fontSize)
             {
                 return asset_manager.AddFont(fontName, fontPath, fontSize);
