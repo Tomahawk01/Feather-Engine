@@ -313,13 +313,13 @@ namespace Feather {
 	{
 		auto& mainRegistry = MAIN_REGISTRY();
 
-		auto& pLuaState = mainRegistry.GetContext<std::shared_ptr<sol::state>>();
-		auto* pRegistry = mainRegistry.GetRegistry();
+		auto& luaState = mainRegistry.GetContext<std::shared_ptr<sol::state>>();
+		auto* registry = mainRegistry.GetRegistry();
 
-		ScriptingSystem::RegisterLuaBindings(*pLuaState, *pRegistry);
-		ScriptingSystem::RegisterLuaFunctions(*pLuaState, *pRegistry);
-		ScriptingSystem::RegisterLuaEvents(*pLuaState, *pRegistry);
-		ScriptingSystem::RegisterLuaSystems(*pLuaState, *pRegistry);
+		ScriptingSystem::RegisterLuaBindings(*luaState, *registry);
+		ScriptingSystem::RegisterLuaFunctions(*luaState, *registry);
+		ScriptingSystem::RegisterLuaEvents(*luaState, *registry);
+		ScriptingSystem::RegisterLuaSystems(*luaState, *registry);
 	}
 
 	bool RuntimeApp::LoadScripts()
@@ -578,6 +578,15 @@ namespace Feather {
 		auto& coreGlobals = CORE_GLOBALS();
 		auto& mainRegistry = MAIN_REGISTRY();
 		auto* registry = mainRegistry.GetRegistry();
+
+		double dt = coreGlobals.GetDeltaTime();
+		coreGlobals.UpdateDeltaTime();
+
+		// Clamp delta time to the target frame rate
+		if (dt < TARGET_FRAME_TIME)
+		{
+			std::this_thread::sleep_for(std::chrono::duration<double>(TARGET_FRAME_TIME - dt));
+		}
 
 		auto& scriptSystem = mainRegistry.GetContext<std::shared_ptr<ScriptingSystem>>();
 		scriptSystem->Update(*registry);
