@@ -560,6 +560,21 @@ namespace Feather {
 				text.isDirty = true;
 			}
 
+			// Color picker
+			ImVec4 col = { text.color.r / 255.0f,
+						   text.color.g / 255.0f,
+						   text.color.b / 255.0f,
+						   text.color.a / 255.0f };
+			ImGui::InlineLabel("color");
+			ImGui::ItemToolTip("Text Color Override");
+			if (ImGui::ColorEdit4("##color", &col.x, IMGUI_COLOR_PICKER_FLAGS))
+			{
+				text.color.r = static_cast<GLubyte>(col.x * 255.0f);
+				text.color.g = static_cast<GLubyte>(col.y * 255.0f);
+				text.color.b = static_cast<GLubyte>(col.z * 255.0f);
+				text.color.a = static_cast<GLubyte>(col.w * 255.0f);
+			}
+
 			ImGui::PopItemWidth();
 			ImGui::PopItemWidth();
 			ImGui::TreePop();

@@ -2,7 +2,6 @@
 
 #include "Logger/Logger.h"
 #include "FileSystem/Dialogs/FileDialog.h"
-#include "Core/Loaders/TilemapLoader.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/Prefab.h"
 #include "Core/CoreUtils/ProjectInfo.h"
@@ -19,6 +18,7 @@
 #include "Editor/Utilities/EditorState.h"
 #include "Editor/Loaders/ProjectLoader.h"
 #include "Editor/Events/EditorEventTypes.h"
+#include "Editor/Loaders/TiledMapImporter.h"
 
 #include <imgui.h>
 #include <SDL.h>
@@ -27,10 +27,12 @@ namespace Feather {
 
 	void MenuDisplay::Draw()
 	{
+		auto& sceneManager = SCENE_MANAGER();
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu(ICON_FA_FILE " File"))
 			{
+				ImGui::SeparatorText("Project");
 				ImGui::InlineLabel(ICON_FA_FILE_ALT, 32.0f);
 				if (ImGui::MenuItem("New", "Ctrl + N"))
 				{
@@ -44,7 +46,7 @@ namespace Feather {
 				}
 
 				ImGui::InlineLabel(ICON_FA_SAVE, 32.0f);
-				if (ImGui::MenuItem("Save", "Ctrl + S"))
+				if (ImGui::MenuItem("Save All", "Ctrl + S"))
 				{
 					auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
 					F_ASSERT(projectInfo && "Project Info must exist!");
@@ -58,7 +60,37 @@ namespace Feather {
 						F_ERROR("Failed to save project '{}' at file '{}'", projectInfo->GetProjectName(), optProjectFilePath->string());
 					}
 				}
+				ImGui::ItemToolTip("Saves entire project to disk");
 
+				ImGui::SeparatorText("Scenes");
+
+				if (auto currentScene = sceneManager.GetCurrentScene())
+				{
+					ImGui::InlineLabel(ICON_FA_SAVE, 32.0f);
+					if (ImGui::MenuItem("Save Current Scene As..."))
+					{
+						// TODO: Save a copy of the scene and all of it's entities under a new name
+					}
+				}
+
+				ImGui::SeparatorText("Import");
+				ImGui::InlineLabel(ICON_FA_FILE_IMPORT, 32.0f);
+				if (ImGui::MenuItem("Import Tiled Map"))
+				{
+					FileDialog fd{};
+					const auto filepath = fd.OpenFileDialog("Import Tiled Map", BASE_PATH, { "*.lua" });
+					if (!filepath.empty())
+					{
+						if (!TiledMapImporter::ImportTilemapFromTiled(&SCENE_MANAGER(), filepath))
+						{
+							F_ERROR("Failed to import tiled map as new scene");
+						}
+					}
+				}
+
+				ImGui::ItemToolTip("Import a map from the Tiled Map Editor. **Must be a lua export**");
+
+				ImGui::SeparatorText("Exit");
 				ImGui::InlineLabel(ICON_FA_WINDOW_CLOSE, 32.0f);
 				if (ImGui::MenuItem("Exit"))
 				{
@@ -70,6 +102,8 @@ namespace Feather {
 
 			if (ImGui::BeginMenu(ICON_FA_EDIT " Edit"))
 			{
+				ImGui::SeparatorText("Configuration");
+
 				auto& coreGlobals = CORE_GLOBALS();
 				auto& toolManager = TOOL_MANAGER();
 
@@ -94,6 +128,8 @@ namespace Feather {
 
 			if (ImGui::BeginMenu(ICON_FA_WINDOW_MAXIMIZE " Displays"))
 			{
+				ImGui::SeparatorText("Displays");
+
 				auto& editorState = MAIN_REGISTRY().GetContext<EditorStatePtr>();
 				DrawDisplayItem(*editorState, ICON_FA_FILE_ALT " Asset Browser", EDisplay::AssetBrowser);
 				DrawDisplayItem(*editorState, ICON_FA_FOLDER " Content Browser", EDisplay::ContentBrowser);
@@ -102,6 +138,7 @@ namespace Feather {
 				DrawDisplayItem(*editorState, ICON_FA_TERMINAL " Console Logger", EDisplay::Console);
 				DrawDisplayItem(*editorState, ICON_FA_COG " Project Settings", EDisplay::GameSettingsView);
 
+				ImGui::Separator();
 				ImGui::EndMenu();
 			}
 
@@ -248,7 +285,7 @@ namespace Feather {
 					ImGui::Text("Feather is a 2D game engine written in C++");
 					ImGui::Text("By Alex (Tomahawk)");
 					ImGui::AddSpaces(2);
-					ImGui::Text("Helpful Links: ");
+					ImGui::SeparatorText("Helpful Links: ");
 					ImGui::TextLinkOpenURL("Github", "https://github.com/Tomahawk01/Feather-Engine");
 					ImGui::Separator();
 					ImGui::TreePop();

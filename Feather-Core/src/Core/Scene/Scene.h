@@ -69,7 +69,7 @@ namespace Feather {
 		 * because it does not set the loaded flag or clear the registry.
 		 * @return true if successful, false otherwise.
 		 */
-		bool SaveScene() { return SaveSceneData(); }
+		bool SaveScene(bool bOverride = false) { return SaveSceneData(bOverride); }
 
 		inline const std::string& GetDefaultMusicName() const { return m_DefaultMusic; }
 		inline void SetDefaultMusic(const std::string& defaultMusic) { m_DefaultMusic = defaultMusic; }

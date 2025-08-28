@@ -309,10 +309,6 @@ namespace Feather {
 			auto& sprite = newTile.AddComponent<SpriteComponent>();
 			DESERIALIZE_COMPONENT(jsonSprite, sprite);
 
-			if (sprite.start_x != 0 || sprite.start_y != 0)
-			{
-				int x{};
-			}
 			if (components.HasMember("boxCollider"))
 			{
 				const auto& jsonBoxCollider = components["boxCollider"];

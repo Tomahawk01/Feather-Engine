@@ -412,7 +412,6 @@ namespace Feather {
 		SoundBinder::CreateSoundBind(lua);
 		RendererBinder::CreateRenderingBind(lua, registry);
 		UserDataBinder::CreateLuaUserData(lua);
-		ContactListenerBinder::CreateLuaContactListener(lua, registry.GetRegistry());
 		LuaFilesystem::CreateLuaFileSystemBind(lua);
 		ScriptingHelpers::CreateLuaHelpers(lua);
 
@@ -434,10 +433,15 @@ namespace Feather {
 		AnimationComponent::CreateAnimationLuaBind(lua);
 		BoxColliderComponent::CreateLuaBoxColliderBind(lua);
 		CircleColliderComponent::CreateLuaCircleColliderBind(lua);
-		PhysicsComponent::CreatePhysicsLuaBind(lua, registry.GetRegistry());
 		TextComponent::CreateLuaTextBindings(lua);
 		RigidBodyComponent::CreateRigidBodyLuaBind(lua);
 		UIComponent::CreateLuaBind(lua);
+
+		if (CORE_GLOBALS().IsPhysicsEnabled())
+		{
+			ContactListenerBinder::CreateLuaContactListener(lua, registry.GetRegistry());
+			PhysicsComponent::CreatePhysicsLuaBind(lua, registry.GetRegistry());
+		}
 	}
 
 	void ScriptingSystem::RegisterLuaFunctions(sol::state& lua, Registry& registry)

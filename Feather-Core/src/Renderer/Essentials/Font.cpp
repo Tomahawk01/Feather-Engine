@@ -6,13 +6,14 @@
 
 namespace Feather {
 
-	Font::Font(GLuint fontAtlasID, int widht, int height, float fontSize, void* data, float fontAscent)
+	Font::Font(GLuint fontAtlasID, int widht, int height, float fontSize, void* data, float fontAscent, const std::string& filename)
 		: m_FontAtlasID{ fontAtlasID }
 		, m_Width{ widht }
 		, m_Height{ height }
 		, m_FontSize{ fontSize }
 		, m_FontAscent{ fontAscent }
 		, m_Data{ std::move(data) }
+		, m_Filename{ filename }
 	{
 		float x{ 0.0f }, y{ 0.0f };
 

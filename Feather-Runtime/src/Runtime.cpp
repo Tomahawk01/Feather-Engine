@@ -395,7 +395,7 @@ namespace Feather {
 		auto& assetManager = MAIN_REGISTRY().GetAssetManager();
 		auto& coreGlobals = CORE_GLOBALS();
 
-		const std::string zipAssetsPath{ std::format("{}{}{}", "assets", PATH_SEPARATOR, "ScionAssets.zip") };
+		const std::string zipAssetsPath{ std::format("{}{}{}", "assets", PATH_SEPARATOR, "FeatherAssets.zip") };
 
 		if (!fs::exists(fs::path{ zipAssetsPath }))
 		{
@@ -436,6 +436,15 @@ namespace Feather {
 					featherAsset->assetSize = asset["dataSize"].get_or(0U);
 					featherAsset->assetEnd = asset["dataEnd"].get_or(0U);
 
+					if (featherAsset->type == AssetType::FONT)
+					{
+						featherAsset->optFontSize = asset["fontSize"].get_or(32.f);
+					}
+					else if (featherAsset->type == AssetType::TEXTURE)
+					{
+						featherAsset->optPixelArt = asset["bPixelArt"].get_or(false);
+					}
+
 					// Get the asset data
 					sol::table dataTable = asset["data"];
 					for (const auto& [_, data] : dataTable)
@@ -457,7 +466,7 @@ namespace Feather {
 				{
 					for (const auto& texAsset : assets)
 					{
-						if (!assetManager.AddTextureFromMemory(texAsset->name, texAsset->assetData.data(), texAsset->assetSize))
+						if (!assetManager.AddTextureFromMemory(texAsset->name, texAsset->assetData.data(), texAsset->assetSize, (texAsset->optPixelArt ? *texAsset->optPixelArt : true)))
 						{
 							F_ERROR("Failed to add texture '{}' from memory", texAsset->name);
 						}
@@ -490,7 +499,7 @@ namespace Feather {
 				{
 					for (const auto& fontAsset : assets)
 					{
-						if (!assetManager.AddFontFromMemory(fontAsset->name, fontAsset->assetData.data(), fontAsset->assetSize))
+						if (!assetManager.AddFontFromMemory(fontAsset->name, fontAsset->assetData.data(), (fontAsset->optFontSize ? *fontAsset->optFontSize : 32.0f)))
 						{
 							F_ERROR("Failed to add font '{}' from memory", fontAsset->name);
 						}

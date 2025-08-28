@@ -44,13 +44,13 @@ namespace Feather {
 		}
 	}
 
-	void AssetPackager::ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const std::string& assetName, const std::string& inAssetFile, AssetType type)
+	void AssetPackager::ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const AssetConversionData& conversionData)
 	{
-		std::fstream in{ inAssetFile, std::ios::in | std::ios::binary };
+		std::fstream in{ conversionData.inAssetFile, std::ios::in | std::ios::binary };
 		if (!in.is_open())
-			throw std::runtime_error(std::format("Failed to open file '{}'", inAssetFile));
+			throw std::runtime_error(std::format("Failed to open file '{}'", conversionData.inAssetFile));
 
-		fs::path assetPath{ inAssetFile };
+		fs::path assetPath{ conversionData.inAssetFile };
 
 		int readByte{ 0 };
 		std::size_t i{ 0U };
@@ -59,9 +59,18 @@ namespace Feather {
 		try
 		{
 			luaSerializer.StartNewTable()
-				.AddKeyValuePair("assetName", assetName, true, false, false, true)
+				.AddKeyValuePair("assetName", conversionData.assetName, true, false, false, true)
 				.AddKeyValuePair("assetExt", assetPath.extension().string(), true, false, false, true)
-				.AddKeyValuePair("assetType", AssetTypeToString(type), true, false, false, true);
+				.AddKeyValuePair("assetType", AssetTypeToString(conversionData.type), true, false, false, true);
+
+			if (conversionData.type == AssetType::FONT)
+			{
+				luaSerializer.AddKeyValuePair("fontSize", conversionData.optFontSize ? *conversionData.optFontSize : 32.0f);
+			}
+			else if (conversionData.type == AssetType::TEXTURE)
+			{
+				luaSerializer.AddKeyValuePair("pixelArt", conversionData.optPixelArt ? *conversionData.optPixelArt : true);
+			}
 
 			luaSerializer.StartNewTable("data");
 
@@ -86,7 +95,7 @@ namespace Feather {
 		}
 		catch (const std::exception& ex)
 		{
-			throw std::runtime_error(std::format("Failed to write '{}' at path '{}' to asset file {}", assetName, inAssetFile, ex.what()));
+			throw std::runtime_error(std::format("Failed to write '{}' at path '{}' to asset file {}", conversionData.assetName, conversionData.inAssetFile, ex.what()));
 		}
 	}
 
@@ -308,7 +317,23 @@ namespace Feather {
 				for (const auto& jsonValue : assetArray.GetArray())
 				{
 					std::string path{ contentPath + PATH_SEPARATOR + jsonValue["path"].GetString() };
-					ConvertAssetToLuaTable(*luaSerializer, jsonValue["name"].GetString(), path, assetType);
+					
+					AssetConversionData conversionData{
+						.inAssetFile = path,
+						.assetName = jsonValue["name"].GetString(),
+						.type = assetType
+					};
+
+					if (assetType == AssetType::FONT && jsonValue.HasMember("fontSize"))
+					{
+						conversionData.optFontSize = jsonValue["fontSize"].GetFloat();
+					}
+					else if (assetType == AssetType::TEXTURE && jsonValue.HasMember("pixelArt"))
+					{
+						conversionData.optPixelArt = jsonValue["pixelArt"].GetBool();
+					}
+
+					ConvertAssetToLuaTable(*luaSerializer, conversionData);
 				}
 			}
 			catch (const std::exception& ex)

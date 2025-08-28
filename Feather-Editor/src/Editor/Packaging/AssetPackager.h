@@ -16,6 +16,15 @@ namespace Feather {
 		std::string ProjectPath{};
 	};
 
+	struct AssetConversionData
+	{
+		std::string inAssetFile{};
+		std::string assetName{};
+		AssetType type;
+		std::optional<float> optFontSize{ std::nullopt };
+		std::optional<bool> optPixelArt{ std::nullopt };
+	};
+
 	class AssetPackager
 	{
 	public:
@@ -25,7 +34,7 @@ namespace Feather {
 		void PackageAssets(const rapidjson::Value& assets);
 
 	private:
-		void ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const std::string& assetName, const std::string& inAssetFile, AssetType type);
+		void ConvertAssetToLuaTable(LuaSerializer& luaSerializer, const AssetConversionData& conversionData);
 
 		void CreateLuaAssetFiles(const std::string& projectPath, const rapidjson::Value& assets);
 		bool CompileLuaAssetFiles();

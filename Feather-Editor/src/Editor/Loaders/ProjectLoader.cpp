@@ -535,8 +535,24 @@ namespace Feather {
 		}
 		serializer->EndArray(); // Music
 
-		serializer->StartNewArray("scenes");
+		serializer->StartNewArray("fonts");
+		for (const auto& [name, font] : assetManager.GetAllFonts())
+		{
+			std::string filename{ font->GetFilename() };
+			// NOTE: If the filename is empty, it must have been loaded from memory
+			if (filename.empty())
+				continue;
 
+			std::string fontPath = filename.substr(filename.find(ASSETS));
+			serializer->StartNewObject()
+				.AddKeyValuePair("name", name)
+				.AddKeyValuePair("path", fontPath)
+				.AddKeyValuePair("fontSize", font->GetFontSize())
+				.EndObject();
+		}
+		serializer->EndArray(); // Fonts
+
+		serializer->StartNewArray("scenes");
 		for (const auto& [name, scene] : sceneMananger.GetAllScenes())
 		{
 			std::string scenePath = scene->GetSceneDataPath().substr(scene->GetSceneDataPath().find(ASSETS));
@@ -548,13 +564,11 @@ namespace Feather {
 		serializer->EndArray(); // Scenes
 
 		serializer->StartNewArray("prefabs");
-
 		for (const auto& [sName, pPrefab] : assetManager.GetAllPrefabs())
 		{
 			std::string sFilepath = pPrefab->GetFilepath().substr(pPrefab->GetFilepath().find(ASSETS));
 			serializer->StartNewObject().AddKeyValuePair("name", sName).AddKeyValuePair("path", sFilepath).EndObject();
 		}
-
 		serializer->EndArray(); // Prefabs
 
 		serializer->EndObject(); // Assets

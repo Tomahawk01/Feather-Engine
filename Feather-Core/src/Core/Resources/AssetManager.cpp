@@ -50,7 +50,7 @@ namespace Feather {
 
     bool AssetManager::CreateDefaultFonts()
     {
-        if (!AddFontFromMemory("defaultFont", g_PixelFont))
+        if (!AddFontFromMemory("pixelFont-32", g_PixelFont))
         {
             F_ERROR("Failed to create default pixel font");
             return false;

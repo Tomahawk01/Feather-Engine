@@ -24,7 +24,7 @@ namespace Feather {
 	class Font
 	{
 	public:
-		Font(GLuint fontAtlasID, int widht, int height, float fontSize, void* data, float fontAscent = 0.0f);
+		Font(GLuint fontAtlasID, int widht, int height, float fontSize, void* data, float fontAscent = 0.0f, const std::string& filename = "");
 		~Font();
 
 		FontGlyph GetGlyph(char c, glm::vec2& pos);
@@ -33,7 +33,8 @@ namespace Feather {
 
 		inline const GLuint GetFontAtlasID() const { return m_FontAtlasID; }
 		inline const float GetFontSize() const { return m_FontSize; }
-		const PaddingInfo& AveragePaddingInfo() const { return m_AveragePadding; }
+		inline const PaddingInfo& AveragePaddingInfo() const { return m_AveragePadding; }
+		inline const std::string& GetFilename() const { return m_Filename; }
 
 	private:
 		/* OpenGL texture ID */
@@ -52,6 +53,8 @@ namespace Feather {
 		PaddingInfo m_AveragePadding;
 		/* Map of each character and their padding info */
 		std::map<char, PaddingInfo> m_mapPaddingInfo;
+		/* Filename of font if loaded from a file */
+		std::string m_Filename;
 	};
 
 }
