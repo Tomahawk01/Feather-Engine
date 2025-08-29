@@ -293,7 +293,7 @@ namespace Feather {
 		if (!tilemap.IsArray() || tilemap.Size() < 1)
 		{
 			F_WARN("Failed to load tilemap '{}': there needs to be at least 1 tile", tilemapFile);
-			return false;
+			return true;
 		}
 
 		for (const auto& tile : tilemap.GetArray())
@@ -510,7 +510,7 @@ namespace Feather {
 		if (!gameObjects.IsArray() || gameObjects.Size() < 1)
 		{
 			F_WARN("Failed to load Game Objects: File '{}' - There needs to be at least 1 tile", objectMapFile);
-			return false;
+			return true;
 		}
 
 		// Map of entity to relationships

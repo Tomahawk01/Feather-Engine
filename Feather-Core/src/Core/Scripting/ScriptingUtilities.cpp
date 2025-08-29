@@ -7,7 +7,7 @@ namespace Feather {
 	void ScriptingHelpers::CreateLuaHelpers(sol::state& lua)
 	{
 		std::string luaClassCode = R"(
-		function F_Class(base)
+		function F_Class(className, base)
 			-- Create a new table that will represent our class
 			local cls = {}
 			-- Set the __index metamethod so method lookups refer to the class

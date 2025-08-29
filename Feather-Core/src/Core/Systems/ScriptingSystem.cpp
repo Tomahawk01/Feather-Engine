@@ -70,28 +70,38 @@ namespace Feather {
 
 		sol::table main_lua = lua["main"];
 
-		sol::optional<sol::table> UpdateExists = main_lua[1];
+		sol::optional<sol::table> InitExists = main_lua[1];
+		if (InitExists == sol::nullopt)
+		{
+			F_ERROR("There is no init function in main.lua!");
+			return false;
+		}
+
+		sol::table init_script = main_lua[1];
+		sol::function init = init_script["init"];
+
+		sol::optional<sol::table> UpdateExists = main_lua[2];
 		if (UpdateExists == sol::nullopt)
 		{
 			F_ERROR("There is no update function in main.lua!");
 			return false;
 		}
-		sol::table update_script = main_lua[1];
+		sol::table update_script = main_lua[2];
 		sol::function update = update_script["update"];
 
-		sol::optional<sol::table> RenderExists = main_lua[2];
+		sol::optional<sol::table> RenderExists = main_lua[3];
 		if (RenderExists == sol::nullopt)
 		{
 			F_ERROR("There is no render function in main.lua!");
 			return false;
 		}
-		sol::table render_script = main_lua[2];
+		sol::table render_script = main_lua[3];
 		sol::function render = render_script["render"];
 
-		Entity mainLuaScript{ registry, "main_script", "" };
-		mainLuaScript.AddComponent<ScriptComponent>(ScriptComponent{
-					.update = update,
-					.render = render });
+		auto& mainScript = registry.GetContext<MainScriptPtr>();
+		mainScript->init = init;
+		mainScript->update = update;
+		mainScript->render = render;
 
 		m_MainLoaded = true;
 
@@ -165,23 +175,12 @@ namespace Feather {
 			return;
 		}
 
-		auto mainScript = FindEntityByTag(registry, "main_script");
-		if (mainScript == entt::null)
+		auto& mainScript = registry.GetContext<MainScriptPtr>();
+		auto error = mainScript->update();
+		if (!error.valid())
 		{
-			F_FATAL("Failed to run main Update script. Entity does not exist");
-			return;
-		}
-			
-		Entity scriptEnt{ registry, mainScript };
-
-		if (auto* script = scriptEnt.TryGetComponent<ScriptComponent>())
-		{
-			auto error = script->update();
-			if (!error.valid())
-			{
-				sol::error err = error;
-				F_ERROR("Error running the Update script: {0}", err.what());
-			}
+			sol::error err = error;
+			F_ERROR("Error running the Update script: {}", err.what());
 		}
 
 		if (auto* lua = registry.TryGetContext<std::shared_ptr<sol::state>>())
@@ -196,23 +195,12 @@ namespace Feather {
 			return;
 		}
 
-		auto mainScript = FindEntityByTag(registry, "main_script");
-		if (mainScript == entt::null)
+		auto& mainScript = registry.GetContext<MainScriptPtr>();
+		auto error = mainScript->render();
+		if (!error.valid())
 		{
-			F_FATAL("Failed to run main render script. Entity does not exist");
-			return;
-		}
-
-		Entity scriptEnt{ registry, mainScript };
-
-		if (auto* script = scriptEnt.TryGetComponent<ScriptComponent>())
-		{
-			auto error = script->render();
-			if (!error.valid())
-			{
-				sol::error err = error;
-				F_ERROR("Error running the Render script: {0}", err.what());
-			}
+			sol::error err = error;
+			F_ERROR("Error running the Render script: {}", err.what());
 		}
 
 		if (auto* lua = registry.TryGetContext<std::shared_ptr<sol::state>>())

@@ -7,6 +7,13 @@
 
 namespace Feather {
 
+	struct MainScriptFunctions
+	{
+		sol::protected_function init{ sol::lua_nil };
+		sol::protected_function update{ sol::lua_nil };
+		sol::protected_function render{ sol::lua_nil };
+	};
+
 	/*
 	* @brief Helper function to create and bind ReadOnly tables in lua.
 	* All keys and values must be of the same type.
@@ -86,3 +93,5 @@ namespace Feather {
 	};
 
 }
+
+using MainScriptPtr = std::shared_ptr<Feather::MainScriptFunctions>;

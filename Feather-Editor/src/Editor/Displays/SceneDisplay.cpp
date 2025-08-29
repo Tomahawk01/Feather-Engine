@@ -12,6 +12,7 @@
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
 #include "Core/Scripting/CrashLoggerTestBindings.h"
+#include "Core/Scripting/ScriptingUtilities.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/Resources/AssetManager.h"
@@ -273,12 +274,21 @@ namespace Feather {
 		}
 
 		// Get the main script path
-		auto& pProjectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
-		if (!scriptSystem->LoadMainScript(*pProjectInfo, runtimeRegistry, *lua))
+		auto mainScript = runtimeRegistry.AddToContext<MainScriptPtr>(std::make_shared<MainScriptFunctions>());
+		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+		if (!scriptSystem->LoadMainScript(*projectInfo, runtimeRegistry, *lua))
 		{
 			F_FATAL("Failed to load main lua script");
 			return;
 		}
+
+		if (!mainScript->init.valid())
+		{
+			F_ERROR("Failed to initialize main script. init() function is invalid");
+			return;
+		}
+
+		mainScript->init();
 
 		// Setup Crash Tests
 		CrashLoggerTests::CreateLuaBind(*lua);
@@ -306,6 +316,7 @@ namespace Feather {
 		runtimeRegistry.RemoveContext<std::shared_ptr<ContactListener>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<ScriptingSystem>>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<EventDispatcher>>();
+		runtimeRegistry.RemoveContext<MainScriptPtr>();
 		runtimeRegistry.RemoveContext<std::shared_ptr<sol::state>>();
 
 		auto& mainRegistry = MAIN_REGISTRY();

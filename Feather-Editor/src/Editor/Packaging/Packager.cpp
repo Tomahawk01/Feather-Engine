@@ -583,19 +583,19 @@ namespace Feather {
 			for k, v in pairs(assets) do
 				for i = 1, #v do
 					if k == "textures" then
-						if not AssetManager.add_texture(v[i].name, v[i].path, v[i].isPixelArt) then
+						if not AssetManager.addTexture(v[i].name, v[i].path, v[i].isPixelArt) then
 							print("Failed to load texture '"..v[i].name.."'")
 						end
 					elseif k == "fonts" then
-						if not AssetManager.add_font(v[i].name, v[i].path, v[i].fontSize) then
+						if not AssetManager.addFont(v[i].name, v[i].path, v[i].fontSize) then
 							print("Failed to load font '"..v[i].name.."'")
 						end
 					elseif k == "soundfx" then
-						if not AssetManager.add_sound(v[i].name, v[i].path) then
+						if not AssetManager.addSound(v[i].name, v[i].path) then
 							print("Failed to load soundfx '"..v[i].name.."'")
 						end
 					elseif k == "music" then
-						if not AssetManager.add_music(v[i].name, v[i].path) then
+						if not AssetManager.addMusic(v[i].name, v[i].path) then
 							print("Failed to load music '"..v[i].name.."'")
 						end
 					end

@@ -11,6 +11,7 @@
 #include "Core/Events/EngineEventTypes.h"
 #include "Core/Scripting/InputManager.h"
 #include "Core/Scripting/CrashLoggerTestBindings.h"
+#include "Core/Scripting/ScriptingUtilities.h"
 #include "Core/Systems/AnimationSystem.h"
 #include "Core/Systems/PhysicsSystem.h"
 #include "Core/Systems/ScriptingSystem.h"
@@ -155,6 +156,7 @@ namespace Feather {
 		}
 
 		mainRegistry.AddToContext<std::shared_ptr<sol::state>>(std::move(luaState));
+		auto mainScript = mainRegistry.AddToContext<MainScriptPtr>(std::make_shared<MainScriptFunctions>());
 
 		if (!LoadShaders())
 		{
@@ -179,6 +181,14 @@ namespace Feather {
 		auto& lua = mainRegistry.GetContext<std::shared_ptr<sol::state>>();
 		tl.LoadTilemapFromLuaTable(*mainRegistry.GetRegistry(), (*lua)[m_GameConfig->startupScene + "_tilemap"]);
 		tl.LoadGameObjectsFromLuaTable(*mainRegistry.GetRegistry(), (*lua)[m_GameConfig->startupScene + "_objects"]);
+
+		if (!mainScript->init.valid())
+		{
+			throw std::runtime_error("Failed to initialize main script. init() function is invalid");
+		}
+
+		mainScript->init();
+
 		if (coreGlobals.IsPhysicsEnabled())
 		{
 			LoadPhysics();
