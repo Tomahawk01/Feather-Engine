@@ -40,7 +40,8 @@ project "Feather-Editor"
         "%{wks.location}/vendor/box2d/include",
         "%{wks.location}/vendor/ImGui/src",
         "%{wks.location}/vendor/rapidjson/include",
-        "%{wks.location}/vendor/libzippp/include"
+        "%{wks.location}/vendor/libzippp/include",
+        "%{wks.location}/vendor/tinyxml2/src"
     }
 
     libdirs
@@ -62,7 +63,8 @@ project "Feather-Editor"
         "Box2D",
         "ImGui",
         "SOIL",
-        "libzippp.lib"
+        "libzippp.lib",
+        "TinyXML2"
     }
 
     dependson { "Feather-Core" }

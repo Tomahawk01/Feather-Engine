@@ -28,6 +28,7 @@ group "Dependencies"
     include "vendor/box2d/Build-Box2D.lua"
     include "vendor/ImGui/Build-ImGui.lua"
     include "vendor/soil/Build-SOIL.lua"
+    include "vendor/tinyxml2/Build-TinyXML2.lua"
 group ""
 
 include "Feather-Core/Build-Core.lua"
