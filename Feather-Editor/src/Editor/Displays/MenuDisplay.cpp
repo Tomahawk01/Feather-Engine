@@ -78,7 +78,7 @@ namespace Feather {
 				if (ImGui::MenuItem("Import Tiled Map"))
 				{
 					FileDialog fd{};
-					const auto filepath = fd.OpenFileDialog("Import Tiled Map", BASE_PATH, { "*.lua" });
+					const auto filepath = fd.OpenFileDialog("Import Tiled Map", BASE_PATH, { "*.lua", "*.tmx" });
 					if (!filepath.empty())
 					{
 						if (!TiledMapImporter::ImportTilemapFromTiled(&SCENE_MANAGER(), filepath))
@@ -88,7 +88,7 @@ namespace Feather {
 					}
 				}
 
-				ImGui::ItemToolTip("Import a map from the Tiled Map Editor. **Must be a lua export**");
+				ImGui::ItemToolTip("Import a map from the Tiled Map Editor. Supports tmx and lua map files");
 
 				ImGui::SeparatorText("Exit");
 				ImGui::InlineLabel(ICON_FA_WINDOW_CLOSE, 32.0f);

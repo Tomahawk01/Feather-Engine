@@ -19,6 +19,12 @@ namespace Feather {
 		static bool ImportTilemapFromTiled(EditorSceneManager* sceneManager, const std::string tiledMapFile);
 
 	private:
+		struct Tileset;
+		static bool ImportFromTMXFile(EditorSceneManager* sceneManager, const std::string tiledMapFile);
+		static bool ImportFromLuaFile(EditorSceneManager* sceneManager, const std::string tiledMapFile);
+		static Tileset* GetTileset(std::vector<Tileset>& tilesets, int id);
+
+	private:
 		struct TileObject
 		{
 			std::string name{};
