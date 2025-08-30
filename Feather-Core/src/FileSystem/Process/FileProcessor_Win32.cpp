@@ -43,4 +43,41 @@ namespace Feather {
 		return true;
 	}
 
+	bool FileProcessor::OpenFileLocation(const std::string& filename)
+	{
+		if (!fs::exists(fs::path{ filename }))
+		{
+			F_ERROR("Failed to open file location '{}'. File does not exist", filename);
+			return false;
+		}
+
+		std::wstring command{ std::format(L"explorer /select, \"{}\"", ConvertUtf8ToWide(filename)) };
+
+		STARTUPINFOW si{};
+		PROCESS_INFORMATION pi{};
+		si.cb = sizeof(si);
+
+		if (CreateProcessW(
+			nullptr, command.data(),
+			nullptr,
+			nullptr,
+			FALSE,
+			CREATE_NO_WINDOW | DETACHED_PROCESS,
+			nullptr,
+			nullptr,
+			&si,
+			&pi
+		))
+		{
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+			return true;
+		}
+
+		DWORD error{ GetLastError() };
+		F_ERROR("Failed to open file location '{}': {}", filename, error);
+
+		return false;
+	}
+
 }

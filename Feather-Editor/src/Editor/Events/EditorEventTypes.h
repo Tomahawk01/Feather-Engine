@@ -33,9 +33,15 @@ namespace Feather {
 
 	enum class ContentCreateAction
 	{
+		/* Create new folder */
 		Folder,
+		/* Create new lua file with F_Class */
 		LuaClass,
+		/* Create new lua file with an empty lua table. TableName = {} */
 		LuaTable,
+		/* Create new lua file with F_Class that has a Feather State class implementation */
+		LuaStateClass,
+		/* Create an empty lua file */
 		EmptyLuaFile,
 
 		NoAction

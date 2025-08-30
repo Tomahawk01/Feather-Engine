@@ -14,6 +14,7 @@ namespace Feather {
 		void Stop();
 		void SetVolume(int volume);
 		bool IsPlaying();
+		bool IsPaused();
 	};
 
 }

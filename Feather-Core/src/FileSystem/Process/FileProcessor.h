@@ -6,6 +6,7 @@ namespace Feather {
 	{
 	public:
 		bool OpenApplicationFromFile(const std::string& filename, std::vector<const char*> params);
+		bool OpenFileLocation(const std::string& filename);
 
 	private:
 		std::string SeparateParams(std::vector<const char*>& params)

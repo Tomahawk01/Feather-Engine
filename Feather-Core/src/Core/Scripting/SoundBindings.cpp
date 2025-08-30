@@ -43,7 +43,8 @@ namespace Feather {
 			"pause", [&]() { musicPlayer.Pause(); },
 			"resume", [&]() { musicPlayer.Resume(); },
 			"setVolume", [&](int volume) { musicPlayer.SetVolume(volume); },
-			"isPlaying", [&]() { return musicPlayer.IsPlaying(); }
+			"isPlaying", [&]() { return musicPlayer.IsPlaying(); },
+			"isPaused", [&]() { return musicPlayer.IsPaused(); }
 		);
 
 		auto& soundFxPlayer = mainRegistry.GetSoundPlayer();

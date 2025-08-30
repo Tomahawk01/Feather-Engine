@@ -75,4 +75,9 @@ namespace Feather {
 		return Mix_PlayingMusic();
 	}
 
+	bool MusicPlayer::IsPaused()
+	{
+		return Mix_PausedMusic();
+	}
+
 }

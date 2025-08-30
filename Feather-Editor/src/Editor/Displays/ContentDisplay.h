@@ -32,6 +32,7 @@ namespace Feather {
 		void OpenCreateFolderPopup();
 
 		void OpenCreateLuaClassPopup();
+		void OpenCreateLuaStateClassPopup();
 		void OpenCreateLuaTablePopup();
 		void OpenCreateEmptyLuaFilePopup();
 
