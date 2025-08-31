@@ -248,6 +248,12 @@ namespace Feather {
 			projectInfo->SetProjectDescription(sDescription);
 		}
 
+		if (projectData.HasMember("default_scene"))
+		{
+			std::string sDefaultScene = projectData["default_scene"].GetString();
+			projectInfo->SetDefaultScene(sDefaultScene);
+		}
+
 		const rapidjson::Value& assets = projectData["assets"];
 		auto& assetManager = ASSET_MANAGER();
 
@@ -408,6 +414,15 @@ namespace Feather {
 			}
 		}
 
+		if (!projectInfo->GetDefaultScene().empty())
+		{
+			SCENE_MANAGER().SetCurrentScene(projectInfo->GetDefaultScene());
+			if (!SCENE_MANAGER().LoadCurrentScene())
+			{
+				F_ERROR("Failed to load default scene '{}'", projectInfo->GetDefaultScene());
+			}
+		}
+
 		if (projectData.HasMember("physics"))
 		{
 			const rapidjson::Value& physics = projectData["physics"];
@@ -492,6 +507,7 @@ namespace Feather {
 			.AddKeyValuePair("copyright", projectInfo.GetCopyRightNotice())
 			.AddKeyValuePair("version", projectInfo.GetProjectVersion())
 			.AddKeyValuePair("description", projectInfo.GetProjectDescription())
+			.AddKeyValuePair("default_scene", projectInfo.GetDefaultScene())
 			.StartNewObject("assets");
 
 		serializer->StartNewArray("textures");

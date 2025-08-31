@@ -61,6 +61,8 @@ namespace Feather {
 		inline const std::string& GetProjectDescription() const { return m_ProjectDescription; }
 		inline void SetCopyRightNotice(const std::string& copyRightNotice) { m_CopyRightNotice = copyRightNotice; }
 		inline const std::string& GetCopyRightNotice() const { return m_CopyRightNotice; }
+		inline const std::string& GetDefaultScene() const { return m_DefaultScene; }
+		inline void SetDefaultScene(const std::string& defaultScene) { m_DefaultScene = defaultScene; }
 
 		inline const std::unordered_map<EProjectFolderType, fs::path>& GetProjectPaths() const { return m_mapProjectFolderPaths; }
 
@@ -71,6 +73,7 @@ namespace Feather {
 		std::optional<fs::path> m_MainLuaScript{ std::nullopt };
 		std::optional<fs::path> m_IconFilePath{ std::nullopt };
 		std::optional<fs::path> m_ScriptListPath{ std::nullopt };
+		std::string m_DefaultScene{};
 		std::string m_ProjectName{};
 		std::string m_ProjectVersion{ "1.0.0.0" };
 		std::string m_ProjectDescription{};

@@ -11,6 +11,7 @@
 #include "Editor/Utilities/GUI/ImGuiUtils.h"
 #include "Editor/Utilities/EditorState.h"
 #include "Editor/Utilities/Fonts/IconsFontAwesome5.h"
+#include "Editor/Scene/SceneManager.h"
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
@@ -245,6 +246,26 @@ namespace Feather {
 								{
 									gameType = sTypeStr;
 									coreGlobals.SetGameType(eType);
+								}
+							}
+						
+							ImGui::EndCombo();
+						}
+					}
+				},
+				{
+					"Default Scene", [&]() {
+						std::string defaultScene{ projectInfo.GetDefaultScene() };
+						ImGui::InlineLabel(ICON_FA_IMAGE " Default Scene");
+						ImGui::ItemToolTip("The default scene to be loaded when the project is loaded");
+						if (ImGui::BeginCombo("##default_scene", defaultScene.c_str()))
+						{
+							for (const auto& sceneName : SCENE_MANAGER().GetSceneNames())
+							{
+								if (ImGui::Selectable(sceneName.c_str(), sceneName == defaultScene))
+								{
+									defaultScene = sceneName;
+									projectInfo.SetDefaultScene(defaultScene);
 								}
 							}
 						
