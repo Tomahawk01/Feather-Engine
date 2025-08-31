@@ -582,8 +582,8 @@ namespace Feather {
 		serializer->StartNewArray("prefabs");
 		for (const auto& [sName, pPrefab] : assetManager.GetAllPrefabs())
 		{
-			std::string sFilepath = pPrefab->GetFilepath().substr(pPrefab->GetFilepath().find(ASSETS));
-			serializer->StartNewObject().AddKeyValuePair("name", sName).AddKeyValuePair("path", sFilepath).EndObject();
+			std::string filepath = pPrefab->GetFilepath().substr(pPrefab->GetFilepath().find(ASSETS));
+			serializer->StartNewObject().AddKeyValuePair("name", sName).AddKeyValuePair("path", filepath).EndObject();
 		}
 		serializer->EndArray(); // Prefabs
 

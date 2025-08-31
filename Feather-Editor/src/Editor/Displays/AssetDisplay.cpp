@@ -390,11 +390,12 @@ namespace Feather {
 
 	void AssetDisplay::OpenAssetContext(const std::string& assetName)
 	{
-		if (ImGui::Selectable("rename"))
+		ImGui::SeparatorText("Edit");
+		if (ImGui::Selectable(ICON_FA_PEN " Rename"))
 		{
 			m_Rename = true;
 		}
-		if (ImGui::Selectable("delete"))
+		if (ImGui::Selectable(ICON_FA_TRASH " Delete"))
 		{
 			bool isSuccess{ false };
 			if (m_eSelectedType == AssetType::SCENE)
@@ -435,6 +436,12 @@ namespace Feather {
 							assetName);
 				}
 			}
+		}
+
+		ImGui::SeparatorText("File Explorer");
+		if (ImGui::Selectable(ICON_FA_FILE_ALT " Open File Location"))
+		{
+			// TODO:
 		}
 	}
 

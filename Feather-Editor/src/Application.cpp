@@ -488,8 +488,8 @@ namespace Feather {
 			case SDL_DROPFILE:
 			{
 				EVENT_DISPATCHER().EmitEvent(FileEvent{
-					.eAction = FileAction::FileDropped,
-					.sFilepath = std::string{m_Event.drop.file}
+					.action = FileAction::FileDropped,
+					.filepath = std::string{m_Event.drop.file}
 					});
 			} break;
 			default:

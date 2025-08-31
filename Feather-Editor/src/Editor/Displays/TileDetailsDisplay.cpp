@@ -113,7 +113,6 @@ namespace Feather {
 			ImGui::AddSpaces(2);
 
 			float itemWidth{ ImGui::GetWindowWidth() - 96.0f };
-			F_ASSERT(itemWidth > 0 && "Item width must not be less than zero");
 
 			auto reverseView = spriteLayers | std::ranges::views::reverse;
 

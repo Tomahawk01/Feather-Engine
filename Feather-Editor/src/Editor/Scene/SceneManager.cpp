@@ -223,7 +223,6 @@ namespace Feather {
 					return false;
 				}
 
-				currentScene->GetRuntimeRegistry().DestroyEntities<ScriptComponent>();
 				if (!scene->IsLoaded())
 				{
 					scene->LoadScene();

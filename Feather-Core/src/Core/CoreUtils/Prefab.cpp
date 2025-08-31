@@ -3,6 +3,7 @@
 #include "Logger/Logger.h"
 #include "Core/ECS/MainRegistry.h"
 #include "Core/ECS/Entity.h"
+#include "Core/ECS/ECSUtils.h"
 #include "Core/ECS/Components/ComponentSerializer.h"
 #include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/CoreUtils/CoreUtilities.h"
@@ -354,9 +355,9 @@ namespace Feather {
 		if (auto* sprite = entityToPrefab.TryGetComponent<SpriteComponent>())
 		{
 			prefabbed.sprite = *sprite;
-			auto pTexture = ASSET_MANAGER().GetTexture(sprite->textureName);
-			F_ASSERT(pTexture && "Sprite texture must exist in the asset manager");
-			GenerateUVs(*prefabbed.sprite, pTexture->GetWidth(), pTexture->GetHeight());
+			auto texture = ASSET_MANAGER().GetTexture(sprite->textureName);
+			F_ASSERT(texture && "Sprite texture must exist in the asset manager");
+			GenerateUVs(*prefabbed.sprite, texture->GetWidth(), texture->GetHeight());
 		}
 
 		if (auto* boxCollider = entityToPrefab.TryGetComponent<BoxColliderComponent>())
@@ -433,7 +434,23 @@ namespace Feather {
 	std::shared_ptr<Entity> PrefabCreator::AddPrefabToScene(const Prefab& prefab, Registry& registry)
 	{
 		const auto& prefabbed = prefab.GetPrefabbedEntity();
-		auto newEnt = std::make_shared<Entity>(registry, prefabbed.id->name, prefabbed.id->group);
+		
+		// Remove the _pfab from the prefabbed id
+		std::string tag{ RemoveSuffixCopy(prefabbed.id->name, "_pfab") };
+		std::string checkTag{ tag };
+		int current{ 0 };
+
+		entt::entity hasEntity = FindEntityByTag(registry, tag);
+		while (hasEntity != entt::null)
+		{
+			checkTag = tag + std::to_string(current);
+			hasEntity = FindEntityByTag(registry, tag);
+			++current;
+		}
+
+		tag = checkTag;
+
+		auto newEnt = std::make_shared<Entity>(registry, tag, prefabbed.id->group);
 
 		newEnt->AddComponent<TransformComponent>(prefabbed.transform);
 		if (prefabbed.sprite)

@@ -17,8 +17,8 @@ namespace Feather {
 
 	struct FileEvent
 	{
-		FileAction eAction{ FileAction::NoAction };
-		std::string sFilepath{};
+		FileAction action{ FileAction::NoAction };
+		std::string filepath{};
 	};
 
 	struct CloseEditorEvent
@@ -49,8 +49,8 @@ namespace Feather {
 
 	struct ContentCreateEvent
 	{
-		ContentCreateAction eAction{ ContentCreateAction::NoAction };
-		std::string sFilepath{};
+		ContentCreateAction action{ ContentCreateAction::NoAction };
+		std::string filepath{};
 	};
 
 	struct NameChangeEvent

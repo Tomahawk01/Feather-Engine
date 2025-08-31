@@ -171,7 +171,7 @@ namespace Feather {
 							}
 						}
 
-						if (ImGui::Selectable("Rename"))
+						if (ImGui::Selectable(ICON_FA_PEN " Rename"))
 						{
 							// TODO: Rename file
 						}
@@ -213,7 +213,7 @@ namespace Feather {
 					{
 						if (ImGui::Selectable(ICON_FA_PASTE "Paste"))
 						{
-							m_FileDispatcher->EnqueueEvent(FileEvent{ .eAction = FileAction::Paste });
+							m_FileDispatcher->EnqueueEvent(FileEvent{ .action = FileAction::Paste, .filepath = m_FilepathToAction });
 						}
 					}
 					else
@@ -412,18 +412,18 @@ namespace Feather {
 
 	void ContentDisplay::HandleFileEvent(const FileEvent& fileEvent)
 	{
-		if (fileEvent.sFilepath.empty() || fileEvent.eAction == FileAction::NoAction)
+		if (fileEvent.filepath.empty() || fileEvent.action == FileAction::NoAction)
 			return;
 
 		auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
 		if (!projectInfo)
 			return;
 
-		switch (fileEvent.eAction)
+		switch (fileEvent.action)
 		{
 			case FileAction::Delete:
 			{
-				std::filesystem::path path{ fileEvent.sFilepath };
+				std::filesystem::path path{ fileEvent.filepath };
 				if (IsDefaultProjectPathOrFile(path, *projectInfo))
 				{
 					F_ERROR("Failed to delete '{}' - This is a reserved default project folder or file", path.string());
@@ -480,12 +480,12 @@ namespace Feather {
 			}
 			case FileAction::FileDropped:
 			{
-				if (!m_WindowHovered || fileEvent.sFilepath.empty())
+				if (!m_WindowHovered || fileEvent.filepath.empty())
 					break;
 
-				CopyDroppedFile(fileEvent.sFilepath, m_CurrentDir);
+				CopyDroppedFile(fileEvent.filepath, m_CurrentDir);
 
-				F_TRACE("Dropped file: {}", fileEvent.sFilepath);
+				F_TRACE("Dropped file: {}", fileEvent.filepath);
 				break;
 			}
 		}
@@ -493,10 +493,10 @@ namespace Feather {
 
 	void ContentDisplay::HandleCreateEvent(const ContentCreateEvent& createEvent)
 	{
-		if (createEvent.eAction == ContentCreateAction::NoAction)
+		if (createEvent.action == ContentCreateAction::NoAction)
 			return;
 
-		switch (createEvent.eAction)
+		switch (createEvent.action)
 		{
 			case ContentCreateAction::Folder: OpenCreateFolderPopup(); break;
 		}
@@ -537,7 +537,7 @@ namespace Feather {
 			ImGui::Text("This cannot be undone. Are you sure?");
 			if (ImGui::Button("Ok"))
 			{
-				m_FileDispatcher->EnqueueEvent(FileEvent{ .eAction = FileAction::Delete, .sFilepath = m_FilepathToAction });
+				m_FileDispatcher->EnqueueEvent(FileEvent{ .action = FileAction::Delete, .filepath = m_FilepathToAction });
 				m_FilepathToAction.clear();
 				m_FileAction = FileAction::NoAction;
 			}

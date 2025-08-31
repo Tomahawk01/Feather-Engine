@@ -57,17 +57,16 @@ namespace Feather {
 		PROCESS_INFORMATION pi{};
 		si.cb = sizeof(si);
 
-		if (CreateProcessW(
-			nullptr, command.data(),
-			nullptr,
-			nullptr,
-			FALSE,
-			CREATE_NO_WINDOW | DETACHED_PROCESS,
-			nullptr,
-			nullptr,
-			&si,
-			&pi
-		))
+		if (CreateProcessW(nullptr,
+						   command.data(),
+						   nullptr,
+						   nullptr,
+						   FALSE,
+						   CREATE_NO_WINDOW | DETACHED_PROCESS,
+						   nullptr,
+						   nullptr,
+						   &si,
+						   &pi))
 		{
 			CloseHandle(pi.hThread);
 			CloseHandle(pi.hProcess);
