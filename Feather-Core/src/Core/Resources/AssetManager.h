@@ -46,6 +46,7 @@ namespace Feather {
 
 		bool AddSoundFx(const std::string& soundFxName, const std::string& filepath);
 		bool AddSoundFxFromMemory(const std::string& soundFxName, const unsigned char* soundFxData, size_t dataSize);
+		std::string GetAssetFilepath(const std::string& assetName, AssetType assetType);
 		std::shared_ptr<SoundFX> GetSoundFx(const std::string& soundFxName);
 		
 		bool AddPrefab(const std::string& prefabName, std::shared_ptr<Prefab> prefab);

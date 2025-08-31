@@ -39,6 +39,8 @@ namespace Feather {
 
 		void UpdateScenes();
 
+		std::string GetSceneFilepath(const std::string& sceneName);
+
 		inline const std::map<std::string, std::shared_ptr<Scene>>& GetAllScenes() const { return m_mapScenes; }
 		inline const std::string& GetCurrentTileset() const { return m_CurrentTileset; }
 

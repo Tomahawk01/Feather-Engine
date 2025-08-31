@@ -494,6 +494,40 @@ namespace Feather {
         return isSuccess;
     }
 
+    std::string AssetManager::GetAssetFilepath(const std::string& assetName, AssetType assetType)
+    {
+        switch (assetType)
+        {
+            case AssetType::TEXTURE:
+            {
+                auto itr = m_mapTextures.find(assetName);
+                return itr != m_mapTextures.end() ? itr->second->GetPath() : std::string{};
+            }
+            case AssetType::FONT:
+            {
+                auto itr = m_mapFonts.find(assetName);
+                return itr != m_mapFonts.end() ? itr->second->GetFilename() : std::string{};
+            }
+            case AssetType::SOUNDFX:
+            {
+                auto itr = m_mapSoundFX.find(assetName);
+                return itr != m_mapSoundFX.end() ? itr->second->GetFilename() : std::string{};
+            }
+            case AssetType::MUSIC:
+            {
+                auto itr = m_mapMusic.find(assetName);
+                return itr != m_mapMusic.end() ? itr->second->GetFilename() : std::string{};
+            }
+            case AssetType::PREFAB:
+            {
+                auto itr = m_mapPrefabs.find(assetName);
+                return itr != m_mapPrefabs.end() ? itr->second->GetFilepath() : std::string{};
+            }
+        }
+
+        return {};
+    }
+
     std::shared_ptr<SoundFX> AssetManager::GetSoundFx(const std::string& soundFxName)
     {
         auto soundItr = m_mapSoundFX.find(soundFxName);

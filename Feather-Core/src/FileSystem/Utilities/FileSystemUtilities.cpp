@@ -29,4 +29,10 @@ namespace Feather {
 		return result;
 	}
 
+	std::string NormalizePath(const std::string& sPath)
+	{
+		fs::path path{ sPath };
+		return path.make_preferred().string();
+	}
+
 }

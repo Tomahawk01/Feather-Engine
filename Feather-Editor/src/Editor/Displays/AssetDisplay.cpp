@@ -12,6 +12,8 @@
 #include "Renderer/Essentials/Font.h"
 #include "Sounds/Essentials/Music.h"
 #include "Sounds/Essentials/SoundFX.h"
+#include "FileSystem/Process/FileProcessor.h"
+#include "FileSystem/Utilities/FileSystemUtilities.h"
 #include "Logger/Logger.h"
 
 #include "Editor/Utilities/EditorUtilities.h"
@@ -441,7 +443,30 @@ namespace Feather {
 		ImGui::SeparatorText("File Explorer");
 		if (ImGui::Selectable(ICON_FA_FILE_ALT " Open File Location"))
 		{
-			// TODO:
+			if (m_eSelectedType == AssetType::SCENE)
+			{
+				std::string scenePath = SCENE_MANAGER().GetSceneFilepath(assetName);
+				if (!scenePath.empty())
+				{
+					FileProcessor fp{};
+					if (!fp.OpenFileLocation(NormalizePath(scenePath)))
+					{
+						F_ERROR("Failed to open file location '{}'", scenePath);
+					}
+				}
+			}
+			else
+			{
+				std::string assetPath = ASSET_MANAGER().GetAssetFilepath(assetName, m_eSelectedType);
+				if (!assetPath.empty())
+				{
+					FileProcessor fp{};
+					if (!fp.OpenFileLocation(NormalizePath(assetPath)))
+					{
+						F_ERROR("Failed to open file location '{}'", assetPath);
+					}
+				}
+			}
 		}
 	}
 

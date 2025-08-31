@@ -188,6 +188,12 @@ namespace Feather {
 		}
 	}
 
+	std::string EditorSceneManager::GetSceneFilepath(const std::string& sceneName)
+	{
+		auto itr = m_mapScenes.find(sceneName);
+		return itr != m_mapScenes.end() ? itr->second->GetFilepath() : std::string{};
+	}
+
 	EditorSceneManager::EditorSceneManager()
 		: SceneManager()
 	{}

@@ -80,6 +80,7 @@ namespace Feather {
 		inline const std::string& GetSceneName() const { return m_SceneName; }
 		inline const std::string& GetSceneDataPath() { return m_SceneDataPath; }
 		inline EMapType GetMapType() const { return m_MapType; }
+		inline const std::string& GetFilepath() const { return m_SceneDataPath; }
 		inline bool IsLoaded() const { return m_SceneLoaded; }
 		/*
 		 * @brief Checks to see if there are any layers in the scenes tilemap.
