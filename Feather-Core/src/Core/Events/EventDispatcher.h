@@ -67,7 +67,7 @@ namespace Feather {
 			if (connection && callback.valid())
 				callback(ev);
 		}
-		~LuaHandler() { F_TRACE("Destroyed!"); }
+		~LuaHandler() {}
 
 		void ReleaseConnection()
 		{

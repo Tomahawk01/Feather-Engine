@@ -635,17 +635,18 @@ namespace Feather {
 			fs::path sceneDataPath = *optContentPath / sceneData;
 
 			Registry registry;
-			auto pSceneObject = std::make_unique<SceneObject>(sceneName, sceneDataPath.string());
-			auto [tilemap, objectMap] = pSceneObject->ExportSceneToLua(sceneName, m_PackageData->TempDataPath, registry);
+			auto sceneObject = std::make_unique<SceneObject>(sceneName, sceneDataPath.string());
+			auto sceneExportFiles = sceneObject->ExportSceneToLua(sceneName, m_PackageData->TempDataPath, registry);
 
-			if (!fs::exists(fs::path{ tilemap }) || !fs::exists(fs::path{ objectMap }))
+			if (!sceneExportFiles.IsValid())
 			{
 				F_ERROR("Failed to create scene files for scene '{}'", sceneName);
 				return {};
 			}
 
-			sceneFiles.push_back(tilemap);
-			sceneFiles.push_back(objectMap);
+			sceneFiles.push_back(sceneExportFiles.tilemapFile);
+			sceneFiles.push_back(sceneExportFiles.objectFile);
+			sceneFiles.push_back(sceneExportFiles.dataFile);
 		}
 
 		return sceneFiles;

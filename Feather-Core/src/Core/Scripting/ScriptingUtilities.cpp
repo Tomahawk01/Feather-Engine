@@ -74,11 +74,24 @@ namespace Feather {
 		end
 		)";
 
+		std::string luaInsertUnique = R"(
+		function F_InsertUnique(tbl, value)
+			for _, v in pairs(tbl) do 
+				if v == value then 
+					return -- Already in table
+				end 
+			end 
+	
+			table.insert(tbl, value)
+		end
+		)";
+
 		try
 		{
 			auto result = lua.safe_script(luaClassCode);
 			result = lua.safe_script(luaDeepClone);
 			result = lua.safe_script(luaShallowCopy);
+			result = lua.safe_script(luaInsertUnique);
 		}
 		catch (const sol::error& err)
 		{

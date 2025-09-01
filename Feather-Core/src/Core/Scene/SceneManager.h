@@ -6,6 +6,14 @@ namespace Feather {
 
 	enum class EMapType;
 	class Scene;
+	class Registry;
+
+	struct SceneManagerData
+	{
+		std::string sceneName{};
+		std::string defaultMusic{};
+		// TODO: Add more stuff
+	};
 
 	class SceneManager
 	{
@@ -52,7 +60,7 @@ namespace Feather {
 		inline void SetCurrentScene(const std::string& sceneName) { m_CurrentScene = sceneName; }
 		inline const std::string& GetCurrentSceneName() const { return m_CurrentScene; }
 
-		static void CreateLuaBind(sol::state& lua, SceneManager& sceneManager);
+		static void CreateLuaBind(sol::state& lua, Registry& registry);
 
 	protected:
 		std::map<std::string, std::shared_ptr<Scene>> m_mapScenes;

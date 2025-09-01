@@ -242,7 +242,7 @@ namespace Feather {
 					}
 
 					if (!m_Rename || !IsSelectedAsset)
-						ImGui::Text(assetName);
+						ImGui::TextWrapped(assetName);
 
 					if (m_Rename && IsSelectedAsset)
 					{

@@ -41,7 +41,7 @@ namespace Feather {
 
         lua.new_usertype<EventDispatcher>(
             "EventDispatcher",
-            sol::meta_function::construct,
+            sol::call_constructor,
             sol::factories([&](EDispatcherType eType, sol::this_state s)
             {
                 if (eType == EDispatcherType::LUA_DISPATCHER)
@@ -53,7 +53,6 @@ namespace Feather {
             [](EventDispatcher& eventDispatcher, const sol::table& handler, const sol::object& type)
             {
                 const auto handle = InvokeMetaFunction(GetIdType(type), "add_handler"_hs, eventDispatcher, handler);
-                F_TRACE("TYPE: {}", handle.type().info().name());
             },
             "removeHandler",
             [](EventDispatcher& eventDispatcher, const sol::table& handler, const sol::object& type)

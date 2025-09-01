@@ -6,7 +6,8 @@
 #include "Core/Loaders/TilemapLoader.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/CoreUtils/ProjectInfo.h"
-#include "Filesystem/Serializers/JSONSerializer.h"
+#include "FileSystem/Serializers/JSONSerializer.h"
+#include "FileSystem/Serializers/LuaSerializer.h"
 
 #include "Editor/Events/EditorEventTypes.h"
 #include "Editor/Commands/CommandManager.h"
@@ -392,7 +393,7 @@ namespace Feather {
 		return success;
 	}
 
-	std::pair<std::string, std::string> SceneObject::ExportSceneToLua(const std::string& sceneName, const std::string& exportPath, Registry& registry)
+	SceneExportFiles SceneObject::ExportSceneToLua(const std::string& sceneName, const std::string& exportPath, Registry& registry)
 	{
 		if (!fs::exists(m_SceneDataPath))
 		{
@@ -483,6 +484,11 @@ namespace Feather {
 			return {};
 		}
 
+		if (IsPlayerStartEnabled())
+		{
+			CopyPlayerStartToRuntimeRegistry(registry);
+		}
+
 		fs::path exportPath_{ exportPath };
 		if (!fs::exists(exportPath_))
 		{
@@ -508,7 +514,40 @@ namespace Feather {
 			return {};
 		}
 
-		return std::make_pair(tilemapLua.string(), objectLua.string());
+		// Export Scene Data
+		std::unique_ptr<LuaSerializer> serializer{ nullptr };
+
+		fs::path sceneDataPath{ exportPath };
+		sceneDataPath /= sceneName + "_data.lua";
+
+		try
+		{
+			serializer = std::make_unique<LuaSerializer>(sceneDataPath.string());
+		}
+		catch (const std::exception& ex)
+		{
+			F_ERROR("Failed to save tilemap '{}': {}", sceneDataPath.string(), ex.what());
+			return {};
+		}
+
+		if (m_DefaultMusic.empty() && sceneData.HasMember("defaultMusic"))
+		{
+			m_DefaultMusic = sceneData["defaultMusic"].GetString();
+		}
+
+		serializer->StartNewTable(sceneName + "_data")
+			.AddKeyValuePair("default_music", m_DefaultMusic, true, false, false, true)
+			.AddKeyValuePair("scene_name", m_SceneName, true, false, false, true)
+			.StartNewTable("canvas")
+			.AddKeyValuePair("width", m_Canvas.width)
+			.AddKeyValuePair("height", m_Canvas.height)
+			.AddKeyValuePair("tileWidth", m_Canvas.tileWidth)
+			.AddKeyValuePair("tileHeight", m_Canvas.tileHeight, true, true)
+			.EndTable()	 // canvas
+			.EndTable(); // _data
+		serializer->FinishStream();
+
+		return { tilemapLua.string(), objectLua.string(), sceneDataPath.string() };
 	}
 
 	bool SceneObject::CheckTagName(const std::string& tagName)

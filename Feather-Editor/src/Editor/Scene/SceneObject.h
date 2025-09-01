@@ -15,6 +15,18 @@ namespace Feather {
 		Canvas canvas;
 	};
 
+	struct SceneExportFiles
+	{
+		std::string tilemapFile{};
+		std::string objectFile{};
+		std::string dataFile{};
+
+		bool IsValid() const
+		{
+			return !tilemapFile.empty() && !objectFile.empty() && !dataFile.empty() && fs::exists(tilemapFile) && fs::exists(objectFile) && fs::exists(dataFile);
+		}
+	};
+
 	class SceneObject : public Scene
 	{
 	public:
@@ -39,7 +51,7 @@ namespace Feather {
 		virtual bool LoadScene() override;
 		virtual bool UnloadScene(bool saveScene = true) override;
 
-		std::pair<std::string, std::string> ExportSceneToLua(const std::string& sceneName, const std::string& exportPath, Registry& registry);
+		SceneExportFiles ExportSceneToLua(const std::string& sceneName, const std::string& exportPath, Registry& registry);
 
 		bool CheckTagName(const std::string& tagName);
 

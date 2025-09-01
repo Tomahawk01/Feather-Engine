@@ -2,6 +2,8 @@
 
 #include "Core/Scene/Scene.h"
 #include "Core/ECS/Components/AllComponents.h"
+#include "Core/ECS/Registry.h"
+#include "Core/Loaders/TilemapLoader.h"
 #include "Utils/FeatherUtilities.h"
 
 namespace Feather {
@@ -91,64 +93,112 @@ namespace Feather {
 		return KeyChange(m_mapScenes, sOldName, sNewName);
 	}
 
-	void SceneManager::CreateLuaBind(sol::state& lua, SceneManager& sceneManager)
+	void SceneManager::CreateLuaBind(sol::state& lua, Registry& registry)
 	{
 		lua.new_usertype<SceneManager>(
 			"SceneManager",
 			sol::no_constructor,
+			"setCurrentScene",
+			[&registry](const std::string& sceneName)
+			{
+				auto* sceneManagerData = registry.TryGetContext<std::shared_ptr<SceneManagerData>>();
+				if (!sceneManagerData)
+				{
+					F_ERROR("Scene manager data was not set correctly");
+					return;
+				}
+
+				(*sceneManagerData)->sceneName = sceneName;
+			},
 			"changeScene",
-			// TODO: This will still need testing once the runtime has been created
 			[&](const std::string& sceneName)
 			{
-				auto currentScene = sceneManager.GetCurrentScene();
-				if (!currentScene)
+				auto* sceneManagerData = registry.TryGetContext<std::shared_ptr<SceneManagerData>>();
+				if (!sceneManagerData)
 				{
-					F_ERROR("Failed to change to scene '{}': Current scene is invalid", sceneName);
+					F_ERROR("Scene manager data was not set correctly");
 					return false;
 				}
 
-				if (currentScene->GetSceneName() == sceneName)
+				(*sceneManagerData)->sceneName = sceneName;
+
+				sol::optional<sol::table> optSceneData = lua[sceneName + "_data"];
+				if (optSceneData)
 				{
-					F_ERROR("Failed to load scene '{}': Scene has already been loaded", sceneName);
-					return false;
+					(*sceneManagerData)->defaultMusic = (*optSceneData)["default_music"].get_or(std::string{});
 				}
 
-				auto pScene = sceneManager.GetScene(sceneName);
-				if (!pScene)
-				{
-					F_ERROR("Failed to change to scene '{}': Scene is invalid", sceneName);
-					return false;
-				}
+				registry.DestroyEntities();
 
-				currentScene->GetRegistry().DestroyEntities<ScriptComponent>();
-				currentScene->UnloadScene();
+				TilemapLoader tl{};
 
-				if (!pScene->IsLoaded())
-				{
-					pScene->LoadScene();
-				}
-
-				sceneManager.SetCurrentScene(sceneName);
+				tl.LoadTilemapFromLuaTable(registry, lua[sceneName + "_tilemap"]);
+				tl.LoadGameObjectsFromLuaTable(registry, lua[sceneName + "_objects"]);
 
 				return true;
 			},
 			"getCanvas", // Returns the canvas of the current scene or an empty canvas object
 			[&]
 			{
-				if (auto currentScene = sceneManager.GetCurrentScene())
-					return currentScene->GetCanvas();
+				auto* sceneManagerData = registry.TryGetContext<std::shared_ptr<SceneManagerData>>();
+				if (!sceneManagerData)
+				{
+					F_ERROR("Scene manager data was not set correctly");
+					return Canvas{};
+				}
+
+				sol::optional<sol::table> optSceneData = lua[(*sceneManagerData)->sceneName + "_data"];
+				if (optSceneData)
+				{
+					if (sol::optional<sol::table> optCanvas = (*optSceneData)["canvas"])
+					{
+						return Canvas{ .width = (*optCanvas)["width"].get_or(640),
+									   .height = (*optCanvas)["height"].get_or(480),
+									   .tileWidth = (*optCanvas)["tileWidth"].get_or(16),
+									   .tileHeight = (*optCanvas)["tileHeight"].get_or(16) };
+					}
+				}
 
 				return Canvas{};
 			},
 			"getDefaultMusic",
 			[&]
 			{
-				if (auto currentScene = sceneManager.GetCurrentScene())
-					return currentScene->GetDefaultMusicName();
+				auto* sceneManagerData = registry.TryGetContext<std::shared_ptr<SceneManagerData>>();
+				if (!sceneManagerData)
+				{
+					F_ERROR("Scene manager data was not set correctly");
+					return std::string{};
+				}
 
-				return std::string{};
+				if ((*sceneManagerData)->defaultMusic.empty())
+				{
+					sol::optional<sol::table> optSceneData = lua[(*sceneManagerData)->sceneName + "_data"];
+					if (optSceneData)
+					{
+						for (const auto& [key, value] : *optSceneData)
+						{
+							std::string sKey = key.as<std::string>();
+							int x{};
+						}
+						(*sceneManagerData)->defaultMusic = (*optSceneData)["default_music"].get_or(std::string{});
+					}
+				}
+
+				return (*sceneManagerData)->defaultMusic;
 			},
-			"getCurrentSceneName", [&] { return sceneManager.GetCurrentSceneName(); }
+			"getCurrentSceneName",
+			[&]
+			{
+				auto* sceneManagerData = registry.TryGetContext<std::shared_ptr<SceneManagerData>>();
+				if (!sceneManagerData)
+				{
+					F_ERROR("Scene manager data was not set correctly");
+					return std::string{};
+				}
+
+				return (*sceneManagerData)->sceneName;
+			}
 		);
 	}
 

@@ -18,6 +18,9 @@
 #include "Core/Systems/RenderSystem.h"
 #include "Core/Systems/RenderUISystem.h"
 #include "Core/Systems/RenderShapeSystem.h"
+#include "Core/Scene/SceneManager.h"
+#include "Core/Loaders/TilemapLoader.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Physics/Box2DWrappers.h"
 #include "Physics/ContactListener.h"
 #include "Logger/Logger.h"
@@ -30,8 +33,6 @@
 #include "Windowing/Input/Gamepad.h"
 #include "Renderer/Core/Camera2D.h"
 #include "Renderer/Core/Renderer.h"
-#include "Core/Loaders/TilemapLoader.h"
-#include "Core/CoreUtils/ProjectInfo.h"
 
 #include <SDL.h>
 #include <sol/sol.hpp>
@@ -177,10 +178,14 @@ namespace Feather {
 			throw std::runtime_error("Failed to load game scripts");
 		}
 
+		auto sceneManagerData = mainRegistry.AddToContext<std::shared_ptr<SceneManagerData>>(std::make_shared<SceneManagerData>());
+
 		TilemapLoader tl{};
 		auto& lua = mainRegistry.GetContext<std::shared_ptr<sol::state>>();
 		tl.LoadTilemapFromLuaTable(*mainRegistry.GetRegistry(), (*lua)[m_GameConfig->startupScene + "_tilemap"]);
 		tl.LoadGameObjectsFromLuaTable(*mainRegistry.GetRegistry(), (*lua)[m_GameConfig->startupScene + "_objects"]);
+
+		sceneManagerData->sceneName = m_GameConfig->startupScene;
 
 		if (!mainScript->init.valid())
 		{
@@ -330,6 +335,8 @@ namespace Feather {
 		ScriptingSystem::RegisterLuaFunctions(*luaState, *registry);
 		ScriptingSystem::RegisterLuaEvents(*luaState, *registry);
 		ScriptingSystem::RegisterLuaSystems(*luaState, *registry);
+
+		SceneManager::CreateLuaBind(*luaState, *registry);
 	}
 
 	bool RuntimeApp::LoadScripts()
