@@ -22,6 +22,8 @@ namespace Feather {
 		static void CreateLuaInputBindings(sol::state& lua, Registry& registry);
 
 		void UpdateInputs();
+		bool GamepadConnected() const;
+		bool GamepadConnected(int location) const;
 
 		inline Keyboard& GetKeyboard() { return *m_Keyboard; }
 		inline Mouse& GetMouse() { return *m_Mouse; }
@@ -29,8 +31,8 @@ namespace Feather {
 
 		std::shared_ptr<Gamepad> GetController(int index);
 
-		bool AddGamepad(Sint32 gamepadID);
-		bool RemoveGamepad(Sint32 gamepadID);
+		int AddGamepad(Sint32 gamepadID);
+		int RemoveGamepad(Sint32 gamepadID);
 		void GamepadButtonPressed(const SDL_Event& event);
 		void GamepadButtonReleased(const SDL_Event& event);
 		void GamepadAxisValues(const SDL_Event& event);

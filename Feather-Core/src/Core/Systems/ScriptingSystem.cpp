@@ -562,6 +562,7 @@ namespace Feather {
 		EventDispatcher::RegisterMetaEventFuncs<ContactEvent>();
 		EventDispatcher::RegisterMetaEventFuncs<KeyEvent>();
 		EventDispatcher::RegisterMetaEventFuncs<LuaEvent>();
+		EventDispatcher::RegisterMetaEventFuncs<GamepadConnectEvent>();
 		EventDispatcher::CreateEventDispatcherLuaBind(lua, **dispatcher);
 	}
 

@@ -461,11 +461,26 @@ namespace Feather {
 				inputManager.GamepadButtonReleased(m_Event);
 				break;
 			case SDL_CONTROLLERDEVICEADDED:
-				inputManager.AddGamepad(m_Event.jdevice.which);
+			{
+				int index = inputManager.AddGamepad(m_Event.jdevice.which);
+				if (index > 0)
+				{
+					EVENT_DISPATCHER().EmitEvent(GamepadConnectEvent{ .connectType = GamepadConnectType::Connected, .index = index });
+				}
+
 				break;
+			}
 			case SDL_CONTROLLERDEVICEREMOVED:
-				inputManager.RemoveGamepad(m_Event.jdevice.which);
+			{
+				int index = inputManager.RemoveGamepad(m_Event.jdevice.which);
+
+				if (index > 0)
+				{
+					EVENT_DISPATCHER().EmitEvent(GamepadConnectEvent{ .connectType = GamepadConnectType::Disconnected, .index = index });
+				}
+
 				break;
+			}
 			case SDL_JOYAXISMOTION:
 				inputManager.GamepadAxisValues(m_Event);
 				break;

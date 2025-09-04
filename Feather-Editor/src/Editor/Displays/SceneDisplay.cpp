@@ -217,8 +217,9 @@ namespace Feather {
 
 		ScriptingSystem::RegisterLuaBindings(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaFunctions(*lua, runtimeRegistry);
-		ScriptingSystem::RegisterLuaEvents(*lua, runtimeRegistry);
 		ScriptingSystem::RegisterLuaSystems(*lua, runtimeRegistry);
+		// We need to be able to get the editor events from lua. Pass in the main registry to get the main event dispatcher
+		ScriptingSystem::RegisterLuaEvents(*lua, *MAIN_REGISTRY().GetRegistry());
 		LuaCoreBinder::CreateLuaBind(*lua, runtimeRegistry);
 
 		EditorSceneManager::CreateSceneManagerLuaBind(*lua);

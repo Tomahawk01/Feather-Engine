@@ -12,7 +12,37 @@ namespace Feather {
 
     InputManager::InputManager()
         : m_Keyboard{ std::make_unique<Keyboard>() }, m_Mouse{ std::make_unique<Mouse>() }
-    {}
+    {
+        // Load already connected devices
+        for (int i = 0; i < SDL_NumJoysticks(); ++i)
+        {
+            SDL_GameController* controller = SDL_GameControllerOpen(i);
+            if (controller)
+            {
+                std::shared_ptr<Gamepad> gamepad{ nullptr };
+                try
+                {
+                    gamepad = std::make_shared<Gamepad>(std::move(MakeSharedFromSDLType<Controller>(controller)));
+                }
+                catch (...)
+                {
+                    std::string error{ SDL_GetError() };
+                    F_ERROR("Failed to open gamepad device: {}", error);
+                    continue;
+                }
+
+                for (int j = 1; j <= MAX_CONTROLLERS; j++)
+                {
+                    if (m_GameControllers.contains(j))
+                        continue;
+
+                    m_GameControllers.emplace(j, std::move(gamepad));
+                    F_TRACE("Gamepad '{}' was added at index '{}'", i, j);
+                    break;
+                }
+            }
+        }
+    }
 
 	InputManager& InputManager::GetInstance()
 	{
@@ -75,6 +105,14 @@ namespace Feather {
         lua.new_usertype<Gamepad>(
             "Gamepad",
             sol::no_constructor,
+            "anyConnected", [&]
+            {
+                return inputManager.GamepadConnected();
+            },
+            "connected", [&](int index)
+            {
+                return inputManager.GamepadConnected(index);
+            },
             "justPressed", [&](int index, int btn)
             {
                 auto gamepad = inputManager.GetController(index);
@@ -135,6 +173,17 @@ namespace Feather {
         UpdateGamepads();
     }
 
+    bool InputManager::GamepadConnected() const
+    {
+        return std::ranges::any_of(m_GameControllers, [](const auto& pair) { return pair.second != nullptr; });
+    }
+
+    bool InputManager::GamepadConnected(int location) const
+    {
+        auto gamepadItr = m_GameControllers.find(location);
+        return gamepadItr != m_GameControllers.end() && gamepadItr->second != nullptr;
+    }
+
     std::shared_ptr<Gamepad> InputManager::GetController(int index)
     {
         auto gamepadItr = m_GameControllers.find(index);
@@ -147,12 +196,19 @@ namespace Feather {
         return gamepadItr->second;
     }
 
-    bool InputManager::AddGamepad(Sint32 gamepadID)
+    int InputManager::AddGamepad(Sint32 gamepadID)
     {
+        // Trying to add a controller with the same id
+        if (std::ranges::any_of(m_GameControllers, [&gamepadID](const auto& pair) { return pair.second->CheckJoystickID(gamepadID); }))
+        {
+            F_WARN("Trying to add a controller that is already mapped. Gamepad ID: {}", gamepadID);
+            return -1;
+        }
+
         if (m_GameControllers.size() >= MAX_CONTROLLERS)
         {
-            F_ERROR("Trying to add too many controllers! Max controllers allowed = {0}", MAX_CONTROLLERS);
-            return false;
+            F_WARN("Trying to add too many controllers! Max controllers allowed = {}", MAX_CONTROLLERS);
+            return -1;
         }
 
         std::shared_ptr<Gamepad> gamepad{ nullptr };
@@ -163,8 +219,8 @@ namespace Feather {
         catch (...)
         {
             std::string error{ SDL_GetError() };
-            F_ERROR("Failed to open gamepad device: {0}", error);
-            return false;
+            F_ERROR("Failed to open gamepad device: {}", error);
+            return -1;
         }
 
         for (int i = 1; i <= MAX_CONTROLLERS; i++)
@@ -173,30 +229,31 @@ namespace Feather {
                 continue;
 
             m_GameControllers.emplace(i, std::move(gamepad));
-            F_TRACE("Gamepad '{0}' added at index {1}", gamepadID, i);
-            return true;
+            F_TRACE("Gamepad '{}' added at index {}", gamepadID, i);
+            return i;
         }
 
         F_ASSERT(false && "Failed to add the new controller!");
         F_ERROR("Failed to add the new controller!");
-        return false;
+        return -1;
     }
 
-    bool InputManager::RemoveGamepad(Sint32 gamepadID)
+    int InputManager::RemoveGamepad(Sint32 gamepadID)
     {
-        auto gamepadRemoved = std::erase_if(m_GameControllers,
-            [&](auto& gamepad) { return gamepad.second->CheckJoystickID(gamepadID); }
-        );
+        auto gamepadItr = std::ranges::find_if(m_GameControllers, [&](const auto& gamepad) { return gamepad.second->CheckJoystickID(gamepadID); });
 
-        if (gamepadRemoved > 0)
+        int index{ -1 };
+        if (gamepadItr == m_GameControllers.end())
         {
-            F_TRACE("Gamepad '{0}' removed", gamepadID);
-            return true;
+            F_ASSERT(false && "Failed to remove Gamepad must not have been mapped correctly");
+            F_ERROR("Failed to remove Gamepad ID '{}' must not have been mapped correctly", gamepadID);
+            return index;
         }
 
-        F_ASSERT(false && "Failed to remove gamepad! Gamepad must not have been mapped");
-        F_ERROR("Failed to remove gamepad! Gamepad '{0}' must not have been mapped", gamepadID);
-        return false;
+        index = gamepadItr->first;
+        m_GameControllers.erase(gamepadItr);
+        F_TRACE("Gamepad ID '{}' at index '{}' was removed", gamepadID, index);
+        return index;
     }
 
     void InputManager::GamepadButtonPressed(const SDL_Event& event)

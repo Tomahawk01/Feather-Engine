@@ -158,7 +158,6 @@ namespace Feather {
 		if (m_FilesChanged.exchange(false, std::memory_order_acquire))
 		{
 			m_ListScripts = true;
-			F_TRACE("File was changed or added to scripts directory");
 		}
 
 		if (m_ListScripts)

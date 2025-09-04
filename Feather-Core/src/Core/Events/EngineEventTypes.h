@@ -25,6 +25,19 @@ namespace Feather {
         EKeyEventType type{ EKeyEventType::NoType };
     };
 
+    enum class GamepadConnectType
+    {
+        Connected,
+        Disconnected,
+        NotConnected
+    };
+
+    struct GamepadConnectEvent
+    {
+        GamepadConnectType connectType{ GamepadConnectType::NotConnected };
+        int index{ 1 };
+    };
+
     struct LuaEvent
     {
         sol::object data{ sol::lua_nil };

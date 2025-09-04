@@ -11,6 +11,7 @@
 #include "Core/Scripting/InputManager.h"
 #include "Core/CoreUtils/CoreEngineData.h"
 #include "Core/CoreUtils/Prefab.h"
+#include "Core/CoreUtils/ProjectInfo.h"
 #include "Core/Events/EventDispatcher.h"
 #include "Core/Events/EngineEventTypes.h"
 #include "Renderer/Core/Camera2D.h"
@@ -44,6 +45,14 @@ namespace Feather {
 		, m_WindowActive{ false }
 	{
 		ADD_EVENT_HANDLER(KeyEvent, &TilemapDisplay::HandleKeyPressedEvent, *this);
+
+		if (auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>())
+		{
+			if (!projectInfo->GetDefaultScene().empty() && SCENE_MANAGER().GetCurrentScene())
+			{
+				LoadNewScene();
+			}
+		}
 	}
 
 	TilemapDisplay::~TilemapDisplay()

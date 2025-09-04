@@ -13,9 +13,17 @@ namespace Feather {
 				{ "NoType", EKeyEventType::NoType },
 			});
 
-		lua.new_usertype<ContactEvent>("ContactEvent",
+		lua.new_enum<GamepadConnectType>("GamepadConnectType",
+			{
+				{ "Connected", GamepadConnectType::Connected },
+				{ "Disconnected", GamepadConnectType::Disconnected },
+				{ "NotConnected", GamepadConnectType::NotConnected },
+			});
+
+		lua.new_usertype<ContactEvent>(
+			"ContactEvent",
 			"type_id",
-			entt::type_hash<ContactEvent>::value,
+			&entt::type_hash<ContactEvent>::value,
 			sol::call_constructor,
 			sol::factories([] { return ContactEvent{}; },
 				[](ObjectData a, ObjectData b)
@@ -30,7 +38,7 @@ namespace Feather {
 		lua.new_usertype<KeyEvent>(
 			"KeyEvent",
 			"type_id",
-			entt::type_hash<KeyEvent>::value,
+			&entt::type_hash<KeyEvent>::value,
 			sol::call_constructor,
 			sol::factories([] { return KeyEvent{}; },
 				[](int key, EKeyEventType type) { return KeyEvent{ .key = key, .type = type }; }),
@@ -39,10 +47,21 @@ namespace Feather {
 			"type",
 			&KeyEvent::type);
 
+		lua.new_usertype<GamepadConnectEvent>(
+			"GamepadConnectEvent",
+			"type_id",
+			&entt::type_hash<GamepadConnectEvent>::value,
+			sol::call_constructor,
+			sol::factories([] { return GamepadConnectEvent{}; }),
+			"index",
+			&GamepadConnectEvent::index,
+			"type",
+			&GamepadConnectEvent::connectType);
+
 		lua.new_usertype<LuaEvent>(
 			"LuaEvent",
 			"type_id",
-			entt::type_hash<LuaEvent>::value,
+			&entt::type_hash<LuaEvent>::value,
 			sol::call_constructor,
 			sol::factories([] { return LuaEvent{}; }, [](const sol::object& data) { return LuaEvent{ .data = data }; }),
 			"data",
@@ -51,9 +70,9 @@ namespace Feather {
 		lua.new_usertype<LuaHandler<ContactEvent>>(
 			"ContactEventHandler",
 			"type_id",
-			entt::type_hash<LuaHandler<ContactEvent>>::value,
+			&entt::type_hash<LuaHandler<ContactEvent>>::value,
 			"event_type",
-			entt::type_hash<ContactEvent>::value,
+			&entt::type_hash<ContactEvent>::value,
 			sol::call_constructor,
 			sol::factories([](const sol::function& func) { return LuaHandler<ContactEvent>{.callback = func }; }),
 			"release",
@@ -62,12 +81,23 @@ namespace Feather {
 		lua.new_usertype<LuaHandler<KeyEvent>>(
 			"KeyEventHandler",
 			"type_id",
-			entt::type_hash<LuaHandler<KeyEvent>>::value,
+			&entt::type_hash<LuaHandler<KeyEvent>>::value,
 			"event_type",
-			entt::type_hash<KeyEvent>::value,
+			&entt::type_hash<KeyEvent>::value,
 			sol::call_constructor,
 			sol::factories([](const sol::function& func) { return LuaHandler<KeyEvent>{.callback = func }; }),
 			"release", &LuaHandler<KeyEvent>::ReleaseConnection);
+
+		lua.new_usertype<LuaHandler<GamepadConnectEvent>>(
+			"GamepadConnectEventHandler",
+			"type_id",
+			&entt::type_hash<LuaHandler<GamepadConnectEvent>>::value,
+			"event_type",
+			&entt::type_hash<GamepadConnectEvent>::value,
+			sol::call_constructor,
+			sol::factories([](const sol::function& func) { return LuaHandler<GamepadConnectEvent>{.callback = func }; }),
+			"release",
+			&LuaHandler<GamepadConnectEvent>::ReleaseConnection);
 
 		lua.new_usertype<LuaHandler<LuaEvent>>(
 			"LuaEventHandler",

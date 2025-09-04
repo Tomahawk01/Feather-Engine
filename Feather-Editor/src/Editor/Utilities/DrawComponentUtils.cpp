@@ -47,7 +47,7 @@ namespace Feather {
 			ImGui::InlineLabel("scale");
 			ImGui::ColoredLabel("x##scl_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 0.1f, 1.0f, "%.2f"))
+			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 0.1f, 1.0f, "%.3f"))
 			{
 				transform.scale.x = glm::clamp(transform.scale.x, 0.1f, 500.0f);
 				transform.isDirty = true;
@@ -55,7 +55,7 @@ namespace Feather {
 			ImGui::SameLine();
 			ImGui::ColoredLabel("y##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 0.1f, 1.0f, "%.2f"))
+			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 0.1f, 1.0f, "%.3f"))
 			{
 				transform.scale.y = glm::clamp(transform.scale.y, 0.1f, 500.0f);
 				transform.isDirty = true;
@@ -134,14 +134,20 @@ namespace Feather {
 			ImGui::ItemToolTip("The width of the sprite");
 			if (ImGui::InputFloat("##width", &sprite.width, 1.0f, 8.0f))
 			{
-				sprite.width = glm::clamp(sprite.width, 8.0f, 2000.0f);
+				if (sprite.width < 8.0f)
+				{
+					sprite.width = 8.0f;
+				}
 				IsChanged = true;
 			}
 			ImGui::InlineLabel("height");
 			ImGui::ItemToolTip("The height of the sprite");
 			if (ImGui::InputFloat("##height", &sprite.height, 1.0f, 8.0f))
 			{
-				sprite.height = glm::clamp(sprite.height, 8.0f, 2000.0f);
+				if (sprite.height < 8.0f)
+				{
+					sprite.height = 8.0f;
+				}
 				IsChanged = true;
 			}
 
