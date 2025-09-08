@@ -35,6 +35,7 @@ void Feather::TransformComponent::CreateLuaTransformBind(sol::state& lua)
 		),
 		"position", &TransformComponent::position,
 		"localPosition", &TransformComponent::localPosition,
+		"localRotation", &TransformComponent::localRotation,
 		"scale", &TransformComponent::scale,
 		"rotation", &TransformComponent::rotation,
 		"setScale", // Should be used rather than directly accessing member

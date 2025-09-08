@@ -156,12 +156,16 @@ namespace Feather {
 		if (assetNames.empty())
 			return;
 
-		float windowWidth = ImGui::GetWindowWidth();
-		int numCols = static_cast<int>((windowWidth - m_AssetSize) / m_AssetSize);
-		int numRows = static_cast<int>(assetNames.size() / (numCols <= 1 ? 1 : numCols) + 1);
+		const float avail = ImGui::GetContentRegionAvail().x;
+		const ImGuiStyle& style = ImGui::GetStyle();
 
-		if (!numCols || !numRows)
-			return;
+		// one cell = image width + left/right cell padding
+		const float cellW = m_AssetSize + style.CellPadding.x * 2.0f;
+
+		// number of columns that actually fit in the visible region
+		int numCols = (int)std::floor((avail + 0.5f) / cellW);
+		if (numCols < 1)
+			numCols = 1;
 
 		ImGuiTableFlags tableFlags{ 0 };
 		tableFlags |= ImGuiTableFlags_SizingFixedFit;
@@ -172,119 +176,116 @@ namespace Feather {
 
 		if (ImGui::BeginTable("Assets", numCols, tableFlags))
 		{
-			for (int row = 0; row < numRows; row++)
+			for (int c = 0; c < numCols; ++c)
+				ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthFixed, cellW);
+
+			for (auto assetItr = assetNames.begin(); assetItr != assetNames.end(); ++assetItr, ++id)
 			{
-				ImGui::TableNextRow();
-				for (int col = 0; col < numCols; col++)
+				ImGui::TableNextColumn();
+				ImGui::PushID(k++);
+
+				bool selectedAsset = (m_SelectedID == id);
+
+				if (selectedAsset)
+					ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImGui::GetColorU32(ImVec4{ 0.0f, 0.9f, 0.0f, 0.3f }));
+				GLuint textureID = GetTextureID(*assetItr);
+				std::string checkName{ m_RenameBuf.data() };
+				std::string assetBtn = "##asset" + std::to_string(id);
+
+				if (m_eSelectedType == AssetType::PREFAB)
 				{
-					if (assetItr == assetNames.end())
-						break;
-
-					ImGui::PushID(k++);
-					ImGui::TableSetColumnIndex(col);
-
-					bool IsSelectedAsset{ m_SelectedID == id };
-					if (IsSelectedAsset)
-						ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImGui::GetColorU32(ImVec4{ 0.0f, 0.9f, 0.0f, 0.5f }));
-
-					GLuint textureID{ GetTextureID(*assetItr) };
-					std::string checkName{ m_RenameBuf.data() };
-
-					std::string assetBtn = "##asset" + std::to_string(id);
-
-					if (m_eSelectedType == AssetType::PREFAB)
+					if (auto prefab = assetManager.GetPrefab(*assetItr))
 					{
-						// TODO: We are currently assuming that all prefabs will have a sprite component.
-						// We need to create an engine/editor texture that will be used in case of the prefab not having a sprite
-						if (auto pPrefab = assetManager.GetPrefab(*assetItr))
+						auto& sprite = prefab->GetPrefabbedEntity().sprite;
+						if (textureID && sprite)
 						{
-							auto& sprite = pPrefab->GetPrefabbedEntity().sprite;
-							if (textureID && sprite)
-							{
-								ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID,
-												   ImVec2{ m_AssetSize, m_AssetSize },
-												   ImVec2{ sprite->uvs.u, sprite->uvs.v },
-												   ImVec2{ sprite->uvs.uv_width, sprite->uvs.uv_height });
-							}
-							else
-							{
-								ImGui::Button(assetBtn.c_str(), ImVec2{ m_AssetSize, m_AssetSize });
-							}
+							ImGui::ImageButton(
+								assetBtn.c_str(),
+								(ImTextureID)(intptr_t)textureID,
+								ImVec2{ m_AssetSize, m_AssetSize },
+								ImVec2{ sprite->uvs.u, sprite->uvs.v },
+								ImVec2{ sprite->uvs.u + sprite->uvs.uv_width, sprite->uvs.v + sprite->uvs.uv_height });
+						}
+						else
+						{
+							ImGui::Button(assetBtn.c_str(), ImVec2{ m_AssetSize, m_AssetSize });
 						}
 					}
-					else
+				}
+				else
+				{
+					if (textureID == 0)
 					{
-						if (textureID == 0)
-						{
-							ImGui::PopID();
-							break;
-						}
-
-						ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
+						ImGui::PopID();
+						continue;
 					}
 
-					if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0) && !m_Rename)
-						m_SelectedID = id;
+					ImGui::ImageButton(assetBtn.c_str(), (ImTextureID)(intptr_t)textureID, ImVec2{ m_AssetSize, m_AssetSize });
+				}
 
-					const char* assetName = (*assetItr).c_str();
+				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0) && !m_Rename)
+				{
+					m_SelectedID = id;
+				}
 
-					if (IsSelectedAsset && ImGui::BeginPopupContextItem())
+				const char* assetName = (*assetItr).c_str();
+
+				if (selectedAsset && ImGui::BeginPopupContextItem())
+				{
+					OpenAssetContext(*assetItr);
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginDragDropSource())
+				{
+					ImGui::SetDragDropPayload(m_DragSource.c_str(), assetName, (strlen(assetName) + 1) * sizeof(char), ImGuiCond_Once);
+					ImGui::Image((ImTextureID)(intptr_t)textureID, DRAG_ASSET_SIZE);
+					ImGui::EndDragDropSource();
+				}
+
+				if (!m_Rename || !selectedAsset)
+				{
+					ImGui::TextWrapped(assetName);
+				}
+
+				if (m_Rename && selectedAsset)
+				{
+					ImGui::SetKeyboardFocusHere();
+					if (ImGui::InputText("##rename", m_RenameBuf.data(), 255, ImGuiInputTextFlags_EnterReturnsTrue))
 					{
-						OpenAssetContext(*assetItr);
-						ImGui::EndPopup();
+						if (!DoRenameAsset(*assetItr, checkName))
+							F_ERROR("Failed to change asset name");
+
+						m_RenameBuf.clear();
+						m_Rename = false;
 					}
-
-					if (ImGui::BeginDragDropSource())
-					{
-						ImGui::SetDragDropPayload(m_DragSource.c_str(), assetName, (strlen(assetName) + 1) * sizeof(char), ImGuiCond_Once);
-						ImGui::Image((ImTextureID)(intptr_t)textureID, DRAG_ASSET_SIZE);
-						ImGui::EndDragDropSource();
-					}
-
-					if (!m_Rename || !IsSelectedAsset)
-						ImGui::TextWrapped(assetName);
-
-					if (m_Rename && IsSelectedAsset)
-					{
-						ImGui::SetKeyboardFocusHere();
-						if (ImGui::InputText("##rename", m_RenameBuf.data(), 255, ImGuiInputTextFlags_EnterReturnsTrue))
-						{
-							if (!DoRenameAsset(*assetItr, checkName))
-								F_ERROR("Failed to change asset name");
-
-							m_RenameBuf.clear();
-							m_Rename = false;
-						}
-						else if (m_Rename && ImGui::IsKeyPressed(ImGuiKey_Escape))
-						{
-							m_RenameBuf.clear();
-							m_Rename = false;
-						}
-					}
-
-					if (!m_Rename && IsSelectedAsset && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+					else if (m_Rename && ImGui::IsKeyPressed(ImGuiKey_Escape))
 					{
 						m_RenameBuf.clear();
-						m_RenameBuf = *assetItr;
-						m_Rename = true;
+						m_Rename = false;
 					}
-
-					if (m_Rename && IsSelectedAsset)
-					{
-						if (assetName != checkName)
-							CheckRename(checkName);
-					}
-
-					++id;
-					++assetItr;
-					ImGui::PopID();
 				}
+
+				if (!m_Rename && selectedAsset && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+				{
+					m_RenameBuf.clear();
+					m_RenameBuf = *assetItr;
+					m_Rename = true;
+				}
+
+				if (m_Rename && selectedAsset)
+				{
+					if (std::string{ assetName } != checkName)
+						CheckRename(checkName);
+				}
+
+				ImGui::PopID();
 			}
 
 			ImGui::EndTable();
 		}
 
-		// NOTE: If we are clicking on the display and no item, we want to reset the selection
+		// NOTE: Click empty space to clear selection
 		if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseClicked(0) && !m_Rename)
 		{
 			m_SelectedID = -1;

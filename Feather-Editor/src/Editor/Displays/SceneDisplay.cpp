@@ -304,6 +304,9 @@ namespace Feather {
 
 	void SceneDisplay::UnloadScene()
 	{
+		EVENT_DISPATCHER().ClearHandlers<GamepadConnectEvent>();
+		EVENT_DISPATCHER().ClearHandlers<LuaEvent>();
+
 		m_PlayScene = false;
 		m_SceneLoaded = false;
 		auto currentScene = SCENE_MANAGER().GetCurrentSceneObject();

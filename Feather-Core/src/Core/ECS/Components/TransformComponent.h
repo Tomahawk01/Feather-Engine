@@ -12,6 +12,7 @@ namespace Feather {
 		glm::vec2 localPosition{ 0.0f };
 		glm::vec2 scale{ 1.0f };
 		float rotation{ 0.0f };
+		float localRotation{ 0.0f };
 		bool isDirty{ true };
 
 		[[nodiscard]] std::string to_string();

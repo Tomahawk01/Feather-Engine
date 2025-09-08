@@ -652,7 +652,7 @@ namespace Feather {
 			ImGui::InlineLabel("scale");
 			ImGui::ColoredLabel("x##scl_x", LABEL_SINGLE_SIZE, LABEL_RED);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 1.0f, 1.0f, "%.1f"))
+			if (ImGui::InputFloat("##scale_x", &transform.scale.x, 1.0f, 1.0f, "%.3f"))
 			{
 				transform.scale.x = std::clamp(transform.scale.x, 0.01f, 150.0f);
 				transform.isDirty = true;
@@ -660,7 +660,7 @@ namespace Feather {
 			ImGui::SameLine();
 			ImGui::ColoredLabel("y##scl_y", LABEL_SINGLE_SIZE, LABEL_GREEN);
 			ImGui::SameLine();
-			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 1.0f, 1.0f, "%.1f"))
+			if (ImGui::InputFloat("##scale_y", &transform.scale.y, 1.0f, 1.0f, "%.3f"))
 			{
 				transform.scale.y = std::clamp(transform.scale.y, 0.01f, 150.0f);
 				transform.isDirty = true;

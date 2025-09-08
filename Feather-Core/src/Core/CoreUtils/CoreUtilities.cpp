@@ -111,7 +111,9 @@ namespace Feather {
 			}
 
 			const auto& paddingInfo = pFont->AveragePaddingInfo();
-			return std::make_tuple(std::abs((position - temp_pos).x - (paddingInfo.paddingX * 0.5f)), 1 * fontSize + (paddingInfo.paddingY * 0.5f));
+			return std::make_tuple(
+				std::abs(((position - temp_pos).x - (paddingInfo.paddingX * 0.5f)) * transform.scale.x),
+				(1 * fontSize + (paddingInfo.paddingY * 0.5f)) * transform.scale.y);
 		}
 
 		// Calculate Text boxSize

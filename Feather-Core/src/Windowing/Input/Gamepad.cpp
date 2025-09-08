@@ -174,4 +174,12 @@ namespace Feather {
 		axisItr->second = value;
 	}
 
+	void Gamepad::RumbleController(Uint16 lowFrequencyRumble, Uint16 highFrequencyRumble, Uint32 durationMs)
+	{
+		if (SDL_GameControllerRumble(m_Controller.get(), lowFrequencyRumble, highFrequencyRumble, durationMs) == -1)
+		{
+			F_WARN("Rumble not supported for controller '{}': {}", m_InstanceID, SDL_GetError());
+		}
+	}
+
 }

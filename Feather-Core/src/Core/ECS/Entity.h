@@ -27,7 +27,7 @@ namespace Feather {
 		* @brief Adds a new child to the entity.
 		* @param underlying entity of the child to add
 		*/
-		bool AddChild(entt::entity child);
+		bool AddChild(entt::entity child, bool isSetLocal = true);
 
 		/*
 		* @brief Updates the position of the entity. If the entity has children, it will update all the children as well.
@@ -36,9 +36,10 @@ namespace Feather {
 
 		void ChangeName(const std::string& name);
 
+		std::uint32_t Kill();
+
 		inline const std::string& GetName() const { return m_Name; }
 		inline const std::string& GetGroup() const { return m_Group; }
-		inline std::uint32_t Kill() { return m_Registry.GetRegistry().destroy(m_Entity); }
 		inline entt::entity& GetEntity() { return m_Entity; }
 		inline entt::registry& GetEnttRegistry() { return m_Registry.GetRegistry(); }
 		inline Registry& GetRegistry() { return m_Registry; }

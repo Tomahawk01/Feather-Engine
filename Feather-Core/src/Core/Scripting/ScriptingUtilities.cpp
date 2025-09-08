@@ -2,6 +2,37 @@
 
 #include "Logger/Logger.h"
 
+namespace
+{
+	const std::string PRIVATE_KEY = "FeatherPrivateEncryptionKey_1234321";
+
+	std::string XorCipher(const std::string& data, const std::string& key)
+	{
+		std::string result{};
+		result.reserve(data.size());
+
+		for (size_t i = 0; i < data.size(); ++i)
+		{
+			unsigned char c = static_cast<unsigned char>(data[i]);
+			unsigned char k = static_cast<unsigned char>(key[i % key.size()]);
+			result.push_back(static_cast<char>(c ^ k));
+		}
+
+		return result;
+	}
+
+	std::string SimpleEncrypt(const std::string& str)
+	{
+		return XorCipher(str, PRIVATE_KEY);
+	}
+
+	std::string SimpleDecrypt(const std::string& str)
+	{
+		return XorCipher(str, PRIVATE_KEY);
+	}
+
+}
+
 namespace Feather {
 
 	void ScriptingHelpers::CreateLuaHelpers(sol::state& lua)
@@ -160,6 +191,9 @@ namespace Feather {
 			result = lua.safe_script(luaInsertUnique);
 			result = lua.safe_script(luaMakeReadOnlyTable);
 			result = lua.safe_script(luaSwitchStatement);
+
+			lua.set_function("F_Encrypt", &SimpleEncrypt);
+			lua.set_function("F_Decrypt", &SimpleDecrypt);
 		}
 		catch (const sol::error& err)
 		{

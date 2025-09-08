@@ -118,7 +118,7 @@ namespace Feather {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
                 {
-                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
                     return false;
                 }
                 return gamepad->IsButtonJustPressed(btn);
@@ -128,7 +128,7 @@ namespace Feather {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
                 {
-                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
                     return false;
                 }
                 return gamepad->IsButtonJustReleased(btn);
@@ -138,7 +138,7 @@ namespace Feather {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
                 {
-                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
                     return false;
                 }
                 return gamepad->IsButtonPressed(btn);
@@ -148,7 +148,7 @@ namespace Feather {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
                 {
-                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
                     return Sint16{ 0 };
                 }
                 return gamepad->GetAxisPosition(axis);
@@ -158,10 +158,21 @@ namespace Feather {
                 auto gamepad = inputManager.GetController(index);
                 if (!gamepad)
                 {
-                    F_ERROR("Invalid gamepad index '{0}' provided or gamepad is not plugged in!", index);
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
                     return Uint8{ 0 };
                 }
                 return gamepad->GetJoystickHatValue();
+            },
+            "rumble", [&](int index, Uint16 lowFrequency, Uint16 highFrequency, Uint32 durationMs)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
+                    return;
+                }
+
+                gamepad->RumbleController(lowFrequency, highFrequency, durationMs);
             }
         );
 	}
