@@ -31,7 +31,7 @@ namespace Feather {
 
 		for (auto entity : tiles)
 		{
-			Entity t{ *registry, entity };
+			Entity t{ registry, entity };
 			const auto& transform = t.GetComponent<TransformComponent>();
 			const auto& sprite = t.GetComponent<SpriteComponent>();
 
@@ -49,8 +49,8 @@ namespace Feather {
 		F_ASSERT(entityToRemove != entt::null && "Entity should not be null");
 		if (entityToRemove != entt::null)
 		{
-			Entity ent{ *registry, entityToRemove };
-			ent.Kill();
+			Entity ent{ registry, entityToRemove };
+			ent.Destroy();
 		}
 	}
 
@@ -70,7 +70,7 @@ namespace Feather {
 			return;
 		}
 
-		Entity t{ *registry, "", "" };
+		Entity t{ registry, "", "" };
 		t.AddComponent<TransformComponent>(tile->transform);
 		t.AddComponent<SpriteComponent>(tile->sprite);
 		t.AddComponent<TileComponent>(static_cast<std::uint32_t>(t.GetEntity()));
@@ -101,7 +101,7 @@ namespace Feather {
 			return;
 		}
 
-		Entity t{ *registry, "", "" };
+		Entity t{ registry, "", "" };
 		t.AddComponent<TransformComponent>(tile->transform);
 		t.AddComponent<SpriteComponent>(tile->sprite);
 		t.AddComponent<TileComponent>(static_cast<std::uint32_t>(t.GetEntity()));
@@ -138,7 +138,7 @@ namespace Feather {
 
 		for (auto entity : tiles)
 		{
-			Entity t{ *registry, entity };
+			Entity t{ registry, entity };
 			const auto& transform = t.GetComponent<TransformComponent>();
 			const auto& sprite = t.GetComponent<SpriteComponent>();
 
@@ -156,8 +156,8 @@ namespace Feather {
 		F_ASSERT(entityToRemove != entt::null && "Entity should not be null");
 		if (entityToRemove != entt::null)
 		{
-			Entity ent{ *registry, entityToRemove };
-			ent.Kill();
+			Entity ent{ registry, entityToRemove };
+			ent.Destroy();
 		}
 	}
 

@@ -14,7 +14,7 @@ using namespace entt::literals;
 namespace Feather {
 
 	Character::Character(Registry& registry, const CharacterParams& params)
-		: Entity{ registry, params.name, params.group }
+		: Entity{ &registry, params.name, params.group }
 	{
 		AddComponent<TransformComponent>(TransformComponent{});
 
@@ -72,7 +72,7 @@ namespace Feather {
 	}
 
 	Character::Character(Registry& registry, entt::entity entity)
-		: Entity{ registry, entity }
+		: Entity{ &registry, entity }
 	{}
 
 	Character::Character(const Entity& entity)
@@ -230,8 +230,8 @@ namespace Feather {
             &Character::GetName,
             "group",
             &Character::GetGroup,
-            "kill",
-            &Character::Kill,
+            "destroy",
+            &Character::Destroy,
             "addChild",
             [](Character& character, Entity& child) { character.AddChild(child.GetEntity()); },
             "updateTransform",

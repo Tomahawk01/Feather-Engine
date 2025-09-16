@@ -167,7 +167,7 @@ namespace Feather {
 
 					if (auto* tileset = GetTileset(tilesets, id))
 					{
-						Entity newTile{ newScene.GetRegistry(), "", "" };
+						Entity newTile{ newScene.GetRegistryPtr(), "", "" };
 						auto& transform = newTile.AddComponent<TransformComponent>();
 						transform.position = glm::vec2{ (col - 1) * tileset->tileWidth, row * tileset->tileHeight };
 
@@ -355,7 +355,7 @@ namespace Feather {
 
 						if (auto* tileset = GetTileset(tilesets, id))
 						{
-							Entity newTile{ newScene.GetRegistry(), "", "" };
+							Entity newTile{ newScene.GetRegistryPtr(), "", "" };
 							auto& transform = newTile.AddComponent<TransformComponent>();
 							transform.position = glm::vec2{ (col - 1) * tileset->tileWidth, row * tileset->tileHeight };
 

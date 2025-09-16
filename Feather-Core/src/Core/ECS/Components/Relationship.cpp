@@ -79,7 +79,7 @@ namespace Feather {
 
 			for (auto entity : childrenToDelete)
 			{
-				Entity ent{ Reg, entity };
+				Entity ent{ &Reg, entity };
 				RemoveAndDelete(ent, entitiesRemoved);
 			}
 		}
@@ -114,9 +114,9 @@ namespace Feather {
 		}
 
 		// Now that the links have been adjusted, we can delete the entity
-		F_TRACE("JUST KILLED: {}", static_cast<std::uint32_t>(entityToRemove.GetEntity()));
+		//F_TRACE("Just Destroyed: {}", static_cast<std::uint32_t>(entityToRemove.GetEntity()));
 		entitiesRemoved.emplace_back(entityToRemove.GetName());
-		entityToRemove.Kill();
+		entityToRemove.Destroy();
 	}
 
 }

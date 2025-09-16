@@ -20,8 +20,8 @@ namespace Feather {
 			return;
 		}
 
-		auto* pRegistry = sceneObject->GetRegistryPtr();
-		if (!pRegistry)
+		auto* registry = sceneObject->GetRegistryPtr();
+		if (!registry)
 		{
 			F_ERROR("Failed to undo remove tile layer. Scene Registry was invalid");
 			return;
@@ -39,10 +39,10 @@ namespace Feather {
 		sceneObject->AddLayer(spriteLayerParams);
 
 		// Push each sprite up one layer
-		auto tileView = pRegistry->GetRegistry().view<TileComponent, SpriteComponent>();
+		auto tileView = registry->GetRegistry().view<TileComponent, SpriteComponent>();
 		for (auto entity : tileView)
 		{
-			Entity ent{ *pRegistry, entity };
+			Entity ent{ registry, entity };
 			if (auto* pSprite = ent.TryGetComponent<SpriteComponent>())
 			{
 				if (pSprite->layer >= spriteLayerParams.layer)
@@ -55,7 +55,7 @@ namespace Feather {
 		// Add the tiles back into the registry
 		for (const auto& tile : tilesRemoved)
 		{
-			Entity ent{ *pRegistry, "", "" };
+			Entity ent{ registry, "", "" };
 			ent.AddComponent<TransformComponent>(tile.transform);
 			ent.AddComponent<SpriteComponent>(tile.sprite);
 			ent.AddComponent<TileComponent>(static_cast<std::uint32_t>(ent.GetEntity()));
@@ -92,8 +92,8 @@ namespace Feather {
 			return;
 		}
 
-		auto* pRegistry = sceneObject->GetRegistryPtr();
-		if (!pRegistry)
+		auto* registry = sceneObject->GetRegistryPtr();
+		if (!registry)
 		{
 			F_ERROR("Failed to undo remove tile layer. Scene Registry was invalid");
 			return;
@@ -112,14 +112,14 @@ namespace Feather {
 			}
 		}
 
-		auto view = pRegistry->GetRegistry().view<TileComponent, SpriteComponent>();
+		auto view = registry->GetRegistry().view<TileComponent, SpriteComponent>();
 		for (auto entity : view)
 		{
-			Entity ent{ *pRegistry, entity };
+			Entity ent{ registry, entity };
 			auto& sprite = ent.GetComponent<SpriteComponent>();
 			if (sprite.layer == spriteLayerParams.layer)
 			{
-				ent.Kill();
+				ent.Destroy();
 			}
 			else if (sprite.layer > spriteLayerParams.layer) // Drop the layer down if greater
 			{
@@ -166,8 +166,8 @@ namespace Feather {
 			return;
 		}
 
-		auto* pRegistry = sceneObject->GetRegistryPtr();
-		F_ASSERT(pRegistry && "Registry must be valid");
+		auto* registry = sceneObject->GetRegistryPtr();
+		F_ASSERT(registry && "Registry must be valid");
 
 		// Change the layers
 		auto& layerParams = sceneObject->GetLayerParams();
@@ -176,10 +176,10 @@ namespace Feather {
 		layerParams[from].layer = nextLayer;
 		std::swap(layerParams[from], layerParams[to]);
 
-		auto tileView = pRegistry->GetRegistry().view<TileComponent, SpriteComponent>();
+		auto tileView = registry->GetRegistry().view<TileComponent, SpriteComponent>();
 		for (auto entity : tileView)
 		{
-			Entity ent{ *pRegistry, entity };
+			Entity ent{ registry, entity };
 			if (auto* sprite = ent.TryGetComponent<SpriteComponent>())
 			{
 				if (sprite->layer == to)
@@ -204,8 +204,8 @@ namespace Feather {
 			return;
 		}
 
-		auto* pRegistry = sceneObject->GetRegistryPtr();
-		F_ASSERT(pRegistry && "Registry must be valid");
+		auto* registry = sceneObject->GetRegistryPtr();
+		F_ASSERT(registry && "Registry must be valid");
 
 		// Change the layers
 		auto& layerParams = sceneObject->GetLayerParams();
@@ -214,10 +214,10 @@ namespace Feather {
 		layerParams[to].layer = nextLayer;
 		std::swap(layerParams[from], layerParams[to]);
 
-		auto tileView = pRegistry->GetRegistry().view<TileComponent, SpriteComponent>();
+		auto tileView = registry->GetRegistry().view<TileComponent, SpriteComponent>();
 		for (auto entity : tileView)
 		{
-			Entity ent{ *pRegistry, entity };
+			Entity ent{ registry, entity };
 			if (auto* sprite = ent.TryGetComponent<SpriteComponent>())
 			{
 				if (sprite->layer == to)

@@ -32,7 +32,7 @@ namespace Feather {
 
 		Show();
 
-		Entity selectedEntity{ *m_Registry, m_SelectedEntity };
+		Entity selectedEntity{ m_Registry, m_SelectedEntity };
 		auto& selectedTransform = selectedEntity.GetComponent<TransformComponent>();
 		float deltaX{ GetDeltaX() };
 		float deltaY{ GetDeltaY() };

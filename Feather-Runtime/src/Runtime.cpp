@@ -359,7 +359,7 @@ namespace Feather {
 		auto physicsEntities = registry->GetRegistry().view<PhysicsComponent>();
 		for (auto entity : physicsEntities)
 		{
-			Entity ent{ *registry, entity };
+			Entity ent{ registry, entity };
 
 			bool bBoxCollider{ ent.HasComponent<BoxColliderComponent>() };
 			bool bCircleCollider{ ent.HasComponent<CircleColliderComponent>() };

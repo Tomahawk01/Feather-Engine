@@ -48,7 +48,7 @@ namespace Feather {
 
 		for (const auto& [key, value] : *maybeTiles)
 		{
-			Entity newTile{ registry, "", "" };
+			Entity newTile{ &registry, "", "" };
 			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
 
 			if (!components)
@@ -121,7 +121,7 @@ namespace Feather {
 
 		for (const auto& [key, value] : *maybeObjects)
 		{
-			Entity newTile{ registry, "", "" };
+			Entity newTile{ &registry, "", "" };
 			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
 
 			if (!components)
@@ -224,7 +224,7 @@ namespace Feather {
 		{
 			serializer->StartNewObject();
 			serializer->StartNewObject("components");
-			auto tileEnt{ Entity{registry, tile} };
+			auto tileEnt{ Entity{ &registry, tile } };
 
 			const auto& transform = tileEnt.GetComponent<TransformComponent>();
 			SERIALIZE_COMPONENT(*serializer, transform);
@@ -298,7 +298,7 @@ namespace Feather {
 
 		for (const auto& tile : tilemap.GetArray())
 		{
-			Entity newTile{ registry, "", "" };
+			Entity newTile{ &registry, "", "" };
 			const auto& components = tile["components"];
 
 			const auto& jsonTransform = components["transform"];
@@ -375,7 +375,7 @@ namespace Feather {
 			serializer->StartNewObject();
 			serializer->StartNewObject("components");
 
-			auto objectEnt{ Entity{ registry, object } };
+			auto objectEnt{ Entity{ &registry, object } };
 
 			if (const auto* id = objectEnt.TryGetComponent<Identification>())
 			{
@@ -426,7 +426,7 @@ namespace Feather {
 				serializer->StartNewObject("relationship");
 				if (relations->parent != entt::null)
 				{
-					Entity parent{ registry, relations->parent };
+					Entity parent{ &registry, relations->parent };
 					serializer->AddKeyValuePair("parent", parent.GetName());
 				}
 				else
@@ -436,7 +436,7 @@ namespace Feather {
 
 				if (relations->nextSibling != entt::null)
 				{
-					Entity nextSibling{ registry, relations->nextSibling };
+					Entity nextSibling{ &registry, relations->nextSibling };
 					serializer->AddKeyValuePair("nextSibling", nextSibling.GetName());
 				}
 				else
@@ -446,7 +446,7 @@ namespace Feather {
 
 				if (relations->prevSibling != entt::null)
 				{
-					Entity prevSibling{ registry, relations->prevSibling };
+					Entity prevSibling{ &registry, relations->prevSibling };
 					serializer->AddKeyValuePair("prevSibling", prevSibling.GetName());
 				}
 				else
@@ -456,7 +456,7 @@ namespace Feather {
 
 				if (relations->firstChild != entt::null)
 				{
-					Entity firstChild{ registry, relations->firstChild };
+					Entity firstChild{ &registry, relations->firstChild };
 					serializer->AddKeyValuePair("firstChild", firstChild.GetName());
 				}
 				else
@@ -518,7 +518,7 @@ namespace Feather {
 
 		for (const auto& object : gameObjects.GetArray())
 		{
-			Entity gameObject{ registry, "", "" };
+			Entity gameObject{ &registry, "", "" };
 			const auto& components = object["components"];
 
 			// Transform
@@ -592,7 +592,7 @@ namespace Feather {
 
 			auto findTag = [&](const std::string& sTag) {
 				auto parItr = std::ranges::find_if(ids, [&](const auto& e) {
-					Entity en{ registry, e };
+					Entity en{ &registry, e };
 					return en.GetName() == sTag;
 				});
 
@@ -604,7 +604,7 @@ namespace Feather {
 
 			for (auto& [entity, saveRelations] : mapEntityToRelationship)
 			{
-				Entity ent{ registry, entity };
+				Entity ent{ &registry, entity };
 				auto& relations = ent.GetComponent<Relationship>();
 
 				if (!saveRelations.Parent.empty())
@@ -663,7 +663,7 @@ namespace Feather {
 		{
 			serializer->StartNewTable();
 			serializer->StartNewTable("components");
-			auto tileEnt{ Entity{registry, tile} };
+			auto tileEnt{ Entity{ &registry, tile } };
 
 			const auto& transform = tileEnt.GetComponent<TransformComponent>();
 			SERIALIZE_COMPONENT(*serializer, transform);
@@ -727,7 +727,7 @@ namespace Feather {
 
 		for (const auto& [key, value] : *maybeTiles)
 		{
-			Entity newTile{ registry, "", "" };
+			Entity newTile{ &registry, "", "" };
 			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
 
 			if (!components)
@@ -810,7 +810,7 @@ namespace Feather {
 		{
 			serializer->StartNewTable();
 			serializer->StartNewTable("components");
-			auto objectEnt{ Entity{ registry, object } };
+			auto objectEnt{ Entity{ &registry, object } };
 
 			if (const auto* id = objectEnt.TryGetComponent<Identification>())
 			{
@@ -866,7 +866,7 @@ namespace Feather {
 				serializer->StartNewTable("relationship");
 				if (relations->parent != entt::null)
 				{
-					Entity parent{ registry, relations->parent };
+					Entity parent{ &registry, relations->parent };
 					serializer->AddKeyValuePair("parent", parent.GetName(), false, false, false, true);
 				}
 				else
@@ -876,7 +876,7 @@ namespace Feather {
 
 				if (relations->nextSibling != entt::null)
 				{
-					Entity nextSibling{ registry, relations->nextSibling };
+					Entity nextSibling{ &registry, relations->nextSibling };
 					serializer->AddKeyValuePair("nextSibling", nextSibling.GetName(), false, false, false, true);
 				}
 				else
@@ -886,7 +886,7 @@ namespace Feather {
 
 				if (relations->prevSibling != entt::null)
 				{
-					Entity prevSibling{ registry, relations->prevSibling };
+					Entity prevSibling{ &registry, relations->prevSibling };
 					serializer->AddKeyValuePair("prevSibling", prevSibling.GetName(), false, false, false, true);
 				}
 				else
@@ -896,7 +896,7 @@ namespace Feather {
 
 				if (relations->firstChild != entt::null)
 				{
-					Entity firstChild{ registry, relations->firstChild };
+					Entity firstChild{ &registry, relations->firstChild };
 					serializer->AddKeyValuePair("firstChild", firstChild.GetName(), false, false, false, true);
 				}
 				else
@@ -942,7 +942,7 @@ namespace Feather {
 
 		for (const auto& [key, value] : *maybeObjects)
 		{
-			Entity gameObject{ registry, "", "" };
+			Entity gameObject{ &registry, "", "" };
 			const sol::optional<sol::table> components = value.as<sol::table>()["components"];
 
 			if (!components)
@@ -1023,7 +1023,7 @@ namespace Feather {
 
 		auto findTag = [&](const std::string& sTag) {
 				auto parItr = std::ranges::find_if(ids, [&](const auto& e) {
-					Entity en{ registry, e };
+					Entity en{ &registry, e };
 					return en.GetName() == sTag;
 				});
 
@@ -1037,7 +1037,7 @@ namespace Feather {
 
 		for (auto& [entity, saveRelations] : mapEntityToRelationship)
 		{
-			Entity ent{ registry, entity };
+			Entity ent{ &registry, entity };
 			auto& relations = ent.GetComponent<Relationship>();
 
 			// Find the parent

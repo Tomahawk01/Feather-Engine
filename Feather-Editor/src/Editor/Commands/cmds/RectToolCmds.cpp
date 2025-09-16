@@ -26,7 +26,7 @@ namespace Feather {
 
 			for (auto entity : tileView)
 			{
-				Entity checkedTile{ *registry, entity };
+				Entity checkedTile{ registry, entity };
 				const auto& transform = checkedTile.GetComponent<TransformComponent>();
 				const auto& sprite = checkedTile.GetComponent<SpriteComponent>();
 
@@ -56,7 +56,7 @@ namespace Feather {
 
 		for (const auto& tile : tiles)
 		{
-			Entity addedTile{ *registry, "", "" };
+			Entity addedTile{ registry, "", "" };
 			addedTile.AddComponent<TransformComponent>(tile.transform);
 			addedTile.AddComponent<SpriteComponent>(tile.sprite);
 			addedTile.AddComponent<TileComponent>(static_cast<std::uint32_t>(addedTile.GetEntity()));
@@ -83,7 +83,7 @@ namespace Feather {
 
 		for (const auto& tile : tiles)
 		{
-			Entity addedTile{ *registry, "", "" };
+			Entity addedTile{ registry, "", "" };
 			addedTile.AddComponent<TransformComponent>(tile.transform);
 			addedTile.AddComponent<SpriteComponent>(tile.sprite);
 			addedTile.AddComponent<TileComponent>(static_cast<std::uint32_t>(addedTile.GetEntity()));
@@ -116,7 +116,7 @@ namespace Feather {
 
 			for (auto entity : tileView)
 			{
-				Entity checkedTile{ *registry, entity };
+				Entity checkedTile{ registry, entity };
 				const auto& transform = checkedTile.GetComponent<TransformComponent>();
 				const auto& sprite = checkedTile.GetComponent<SpriteComponent>();
 

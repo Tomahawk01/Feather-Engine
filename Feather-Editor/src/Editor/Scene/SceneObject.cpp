@@ -79,7 +79,7 @@ namespace Feather {
 				if (!storage.contains(entityToCopy))
 					continue;
 
-				InvokeMetaFunction(id, "copy_component"_hs, Entity{ m_Registry, entityToCopy }, Entity{ m_RuntimeRegistry, newEntity });
+				InvokeMetaFunction(id, "copy_component"_hs, Entity{ &m_Registry, entityToCopy }, Entity{ &m_RuntimeRegistry, newEntity });
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace Feather {
 				if (!storage.contains(entityToCopy))
 					continue;
 
-				InvokeMetaFunction(id, "copy_component"_hs, Entity{ registry, entityToCopy }, Entity{ m_RuntimeRegistry, newEntity });
+				InvokeMetaFunction(id, "copy_component"_hs, Entity{ &registry, entityToCopy }, Entity{ &m_RuntimeRegistry, newEntity });
 			}
 		}
 
@@ -193,7 +193,7 @@ namespace Feather {
 		auto view = m_Registry.GetRegistry().view<TileComponent, SpriteComponent>();
 		for (auto entity : view)
 		{
-			Entity ent{ m_Registry, entity };
+			Entity ent{ &m_Registry, entity };
 			auto& sprite = ent.GetComponent<SpriteComponent>();
 			if (sprite.layer == layer)
 			{
@@ -225,7 +225,7 @@ namespace Feather {
 					removedTile.physics = *physics;
 				}
 
-				ent.Kill();
+				ent.Destroy();
 				removedTiles.push_back(removedTile);
 			}
 			else if (sprite.layer > layer) // Drop the layer down if greater
@@ -243,7 +243,7 @@ namespace Feather {
 
 	bool SceneObject::AddGameObject()
 	{
-		Entity newObject{ m_Registry, "", "" };
+		Entity newObject{ &m_Registry, "", "" };
 		newObject.AddComponent<TransformComponent>();
 		std::string tag{ "GameObject" };
 
@@ -307,7 +307,7 @@ namespace Feather {
 			if (!storage.contains(entity))
 				continue;
 
-			InvokeMetaFunction(id, "copy_component"_hs, Entity{ m_Registry, entity }, Entity{ m_Registry, newEntity });
+			InvokeMetaFunction(id, "copy_component"_hs, Entity{ &m_Registry, entity }, Entity{ &m_Registry, newEntity });
 		}
 
 		// Now we need to set the tag for the entity
@@ -318,7 +318,7 @@ namespace Feather {
 			++tagNum;
 		}
 
-		Entity newEnt{ m_Registry, newEntity };
+		Entity newEnt{ &m_Registry, newEntity };
 		newEnt.ChangeName(std::format("{}_{}", objItr->first, tagNum));
 
 		m_mapTagToEntity.emplace(newEnt.GetName(), newEntity);
@@ -336,7 +336,7 @@ namespace Feather {
 		}
 
 		std::vector<std::string> removedEntities;
-		Entity ent{ m_Registry, objItr->second };
+		Entity ent{ &m_Registry, objItr->second };
 
 		RelationshipUtils::RemoveAndDelete(ent, removedEntities);
 
@@ -362,7 +362,7 @@ namespace Feather {
 		}
 
 		std::vector<std::string> removedEntities;
-		Entity ent{ m_Registry, objItr->second };
+		Entity ent{ &m_Registry, objItr->second };
 
 		RelationshipUtils::RemoveAndDelete(ent, removedEntities);
 
@@ -380,7 +380,7 @@ namespace Feather {
 		auto view = m_Registry.GetRegistry().view<entt::entity>(entt::exclude<TileComponent>);
 		for (auto entity : view)
 		{
-			Entity ent{ m_Registry, entity };
+			Entity ent{ &m_Registry, entity };
 			AddGameObjectByTag(ent.GetName(), entity);
 		}
 

@@ -63,7 +63,7 @@ namespace Feather {
 
 		for (auto entity : sceneEntities)
 		{
-			Entity ent{ registry, entity };
+			Entity ent{ &registry, entity };
 			if (!m_TextFilter.PassFilter(ent.GetName().c_str()))
 				continue;
 
@@ -104,7 +104,7 @@ namespace Feather {
 
 		if (ImGui::IsItemClicked())
 		{
-			m_SelectedEntity = std::make_shared<Entity>(currentScene->GetRegistry(), entity.GetEntity());
+			m_SelectedEntity = std::make_shared<Entity>(currentScene->GetRegistryPtr(), entity.GetEntity());
 			TOOL_MANAGER().SetSelectedEntity(entity.GetEntity());
 		}
 
@@ -132,7 +132,7 @@ namespace Feather {
 
 		while (curr != entt::null && treeNodeOpen)
 		{
-			Entity ent{ currentScene->GetRegistry(), curr };
+			Entity ent{ currentScene->GetRegistryPtr(), curr };
 			if (OpenTreeNode(ent))
 				ImGui::TreePop();
 			curr = ent.GetComponent<Relationship>().nextSibling;
@@ -421,7 +421,7 @@ namespace Feather {
 			return;
 		}
 
-		m_SelectedEntity = std::make_shared<Entity>(currentScene->GetRegistry(), swEntEvent.entity->GetEntity());
+		m_SelectedEntity = std::make_shared<Entity>(currentScene->GetRegistryPtr(), swEntEvent.entity->GetEntity());
 
 		F_ASSERT(m_SelectedEntity && "Entity must be valid here!");
 	}

@@ -450,7 +450,7 @@ namespace Feather {
 
 		tag = checkTag;
 
-		auto newEnt = std::make_shared<Entity>(registry, tag, prefabbed.id->group);
+		auto newEnt = std::make_shared<Entity>(&registry, tag, prefabbed.id->group);
 
 		newEnt->AddComponent<TransformComponent>(prefabbed.transform);
 		if (prefabbed.sprite)

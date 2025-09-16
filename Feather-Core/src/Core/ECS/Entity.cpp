@@ -7,12 +7,15 @@
 
 namespace Feather {
 
-	Entity::Entity(Registry& registry)
+	Entity::Entity(Registry* registry)
 		: Entity(registry, "GameObject", "")
 	{}
 
-	Entity::Entity(Registry& registry, const std::string& name, const std::string& group)
-		: m_Registry(registry), m_Entity{ registry.CreateEntity() }, m_Name{ name }, m_Group{ group }
+	Entity::Entity(Registry* registry, const std::string& name, const std::string& group)
+		: m_Registry{ registry }
+		, m_Entity{ registry->CreateEntity() }
+		, m_Name{ name }
+		, m_Group{ group }
 	{
 		AddComponent<Identification>(Identification{
 									 .name = name,
@@ -22,8 +25,11 @@ namespace Feather {
 		AddComponent<Relationship>(Relationship{ .self = m_Entity });
 	}
 
-	Entity::Entity(Registry& registry, const entt::entity& entity)
-		: m_Registry(registry), m_Entity(entity), m_Name{}, m_Group{}
+	Entity::Entity(Registry* registry, const entt::entity& entity)
+		: m_Registry{ registry }
+		, m_Entity{ entity }
+		, m_Name{}
+		, m_Group{}
 	{
 		if (HasComponent<Identification>())
 		{
@@ -33,9 +39,53 @@ namespace Feather {
 		}
 	}
 
+	Entity::Entity(const Entity& other)
+		: m_Registry{ other.m_Registry }
+		, m_Entity{ other.m_Entity }
+		, m_Name{ other.m_Name }
+		, m_Group{ other.m_Group }
+	{}
+
+	Entity& Entity::operator=(const Entity& other)
+	{
+		if (this != &other)
+		{
+			this->m_Registry = other.m_Registry;
+			this->m_Entity = other.m_Entity;
+			this->m_Name = other.m_Name;
+			this->m_Group = other.m_Group;
+		}
+
+		return *this;
+	}
+
+	Entity::Entity(Entity&& other) noexcept
+		: m_Registry{ other.m_Registry }
+		, m_Entity{ other.m_Entity }
+		, m_Name{ std::move(other.m_Name) }
+		, m_Group{ std::move(other.m_Group) }
+	{
+		other.m_Registry = nullptr;
+		other.m_Entity = entt::null;
+		other.m_Name.clear();
+		other.m_Group.clear();
+	}
+
+	Entity& Entity::operator=(Entity&& other) noexcept
+	{
+		if (this != &other)
+		{
+		}
+
+		return *this;
+	}
+
+	Entity::~Entity()
+	{}
+
 	bool Entity::AddChild(entt::entity child, bool isSetLocal)
 	{
-		auto& registry = m_Registry.GetRegistry();
+		auto& registry = m_Registry->GetRegistry();
 		auto& relations = registry.get<Relationship>(m_Entity);
 
 		Entity childEntity{ m_Registry, child };
@@ -192,15 +242,15 @@ namespace Feather {
 		m_Name = name;
 	}
 
-	std::uint32_t Entity::Kill()
+	std::uint32_t Entity::Destroy()
 	{
-		if (!m_Registry.IsValid(m_Entity))
+		if (!m_Registry->IsValid(m_Entity))
 		{
 			F_ERROR("Failed to destroy entity. Entity ID '{}' is not valid", static_cast<std::uint32_t>(m_Entity));
 			return static_cast<std::uint32_t>(entt::null);
 		}
 
-		return m_Registry.GetRegistry().destroy(m_Entity);
+		return m_Registry->GetRegistry().destroy(m_Entity);
 	}
 
 	void Entity::CreateLuaEntityBind(sol::state& lua, Registry& registry)
@@ -212,15 +262,15 @@ namespace Feather {
 			sol::factories(
 				[&](Registry& reg, const std::string& name, const std::string& group)
 				{
-					return Entity{ reg, name, group };
+					return Entity{ &reg, name, group };
 				},
 				[&](const std::string& name, const std::string& group)
 				{
-					return Entity{ registry, name, group };
+					return Entity{ &registry, name, group };
 				},
 				[&](uint32_t id)
 				{
-					return Entity{ registry, static_cast<entt::entity>(id) };
+					return Entity{ &registry, static_cast<entt::entity>(id) };
 				}
 			),
 			"addComponent", [](Entity& entity, const sol::table& comp, sol::this_state s) -> sol::object
@@ -267,7 +317,7 @@ namespace Feather {
 			},
 			"name", &Entity::GetName,
 			"group", &Entity::GetGroup,
-			"kill", &Entity::Kill,
+			"destroy", &Entity::Destroy,
 			"addChild", [](Entity& entity, Entity& child) { entity.AddChild(child.GetEntity()); },
 			"updateTransform", &Entity::UpdateTransform,
 			"updateIsoSorting",

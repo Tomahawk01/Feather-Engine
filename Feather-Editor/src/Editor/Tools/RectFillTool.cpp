@@ -242,7 +242,7 @@ namespace Feather {
 				removedTile.hasPhysics = true;
 			}
 
-			tileToRemove.Kill();
+			tileToRemove.Destroy();
 			removedTiles.push_back(removedTile);
 		}
 

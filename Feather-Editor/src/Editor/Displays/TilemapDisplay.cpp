@@ -225,7 +225,7 @@ namespace Feather {
 					}
 					else
 					{
-						Entity checkedEntity{ currentScene->GetRegistry(), static_cast<entt::entity>(id) };
+						Entity checkedEntity{ currentScene->GetRegistryPtr(), static_cast<entt::entity>(id) };
 						if (checkedEntity.HasComponent<TileComponent>())
 							id = entt::null;
 					}
@@ -411,7 +411,7 @@ namespace Feather {
 			++count;
 		}
 
-		Entity newEnt{ pCurrentScene->GetRegistry(), sTag, prefabbed.id->group };
+		Entity newEnt{ pCurrentScene->GetRegistryPtr(), sTag, prefabbed.id->group };
 
 		newEnt.AddComponent<TransformComponent>(prefabbed.transform);
 		if (prefabbed.sprite)

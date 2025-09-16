@@ -50,7 +50,7 @@ namespace Feather {
 		}
 		else
 		{
-			Entity characterEnt{ registry, "Player", "" };
+			Entity characterEnt{ &registry, "Player", "" };
 			auto& transform = characterEnt.AddComponent<TransformComponent>(m_VisualEntity->GetComponent<TransformComponent>());
 			transform.scale = glm::vec2{ 1.0f }; // Should the scale be changed here?
 
@@ -136,7 +136,7 @@ namespace Feather {
 		if (!m_VisualEntityCreated)
 			return;
 
-		m_VisualEntity->Kill();
+		m_VisualEntity->Destroy();
 		m_VisualEntity.reset();
 		m_VisualEntityCreated = false;
 
@@ -156,7 +156,7 @@ namespace Feather {
 
 		if (!m_VisualEntity)
 		{
-			m_VisualEntity = std::make_shared<Entity>(Entity{ m_SceneRef.GetRegistry(), std::string{ PlayerStartTag }, "" });
+			m_VisualEntity = std::make_shared<Entity>(Entity{ m_SceneRef.GetRegistryPtr(), std::string{ PlayerStartTag }, "" });
 		}
 
 		m_VisualEntity->AddComponent<TransformComponent>(TransformComponent{});

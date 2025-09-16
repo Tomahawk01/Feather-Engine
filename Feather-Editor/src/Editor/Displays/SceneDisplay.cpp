@@ -229,7 +229,7 @@ namespace Feather {
 		
 		for (auto entity : physicsEntities)
 		{
-			Entity ent{ runtimeRegistry, entity };
+			Entity ent{ &runtimeRegistry, entity };
 
 			bool boxCollider{ ent.HasComponent<BoxColliderComponent>() };
 			bool circleCollider{ ent.HasComponent<CircleColliderComponent>() };

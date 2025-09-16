@@ -69,7 +69,7 @@ namespace Feather {
 		m_SelectedEntity = entity;
 		if (m_SelectedEntity != entt::null && m_Registry)
 		{
-			Entity ent{ *m_Registry, entity };
+			Entity ent{ m_Registry, entity };
 			SetGizmoPosition(ent);
 			GetDispatcher().EmitEvent(SwitchEntityEvent{ .entity = &ent });
 			m_UIComponent = ent.HasComponent<UIComponent>();

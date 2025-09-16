@@ -32,7 +32,7 @@ namespace Feather {
 
 				for (auto entity : view)
 				{
-					Entity ent{ registry, entity };
+					Entity ent{ &registry, entity };
 					callback(ent);
 				}
 			},
@@ -43,7 +43,7 @@ namespace Feather {
 
 				for (auto entity : view)
 				{
-					Entity ent{ reg, entity };
+					Entity ent{ &reg, entity };
 					callback(ent);
 				}
 			}),
@@ -108,17 +108,17 @@ namespace Feather {
 			{
 				auto entity = FindEntityByTag(reg, tag);
 
-				return entity == entt::null ? sol::lua_nil_t{} : sol::make_reference(s, Entity{ reg, entity });
+				return entity == entt::null ? sol::lua_nil_t{} : sol::make_reference(s, Entity{ &reg, entity });
 			},
 			"createEntity",
 			sol::overload(
 			[](Registry& reg)
 			{
-				return Entity{ reg, "", "" };
+				return Entity{ &reg, "", "" };
 			},
-			[](Registry& reg, const std::string& sName, const std::string sGroup)
+			[](Registry& reg, const std::string& name, const std::string group)
 			{
-				return Entity{ reg, sName, sGroup };
+				return Entity{ &reg, name, group };
 			}),
 			"clear",
 			[&](Registry& reg)

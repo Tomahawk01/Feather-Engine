@@ -9,19 +9,17 @@ namespace Feather {
 	class Entity
 	{
 	public:
-		Entity(Registry& registry);
-		Entity(Registry& registry, const std::string& name = "", const std::string& group = "");
-		Entity(Registry& registry, const entt::entity& entity);
-		virtual ~Entity() = default;
+		Entity(Registry* registry);
+		Entity(Registry* registry, const std::string& name = "", const std::string& group = "");
+		Entity(Registry* registry, const entt::entity& entity);
 
-		Entity& operator=(const Entity& other)
-		{
-			this->m_Entity = other.m_Entity;
-			this->m_Name = other.m_Name;
-			this->m_Group = other.m_Group;
-			
-			return *this;
-		}
+		Entity(const Entity& other);
+		Entity& operator=(const Entity& other);
+
+		Entity(Entity&& other) noexcept;
+		Entity& operator=(Entity&& other) noexcept;
+
+		virtual ~Entity();
 
 		/*
 		* @brief Adds a new child to the entity.
@@ -36,13 +34,13 @@ namespace Feather {
 
 		void ChangeName(const std::string& name);
 
-		std::uint32_t Kill();
+		std::uint32_t Destroy();
 
 		inline const std::string& GetName() const { return m_Name; }
 		inline const std::string& GetGroup() const { return m_Group; }
 		inline entt::entity& GetEntity() { return m_Entity; }
-		inline entt::registry& GetEnttRegistry() { return m_Registry.GetRegistry(); }
-		inline Registry& GetRegistry() { return m_Registry; }
+		inline entt::registry& GetEnttRegistry() { return m_Registry->GetRegistry(); }
+		inline Registry& GetRegistry() { return *m_Registry; }
 
 		static void CreateLuaEntityBind(sol::state& lua, Registry& registry);
 
@@ -78,8 +76,8 @@ namespace Feather {
 		auto RemoveComponent();
 
 	private:
-		/* Reference to the registry this entity belongs to */
-		Registry& m_Registry;
+		/* Pointer to the registry this entity belongs to */
+		Registry* m_Registry;
 		/* Underlying entity */
 		entt::entity m_Entity;
 		/* Entities specific name */

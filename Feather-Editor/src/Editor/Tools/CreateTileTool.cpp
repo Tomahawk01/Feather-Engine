@@ -132,7 +132,7 @@ namespace Feather {
 				removedTile.physics = tileToRemove.GetComponent<PhysicsComponent>();
 			}
 
-			tileToRemove.Kill();
+			tileToRemove.Destroy();
 
 			auto createToolRemoveCmd = UndoableCommands
 			{

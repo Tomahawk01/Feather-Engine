@@ -105,7 +105,7 @@ namespace Feather {
 
 		for (auto entity : tileView)
 		{
-			Entity tile{ *m_Registry, entity };
+			Entity tile{ m_Registry, entity };
 			const auto& transform = tile.GetComponent<TransformComponent>();
 			const auto& sprite = tile.GetComponent<SpriteComponent>();
 
@@ -144,13 +144,13 @@ namespace Feather {
 	Entity TileTool::CreateEntity()
 	{
 		F_ASSERT(m_Registry && "The registry must be valid to create an entity");
-		return Entity{ *m_Registry, "", "" };
+		return Entity{ m_Registry, "", "" };
 	}
 
 	Entity TileTool::CreateEntity(uint32_t id)
 	{
 		F_ASSERT(m_Registry && "The registry must be valid to create an entity");
-		return Entity{ *m_Registry, static_cast<entt::entity>(id) };
+		return Entity{ m_Registry, static_cast<entt::entity>(id) };
 	}
 
 	void TileTool::DrawMouseSprite()
