@@ -80,6 +80,7 @@ project "Feather-Editor"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
+        ignoredefaultlibraries { "MSVCRT.lib" }
         runtime "Debug"
         symbols "On"
 
