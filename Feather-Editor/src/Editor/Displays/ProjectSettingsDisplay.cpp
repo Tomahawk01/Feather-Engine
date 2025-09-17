@@ -132,6 +132,7 @@ namespace Feather {
 		projectSettings.subCategories.emplace_back(CreateGeneralSettings(coreGlobals, *projectInfo, mainRegistry));
 		projectSettings.subCategories.emplace_back(CreatePhysicsSettings(coreGlobals, *projectInfo, mainRegistry));
 		projectSettings.subCategories.emplace_back(CreateGraphicsSettings(coreGlobals, *projectInfo, mainRegistry));
+		projectSettings.subCategories.emplace_back(CreateAudioSettings(coreGlobals, *projectInfo, mainRegistry));
 
 		m_SettingsCategory = projectSettings;
 	}
@@ -340,6 +341,8 @@ namespace Feather {
 			.items = {
 				{
 					"Resolution", [&]() {
+						ImGui::SeparatorText("Graphics Settings");
+
 						int width{ coreGlobals.WindowWidth() };
 						int height{ coreGlobals.WindowHeight() };
 						
@@ -361,7 +364,114 @@ namespace Feather {
 
 	ProjectSettingsDisplay::SettingCategory ProjectSettingsDisplay::CreateAudioSettings(CoreEngineData& coreGlobals, ProjectInfo& projectInfo, MainRegistry& mainRegistry)
 	{
-		return SettingCategory();
+		return SettingCategory{
+		"Audio",
+		{},
+		{
+			{
+				"Global Overrides",
+				{
+					{
+						"Overrides",
+						[&]
+						{
+							ImGui::SeparatorText("Global Sound Overrides");
+							ImGui::InlineLabel("Enable");
+							ImGui::Checkbox("##enable_override", &projectInfo.GetAudioConfig().globalOverrideEnabled);
+							ImGui::InlineLabel("Volume");
+							if (ImGui::InputInt("##override_volume", &projectInfo.GetAudioConfig().globalVolumeOverride))
+							{
+								projectInfo.GetAudioConfig().globalVolumeOverride = std::clamp(projectInfo.GetAudioConfig().globalVolumeOverride, 0, 100);
+							}
+						}
+					}
+				},
+				{}
+			},
+			{
+				"Music Overrides",
+				{
+					{
+						"Music Overrides",
+						[&]
+						{
+							ImGui::SeparatorText("Music Channel Overrides");
+							ImGui::InlineLabel("Enable");
+							ImGui::ItemToolTip("Enables music channel override. If enabled, the volume set here will override other settings");
+							ImGui::Checkbox("##enable_music_override", &projectInfo.GetAudioConfig().musicVolumeOverrideEnabled);
+							ImGui::InlineLabel("Volume");
+							ImGui::ItemToolTip("Music channel volume override");
+							if (ImGui::InputInt("##override_music_volume", &projectInfo.GetAudioConfig().musicVolumeOverride))
+							{
+								projectInfo.GetAudioConfig().musicVolumeOverride = std::clamp(projectInfo.GetAudioConfig().musicVolumeOverride, 0, 100);
+							}
+						}
+					}
+				},
+				{}
+			},
+			{
+				"Sound FX Overrides",
+				{
+					{
+						"SoundFX Overrides",
+						[&]
+						{
+							ImGui::SeparatorText("Sound FX Channel Settings");
+							int allocatedChannels{ projectInfo.GetAudioConfig().GetAllocatedChannelCount() };
+							ImGui::InlineLabel("Channels");
+							ImGui::ItemToolTip("The number of allocated channels. Min 8 channels. Max 64 channels");
+							if (ImGui::InputInt("##channels_allocated", &allocatedChannels))
+							{
+								int newChannelCount{ allocatedChannels - projectInfo.GetAudioConfig().GetAllocatedChannelCount() };
+								if (newChannelCount != 0)
+								{
+									if (!projectInfo.GetAudioConfig().UpdateSoundChannels(newChannelCount))
+									{
+										F_ERROR("Failed to update sound channels");
+									}
+								}
+							}
+
+							if (ImGui::BeginTable("ChannelTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+							{
+								ImGui::TableSetupColumn("Channel");
+								ImGui::TableSetupColumn("Enabled");
+								ImGui::TableSetupColumn("Volume");
+								ImGui::TableHeadersRow();
+
+								for (const auto& [channelId, state] : projectInfo.GetAudioConfig().GetSoundChannelMap())
+								{
+									bool enabled{ state.first };
+									int volume{ state.second };
+
+									ImGui::TableNextRow();
+
+									ImGui::TableSetColumnIndex(0);
+									ImGui::Text("%d", channelId);
+
+									ImGui::TableSetColumnIndex(1);
+									if (ImGui::Checkbox(("##enabled_" + std::to_string(channelId)).c_str(), &enabled))
+									{
+										projectInfo.GetAudioConfig().EnableChannelOverride(channelId, enabled);
+									}
+
+									ImGui::TableSetColumnIndex(2);
+									if (ImGui::SliderInt(("##volume_" + std::to_string(channelId)).c_str(), &volume, 0, 100))
+									{
+										projectInfo.GetAudioConfig().SetChannelVolume(channelId, volume);
+									}
+								}
+
+								ImGui::EndTable();
+							}
+						}
+					}
+				},
+				{}
+			}
+		}
+		};
 	}
 
 }

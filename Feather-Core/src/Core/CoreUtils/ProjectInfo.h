@@ -6,6 +6,47 @@ namespace Feather {
 
 	class Texture;
 
+	struct AudioConfigInfo
+	{
+		using SoundChannelMap = std::map<int, std::pair<bool, int>>;
+
+		/* Overrides all sound and music channels */
+		bool globalOverrideEnabled{ false };
+		/* The amount to override all channels. Percentage [0 - 100] */
+		int globalVolumeOverride{ 100 };
+		/* Overrides the music channel. This is overridden if global override is enabled */
+		bool musicVolumeOverrideEnabled{ false };
+		/* The amount to override the music channel. Percentage [0 - 100] */
+		int musicVolumeOverride{ 100 };
+
+		bool UpdateSoundChannels(int numChannels);
+		bool EnableChannelOverride(int channel, bool enable);
+		bool SetChannelVolume(int channel, int volume);
+
+		const SoundChannelMap& GetSoundChannelMap() const { return mapSoundChannelVolume; }
+		const int GetAllocatedChannelCount() const { return allocatedSoundChannels; }
+
+	private:
+		/* @brief Adds more channels to the channel map */
+		void AddChannels(int numChannels);
+		void RemoveChannels(int numChannels);
+
+	private:
+		int allocatedSoundChannels{ 8 };
+
+		/* Map of the allocated channels. Channel to enabled/volume override */
+		SoundChannelMap mapSoundChannelVolume{
+			{ 0, { false, 100 } },
+			{ 1, { false, 100 } },
+			{ 2, { false, 100 } },
+			{ 3, { false, 100 } },
+			{ 4, { false, 100 } },
+			{ 5, { false, 100 } },
+			{ 6, { false, 100 } },
+			{ 7, { false, 100 } }
+		};
+	};
+
 	/*
 	* @brief Enum class defining the different folder types within a project
 	*/
@@ -63,6 +104,8 @@ namespace Feather {
 		inline const std::string& GetCopyRightNotice() const { return m_CopyRightNotice; }
 		inline const std::string& GetDefaultScene() const { return m_DefaultScene; }
 		inline void SetDefaultScene(const std::string& defaultScene) { m_DefaultScene = defaultScene; }
+		inline AudioConfigInfo& GetAudioConfig() { return m_AudioConfig; }
+		inline const AudioConfigInfo& GetAudioConfig() const { return m_AudioConfig; }
 
 		inline const std::unordered_map<EProjectFolderType, fs::path>& GetProjectPaths() const { return m_mapProjectFolderPaths; }
 
@@ -79,6 +122,8 @@ namespace Feather {
 		std::string m_ProjectDescription{};
 		std::string m_CopyRightNotice{};
 		std::shared_ptr<Texture> m_IconTexture{ nullptr };
+
+		AudioConfigInfo m_AudioConfig{};
 
 		bool m_UseVSync{ true };
 		bool m_Resizable{ false };

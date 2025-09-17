@@ -4,6 +4,8 @@
 #include "Renderer/Essentials/Texture.h"
 #include "Renderer/Essentials/TextureLoader.h"
 
+#include <SDL_mixer.h>
+
 namespace Feather {
 
 	void ProjectInfo::SetProjectPath(const fs::path& path)
@@ -93,6 +95,76 @@ namespace Feather {
 		}
 
 		return std::nullopt;
+	}
+
+	bool AudioConfigInfo::UpdateSoundChannels(int numChannels)
+	{
+		if (allocatedSoundChannels + numChannels > 64)
+		{
+			F_ERROR("Failed to update sound channels. Max 64 channels are supported");
+			return false;
+		}
+		else if (allocatedSoundChannels + numChannels < 8)
+		{
+			F_ERROR("Failed to update sound channels. There must be at least 8 sound channels");
+			return false;
+		}
+
+		if (numChannels > 0)
+			AddChannels(numChannels);
+		else if (numChannels < 0)
+			RemoveChannels(-numChannels);
+
+		Mix_AllocateChannels(allocatedSoundChannels);
+
+		return true;
+	}
+
+	bool AudioConfigInfo::EnableChannelOverride(int channel, bool enable)
+	{
+		auto channelItr = mapSoundChannelVolume.find(channel);
+		if (channelItr == mapSoundChannelVolume.end())
+		{
+			F_ERROR("Failed to change sound channel override. Channel '{}' is invalid", channel);
+			return false;
+		}
+
+		channelItr->second.first = enable;
+		return true;
+	}
+
+	bool AudioConfigInfo::SetChannelVolume(int channel, int volume)
+	{
+		auto channelItr = mapSoundChannelVolume.find(channel);
+		if (channelItr == mapSoundChannelVolume.end())
+		{
+			F_ERROR("Failed to set sound channel volume. Channel '{}' is invalid", channel);
+			return false;
+		}
+
+		channelItr->second.second = volume;
+		return true;
+	}
+
+	void AudioConfigInfo::AddChannels(int numChannels)
+	{
+		for (int i = 0; i < numChannels; ++i)
+		{
+			int channelID{ allocatedSoundChannels + i };
+			mapSoundChannelVolume.emplace(channelID, std::make_pair(false, 100));
+		}
+
+		allocatedSoundChannels += numChannels;
+	}
+
+	void AudioConfigInfo::RemoveChannels(int numChannels)
+	{
+		for (int i = 0; i < numChannels && allocatedSoundChannels > 0; ++i)
+		{
+			int channelID{ allocatedSoundChannels - 1 };
+			mapSoundChannelVolume.erase(channelID);
+			--allocatedSoundChannels;
+		}
 	}
 
 }

@@ -441,6 +441,43 @@ namespace Feather {
 			coreGlobals.SetPositionIterations(physics["positionIterations"].GetInt());
 		}
 
+		if (projectData.HasMember("audio_config"))
+		{
+			auto& audioConfig = projectInfo->GetAudioConfig();
+			const rapidjson::Value& jsonAudioConfig = projectData["audio_config"];
+			audioConfig.globalOverrideEnabled = jsonAudioConfig["globalEnabled"].GetBool();
+			audioConfig.globalVolumeOverride = jsonAudioConfig["globalVolume"].GetInt();
+			audioConfig.musicVolumeOverrideEnabled = jsonAudioConfig["musicOverrideEnabled"].GetBool();
+			audioConfig.musicVolumeOverride = jsonAudioConfig["musicVolume"].GetInt();
+			int allocatedChannels = jsonAudioConfig["allocatedChannels"].GetInt();
+			int channelDelta = allocatedChannels - audioConfig.GetAllocatedChannelCount();
+			if (channelDelta > 0)
+			{
+				audioConfig.UpdateSoundChannels(channelDelta);
+			}
+
+			if (jsonAudioConfig.HasMember("sound_channel_data") && jsonAudioConfig["sound_channel_data"].IsArray())
+			{
+				const rapidjson::Value& jsonChannelDataArray = jsonAudioConfig["sound_channel_data"];
+				for (const auto& channelData : jsonChannelDataArray.GetArray())
+				{
+					int channelID = channelData["channelID"].GetInt();
+					bool enabled = channelData["enabled"].GetBool();
+					int volume = channelData["volume"].GetInt();
+
+					if (!audioConfig.EnableChannelOverride(channelID, enabled))
+					{
+						F_ERROR("Failed to enable sound channel override. Channel '{}' is invalid", channelID);
+					}
+
+					if (!audioConfig.SetChannelVolume(channelID, volume))
+					{
+						F_ERROR("Failed to set sound channel volume override. Channel '{}' is invalid", channelID);
+					}
+				}
+			}
+		}
+
 		auto& editorState = mainRegistry.GetContext<EditorStatePtr>();
 		if (!editorState->Load(*projectInfo))
 		{
@@ -594,6 +631,30 @@ namespace Feather {
 			.AddKeyValuePair("velocityIterations", coreGlobals.GetVelocityIterations())
 			.AddKeyValuePair("positionIterations", coreGlobals.GetPositionIterations())
 			.EndObject();		 // Physics
+
+		const auto& audioConfig = projectInfo.GetAudioConfig();
+
+		serializer->StartNewObject("audio_config")
+			.AddKeyValuePair("globalEnabled", audioConfig.globalOverrideEnabled)
+			.AddKeyValuePair("globalVolume", audioConfig.globalVolumeOverride)
+			.AddKeyValuePair("musicOverrideEnabled", audioConfig.musicVolumeOverrideEnabled)
+			.AddKeyValuePair("musicVolume", audioConfig.musicVolumeOverride)
+			.AddKeyValuePair("allocatedChannels", audioConfig.GetAllocatedChannelCount());
+
+		serializer->StartNewArray("sound_channel_data");
+
+		for (const auto& [channelID, state] : audioConfig.GetSoundChannelMap())
+		{
+			serializer->StartNewObject()
+				.AddKeyValuePair("channelID", channelID)
+				.AddKeyValuePair("enabled", state.first)
+				.AddKeyValuePair("volume", state.second)
+				.EndObject();
+		}
+
+		serializer->EndArray()  // Sound Channel Data
+			.EndObject();		// Audio Config
+
 		serializer->EndObject(); // Project Data
 
 		return serializer->EndDocument();
