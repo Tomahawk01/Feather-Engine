@@ -8,7 +8,6 @@ std::string Feather::AnimationComponent::to_string() const
 	ss << "==== Animation Component ==== \n" << std::boolalpha <<
 		  "Num Frames: " << numFrames << "\n" <<
 		  "Frame Rate: " << frameRate << "\n" <<
-		  "Frame Offset: " << frameOffset << "\n" <<
 		  "IsVertical: " << isVertical << "\n" <<
 		  "IsLooped: " << isLooped << "\n";
 
@@ -21,19 +20,17 @@ void Feather::AnimationComponent::CreateAnimationLuaBind(sol::state& lua)
 		"Animation",
 		"type_id", &entt::type_hash<AnimationComponent>::value,
 		sol::call_constructor,
-		sol::factories([](int numFrames, int frameRate, int frameOffset, bool isVertical, bool isLooped)
+		sol::factories([](int numFrames, int frameRate, bool isVertical, bool isLooped)
 		{
 			return AnimationComponent {
 					.numFrames = numFrames,
 					.frameRate = frameRate,
-					.frameOffset = frameOffset,
 					.isVertical = isVertical,
 					.isLooped = isLooped,
 			};
 		}),
 		"numFrames", &AnimationComponent::numFrames,
 		"frameRate", &AnimationComponent::frameRate,
-		"frameOffset", &AnimationComponent::frameOffset,
 		"currentFrame", &AnimationComponent::currentFrame,
 		"startTime", &AnimationComponent::startTime,
 		"isVertical", &AnimationComponent::isVertical,

@@ -9,7 +9,6 @@ namespace Feather {
 	{
 		int numFrames{ 1 };
 		int frameRate{ 1 };
-		int frameOffset{ 0 };
 		int currentFrame{ 0 };
 		int startTime{ static_cast<int>(SDL_GetTicks()) };
 

@@ -60,7 +60,6 @@ namespace Feather {
 		serializer.StartNewObject("animation")
 			.AddKeyValuePair("numFrames", animation.numFrames)
 			.AddKeyValuePair("frameRate", animation.frameRate)
-			.AddKeyValuePair("frameOffset", animation.frameOffset)
 			.AddKeyValuePair("isVertical", animation.isVertical)
 			.AddKeyValuePair("isLooped", animation.isLooped)
 			.EndObject();
@@ -252,7 +251,6 @@ namespace Feather {
 	{
 		animation.numFrames = jsonValue["numFrames"].GetInt();
 		animation.frameRate = jsonValue["frameRate"].GetInt();
-		animation.frameOffset = jsonValue["frameOffset"].GetInt();
 		animation.isVertical = jsonValue["isVertical"].GetBool();
 		animation.isLooped = jsonValue["isLooped"].GetBool();
 	}
@@ -391,7 +389,6 @@ namespace Feather {
 		serializer.StartNewTable("animation")
 			.AddKeyValuePair("numFrames", animation.numFrames, false)
 			.AddKeyValuePair("frameRate", animation.frameRate, false)
-			.AddKeyValuePair("frameOffset", animation.frameOffset, false)
 			.AddKeyValuePair("isVertical", animation.isVertical, false)
 			.AddKeyValuePair("isLooped", animation.isLooped, false, true)
 			.EndTable(false);
@@ -562,7 +559,6 @@ namespace Feather {
 	{
 		animation.numFrames = table["numFrames"].get_or(0);
 		animation.frameRate = table["frameRate"].get_or(0);
-		animation.frameOffset = table["frameOffset"].get_or(0);
 		animation.isVertical = table["isVertical"].get_or(false);
 		animation.isLooped = table["isLooped"].get_or(false);
 	}

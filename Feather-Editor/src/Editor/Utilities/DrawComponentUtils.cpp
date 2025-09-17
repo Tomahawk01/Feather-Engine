@@ -214,10 +214,6 @@ namespace Feather {
 			if (ImGui::InputInt("##frame_rate", &animation.frameRate, 1, 1))
 				animation.frameRate = std::clamp(animation.frameRate, 1, 25);
 
-			ImGui::InlineLabel("frame offset");
-			if (ImGui::InputInt("##frame_offset", &animation.frameOffset, 1, 1))
-				animation.frameOffset = std::clamp(animation.frameOffset, 0, 15);
-
 			ImGui::InlineLabel("vertical");
 			ImGui::ItemToolTip("Does the sprite animations scroll vertically");
 			ImGui::Checkbox("##vertical", &animation.isVertical);
