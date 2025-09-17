@@ -76,6 +76,8 @@ namespace Feather {
 		*/
 		const bool IsGamepadPresent() const;
 
+		const bool IsRumbleSupported() const;
+
 		/**
 		* @brief Retrieves the current position of an axis.
 		*

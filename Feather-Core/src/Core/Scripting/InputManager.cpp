@@ -173,6 +173,17 @@ namespace Feather {
                 }
 
                 gamepad->RumbleController(lowFrequency, highFrequency, durationMs);
+            },
+            "isRumbleSupported", [&](int index)
+            {
+                auto gamepad = inputManager.GetController(index);
+                if (!gamepad)
+                {
+                    F_ERROR("Invalid gamepad index '{}' provided or gamepad is not plugged in!", index);
+                    return false;
+                }
+
+                return gamepad->IsRumbleSupported();
             }
         );
 	}

@@ -150,6 +150,11 @@ namespace Feather {
 		return m_Controller != nullptr && SDL_NumJoysticks() > 0;
 	}
 
+	const bool Gamepad::IsRumbleSupported() const
+	{
+		return m_Controller != nullptr ? SDL_GameControllerHasRumble(m_Controller.get()) : false;
+	}
+
 	const Sint16 Gamepad::GetAxisPosition(Uint8 axis)
 	{
 		auto axisItr = m_AxisValues.find(axis);
