@@ -19,6 +19,102 @@
                     "path": "assets\\textures\\FeatherAsteroidsLogo.png",
                     "isPixelArt": false,
                     "isTileset": false
+                },
+                {
+                    "name": "asteroid_big",
+                    "path": "assets\\textures\\asteroid_1.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "asteroid_small",
+                    "path": "assets\\textures\\asteroid_2.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "dark_bg",
+                    "path": "assets\\textures\\dark_bg.png",
+                    "isPixelArt": true,
+                    "isTileset": true
+                },
+                {
+                    "name": "default_pickup",
+                    "path": "assets\\textures\\pickups\\powerupBlue.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "game_over",
+                    "path": "assets\\textures\\game_over.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "lives",
+                    "path": "assets\\textures\\lives_ship.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "powerup_bolt_yellow",
+                    "path": "assets\\textures\\pickups\\powerupYellow_bolt.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "powerup_shield_green",
+                    "path": "assets\\textures\\pickups\\powerupGreen_shield.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "powerup_star_blue",
+                    "path": "assets\\textures\\pickups\\powerupBlue_star.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "proj_1",
+                    "path": "assets\\textures\\projectile_1.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "screen_crack",
+                    "path": "assets\\textures\\screen_crack.png",
+                    "isPixelArt": false,
+                    "isTileset": false
+                },
+                {
+                    "name": "shield",
+                    "path": "assets\\textures\\shield.png",
+                    "isPixelArt": false,
+                    "isTileset": false
+                },
+                {
+                    "name": "ship",
+                    "path": "assets\\textures\\ship.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "ship_explosion",
+                    "path": "assets\\textures\\ship_explosion.png",
+                    "isPixelArt": true,
+                    "isTileset": false
+                },
+                {
+                    "name": "status_bar_fill",
+                    "path": "assets\\textures\\status_bar_fill.png",
+                    "isPixelArt": false,
+                    "isTileset": false
+                },
+                {
+                    "name": "status_bars",
+                    "path": "assets\\textures\\status_bars.png",
+                    "isPixelArt": true,
+                    "isTileset": false
                 }
             ],
             "soundfx": [],
