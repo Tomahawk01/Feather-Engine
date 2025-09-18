@@ -3,7 +3,7 @@
         "name": "main",
         "tilemapPath": "main\\main_tilemap.json",
         "objectmapPath": "main\\main_objects.json",
-        "defaultMusic": "None",
+        "defaultMusic": "space",
         "canvas": {
             "width": 640,
             "height": 480,
@@ -15,10 +15,15 @@
             "enabled": true,
             "character": "default",
             "position": {
-                "x": 297.0,
-                "y": 186.0
+                "x": 304.0,
+                "y": 182.0
             }
         },
-        "sprite_layers": []
+        "sprite_layers": [
+            {
+                "layerName": "background",
+                "isVisible": true
+            }
+        ]
     }
 }

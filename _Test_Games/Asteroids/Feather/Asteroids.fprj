@@ -22,7 +22,20 @@
                 }
             ],
             "soundfx": [],
-            "music": [],
+            "music": [
+                {
+                    "name": "game_over",
+                    "path": "assets\\music\\game_over.ogg"
+                },
+                {
+                    "name": "space",
+                    "path": "assets\\music\\space.ogg"
+                },
+                {
+                    "name": "title",
+                    "path": "assets\\music\\title.mp3"
+                }
+            ],
             "fonts": [
                 {
                     "name": "Future-32",

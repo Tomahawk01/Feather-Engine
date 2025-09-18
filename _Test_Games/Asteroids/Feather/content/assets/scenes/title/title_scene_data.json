@@ -3,7 +3,7 @@
         "name": "title",
         "tilemapPath": "title\\title_tilemap.json",
         "objectmapPath": "title\\title_objects.json",
-        "defaultMusic": "None",
+        "defaultMusic": "title",
         "canvas": {
             "width": 640,
             "height": 480,
