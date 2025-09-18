@@ -117,7 +117,84 @@
                     "isTileset": false
                 }
             ],
-            "soundfx": [],
+            "soundfx": [
+                {
+                    "name": "big_ast_explosion",
+                    "path": "assets\\soundfx\\big_ast_explosion.wav"
+                },
+                {
+                    "name": "collect_1",
+                    "path": "assets\\soundfx\\collect_1.mp3"
+                },
+                {
+                    "name": "complete",
+                    "path": "assets\\soundfx\\complete.ogg"
+                },
+                {
+                    "name": "crack_screen",
+                    "path": "assets\\soundfx\\crack_screen.ogg"
+                },
+                {
+                    "name": "final_death",
+                    "path": "assets\\soundfx\\final_death.ogg"
+                },
+                {
+                    "name": "health_increase",
+                    "path": "assets\\soundfx\\health_increase.ogg"
+                },
+                {
+                    "name": "health_pickup",
+                    "path": "assets\\soundfx\\health_pickup.ogg"
+                },
+                {
+                    "name": "laser",
+                    "path": "assets\\soundfx\\laser.ogg"
+                },
+                {
+                    "name": "off",
+                    "path": "assets\\soundfx\\off.ogg"
+                },
+                {
+                    "name": "on",
+                    "path": "assets\\soundfx\\on.ogg"
+                },
+                {
+                    "name": "shield_enabled",
+                    "path": "assets\\soundfx\\shield_enabled.ogg"
+                },
+                {
+                    "name": "shield_hit_1",
+                    "path": "assets\\soundfx\\shield_hit_1.ogg"
+                },
+                {
+                    "name": "shield_increase",
+                    "path": "assets\\soundfx\\shield_increase.ogg"
+                },
+                {
+                    "name": "ship_damage_1",
+                    "path": "assets\\soundfx\\ship_damage_1.ogg"
+                },
+                {
+                    "name": "ship_explosion",
+                    "path": "assets\\soundfx\\explosion.wav"
+                },
+                {
+                    "name": "ship_hit_1",
+                    "path": "assets\\soundfx\\ship_hit_1.ogg"
+                },
+                {
+                    "name": "small_explosion_2",
+                    "path": "assets\\soundfx\\small_explosion_2.ogg"
+                },
+                {
+                    "name": "weapon_pickup",
+                    "path": "assets\\soundfx\\weapon_pickup.ogg"
+                },
+                {
+                    "name": "weapon_powerup",
+                    "path": "assets\\soundfx\\weapon_powerup.ogg"
+                }
+            ],
             "music": [
                 {
                     "name": "game_over",
