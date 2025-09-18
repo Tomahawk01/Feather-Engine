@@ -426,6 +426,13 @@ namespace Feather {
 			.AddKeyValuePair("velocityIterations", m_PackageData->GameConfig->velocityIterations)
 			.AddKeyValuePair("gravity", m_PackageData->GameConfig->gravity)
 			.EndTable() // PhysicsParams
+			.StartNewTable("AudioParams")
+			.AddKeyValuePair("globalEnabled", m_PackageData->GameConfig->audioConfig.globalOverrideEnabled)
+			.AddKeyValuePair("globalVolume", m_PackageData->GameConfig->audioConfig.globalVolumeOverride)
+			.AddKeyValuePair("musicOverrideEnabled", m_PackageData->GameConfig->audioConfig.musicVolumeOverrideEnabled)
+			.AddKeyValuePair("musicVolume", m_PackageData->GameConfig->audioConfig.musicVolumeOverride)
+			.AddKeyValuePair("allocatedChannels", m_PackageData->GameConfig->audioConfig.GetAllocatedChannelCount())
+			.EndTable() // AudioParams
 			.EndTable() // GameConfig
 			.FinishStream();
 

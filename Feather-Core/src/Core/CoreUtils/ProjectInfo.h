@@ -154,6 +154,8 @@ namespace Feather {
 
 		bool packageAssets{ false };
 
+		AudioConfigInfo audioConfig{};
+
 		void Reset()
 		{
 			gameName.clear();
@@ -171,6 +173,8 @@ namespace Feather {
 			positionIterations = 8;
 			velocityIterations = 8;
 			gravity = 9.8f;
+
+			audioConfig = {};
 
 			packageAssets = false;
 		}

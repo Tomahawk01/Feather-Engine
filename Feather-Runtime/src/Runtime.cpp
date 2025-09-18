@@ -151,6 +151,12 @@ namespace Feather {
 			throw std::runtime_error("Failed to initialize Main Registry");
 		}
 
+		// Allocate SDL_Mixer channels
+		if (m_DeltaAllocatedChannels != 0 && !m_GameConfig->audioConfig.UpdateSoundChannels(m_DeltaAllocatedChannels))
+		{
+			throw std::runtime_error("Failed to allocated new channels");
+		}
+
 		if (!mainRegistry.GetAssetManager().CreateDefaultFonts())
 		{
 			throw std::runtime_error("Failed to create default fonts");
@@ -301,6 +307,17 @@ namespace Feather {
 		// TODO: Flags
 
 		m_GameConfig->packageAssets = (*maybeConfig)["PackageAssets"].get_or(false);
+
+		sol::optional<sol::table> maybeAudio = (*maybeConfig)["AudioParams"];
+		if (maybeAudio)
+		{
+			if ((*maybeAudio)["allocatedChannels"].valid())
+			{
+				int allocatedChannels = m_GameConfig->audioConfig.GetAllocatedChannelCount();
+				int newAllocatedChannels = (*maybeAudio)["allocatedChannels"].get_or(0);
+				m_DeltaAllocatedChannels = newAllocatedChannels - allocatedChannels;
+			}
+		}
 
 		return true;
 	}

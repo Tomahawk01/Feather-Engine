@@ -244,16 +244,16 @@ namespace Feather {
 			{
 				// We want to ensure we are packaging the most current data.
 				// Save all files, before packaging
-				auto& pProjectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
-				F_ASSERT(pProjectInfo && "Project Info must exist!");
+				auto& projectInfo = MAIN_REGISTRY().GetContext<ProjectInfoPtr>();
+				F_ASSERT(projectInfo && "Project Info must exist!");
 				// Save entire project
 				ProjectLoader pl{};
-				if (!pl.SaveLoadedProject(*pProjectInfo))
+				if (!pl.SaveLoadedProject(*projectInfo))
 				{
-					auto optProjectFilePath = pProjectInfo->GetProjectFilePath();
+					auto optProjectFilePath = projectInfo->GetProjectFilePath();
 					F_ASSERT(optProjectFilePath && "Project file path not set correctly in project info");
 
-					F_ERROR("Failed to save project '{}' at file '{}'", pProjectInfo->GetProjectName(), optProjectFilePath->string());
+					F_ERROR("Failed to save project '{}' at file '{}'", projectInfo->GetProjectName(), optProjectFilePath->string());
 
 					return;
 				}
@@ -265,7 +265,8 @@ namespace Feather {
 				m_GameConfig->positionIterations = coreGlobals.GetPositionIterations();
 				m_GameConfig->velocityIterations = coreGlobals.GetVelocityIterations();
 				m_GameConfig->gravity = coreGlobals.GetGravity();
-				m_GameConfig->gameName = pProjectInfo->GetProjectName();
+				m_GameConfig->gameName = projectInfo->GetProjectName();
+				m_GameConfig->audioConfig = projectInfo->GetAudioConfig();
 
 				// Set window flags
 				uint32_t flags{ 0 };
@@ -282,9 +283,9 @@ namespace Feather {
 				std::string sFullDestination = std::format("{}{}{}", m_DestinationPath, PATH_SEPARATOR, m_GameConfig->gameName);
 
 				auto pPackageData = std::make_unique<PackageData>();
-				pPackageData->ProjectInfo = std::make_unique<ProjectInfo>(*pProjectInfo);
+				pPackageData->ProjectInfo = std::make_unique<ProjectInfo>(*projectInfo);
 				pPackageData->GameConfig = std::make_unique<GameConfig>(*m_GameConfig);
-				pPackageData->TempDataPath = fs::path{ pProjectInfo->GetProjectPath() / "tempData" }.string();
+				pPackageData->TempDataPath = fs::path{ projectInfo->GetProjectPath() / "tempData" }.string();
 				pPackageData->FinalDestination = sFullDestination;
 				pPackageData->AssetFilepath = pPackageData->TempDataPath + PATH_SEPARATOR + "assetDefs.lua";
 
