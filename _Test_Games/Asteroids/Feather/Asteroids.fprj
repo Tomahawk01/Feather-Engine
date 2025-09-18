@@ -5,19 +5,364 @@
     },
     "project_data": {
         "project_name": "Asteroids",
-        "main_lua_file": "scripts\\main.lua",
-        "game_type": "No Type",
+        "main_lua_script": "scripts\\main.lua",
+        "file_icon": "",
+        "game_type": "Top Down",
+        "copyright": "Copyright 2025 @Tomahawk01. All rights reserved",
+        "version": "1.0.0.0",
+        "description": "Asteroids is an example game on how to use different systems in Feather Engine.",
+        "default_scene": "title",
         "assets": {
             "textures": [],
             "soundfx": [],
             "music": [],
-            "scenes": []
+            "fonts": [],
+            "scenes": [
+                {
+                    "name": "main",
+                    "sceneData": "assets/scenes\\main\\main_scene_data.json"
+                },
+                {
+                    "name": "title",
+                    "sceneData": "assets/scenes\\title\\title_scene_data.json"
+                }
+            ],
+            "prefabs": []
         },
         "physics": {
-            "enabled": true,
+            "enabled": false,
             "gravityScale": 9.8,
-            "velocityIterations": 8,
-            "positionIterations": 10
+            "velocityIterations": 10,
+            "positionIterations": 8
+        },
+        "audio_config": {
+            "globalEnabled": false,
+            "globalVolume": 100,
+            "musicOverrideEnabled": false,
+            "musicVolume": 100,
+            "allocatedChannels": 64,
+            "sound_channel_data": [
+                {
+                    "channelID": 0,
+                    "enabled": true,
+                    "volume": 67
+                },
+                {
+                    "channelID": 1,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 2,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 3,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 4,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 5,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 6,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 7,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 8,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 9,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 10,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 11,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 12,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 13,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 14,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 15,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 16,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 17,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 18,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 19,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 20,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 21,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 22,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 23,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 24,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 25,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 26,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 27,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 28,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 29,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 30,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 31,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 32,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 33,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 34,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 35,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 36,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 37,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 38,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 39,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 40,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 41,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 42,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 43,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 44,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 45,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 46,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 47,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 48,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 49,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 50,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 51,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 52,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 53,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 54,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 55,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 56,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 57,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 58,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 59,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 60,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 61,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 62,
+                    "enabled": false,
+                    "volume": 100
+                },
+                {
+                    "channelID": 63,
+                    "enabled": false,
+                    "volume": 100
+                }
+            ]
         }
     }
 }

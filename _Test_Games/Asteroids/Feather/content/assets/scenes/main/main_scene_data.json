@@ -1,0 +1,24 @@
+{
+    "scene_data": {
+        "name": "main",
+        "tilemapPath": "main\\main_tilemap.json",
+        "objectmapPath": "main\\main_objects.json",
+        "defaultMusic": "None",
+        "canvas": {
+            "width": 640,
+            "height": 480,
+            "tileWidth": 16,
+            "tileHeight": 16
+        },
+        "mapType": "grid",
+        "playerStart": {
+            "enabled": true,
+            "character": "default",
+            "position": {
+                "x": 297.0,
+                "y": 186.0
+            }
+        },
+        "sprite_layers": []
+    }
+}
