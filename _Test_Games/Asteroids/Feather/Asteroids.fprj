@@ -1,0 +1,23 @@
+{
+    "warnings": {
+        "warning": "This file is engine generated",
+        "warning": "DO NOT CHANGE unless you know what you are doing"
+    },
+    "project_data": {
+        "project_name": "Asteroids",
+        "main_lua_file": "scripts\\main.lua",
+        "game_type": "No Type",
+        "assets": {
+            "textures": [],
+            "soundfx": [],
+            "music": [],
+            "scenes": []
+        },
+        "physics": {
+            "enabled": true,
+            "gravityScale": 9.8,
+            "velocityIterations": 8,
+            "positionIterations": 10
+        }
+    }
+}
