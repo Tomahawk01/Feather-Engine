@@ -6,7 +6,7 @@
     "project_data": {
         "project_name": "Asteroids",
         "main_lua_script": "scripts\\main.lua",
-        "file_icon": "",
+        "file_icon": "assets\\misc\\feather_asteroids_icon.ico",
         "game_type": "Top Down",
         "copyright": "Copyright 2025 @Tomahawk01. All rights reserved",
         "version": "1.0.0.0",
