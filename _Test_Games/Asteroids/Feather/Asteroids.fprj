@@ -16,7 +16,13 @@
             "textures": [],
             "soundfx": [],
             "music": [],
-            "fonts": [],
+            "fonts": [
+                {
+                    "name": "Future-32",
+                    "path": "assets\\fonts\\Kenney Future.ttf",
+                    "fontSize": 32.0
+                }
+            ],
             "scenes": [
                 {
                     "name": "main",
