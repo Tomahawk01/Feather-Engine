@@ -13,7 +13,14 @@
         "description": "Asteroids is an example game on how to use different systems in Feather Engine.",
         "default_scene": "title",
         "assets": {
-            "textures": [],
+            "textures": [
+                {
+                    "name": "FeatherAsteroidsLogo",
+                    "path": "assets\\textures\\FeatherAsteroidsLogo.png",
+                    "isPixelArt": false,
+                    "isTileset": false
+                }
+            ],
             "soundfx": [],
             "music": [],
             "fonts": [
