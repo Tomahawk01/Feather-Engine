@@ -1,3 +1,890 @@
 {
-    "game_objects": []
+    "game_objects": [
+        {
+            "components": {
+                "id": {
+                    "name": "Life_6",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 994.781,
+                        "y": 54.42985
+                    },
+                    "localPosition": {
+                        "x": 536.3905,
+                        "y": 29.71492
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "Lives_2",
+                    "nextSibling": "",
+                    "prevSibling": "Life_5",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_5",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 955.78051,
+                        "y": 53.71492
+                    },
+                    "localPosition": {
+                        "x": 497.39001,
+                        "y": 29.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "Lives_2",
+                    "nextSibling": "Life_6",
+                    "prevSibling": "Life_4",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_4",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 916.781,
+                        "y": 54.42985
+                    },
+                    "localPosition": {
+                        "x": 458.3905,
+                        "y": 29.71492
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "Lives_2",
+                    "nextSibling": "Life_5",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Lives_2",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 458.3905,
+                        "y": 24.71492
+                    },
+                    "localPosition": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "relationship": {
+                    "parent": "",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": "Life_4"
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_1_2",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "localPosition": {
+                        "x": -163.39999,
+                        "y": -36.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "relationship": {
+                    "parent": "Lives_1",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_1_1",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "localPosition": {
+                        "x": -163.39999,
+                        "y": -36.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "relationship": {
+                    "parent": "Lives_1",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_1",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 337.09271,
+                        "y": 77.09796
+                    },
+                    "localPosition": {
+                        "x": 173.72729,
+                        "y": 41.04898
+                    },
+                    "scale": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "Lives_1",
+                    "nextSibling": "Life_2",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Lives_1",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 163.3654,
+                        "y": 36.04898
+                    },
+                    "localPosition": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "relationship": {
+                    "parent": "",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": "Life_1"
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "ScoreValue",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 591.79052,
+                        "y": 10.0
+                    },
+                    "localPosition": {
+                        "x": 344.34289,
+                        "y": 5.0
+                    },
+                    "scale": {
+                        "x": 0.75,
+                        "y": 0.75
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "text": {
+                    "text": "99999",
+                    "fontName": "Future-32",
+                    "padding": 0,
+                    "wrap": -1.0,
+                    "isHidden": false,
+                    "color": {
+                        "r": 232,
+                        "g": 221,
+                        "b": 28,
+                        "a": 255
+                    }
+                },
+                "ui": {},
+                "relationship": {
+                    "parent": "ScoreLabel",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "ScoreLabel",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 247.44763,
+                        "y": 5.0
+                    },
+                    "localPosition": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "scale": {
+                        "x": 0.75,
+                        "y": 0.75
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "text": {
+                    "text": "Score:",
+                    "fontName": "Future-32",
+                    "padding": 0,
+                    "wrap": -1.0,
+                    "isHidden": false,
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    }
+                },
+                "ui": {},
+                "relationship": {
+                    "parent": "",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": "ScoreValue"
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_2",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 317.58801,
+                        "y": 77.09796
+                    },
+                    "localPosition": {
+                        "x": 154.22259,
+                        "y": 41.04898
+                    },
+                    "scale": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "Lives_1",
+                    "nextSibling": "Life_3",
+                    "prevSibling": "Life_1",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "Life_3",
+                    "group": "Lives"
+                },
+                "transform": {
+                    "position": {
+                        "x": 298.08319,
+                        "y": 77.09796
+                    },
+                    "localPosition": {
+                        "x": 134.7178,
+                        "y": 41.04898
+                    },
+                    "scale": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "Lives_1",
+                    "nextSibling": "",
+                    "prevSibling": "Life_2",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "PowerBars_1",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 1.99996,
+                        "y": 0.0
+                    },
+                    "localPosition": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "scale": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "relationship": {
+                    "parent": "",
+                    "nextSibling": "",
+                    "prevSibling": "",
+                    "firstChild": "ShieldBar"
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "ShieldBar",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 24.11421,
+                        "y": 15.0
+                    },
+                    "localPosition": {
+                        "x": 22.11424,
+                        "y": 15.0
+                    },
+                    "scale": {
+                        "x": 0.75,
+                        "y": 0.75
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 256.0,
+                    "height": 48.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 0,
+                    "texture_name": "status_bars",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 210
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "PowerBars_1",
+                    "nextSibling": "LifeBar",
+                    "prevSibling": "",
+                    "firstChild": "ShieldBarFill"
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "ShieldBarFill",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 59.19421,
+                        "y": 44.45
+                    },
+                    "localPosition": {
+                        "x": 35.08,
+                        "y": 29.45
+                    },
+                    "scale": {
+                        "x": 0.75,
+                        "y": 0.75
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 201.0,
+                    "height": 10.0,
+                    "startX": 0,
+                    "startY": 1,
+                    "layer": 1,
+                    "texture_name": "status_bar_fill",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.33333,
+                        "uv_width": 1.0,
+                        "uv_height": 0.33333
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 210
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "ShieldBar",
+                    "nextSibling": "ShieldBarImage",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "ShieldBarImage",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 213.66421,
+                        "y": 39.3236
+                    },
+                    "localPosition": {
+                        "x": 189.55,
+                        "y": 24.32361
+                    },
+                    "scale": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 34.0,
+                    "height": 33.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "powerup_shield_green",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 210
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "ShieldBar",
+                    "nextSibling": "",
+                    "prevSibling": "ShieldBarFill",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "LifeBar",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 5.21903,
+                        "y": 0.0
+                    },
+                    "localPosition": {
+                        "x": 3.21906,
+                        "y": 0.0
+                    },
+                    "scale": {
+                        "x": 0.75,
+                        "y": 0.75
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 256.0,
+                    "height": 48.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 0,
+                    "texture_name": "status_bars",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 210
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "PowerBars_1",
+                    "nextSibling": "",
+                    "prevSibling": "ShieldBar",
+                    "firstChild": "LifeBarFill"
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "LifeBarFill",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 36.42903,
+                        "y": 14.0
+                    },
+                    "localPosition": {
+                        "x": 31.20999,
+                        "y": 14.0
+                    },
+                    "scale": {
+                        "x": 0.75,
+                        "y": 0.75
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 201.0,
+                    "height": 10.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "status_bar_fill",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 0.33333
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 255
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "LifeBar",
+                    "nextSibling": "LifeBarImage",
+                    "prevSibling": "",
+                    "firstChild": ""
+                }
+            }
+        },
+        {
+            "components": {
+                "id": {
+                    "name": "LifeBarImage",
+                    "group": ""
+                },
+                "transform": {
+                    "position": {
+                        "x": 15.14288,
+                        "y": 10.1448
+                    },
+                    "localPosition": {
+                        "x": 9.92385,
+                        "y": 10.1448
+                    },
+                    "scale": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "rotation": 0.0,
+                    "localRotation": 0.0
+                },
+                "sprite": {
+                    "width": 37.0,
+                    "height": 26.0,
+                    "startX": 0,
+                    "startY": 0,
+                    "layer": 1,
+                    "texture_name": "lives",
+                    "uvs": {
+                        "u": 0.0,
+                        "v": 0.0,
+                        "uv_width": 1.0,
+                        "uv_height": 1.0
+                    },
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                        "a": 210
+                    },
+                    "isHidden": false,
+                    "isIsometric": false,
+                    "isoCellX": 0,
+                    "isoCellY": 0
+                },
+                "relationship": {
+                    "parent": "LifeBar",
+                    "nextSibling": "",
+                    "prevSibling": "LifeBarFill",
+                    "firstChild": ""
+                }
+            }
+        }
+    ]
 }
