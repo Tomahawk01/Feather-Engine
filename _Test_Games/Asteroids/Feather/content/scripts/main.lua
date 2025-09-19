@@ -10,12 +10,18 @@ main = {
 		--[[ Initialize global state variables here ]]
 		init = function() 
 			math.randomseed(os.time())
+			gStateStack = StateStack()
+			local title = TitleState:Create( { stack = gStateStack } )
+			gStateStack:changeState(title:GetState())
+			Music.setVolume(20)
 		end
 	}, 
 	[2] = { 
 		--[[ Main Lua Update function ]]
 		update = function()
-
+			if gStateStack then
+				gStateStack:update(F_DeltaTime())
+			end
 		end
 	}, 
 	[3] = { 
