@@ -101,7 +101,7 @@ end
 --- @brief Handles input for the Game Over state
 --- Pressing Enter or Start will exit this state
 function GameOverState:HandleInputs()
-	if Keyboard.justReleased(KEY_ENTER) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BTN_START)) then 
+	if Keyboard.justReleased(KEY_ENTER) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BUTTON_START)) then 
 		self.stack:pop()
 		return 
 	end

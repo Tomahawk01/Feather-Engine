@@ -81,7 +81,7 @@ end
 -- @brief Handle player input while paused
 -- Exits the pause state (pops from stack) when Backspace or Gamepad Start is pressed
 function PauseState:HandleInputs()
-	if Keyboard.justReleased(KEY_BACKSPACE) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BTN_START)) then 
+	if Keyboard.justReleased(KEY_BACKSPACE) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BUTTON_START)) then 
 		self.stack:pop()
 	end
 end

@@ -89,7 +89,7 @@ end
 -- @brief Handle input specific to the GameState
 -- Allows pausing the game via Backspace or Gamepad Start button
 function GameState:HandleInputs()
-	if Keyboard.justReleased(KEY_BACKSPACE) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BTN_START)) then 
+	if Keyboard.justReleased(KEY_BACKSPACE) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BUTTON_START)) then 
 		self.stack:push(PauseState:Create({stack = self.stack}):GetState())
 		return
 	end

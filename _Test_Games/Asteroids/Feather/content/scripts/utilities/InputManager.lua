@@ -40,7 +40,7 @@ function InputManager:MoveForward()
 			return false
 		end
 	
-		return Gamepad.pressed(self.playerNum, DPAD_UP)
+		return Gamepad.pressed(self.playerNum, GP_DPAD_UP)
 	end
 	
 	if self.playerNum == 1 then 
@@ -58,7 +58,7 @@ function InputManager:RotateCCW()
 			return false
 		end
 		
-		return Gamepad.pressed(self.playerNum, DPAD_LEFT)
+		return Gamepad.pressed(self.playerNum, GP_DPAD_LEFT)
 	end 
 	
 	if self.playerNum == 1 then 
@@ -76,7 +76,7 @@ function InputManager:RotateCW()
 			return false
 		end
 		
-		return Gamepad.pressed(self.playerNum, DPAD_RIGHT)
+		return Gamepad.pressed(self.playerNum, GP_DPAD_RIGHT)
 	end
 	
 	if self.playerNum == 1 then 
@@ -94,7 +94,7 @@ function InputManager:Fire()
 			return false
 		end
 		
-		return Gamepad.pressed(self.playerNum, GP_BTN_A)
+		return Gamepad.pressed(self.playerNum, GP_BUTTON_A)
 	end
 	
 	if self.playerNum == 1 then 

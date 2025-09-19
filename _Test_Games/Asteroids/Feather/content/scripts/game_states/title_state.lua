@@ -63,7 +63,7 @@ end
 -- @brief Handles input for the Title state
 -- Allows starting the game VIA Enter or Gamepad Start Button
 function TitleState:HandleInputs()
-	if Keyboard.justReleased(KEY_ENTER) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BTN_START)) then 
+	if Keyboard.justReleased(KEY_ENTER) or (Gamepad.connected(1) and Gamepad.justReleased(1, GP_BUTTON_START)) then 
 		self.stack:changeState(GameState:Create({ stack = self.stack}):GetState())
 		return
 	end
