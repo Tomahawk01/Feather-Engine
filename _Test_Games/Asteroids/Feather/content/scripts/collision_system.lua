@@ -7,11 +7,11 @@ CollisionData = F_Class("CollisionData")
 -- @param params table Table containing collision data parameters:
 --   - id (integer) Entity ID involved in the collision.
 --   - damage (integer) Optional damage value (default = 10).
---   - bDestroy (boolean) Whether entity should be destroyed (default = false).
+--   - destroy (boolean) Whether entity should be destroyed (default = false).
 function CollisionData:Init(params)
 	self.id = params.id
 	self.damage = params.damage or 10
-	self.bDestroy = params.bDestroy or false
+	self.destroy = params.destroy or false
 end
 
 -- @class CollisionSystem
@@ -129,7 +129,7 @@ function CollisionSystem:HandleEvent(event)
 	local collider_a = entityA:getComponent(CircleCollider)
 	local collider_b = entityB:getComponent(CircleCollider)
 	
-	if collider_a.bColliding or collider_b.bColliding then
+	if collider_a.colliding or collider_b.colliding then
 		return
 	end
 	
@@ -137,30 +137,30 @@ function CollisionSystem:HandleEvent(event)
 	local name_b = entityB:name()
 	
 	if group_a == "projectiles" and group_b == "asteroids" then 
-		collider_a.bColliding = true 
-		collider_b.bColliding = true
+		collider_a.colliding = true 
+		collider_b.colliding = true
 		F_InsertUnique(self.entitiesToDestroy, 
-			CollisionData:Create({ id = entityB:id(), bDestroy = true })
+			CollisionData:Create({ id = entityB:id(), destroy = true })
 		)
 		F_InsertUnique(self.entitiesToDestroy, 
-			CollisionData:Create({ id = entityA:id(), bDestroy = true })
+			CollisionData:Create({ id = entityA:id(), destroy = true })
 		)
 	elseif group_b == "projectiles" and group_a == "asteroids" then 
-		collider_a.bColliding = true 
-		collider_b.bColliding = true
+		collider_a.colliding = true 
+		collider_b.colliding = true
 		F_InsertUnique(self.entitiesToDestroy, 
-			CollisionData:Create({ id = entityA:id(), bDestroy = true })
+			CollisionData:Create({ id = entityA:id(), destroy = true })
 		)
 		F_InsertUnique(self.entitiesToDestroy, 
-			CollisionData:Create({ id = entityB:id(), bDestroy = true })
+			CollisionData:Create({ id = entityB:id(), destroy = true })
 		)
 	elseif name_a == "PlayerShip" and group_b == "asteroids" then 
-		collider_a.bColliding = true 
+		collider_a.colliding = true 
 		F_InsertUnique(self.entitiesToDestroy, 
 			CollisionData:Create({ id = entityA:id(), damage = 25 })
 		)
 	elseif name_b == "PlayerShip" and group_a == "asteroids" then 
-		collider_b.bColliding = true 
+		collider_b.colliding = true 
 		F_InsertUnique(self.entitiesToDestroy, 
 			CollisionData:Create({ id = entityB:id(), damage = 25 })
 		)

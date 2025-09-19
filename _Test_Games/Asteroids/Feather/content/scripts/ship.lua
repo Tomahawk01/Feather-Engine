@@ -372,7 +372,7 @@ function Ship:UpdateGhostEffect()
 		if self.invincibleTimer:elapsed_ms() > 3000 then 
 			-- Reset collision after 3 seconds
 			local collider = ship:getComponent(CircleCollider)
-			collider.bColliding = false 
+			collider.colliding = false 
 
 			self.invincibleTimer:stop() 
 			sprite.color.a = 255
@@ -387,7 +387,7 @@ function Ship:UpdateGhostEffect()
 		if self.damageTimer:elapsed_ms() > 500 then 
 			self.takingDamage = false
 			local collider = ship:getComponent(CircleCollider)
-			collider.bColliding = false 
+			collider.colliding = false 
 			sprite.color = Color(255, 255, 255, 255)
 			self.damageTimer:stop()
 			self.damageFlashTimer:stop()
@@ -402,7 +402,7 @@ function Ship:UpdateGhostEffect()
 		if self.shieldDamageTimer:elapsed_ms() > 500 then 
 			self.takingDamage = false
 			local collider = ship:getComponent(CircleCollider)
-			collider.bColliding = false 
+			collider.colliding = false 
 			sprite.color = Color(255, 255, 255, 255)
 			self.shieldDamageTimer:stop()
 			self.shieldDamageFlashTimer:stop()
@@ -490,7 +490,7 @@ function Ship:Reset()
 	shieldSprite.isHidden = false 
 	
 	local circle_collider = ship:getComponent(CircleCollider)
-	circle_collider.bColliding = false
+	circle_collider.colliding = false
 	
 	self.eventDispatcher:emitEvent(
 		LuaEvent( 
