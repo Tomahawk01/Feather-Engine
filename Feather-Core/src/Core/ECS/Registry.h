@@ -55,7 +55,7 @@ namespace Feather {
 	entt::runtime_view& add_component_to_view(Registry* registry, entt::runtime_view& view);
 
 	template <typename TComponent>
-	entt::runtime_view& exclude_component_from_view(Registry* registry, entt::runtime_view& view);
+	auto exclude_component_from_view(Registry* registry, entt::runtime_view* view);
 
 }
 

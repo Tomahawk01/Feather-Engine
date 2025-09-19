@@ -49,9 +49,9 @@ namespace Feather {
 	}
 
 	template <typename TComponent>
-	entt::runtime_view& exclude_component_from_view(Registry* registry, entt::runtime_view& view)
+	auto exclude_component_from_view(Registry* registry, entt::runtime_view* view)
 	{
-		return view.exclude(registry->GetRegistry().storage<TComponent>());
+		view->exclude(registry->GetRegistry().storage<TComponent>());
 	}
 
 	template <typename TComponent>
