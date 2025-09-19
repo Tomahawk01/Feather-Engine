@@ -12,6 +12,8 @@
 #include "Renderer/Essentials/Font.h"
 #include "Sounds/Essentials/Music.h"
 #include "Sounds/Essentials/SoundFX.h"
+#include "Sounds/MusicPlayer/MusicPlayer.h"
+#include "Sounds/SoundPlayer/SoundFXPlayer.h"
 #include "FileSystem/Process/FileProcessor.h"
 #include "FileSystem/Utilities/FileSystemUtilities.h"
 #include "Logger/Logger.h"
@@ -393,6 +395,8 @@ namespace Feather {
 
 	void AssetDisplay::OpenAssetContext(const std::string& assetName)
 	{
+		DrawSoundContext(assetName);
+
 		ImGui::SeparatorText("Edit");
 		if (ImGui::Selectable(ICON_FA_PEN " Rename"))
 		{
@@ -466,6 +470,74 @@ namespace Feather {
 					{
 						F_ERROR("Failed to open file location '{}'", assetPath);
 					}
+				}
+			}
+		}
+	}
+
+	void AssetDisplay::DrawSoundContext(const std::string& assetName)
+	{
+		if (m_eSelectedType == AssetType::MUSIC)
+		{
+			ImGui::SeparatorText("Music Controls");
+			auto& musicPlayer = MAIN_REGISTRY().GetMusicPlayer();
+
+			if (!musicPlayer.IsPlaying())
+			{
+				if (ImGui::Selectable(ICON_FA_PLAY " Play"))
+				{
+					auto& assetManager = MAIN_REGISTRY().GetAssetManager();
+					if (auto music = assetManager.GetMusic(assetName))
+					{
+						musicPlayer.Play(*music);
+					}
+				}
+
+				ImGui::BeginDisabled();
+				ImGui::Selectable(ICON_FA_STOP " Stop");
+				ImGui::EndDisabled();
+			}
+			else
+			{
+				ImGui::BeginDisabled();
+				ImGui::Selectable(ICON_FA_PLAY " Play");
+				ImGui::EndDisabled();
+
+				if (ImGui::Selectable(ICON_FA_STOP " Stop"))
+				{
+					musicPlayer.Stop();
+				}
+			}
+		}
+		else if (m_eSelectedType == AssetType::SOUNDFX)
+		{
+			ImGui::SeparatorText("Sound Controls");
+			auto& soundPlayer = MAIN_REGISTRY().GetSoundPlayer();
+
+			if (!soundPlayer.IsPlaying(0))
+			{
+				if (ImGui::Selectable(ICON_FA_PLAY " Play"))
+				{
+					auto& assetManager = MAIN_REGISTRY().GetAssetManager();
+					if (auto soundfx = assetManager.GetSoundFx(assetName))
+					{
+						soundPlayer.Play(*soundfx, 0, 0);
+					}
+				}
+
+				ImGui::BeginDisabled();
+				ImGui::Selectable(ICON_FA_STOP " Stop");
+				ImGui::EndDisabled();
+			}
+			else
+			{
+				ImGui::BeginDisabled();
+				ImGui::Selectable(ICON_FA_PLAY " Play");
+				ImGui::EndDisabled();
+
+				if (ImGui::Selectable(ICON_FA_STOP " Stop"))
+				{
+					soundPlayer.Stop(0);
 				}
 			}
 		}

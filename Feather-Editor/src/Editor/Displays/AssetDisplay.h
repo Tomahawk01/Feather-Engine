@@ -22,6 +22,7 @@ namespace Feather {
 		bool DoRenameAsset(const std::string& oldName, const std::string& newName) const;
 		void CheckRename(const std::string& checkName) const;
 		void OpenAssetContext(const std::string& assetName);
+		void DrawSoundContext(const std::string& assetName);
 
 	protected:
 		virtual void DrawToolbar() override;
