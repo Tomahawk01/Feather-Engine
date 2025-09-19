@@ -339,15 +339,15 @@ function Ship:OnShipDestroy()
 		
 		-- Set explosion animation
 		local animation = ship:getComponent(Animation)
-		animation.numFrames = 11 
-		animation.frameRate = 15
+		animation.numFrames = 54 
+		animation.frameRate = 35
 		animation:reset()
 		
 		-- Set explosion sprite
 		local sprite = ship:getComponent(Sprite)		
-		sprite.sTextureName = "ship_explosion"
-		sprite.width = 80
-		sprite.height = 80
+		sprite.texture_name = "ship_explosion"
+		sprite.width = 100
+		sprite.height = 100
 		sprite:generateUVs()
 
 		-- Enlarge explosion scale
@@ -425,9 +425,9 @@ function Ship:UpdateExplosion()
 
 			-- Reset to normal ship sprite
 			local sprite = ship:getComponent(Sprite)
-			sprite.sTextureName = "ship"
-			sprite.width = 80
-			sprite.height = 112 
+			sprite.texture_name = "ship"
+			sprite.width = 84
+			sprite.height = 136 
 			sprite:generateUVs()
 			sprite.startX = 0
 

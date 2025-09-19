@@ -44,8 +44,8 @@ AsteroidDefs =
 			}, 
 			sprite = {
 				asset_name = "asteroid_small",
-				width = 32,
-				height = 32,
+				width = 28,
+				height = 28,
 				start_x = 0, start_y = 0,
 				layer = 2
 			},
@@ -73,8 +73,8 @@ ProjectileDefs =
 			}, 
 			sprite = {
 				asset_name = "proj_1",
-				width = 32,
-				height = 32,
+				width = 37,
+				height = 13,
 				start_x = 0, start_y = 0,
 				layer = 2
 			},

@@ -42,7 +42,7 @@ end
 -- Iterates through entities, checks intersections, and dispatches events.
 function CollisionSystem:UpdateCircleCollision()
 	local reg = Registry()
-	local entities = reg:getEntities( CircleCollider )
+	local entities = reg:getEntities(CircleCollider)
 	self.entitiesToDestroy = {}
 	entities:for_each(
 		function(entity_a)	
@@ -53,7 +53,7 @@ function CollisionSystem:UpdateCircleCollision()
 					end
 			
 					if self:Intersect(entity_a, entity_b) then 
-						self.collisionEventDispatcher:emitEvent( LuaEvent( { entityA = entity_a:id(), entityB = entity_b:id() } ))
+						self.collisionEventDispatcher:emitEvent(LuaEvent( { entityA = entity_a:id(), entityB = entity_b:id() } ))
 					end
 					
 					::continue::
@@ -94,7 +94,6 @@ end
 -- @param entity_b Entity Second entity.
 -- @return boolean True if entities intersect, false otherwise.
 function CollisionSystem:Intersect(entity_a, entity_b)
-	
 	local a_center = self:GetCenter(entity_a)
 	local b_center = self:GetCenter(entity_b)
 
@@ -116,7 +115,6 @@ end
 -- @brief Handles collision events between entities.
 -- @param event LuaEvent The collision event containing entity IDs.
 function CollisionSystem:HandleEvent(event)
-	
 	local entityA = Entity(event.data.entityA)
 	local entityB = Entity(event.data.entityB)
 	local group_a = entityA:group()
@@ -167,13 +165,13 @@ function CollisionSystem:HandleEvent(event)
 	elseif name_a == "PlayerShip" and group_b == "pickups" then 
 		self.collisionEventDispatcher:enqueueEvent( 
 			LuaEvent( 
-				{ bIsPickup = true, shipID = entityA:id(), pickupID = entityB:id() } 
+				{ isPickup = true, shipID = entityA:id(), pickupID = entityB:id() } 
 			)
 		)
 	elseif name_b == "PlayerShip" and group_a == "pickups" then 
 		self.collisionEventDispatcher:enqueueEvent( 
 			LuaEvent( 
-				{ bIsPickup = true, shipID = entityB:id(), pickupID = entityA:id() } 
+				{ isPickup = true, shipID = entityB:id(), pickupID = entityA:id() } 
 			)
 		)
 	end
@@ -182,7 +180,7 @@ end
 -- @brief Handles pickup collision events.
 -- @param event LuaEvent Event containing ship and pickup IDs.
 function CollisionSystem:HandlePickups(event)
-	if not event.data.bIsPickup then 
+	if not event.data.isPickup then 
 		return 
 	end 
 	
