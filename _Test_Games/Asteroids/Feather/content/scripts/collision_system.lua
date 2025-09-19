@@ -25,8 +25,8 @@ function CollisionSystem:Init(params)
 	params = params or {}
 	
 	self.collisionEventDispatcher = EventDispatcher(DispatcherType.Lua)
-	self.collisionHandler = LuaEventHandler( function(event) self:HandleEvent(event) end )
-	self.pickupHandler = LuaEventHandler( function (event) self:HandlePickups(event) end )
+	self.collisionHandler = LuaEventHandler(function(event) self:HandleEvent(event) end)
+	self.pickupHandler = LuaEventHandler(function (event) self:HandlePickups(event) end)
 	self.collisionEventDispatcher:addHandler(self.collisionHandler, LuaEvent)
 	self.collisionEventDispatcher:addHandler(self.pickupHandler, LuaEvent)
 	self.entitiesToDestroy = {}
@@ -61,7 +61,7 @@ function CollisionSystem:UpdateCircleCollision()
 			)
 		end
 	)
-		
+
 	for k, v in pairs(self.entitiesToDestroy) do 
 		local entity = Entity(v.id)
 		if entity:group() == "asteroids" then 
@@ -119,7 +119,7 @@ function CollisionSystem:HandleEvent(event)
 	local entityB = Entity(event.data.entityB)
 	local group_a = entityA:group()
 	local group_b = entityB:group()
-	
+
 	if group_a == group_b then
 		return
 	end

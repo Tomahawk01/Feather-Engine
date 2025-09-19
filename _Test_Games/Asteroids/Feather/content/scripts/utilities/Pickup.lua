@@ -28,7 +28,7 @@ function Pickup:Init(params)
 	
 	local sprite = self.pickup:addComponent(
 		Sprite(
-			params.sTexture or "default_pickup", 
+			params.texture_name or "default_pickup", 
 			params.width or 34, 
 			params.height or 33, 
 			params.startX or 0,
