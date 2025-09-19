@@ -226,7 +226,12 @@
                     "sceneData": "assets/scenes\\title\\title_scene_data.json"
                 }
             ],
-            "prefabs": []
+            "prefabs": [
+                {
+                    "name": "PlayerShip_pfab",
+                    "path": "assets/prefabs\\PlayerShip_pfab.json"
+                }
+            ]
         },
         "physics": {
             "enabled": false,

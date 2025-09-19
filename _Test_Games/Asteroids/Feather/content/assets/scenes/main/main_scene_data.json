@@ -13,7 +13,7 @@
         "mapType": "grid",
         "playerStart": {
             "enabled": true,
-            "character": "default",
+            "character": "PlayerShip_pfab",
             "position": {
                 "x": 304.0,
                 "y": 182.0
