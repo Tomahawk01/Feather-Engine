@@ -9,7 +9,7 @@ function AsteroidHandler:Init()
 	self.asteroids = {}			-- Table of active asteroids
 	self.spawnTimer = Timer()	-- Timer used to control asteroid spawning 
 	self.spawnTimer:start()		
-	self.bAllowSpawn = true		-- Flag to enable/disable spawning
+	self.allowSpawn = true		-- Flag to enable/disable spawning
 end
 
 --- @brief Adds an asteroid to the internal list
@@ -32,7 +32,7 @@ function AsteroidHandler:Update()
 	end
 	
 	-- Skip spawning if disabled
-	if not self.bAllowSpawn then 
+	if not self.allowSpawn then 
 		return 
 	end
 	
@@ -137,13 +137,13 @@ function AsteroidHandler:ResetAsteroids()
 		self.asteroids[k] = nil
 	end
 	
-	self.bAllowSpawn = true
+	self.allowSpawn = true
 	self.spawnTimer:restart()
 end
 
 --- @brief Disables spawning of new asteroids
 function AsteroidHandler:Disable()
-	self.bAllowSpawn = false
+	self.allowSpawn = false
 end
 
 -- Global instance of asteroid handler

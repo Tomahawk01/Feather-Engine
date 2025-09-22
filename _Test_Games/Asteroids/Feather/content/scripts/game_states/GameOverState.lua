@@ -49,8 +49,7 @@ function GameOverState:Init(params)
 		(F_WindowHeight() * 0.5) - (asteroidSprite.height * 0.5)
 	)
 	
-	self.bBrokenScreen = false
-	
+	self.isBrokenScreen = false
 end
 
 --- @brief Gets the internal State object for this Game Over state

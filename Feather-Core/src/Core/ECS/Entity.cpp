@@ -33,7 +33,7 @@ namespace Feather {
 	{
 		if (HasComponent<Identification>())
 		{
-			auto id = GetComponent<Identification>();
+			const auto& id = GetComponent<Identification>();
 			m_Name = id.name;
 			m_Group = id.group;
 		}

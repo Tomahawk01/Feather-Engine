@@ -59,10 +59,10 @@ function LoadEntity(def)
 		newEntity:addComponent(
 			Animation(
 				def.components.animation.num_frames,
-				def.components.animation.frame_rate,
-				def.components.animation.frame_offset,
-				def.components.animation.bVertical,
-				def.components.animation.bLooped
+				def.components.animation.frameRate,
+				def.components.animation.frameOffset,
+				def.components.animation.isVertical,
+				def.components.animation.isLooped
 			)
 		)
 	end

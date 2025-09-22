@@ -9,7 +9,7 @@ void Feather::State::CreateLuaStateBind(sol::state& lua)
 		sol::call_constructor,
 		sol::factories(
 			[](const std::string& name) {
-				return new State{ .name = name };
+				return State{ .name = name };
 			},
 			[](const std::string& name, sol::protected_function on_enter, sol::protected_function on_exit,
 			   sol::protected_function on_update, sol::protected_function on_render, sol::protected_function handle_inputs, sol::object variables) {

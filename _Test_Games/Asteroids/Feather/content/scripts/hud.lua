@@ -57,7 +57,7 @@ function Hud:Init()
 	text.textStr = "0"
 
 	-- Internal state
-	self.bGameOver = false 
+	self.gameOver = false 
 	self.shipEventHandler = LuaEventHandler( function (event) self:HandleShipEvent(event) end )
 	gShipHandler:AddEventHandler(self.shipEventHandler)
 
@@ -65,13 +65,13 @@ function Hud:Init()
 	self.shipDamageTimer = Timer()
 	self.shieldDamageTimer = Timer()
 	self.flashTimer = Timer()
-	self.bShip1Damaged = false	
-	self.bShield1Damaged = false	
+	self.ship1Damaged = false	
+	self.shield1Damaged = false	
 end
 
 -- @brief Updates HUD state every frame. Handles score and damage effects.
 function Hud:Update()
-	if self.bGameOver then
+	if self.gameOver then
 		return 
 	end
 	
@@ -118,7 +118,7 @@ function Hud:UpdateHealth(event)
 	local healthFillTransform = self.lifeBarFill:getComponent(Transform)
 	healthFillTransform.scale.x = F_clamp(self.lifeFillScaleX * healthPct, 0.0, self.lifeFillScaleX)
 	
-	self.bShip1Damaged = true 
+	self.ship1Damaged = true 
 	self.shipDamageTimer:start()
 end
 
@@ -136,7 +136,7 @@ function Hud:UpdateShield(event)
 	
 	local shieldFillTransform = self.shieldBarFill:getComponent(Transform)
 	shieldFillTransform.scale.x = F_clamp(self.lifeFillScaleX * shieldPct, 0.0, self.lifeFillScaleX)
-	self.bShield1Damaged = true 
+	self.shield1Damaged = true 
 	self.shieldDamageTimer:start()
 end
 
@@ -160,11 +160,11 @@ end
 
 -- @brief Resets the HUD state for a new game session.
 function Hud:Reset()
-	self.bGameOver = false 
-	self.bShowGameOver = false 
+	self.gameOver = false 
+	self.showGameOver = false 
 	self:SetScore(0)
 	self:ShowDamage(false)
-	self.bShip1Damaged = false 
+	self.ship1Damaged = false 
 	self.shipDamageTimer:stop()
 	self.flashTimer:stop()
 end
@@ -185,22 +185,22 @@ end
 -- @brief Updates flashing animations for damaged ship or shield.
 -- Uses timers to flash between two colors for 500ms.
 function Hud:UpdateShipDamage()
-	if self.bShip1Damaged and self.shipDamageTimer:is_running() then 
+	if self.ship1Damaged and self.shipDamageTimer:is_running() then 
 		local sprite = self.lifeBarFill:getComponent(Sprite)
 		FlashColor(sprite, self.flashTimer, 50, Color(255, 0, 0, 200), Color(255, 255, 255, 200))
 		
 		if self.shipDamageTimer:elapsed_ms() > 500 then 
-			self.bShip1Damaged = false 
+			self.ship1Damaged = false 
 			self.shipDamageTimer:stop()
 			self.flashTimer:stop()
 			sprite.color = Color(255, 255, 255, 255)
 		end
-	elseif self.bShield1Damaged and self.shieldDamageTimer:is_running() then  
+	elseif self.shield1Damaged and self.shieldDamageTimer:is_running() then  
 		local sprite = self.shieldBarFill:getComponent(Sprite)
 		FlashColor(sprite, self.flashTimer, 50, Color(0, 0, 255, 200), Color(255, 255, 255, 200))
 		
 		if self.shieldDamageTimer:elapsed_ms() > 500 then 
-			self.bShield1Damaged = false 
+			self.shield1Damaged = false 
 			self.shieldDamageTimer:stop()
 			self.flashTimer:stop()
 			sprite.color = Color(255, 255, 255, 255)

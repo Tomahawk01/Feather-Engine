@@ -36,7 +36,7 @@ namespace Feather {
 			{
 				try
 				{
-					auto result = oldState->on_exit();
+					auto result = oldState->on_exit(oldState->variables);
 					if (!result.valid())
 					{
 						sol::error error = result;
@@ -51,7 +51,7 @@ namespace Feather {
 			}
 
 			if (removeState)
-				oldState->killState = true;
+				oldState->killState;
 
 			m_CurrentState = stateName;
 		}
@@ -60,7 +60,7 @@ namespace Feather {
 		{
 			try
 			{
-				auto result = newState->on_enter(enterParams);
+				auto result = newState->on_enter(newState->variables, enterParams);
 				if (!result.valid())
 				{
 					sol::error error = result;
@@ -83,9 +83,21 @@ namespace Feather {
 			if (stateItr == m_mapStates.end())
 				return;
 
-			if (stateItr->second->on_update.valid())
+			auto& stateRef = stateItr->second;
+
+			if (stateRef->handle_inputs.valid())
 			{
-				auto result = stateItr->second->on_update(dt);
+				auto result = stateRef->handle_inputs(stateRef->variables);
+				if (!result.valid())
+				{
+					sol::error error = result;
+					throw error;
+				}
+			}
+
+			if (stateRef->on_update.valid())
+			{
+				auto result = stateRef->on_update(stateRef->variables, dt);
 				if (!result.valid())
 				{
 					sol::error error = result;
@@ -114,9 +126,11 @@ namespace Feather {
 			if (stateItr == m_mapStates.end())
 				return;
 
-			if (stateItr->second->on_render.valid())
+			auto& stateRef = stateItr->second;
+
+			if (stateRef->on_render.valid())
 			{
-				auto result = stateItr->second->on_render();
+				auto result = stateRef->on_render(stateRef->variables);
 				if (!result.valid())
 				{
 					sol::error error = result;
@@ -154,8 +168,9 @@ namespace Feather {
 			return;
 		}
 
-		stateItr->second->on_exit();
-		stateItr->second->killState = true;
+		auto& stateRef = stateItr->second;
+		stateRef->on_exit(stateRef->variables);
+		stateRef->killState = true;
 		m_CurrentState.clear();
 	}
 
@@ -163,7 +178,7 @@ namespace Feather {
 	{
 		for (auto& [name, state] : m_mapStates)
 		{
-			state->on_exit();
+			state->on_exit(state->variables);
 		}
 
 		m_mapStates.clear();
