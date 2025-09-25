@@ -20,13 +20,13 @@ namespace Feather {
         lua.new_usertype<Mouse>(
             "Mouse",
             sol::no_constructor,
-            "just_pressed",
+            "justPressed",
             [&](int btn) { return mouse.IsButtonJustPressed(btn); },
-            "just_released",
+            "justReleased",
             [&](int btn) { return mouse.IsButtonJustReleased(btn); },
             "pressed",
             [&](int btn) { return mouse.IsButtonPressed(btn); },
-            "screen_position",
+            "screenPosition",
             [&]()
             {
                 const auto& mouseInfo = registry.GetContext<std::shared_ptr<MouseGuiInfo>>();
@@ -40,7 +40,7 @@ namespace Feather {
 
                 return mouseInfo->position;
             },
-            "world_position",
+            "worldPosition",
             [&]()
             {
                 const auto& mouseInfo = registry.GetContext<std::shared_ptr<MouseGuiInfo>>();
@@ -60,9 +60,9 @@ namespace Feather {
 
                 return camera->ScreenCoordsToWorld(glm::vec2{ x, y });
             },
-            "wheel_x",
+            "wheelX",
             [&]() { return mouse.GetMouseWheelX(); },
-            "wheel_y",
+            "wheelY",
             [&]() { return mouse.GetMouseWheelY(); }
         );
 

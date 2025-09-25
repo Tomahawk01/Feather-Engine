@@ -297,31 +297,28 @@ namespace Feather {
 			return false;
 		}
 
-		// Create the new entity in the registry
-		auto& registry = m_Registry.GetRegistry();
-		auto newEntity = registry.create();
+		auto newestEntity = RelationshipUtils::DuplicateRecursive(m_Registry.GetRegistry(), entity);
 
-		// Copy the components of the entity to the new entity
-		for (auto&& [id, storage] : registry.storage())
-		{
-			if (!storage.contains(entity))
-				continue;
+		auto checkTagName =
+			[&](entt::entity entity, Registry* reg)
+			{
+				Entity ent{ reg, entity };
+				const std::string& tag{ ent.GetName() };
+				if (m_mapTagToEntity.contains(tag))
+				{
+					size_t tagNum{ 1 };
+					while (m_mapTagToEntity.contains(std::format("{}_{}", tag, tagNum)))
+					{
+						++tagNum;
+					}
 
-			InvokeMetaFunction(id, "copy_component"_hs, Entity{ &m_Registry, entity }, Entity{ &m_Registry, newEntity });
-		}
+					ent.ChangeName(std::format("{}_{}", tag, tagNum));
+				}
 
-		// Now we need to set the tag for the entity
-		size_t tagNum{ 1 };
+				m_mapTagToEntity.emplace(ent.GetName(), entity);
+			};
 
-		while (CheckTagName(std::format("{}_{}", objItr->first, tagNum)))
-		{
-			++tagNum;
-		}
-
-		Entity newEnt{ &m_Registry, newEntity };
-		newEnt.ChangeName(std::format("{}_{}", objItr->first, tagNum));
-
-		m_mapTagToEntity.emplace(newEnt.GetName(), newEntity);
+		RelationshipUtils::ApplyFunctionToHierarchy(m_Registry.GetRegistry(), newestEntity, checkTagName, &m_Registry);
 
 		return true;
 	}

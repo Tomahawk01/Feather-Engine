@@ -119,4 +119,64 @@ namespace Feather {
 		entityToRemove.Destroy();
 	}
 
+	entt::entity RelationshipUtils::DuplicateRecursive(entt::registry& reg, entt::entity source, entt::entity newParent)
+	{
+		// Create a new entity
+		entt::entity copy = reg.create();
+
+		// Copy all components except relationship
+		for (auto&& [id, storage] : reg.storage())
+		{
+			if (id == entt::type_hash<Relationship>::value())
+				continue;
+
+			if (storage.contains(source))
+			{
+				storage.push(copy, storage.value(source));
+			}
+		}
+
+		// Add a new relationship
+		auto& copyRel = reg.emplace<Relationship>(copy);
+		copyRel.self = copy;
+		copyRel.parent = newParent;
+
+		// Recursively duplicate children
+		const auto& srcRel = reg.get<Relationship>(source);
+		for (entt::entity child = srcRel.firstChild;
+			 child != entt::null;
+			 child = reg.get<Relationship>(child).nextSibling)
+		{
+			entt::entity childCopy = DuplicateRecursive(reg, child, copy);
+
+			// Append to copy's child list
+			auto& copyRelRef = reg.get<Relationship>(copy);
+			auto& childRel = reg.get<Relationship>(childCopy);
+
+			if (copyRelRef.firstChild == entt::null)
+			{
+				copyRelRef.firstChild = childCopy;
+			}
+			else
+			{
+				entt::entity last = copyRelRef.firstChild;
+				auto* lastRel = reg.try_get<Relationship>(last);
+				while (lastRel && lastRel->nextSibling != entt::null)
+				{
+					last = lastRel->nextSibling;
+					lastRel = reg.try_get<Relationship>(last);
+				}
+
+				if (lastRel)
+				{
+					lastRel->nextSibling = childCopy;
+				}
+
+				childRel.prevSibling = last;
+			}
+		}
+
+		return copy;
+	}
+
 }
