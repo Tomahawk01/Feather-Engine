@@ -51,7 +51,9 @@ namespace Feather {
 			}
 
 			if (removeState)
-				oldState->killState;
+			{
+				oldState->killState = true;
+			}
 
 			m_CurrentState = stateName;
 		}
