@@ -254,15 +254,16 @@ namespace Feather {
 		m_Name = name;
 	}
 
-	std::uint32_t Entity::Destroy()
+	void Entity::Destroy()
 	{
 		if (!m_Registry->IsValid(m_Entity))
 		{
 			F_ERROR("Failed to destroy entity. Entity ID '{}' is not valid", static_cast<std::uint32_t>(m_Entity));
-			return static_cast<std::uint32_t>(entt::null);
+			return;
 		}
 
-		return m_Registry->GetRegistry().destroy(m_Entity);
+		// TODO: Handle deleting children etc.
+		m_Registry->AddToPendingDestruction(m_Entity);
 	}
 
 	void Entity::CreateLuaEntityBind(sol::state& lua, Registry& registry)

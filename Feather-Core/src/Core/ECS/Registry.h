@@ -21,7 +21,10 @@ namespace Feather {
 
 		inline entt::registry& GetRegistry() { return *m_Registry; }
 		inline entt::entity CreateEntity() { return m_Registry->create(); }
-		inline void ClearRegistry() { m_Registry->clear(); }
+
+		void ClearRegistry();
+		void AddToPendingDestruction(entt::entity entity);
+		void ClearPendingEntities();
 
 		template <typename TContext>
 		TContext AddToContext(TContext context);
@@ -49,6 +52,7 @@ namespace Feather {
 	private:
 		std::shared_ptr<entt::registry> m_Registry;
 		RegistryType m_Type{ RegistryType::FeatherRegistry };
+		std::vector<entt::entity> m_EntitiesPendingDestruction;
 	};
 
 	template <typename TComponent>

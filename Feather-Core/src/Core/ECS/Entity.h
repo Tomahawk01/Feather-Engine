@@ -34,7 +34,12 @@ namespace Feather {
 
 		void ChangeName(const std::string& name);
 
-		std::uint32_t Destroy();
+		/*
+		* @brief Destroys the underlying entt::entity. This will remove the entity from the registry.
+		* USE WITH CAUTION! Please ensure that there are no other references to
+		* this Entity, trying to access an entity that does not exist can cause problems.
+		*/
+		void Destroy();
 
 		inline const std::string& GetName() const { return m_Name; }
 		inline const std::string& GetGroup() const { return m_Group; }

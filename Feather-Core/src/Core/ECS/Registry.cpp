@@ -3,12 +3,43 @@
 #include "Entity.h"
 #include "MetaUtilities.h"
 #include "ECSUtils.h"
+#include "Components\PersistentComponent.h"
 
 namespace Feather {
 
 	Registry::Registry()
 		: m_Registry{ std::make_shared<entt::registry>() }
 	{}
+
+	void Registry::ClearRegistry()
+	{
+		auto view = m_Registry->view<entt::entity>(entt::exclude<PersistentComponent>);
+		for (auto entity : view)
+		{
+			m_Registry->destroy(entity);
+		}
+	}
+
+	void Registry::AddToPendingDestruction(entt::entity entity)
+	{
+		m_EntitiesPendingDestruction.push_back(entity);
+	}
+
+	void Registry::ClearPendingEntities()
+	{
+		if (m_EntitiesPendingDestruction.empty())
+			return;
+
+		for (auto entity : m_EntitiesPendingDestruction)
+		{
+			if (m_Registry->valid(entity))
+			{
+				m_Registry->destroy(entity);
+			}
+		}
+
+		m_EntitiesPendingDestruction.clear();
+	}
 
 	void Registry::CreateLuaRegistryBind(sol::state& lua, Registry& registry)
 	{
