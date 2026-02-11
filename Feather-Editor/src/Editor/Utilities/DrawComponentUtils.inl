@@ -27,7 +27,7 @@ namespace Feather {
 	inline void DrawComponentsUtil::RegisterUIComponent()
 	{
 		using namespace entt::literals;
-		entt::meta_factory<TComponent>()
+		entt::meta<TComponent>()
 			.type(entt::type_hash<TComponent>::value())
 			.template func<&DrawEntityComponentInfo<TComponent>>("DrawEntityComponentInfo"_hs);
 	}

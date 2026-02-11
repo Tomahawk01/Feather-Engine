@@ -94,7 +94,7 @@ namespace Feather {
 	inline void Entity::RegisterMetaComponent()
 	{
 		using namespace entt::literals;
-		entt::meta_factory<TComponent>()
+		entt::meta<TComponent>()
 			.type(entt::type_hash<TComponent>::value())
 			.template func<&add_component<TComponent>>("add_component"_hs)
 			.template func<&add_component_default<TComponent>>("add_component_default"_hs)
