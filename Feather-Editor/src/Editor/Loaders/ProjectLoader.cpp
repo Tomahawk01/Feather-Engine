@@ -142,7 +142,7 @@ namespace Feather {
 			fs::path fullPath{ projectPath / subDir };
 			if (!fs::exists(fullPath, ec))
 			{
-				F_ERROR("Failed to load project: Failed to setup project folders. {}", ec.message());
+				F_ERROR("Failed to load project: Failed to setup project folders. '{}' - {}", fullPath.string(), ec.message());
 				return false;
 			}
 

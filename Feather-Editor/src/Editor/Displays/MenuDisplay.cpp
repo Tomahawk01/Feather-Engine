@@ -78,7 +78,7 @@ namespace Feather {
 				if (ImGui::MenuItem("Import Tiled Map"))
 				{
 					FileDialog fd{};
-					const auto filepath = fd.OpenFileDialog("Import Tiled Map", BASE_PATH, { "*.lua", "*.tmx" });
+					const auto filepath = fd.OpenFileDialog("Import Tiled Map", BASE_PATH, { "*.lua", "*.tmx" }, "Tiled Map Files (*.lua, *.tmx)");
 					if (!filepath.empty())
 					{
 						if (!TiledMapImporter::ImportTilemapFromTiled(&SCENE_MANAGER(), filepath))
