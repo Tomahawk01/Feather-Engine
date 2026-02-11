@@ -699,6 +699,8 @@ namespace Feather {
 
 		INPUT_MANAGER().UpdateInputs();
 		camera->Update();
+
+		registry->ClearPendingEntities();
 	}
 
 	void RuntimeApp::Render()

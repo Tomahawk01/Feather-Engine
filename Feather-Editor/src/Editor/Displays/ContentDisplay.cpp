@@ -151,17 +151,17 @@ namespace Feather {
 						if (m_ItemCut)
 						{
 							ImGui::BeginDisabled();
-							ImGui::Selectable(ICON_FA_CUT "Cut");
+							ImGui::Selectable(ICON_FA_CUT " Cut");
 							ImGui::EndDisabled();
 						}
 						else
 						{
-							if (ImGui::Selectable(ICON_FA_CUT "Cut"))
+							if (ImGui::Selectable(ICON_FA_CUT " Cut"))
 							{
 								m_FilepathToAction = path.string();
 								m_ItemCut = true;
 							}
-							if (ImGui::Selectable(ICON_FA_TRASH "Delete"))
+							if (ImGui::Selectable(ICON_FA_TRASH " Delete"))
 							{
 								if (m_Selected == id)
 								{

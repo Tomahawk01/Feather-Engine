@@ -241,7 +241,7 @@ namespace Feather {
 		if (ImGui::Button("Browse"))
 		{
 			FileDialog fd{};
-			const auto filepath = fd.OpenFileDialog("Open", "", { "*.fprj" });
+			const auto filepath = fd.OpenFileDialog("Open", BASE_PATH, { "*.fprj" }, "Feather Project (*.fprj)");
 			if (!filepath.empty())
 			{
 #ifdef _WIN32

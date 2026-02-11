@@ -33,7 +33,7 @@ namespace Feather {
 	{
 		if (HasComponent<Identification>())
 		{
-			auto id = GetComponent<Identification>();
+			const auto& id = GetComponent<Identification>();
 			m_Name = id.name;
 			m_Group = id.group;
 		}
@@ -86,6 +86,18 @@ namespace Feather {
 	bool Entity::AddChild(entt::entity child, bool isSetLocal)
 	{
 		auto& registry = m_Registry->GetRegistry();
+		if (auto* childUneditable = registry.try_get<UneditableComponent>(child))
+		{
+			F_WARN("Failed to add child. Child is an uneditable entity");
+			return false;
+		}
+
+		if (auto* parentUneditable = registry.try_get<UneditableComponent>(m_Entity))
+		{
+			F_WARN("Failed to add child. Parent is an uneditable entity");
+			return false;
+		}
+
 		auto& relations = registry.get<Relationship>(m_Entity);
 
 		Entity childEntity{ m_Registry, child };
@@ -242,15 +254,16 @@ namespace Feather {
 		m_Name = name;
 	}
 
-	std::uint32_t Entity::Destroy()
+	void Entity::Destroy()
 	{
 		if (!m_Registry->IsValid(m_Entity))
 		{
 			F_ERROR("Failed to destroy entity. Entity ID '{}' is not valid", static_cast<std::uint32_t>(m_Entity));
-			return static_cast<std::uint32_t>(entt::null);
+			return;
 		}
 
-		return m_Registry->GetRegistry().destroy(m_Entity);
+		// TODO: Handle deleting children etc.
+		m_Registry->AddToPendingDestruction(m_Entity);
 	}
 
 	void Entity::CreateLuaEntityBind(sol::state& lua, Registry& registry)

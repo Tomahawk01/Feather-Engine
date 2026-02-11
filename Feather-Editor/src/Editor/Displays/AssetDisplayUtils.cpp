@@ -17,6 +17,11 @@
 #define MUSIC_FILTERS std::vector<const char*>{ "*.mp3", "*.wav", "*.ogg" }
 #define SOUNDFX_FILTERS std::vector<const char*>{ "*.mp3", "*.wav", "*.ogg" }
 
+constexpr const char* IMAGE_DESC = "Image Files (*.png, *.bmp, *.jpg)";
+constexpr const char* FONT_DESC = "Fonts (*.ttf)";
+constexpr const char* MUSIC_DESC = "Music Files (*.mp3, *.wav, *.ogg)";
+constexpr const char* SOUNDFX_DESC = "Soundfx Files (*.mp3, *.wav, *.ogg)";
+
 static const std::map<std::string, Feather::EMapType> g_mapStringToMapTypes{
 	{ "Grid", Feather::EMapType::Grid },
 	{ "IsoGrid", Feather::EMapType::IsoGrid }
@@ -163,7 +168,7 @@ namespace {
 				if (ImGui::Button("Browse"))
 				{
 					Feather::FileDialog fd{};
-					filepath = fd.OpenFileDialog("Open", "", Feather::AssetDisplayUtils::GetAssetFileFilters(assetType));
+					filepath = fd.OpenFileDialog("Open", BASE_PATH, Feather::AssetDisplayUtils::GetAssetFileFilters(assetType), Feather::AssetDisplayUtils::GetAssetDescriptionByType(assetType));
 
 					if (!filepath.empty())
 					{
@@ -242,6 +247,19 @@ namespace Feather {
 
 		return {};
     }
+
+	const char* AssetDisplayUtils::GetAssetDescriptionByType(AssetType assetType)
+	{
+		switch (assetType)
+		{
+			case AssetType::TEXTURE: return IMAGE_DESC;
+			case AssetType::FONT: return FONT_DESC;
+			case AssetType::SOUNDFX: return SOUNDFX_DESC;
+			case AssetType::MUSIC: return MUSIC_DESC;
+		}
+
+		return "Files";
+	}
 
     std::string AssetDisplayUtils::AddAssetBasedOnType(AssetType assetType)
     {

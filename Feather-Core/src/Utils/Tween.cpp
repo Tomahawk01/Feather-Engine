@@ -116,7 +116,7 @@ namespace Feather {
 		float a = change;
 		float s = p / 4.0f;
 
-		return -(a * powf(2.0f, -10 * (current -= 1)) * sin((current * duration - s) * TwoPI / p)) + start;
+		return -(a * powf(2.0f, -10 * (current -= 1.0f)) * sinf((current * duration - s) * TwoPI / p)) + start;
 	};
 
 	// Elastic easing: [OUT] - Oscillates around the end position.
@@ -132,7 +132,7 @@ namespace Feather {
 		float a = change;
 		float s = p / 4.0f;
 
-		return -(a * powf(2.0f, -10 * current) * sin((current * duration - s) * TwoPI / p)) + change + start;
+		return -(a * powf(2.0f, -10.0f * current) * sinf((current * duration - s) * TwoPI / p)) + change + start;
 	};
 
 	// Elastic easing: [IN-OUT] - Oscillates around the end position.
@@ -149,9 +149,9 @@ namespace Feather {
 		float s = p / 4.0f;
 
 		if (current < 1.0f)
-			return -0.5f * (a * powf(2.0f, -10 * (current -= 1)) * sin((current * duration - s) * TwoPI / p)) + start;
+			return -0.5f * (a * powf(2.0f, -10.0f * (current -= 1.0f)) * sinf((current * duration - s) * TwoPI / p)) + start;
 
-		return (a * powf(2.0f, -10 * (current -= 1.0f)) * sin((current * duration - s) * TwoPI / p)) * 0.5f + change + start;
+		return (a * powf(2.0f, -10.0f * (current -= 1.0f)) * sinf((current * duration - s) * TwoPI / p)) * 0.5f + change + start;
 	};
 
 	// Exponential easing: 2^t

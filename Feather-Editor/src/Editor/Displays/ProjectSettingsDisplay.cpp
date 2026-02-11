@@ -196,8 +196,7 @@ namespace Feather {
 							F_ASSERT(optContentPath && "Content folder not set correctly in project info.");
 							FileDialog fd{};
 						
-							std::string openIcoPath = fd.OpenFileDialog(
-								"Open Icon File", optContentPath->string(), { "*.ico" }, "Ico Files");
+							std::string openIcoPath = fd.OpenFileDialog("Open Icon File", optContentPath->string(), { "*.ico" }, "Ico Files (*.ico)");
 						
 							if (!openIcoPath.empty())
 							{

@@ -13,6 +13,7 @@
 #include "TileComponent.h"
 #include "Relationship.h"
 #include "UIComponent.h"
+#include "PersistentComponent.h"
 
 namespace Feather {
 

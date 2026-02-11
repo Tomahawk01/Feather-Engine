@@ -85,7 +85,7 @@ void Feather::SpriteComponent::CreateSpriteLuaBind(sol::state& lua)
 		"startX", &SpriteComponent::start_x,
 		"startY", &SpriteComponent::start_y,
 		"layer", &SpriteComponent::layer,
-		"hidden", &SpriteComponent::isHidden,
+		"isHidden", &SpriteComponent::isHidden,
 		"uvs", &SpriteComponent::uvs,
 		"color", &SpriteComponent::color,
 		"generateUVs", [&](SpriteComponent& sprite)

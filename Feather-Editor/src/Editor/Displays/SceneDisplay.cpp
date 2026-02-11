@@ -177,6 +177,8 @@ namespace Feather {
 
 		auto& animationSystem = mainRegistry.GetAnimationSystem();
 		animationSystem.Update(runtimeRegistry, *camera);
+
+		runtimeRegistry.ClearPendingEntities();
 	}
 
 	void SceneDisplay::LoadScene()

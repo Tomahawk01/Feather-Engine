@@ -182,6 +182,9 @@ namespace Feather {
 			else
 				COMMAND_MANAGER().Undo();
 		}
+
+		// Need to clear pending entities if they have been removed/deleted
+		currentScene->GetRegistry().ClearPendingEntities();
 	}
 
 	void TilemapDisplay::RenderTilemap()
