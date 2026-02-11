@@ -49,8 +49,8 @@ function TitleState:Create(stack)
 end
 
 function TitleState:OnExit()
-	self.m_Title:kill()
-	self.m_PressEnter:kill()
+	self.m_Title:destroy()
+	self.m_PressEnter:destroy()
 end
 
 function TitleState:HandleInputs()

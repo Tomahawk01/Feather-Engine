@@ -2,8 +2,11 @@
 
 #include "Core/Scripting/ScriptingUtilities.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtc/epsilon.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace Feather {
 

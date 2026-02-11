@@ -41,7 +41,7 @@ namespace Feather {
 	inline void UserDataBinder::register_user_meta_data()
 	{
 		using namespace entt::literals;
-		entt::meta<DATA>()
+		entt::meta_factory<DATA>()
 			.type(entt::type_hash<DATA>::value())
 			.template func<&create_user_data<DATA>>("create_user_data"_hs)
 			.template func<&set_user_data<DATA>>("set_user_data"_hs)

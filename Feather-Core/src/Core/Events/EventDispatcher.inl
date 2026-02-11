@@ -68,7 +68,7 @@ namespace Feather {
 	inline void EventDispatcher::RegisterMetaEventFuncs()
 	{
 		using namespace entt::literals;
-		entt::meta<TEvent>()
+		entt::meta_factory<TEvent>()
 			.type(entt::type_hash<TEvent>::value())
 			.template func<&add_handler<TEvent>>("add_handler"_hs)
 			.template func<&remove_handler<TEvent>>("remove_handler"_hs)
