@@ -13,6 +13,8 @@
 
 #include <rapidjson/error/en.h>
 
+#include <ranges>
+
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
@@ -29,7 +31,7 @@ constexpr std::array<std::string_view, 16> CopyPackageFiles = {
 	//"vorbisfile.dll",
 	//"wavpackdll.dll",
 	"zlibd1.dll",
-	"bz2d.dll",
+	"bz2.dll",
 	"zip.dll",
 	"libzippp.dll",
 	//"mpg123.dll"
@@ -661,10 +663,162 @@ namespace Feather {
 
 	void Packager::CopyFilesToDestination()
 	{
+		fs::path currentPath = fs::current_path();
+
+		F_TRACE("Listing files in: {}\n.", currentPath.string());
+		F_TRACE("Copy Destination: {}", m_PackageData->FinalDestination);
+
+		try
+		{
+			for (const auto& entry : fs::directory_iterator(currentPath))
+			{
+				auto it = std::ranges::find(CopyPackageFiles, entry.path().filename().string());
+				if (it != CopyPackageFiles.end())
+				{
+					const auto& path = entry.path();
+					if (fs::is_regular_file(path))
+					{
+						auto dest = fs::path{ m_PackageData->FinalDestination } / path.filename();
+						fs::copy(path, dest, fs::copy_options::overwrite_existing);
+						F_TRACE("Copied file '{}' to '{}'", path.filename().string(), m_PackageData->FinalDestination);
+					}
+				}
+			}
+
+			fs::path destination{ m_PackageData->FinalDestination };
+
+			// Copy the temp luac compiled files
+			fs::path configPath = destination / "config";
+			if (!fs::exists(configPath))
+			{
+				fs::create_directory(configPath);
+			}
+
+			fs::path scriptPath{ destination / std::format("{}{}{}", "assets", PATH_SEPARATOR, "scripts") };
+			if (!fs::exists(scriptPath))
+			{
+				fs::create_directories(scriptPath);
+			}
+
+			fs::path tempDataPath{ m_PackageData->TempDataPath };
+			if (!fs::exists(tempDataPath))
+			{
+				F_ERROR("Failed to copy files from temp data path");
+			}
+			else
+			{
+				for (const auto& entry : fs::directory_iterator(tempDataPath))
+				{
+					if (entry.path().extension() == ".luac")
+					{
+						const auto& path = entry.path();
+						if (fs::is_regular_file(path))
+						{
+							// Put the config file into the config folder
+							if (path.filename().string().find("config") != std::string::npos)
+							{
+								auto dest = configPath / path.filename();
+								fs::copy(path, dest, fs::copy_options::overwrite_existing);
+								F_TRACE("Copied file '{}' to '{}'", path.filename().string(), configPath.string());
+							} // Only copy the master.luac and the config, possible asset luac files should be deleted
+							else if (path.filename().string().find("master.luac") != std::string::npos)
+							{
+								auto dest = scriptPath / path.filename();
+								fs::copy(path, dest, fs::copy_options::overwrite_existing);
+								F_TRACE("Copied file '{}' to '{}'", path.filename().string(), scriptPath.string());
+							}
+						}
+					}
+				}
+			}
+
+			// Replace the Feather-Runtime.exe name with the game name and change the icon if available
+			for (const auto& entry : fs::directory_iterator(destination))
+			{
+				if (entry.path().filename().string() == "Feather-Runtime.exe")
+				{
+					if (auto optFileIconPath = m_PackageData->ProjectInfo->GetFileIconPath())
+					{
+						IconReplacer iconReplacer{ optFileIconPath->string(), entry.path().string() };
+						if (!iconReplacer.ReplaceIcon())
+						{
+							F_ERROR("Failed to replace icon file with '{}'", optFileIconPath->string());
+						}
+					}
+
+					fs::rename(entry.path(), destination / (m_PackageData->GameConfig->gameName + ".exe"));
+					break;
+				}
+			}
+		}
+		catch (const fs::filesystem_error& err)
+		{
+			F_ERROR("Failed to copy files to destination: '{}' - {}", m_PackageData->FinalDestination, err.what());
+			return;
+		}
+
+		// Only copy the assets directly if not packaged
+		if (!m_PackageData->GameConfig->packageAssets)
+		{
+			CopyAssetsToDestination();
+		}
 	}
 
 	void Packager::CopyAssetsToDestination()
 	{
+		auto optAssetPath = m_PackageData->ProjectInfo->TryGetFolderPath(EProjectFolderType::Assets);
+		F_ASSERT(optAssetPath && "Assets folder was not set in project info.");
+
+		if (!optAssetPath)
+		{
+			F_ERROR("Faield to copy the game assets. Assets folder was not set in project info");
+			return;
+		}
+
+		if (!fs::exists(*optAssetPath))
+		{
+			F_ERROR("Failed to copy the game assets to the destination");
+			return;
+		}
+		fs::path destination{ m_PackageData->FinalDestination };
+		destination /= "assets";
+
+		const std::unordered_set<std::string> foldersToCopy = { "textures", "music", "soundfx", "fonts" };
+
+		for (fs::recursive_directory_iterator itr(*optAssetPath), end; itr != end; ++itr)
+		{
+			const auto& path = itr->path();
+			auto relativePath = fs::relative(path, *optAssetPath);
+
+			// Skip directories not in the selected set at the root level
+			if (!relativePath.has_parent_path() && itr->is_directory())
+			{
+				if (!foldersToCopy.contains(path.filename().string()))
+				{
+					itr.disable_recursion_pending();
+					continue;
+				}
+			}
+
+			fs::path destPath = destination / relativePath;
+
+			try
+			{
+				if (fs::is_directory(path))
+				{
+					fs::create_directories(destPath);
+				}
+				else if (fs::is_regular_file(path))
+				{
+					fs::create_directories(destPath.parent_path());
+					fs::copy_file(path, destPath, fs::copy_options::overwrite_existing);
+				}
+			}
+			catch (const fs::filesystem_error& err)
+			{
+				F_ERROR("Failed to copy asset file: {}", err.what());
+			}
+		}
 	}
 
 }
